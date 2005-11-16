@@ -526,6 +526,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.0  2005/11/16 02:18:15  areibens
+    revision workaround for SF cvs import not to screw up CPAN
+
     Revision 1.2  2005/11/16 01:27:50  areibens
     genesis2
 
