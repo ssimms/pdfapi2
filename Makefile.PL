@@ -68,7 +68,7 @@ sub MY::postamble{
     $y.=qq|\t\$(TAR) \$(TARFLAGS) \$(DISTNAME)-\$(VERSION)-PPM/\$(DISTNAME)-\$(VERSION).ppm.tar blib\n|;
     $y.=qq|\t\$(COMPRESS) \$(DISTNAME)-\$(VERSION)-PPM/\$(DISTNAME)-\$(VERSION).ppm.tar\n|;
     $y.=qq|\t\$(CP) \$(DISTNAME).ppd \$(DISTNAME)-\$(VERSION)-PPM/\$(DISTNAME).ppd\n|;
-    $y.=qq|\t\$(ZIP) \$(ZIPFLAGS) \$(DISTNAME)-\$(VERSION).\$(OSNAME)-\$(OSVERS).ppm.zip \$(DISTNAME)-\$(VERSION)-PPM/\$(DISTNAME)-\$(VERSION).ppm.tar.gz \$(DISTNAME)-\$(VERSION)-PPM/\$(DISTNAME).ppd\n|;
+    $y.=qq|\t\$(ZIP) \$(ZIPFLAGS) \$(DISTNAME)-\$(VERSION).ppm.zip \$(DISTNAME)-\$(VERSION)-PPM/\$(DISTNAME)-\$(VERSION).ppm.tar.gz \$(DISTNAME)-\$(VERSION)-PPM/\$(DISTNAME).ppd\n|;
     $y.=qq|\t\$(RM_RF) \$(DISTNAME)-\$(VERSION)-PPM\n|;
     $y.=qq|\n|;
     return($y);
