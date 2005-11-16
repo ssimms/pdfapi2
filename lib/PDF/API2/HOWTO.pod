@@ -1,0 +1,169 @@
+#=======================================================================
+#    ____  ____  _____              _    ____ ___   ____
+#   |  _ \|  _ \|  ___|  _   _     / \  |  _ \_ _| |___ \
+#   | |_) | | | | |_    (_) (_)   / _ \ | |_) | |    __) |
+#   |  __/| |_| |  _|    _   _   / ___ \|  __/| |   / __/
+#   |_|   |____/|_|     (_) (_) /_/   \_\_|  |___| |_____|
+#
+#   A Perl Module Chain to faciliate the Creation and Modification
+#   of High-Quality "Portable Document Format (PDF)" Files.
+#
+#   Copyright 1999-2005 Alfred Reibenschuh <areibens@cpan.org>.
+#
+#=======================================================================
+#
+#   PERMISSION TO USE, COPY, MODIFY, AND DISTRIBUTE THIS FILE FOR
+#   ANY PURPOSE WITHOUT FEE IS HEREBY GRANTED, PROVIDED THAT THE ABOVE 
+#   COPYRIGHT NOTICE AND THIS PERMISSION NOTICE APPEAR IN ALL COPIES.
+#
+#   THIS FILE IS PROVIDED ``AS IS´´ AND ANY EXPRESSED OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#   IN NO EVENT SHALL THE AUTHORS AND COPYRIGHT HOLDERS AND THEIR
+#   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+#   USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+#   OF THE USE OF THIS FILE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#   SUCH DAMAGE.
+#
+#   $Id$
+#
+#=======================================================================
+
+=head1 NAME
+
+PDF::API2::HOWTO - A basic set of guidelines to use PDF::API2.
+
+=head1 THEORY
+
+=head2 Coordinates and Units
+
+=head3 Transformations
+
+=head2 Colors
+
+=head3 R-G-B
+
+=head3 C-M-Y-K
+
+=head3 H-S-V
+
+=head1 THE BASIC DOCUMENT
+
+=head2 A Hello World.
+
+    $pdf = PDF::API2->new;
+    #
+    $fnt = $pdf->corefont('Helvetica-Bold');
+    #
+    $page = $pdf->page;
+    $page->mediabox('A4');
+    #
+    $gfx = $page->gfx;
+    $gfx->textlabel(200,700,$fnt,20,'Hello World !');
+    #
+    $pdf->saveas('/this/new/document.pdf');
+    $pdf->end;
+
+=head1 FONTS AND TYPESETTING
+
+=head1 INTEROPERABLILITIES
+
+
+=head2 Adobe Reader & Acrobat (Windows)
+
+The Acrobat/Adobe Reader will open and print files created with PDF::API2,
+but sometimes Acrobat (Full Product) will be unable to edit/update them.
+
+=head3 Adobe Reader (Linux)
+
+Since the MS Core Fonts may not be available via X11, those corefonts may
+either look/print odd or may be entirely missing (dependent on installation).
+
+
+=head2 Macromedia Freehand (Windows)
+
+Any version of Freehand is unable to open files either created or updated by PDF::API2.
+Redestilled files do work, but embedded fonts are missing, which is probably bug in
+Freehand's pdf engine.
+
+
+=head2 Ghostscript
+
+Versions before 7.03 had problems reading PDF::API2 created pdfs.
+
+PDF::API2 versions prior to 0.30_7x embedded Type1 Fonts not
+digestible by gs.
+
+=head3 Redmon / FreePDF (Windows)
+
+Since these are based on ghostscript, they can be used to redistill 
+pdfs from and to PDF::API2.
+
+
+=head2 Xpdf
+
+Xpdf and tools need to be compiled with both freetype2 and libT1.
+
+pdftops produces problematic ps-files if the pdf-file created via PDF::API2 
+contains embedded CFF (aka. Opentype) fonts.
+
+
+=head2 pdftk
+
+pdftk is a nice tool to pre/post-process pdf-files. 
+
+Version 0.91 does not support big-endian unicode metadata as
+PDF::API2 does use as default.
+
+
+=head2 Jaws PDF
+
+Some versions of this software (5D PDF Creator) create pdfs not consumable
+by PDF::API2 (if you just need a pdf-printer driver use FreePDF).
+
+
+=head2 Omnipage
+
+PDF::API2 versions prior to 0.40_17 had a bug that screws up omnipages
+unfortunate image name-keys and lzw-encoded page descriptions. 
+
+
+=head2 Open Office
+
+PDF::API2 versions prior to 0.40_xx had a bug that screws up colorspaces 
+of indexed images during import/save.
+
+=cut
+
+__END__
+
+=head1 CHANGES
+
+    $Log$
+    Revision 1.1  2005/11/16 01:19:24  areibens
+    genesis
+
+    Revision 1.6  2005/03/14 22:01:05  fredo
+    upd 2005
+
+    Revision 1.5  2004/06/07 19:44:12  fredo
+    cleaned out cr+lf for lf
+
+    Revision 1.4  2004/02/22 23:45:25  fredo
+    added pdftk tool comment
+
+    Revision 1.3  2004/02/19 00:37:55  fredo
+    added interoperability section
+
+    Revision 1.2  2004/02/13 10:56:31  fredo
+    added hello world example
+
+    Revision 1.1  2003/12/08 22:42:19  Administrator
+    rudimentary skeleton
+
+
+=cut

@@ -1,0 +1,135 @@
+$Id$
+
+     ____  ____  _____              _    ____ ___   ____
+    |  _ \|  _ \|  ___|  _   _     / \  |  _ \_ _| |___ \
+    | |_) | | | | |_    (_) (_)   / _ \ | |_) | |    __) |
+    |  __/| |_| |  _|    _   _   / ___ \|  __/| |   / __/
+    |_|   |____/|_|     (_) (_) /_/   \_\_|  |___| |_____|
+
+
+There seem to be a growing plethora of Perl modules for creating and
+manipulating PDF files.
+
+This module is 'The Next Generation' of Text::PDF::API which initially
+provided a nice API around the Text::PDF::* modules created by Martin Hosken.
+
+
+FEATURES
+
+    .  Works with more than one PDF file open at once
+
+    .  It presents a object-oriented API to the user
+
+    .  Supports:
+        the 14 base PDF Core Fonts,
+        a subset of the base PDF CJK Fonts,
+        a subset of the Microsoft Webfonts (not embedded),
+        Adobe-Type1 Fonts in both ascii and binary format (.pfa/pfb),
+        TrueType fonts (.ttf),
+        OpenType Fonts with TrueType Outlines (.ttf),
+        OpenType Fonts with Postscript Outlines (.otf)
+
+    .  Supports:
+        "Joint Photographics Experts Group" images (.jpeg),
+        "Portable Network Graphics" images (.png),
+        "Graphics Interchange Format" images (.gif),
+        "Tagged Image File Format" images (.tiff),
+        "Portable AnyMap" images (.pbm/pgm/ppm)
+
+    .  Supports:
+        "Electronic Article Numbering 13" barcodes (EAN13),
+        "Code 3 of 9" barcodes (CODE39) with/without check-number,
+        "Extended Code 3 of 9" barcodes (CODE39EXT) with/without check-number,
+        "Code 2 of 5 Interleaved" barcodes (CODE25INT),
+        "CODABAR" barcodes
+
+    .  Supports rudemantary modification of existing pdfs
+        and imports from existing pdfs
+
+
+UN-FEATURES (which will one day be fixed)
+
+    .  Documentation is currently rather sparse
+    .  This is code in development which works
+       for my apps, your milage may vary :)
+
+
+REQUIREMENTS
+
+This module set requires you to have installed the following other perl modules:
+
+    Module      Required for
+    ------------------------------------------------------
+    Compress::Zlib   - Compression of PDF object streams
+    Memoize          - part of perl 5.8+ now
+    perl >= 5.8.0
+
+NOTES
+
+For Type1 font support to work correctly you have to have a postscript font file,
+either binary (pfb) or ascii (pfa) format and an adobe font metrics file (afm).
+
+
+Thanks.
+
+
+CHANGES
+
+* between 0.3r77 and 0.40_13:
+
+    put entire source under CVS.
+
+    corrected licencing statements in all modules.
+
+    requires at least 5.8.0 (5.8.1 would be better).
+
+    rewrote entire module structure.
+
+    rewrote importpage to use xobject rather than a true
+    page, which is more reliable but discards annotations
+    and acroforms.
+
+
+    additional supported fonts:
+
+        SynFont, CJKFont
+
+    all fonts now use perl's 'Encode' modules wherever possible
+    for full unicode support
+
+
+    fixed imageformats:
+
+        TIFF, GD, PNM, PNG
+
+    additional supported imageformat:
+
+        GIF
+
+
+    supported bar-codes:
+
+        2 of 5 interleaved
+        codabar
+        UPC/Code128/EAN128
+        3 of 9/Code39
+        EAN13
+
+    barcodes are now full xobjects rather than copied
+    page descriptions, which makes them more manageable.
+
+
+    additional supported colorspaces:
+
+        Indexed/ACTFile (adobe color table)
+        Indexed/Hue (experimental; subject to change)
+        Indexed/WebColor (experimental; subject to change)
+
+    generic colorspace support has been dropped in favour
+    of the new module structs.
+
+    business-color support is disabled until rewritten.
+
+
+    xobjects are now derived from page-content, so all drawing
+    and text methods are also available there.

@@ -1,0 +1,58 @@
+#=======================================================================
+#    ____  ____  _____              _    ____ ___   ____
+#   |  _ \|  _ \|  ___|  _   _     / \  |  _ \_ _| |___ \
+#   | |_) | | | | |_    (_) (_)   / _ \ | |_) | |    __) |
+#   |  __/| |_| |  _|    _   _   / ___ \|  __/| |   / __/
+#   |_|   |____/|_|     (_) (_) /_/   \_\_|  |___| |_____|
+#
+#   $Id$
+#
+#=======================================================================
+
+FOR ``0.41 PRODUCTION RELEASE´´:
+
+    - update all cjkfonts + cmaps to latest character collection
+
+    - update all corefonts to latin1-10 glyph specs
+
+    - update ttfonts to use cjk-encoding-strategy (cjk ttf)
+        *DONE*
+
+    - fix ttfonts for cff/opentype to pdf-1.6 spec
+
+    - add cmap support cid-based cff/opentype fonts
+        *DONE*
+
+FURTHER DOWN:
+
+    - custom page labels (PDF-1.6 spec/8.3.1 Page Labels):
+        >By 'specify' do you mean the API or how to implement them? For the API, 
+        >something simple would be convenient. To implement the example in the 
+        >spec:
+        >
+        >$doc->page_labels(
+        >   # no prefix and starts at one (1).
+        >   1 => 'r',
+        >   5 => 'd',
+        >   # has prefix or starts > 1
+        >   8 => { -style => 'd',
+        >          -prefix => 'A-',
+        >          -start => 8 },
+        >);
+        
+        
+        1 0 obj << 
+            /Type /Catalog
+            /PageLabels << 
+                /Nums [ 
+                    1 << /S /r >> 
+                    5 << /S /D >> 
+                    8 << 
+                        /S /D
+                        /P (A-)
+                        /St 8
+                    >>
+                ]
+            >>
+        >>
+        endobj
