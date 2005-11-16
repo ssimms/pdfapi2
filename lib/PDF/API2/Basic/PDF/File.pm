@@ -573,14 +573,14 @@ sub readval
     my ($fh) = $self->{' INFILE'};
     my ($res, $key, $value, $k);
 
-    #$str = update($fh, $str);
-    updateRef($fh, \$str);
+    $str = update($fh, $str);
+    ## updateRef($fh, \$str);
 
     if ($str =~ m/^<</so)
     {
         $str = substr ($str, 2);
-        #$str = update($fh, $str);
-        updateRef($fh, \$str);
+        $str = update($fh, $str);
+        ## updateRef($fh, \$str);
         $res = PDFDict();
 
         while ($str !~ m/^>>/o) {
@@ -602,12 +602,12 @@ sub readval
                 ($value, $str) = $self->readval($str, %opts);
                 $res->{null} = $value;
             }
-            #$str = update($fh, $str); # thanks gareth.jones@stud.man.ac.uk
-            updateRef($fh, \$str); # thanks gareth.jones@stud.man.ac.uk
+            $str = update($fh, $str); # thanks gareth.jones@stud.man.ac.uk
+            ## updateRef($fh, \$str); # thanks gareth.jones@stud.man.ac.uk
         }
         $str =~ s/^>>//o;
-        #$str = update($fh, $str);
-        updateRef($fh, \$str);
+        $str = update($fh, $str);
+        ## updateRef($fh, \$str);
     # streams can't be followed by a lone carriage-return.
     # fredo: yes they can !!! -- use the MacOS Luke.
         if (($str =~ s/^stream(?:(?:\015\012)|\012|\015)//o)
@@ -628,8 +628,8 @@ sub readval
                 $value .= substr($str, 0, $k);
                 $res->{' stream'} = $value;
                 $res->{' nofilt'} = 1;
-                #$str = update($fh, $str, 1);  # tell update we are in-stream and only need an endstream 
-                updateRef($fh, \$str, 1);  # tell update we are in-stream and only need an endstream 
+                $str = update($fh, $str, 1);  # tell update we are in-stream and only need an endstream 
+                ## updateRef($fh, \$str, 1);  # tell update we are in-stream and only need an endstream 
                 #$str =~ s/^endstream//o; # we cannot regexpr here since we need the first endstream only
                 # so we do the following:
                 my $wh = index($str,'endstream');
@@ -674,8 +674,8 @@ sub readval
             $self->add_obj($res, $k, $value);
             $res->{' realised'} = 1;
         }
-        #$str = update($fh, $str);       # thanks to kundrat@kundrat.sk
-        updateRef($fh, \$str);       # thanks to kundrat@kundrat.sk
+        $str = update($fh, $str);       # thanks to kundrat@kundrat.sk
+        ## updateRef($fh, \$str);       # thanks to kundrat@kundrat.sk
         $str =~ s/^endobj//o;
     } elsif ($str =~ m|^/($reg_char+)|so)        # name
     {
@@ -736,15 +736,15 @@ sub readval
     elsif ($str =~ m/^\[/o)                                      # array
     {
         $str =~ s/^\[//o;
-        #$str = update($fh, $str);
-        updateRef($fh, \$str);
+        $str = update($fh, $str);
+        ## updateRef($fh, \$str);
         $res = PDFArray();
         while ($str !~ m/^\]/o)
         {
             ($value, $str) = $self->readval($str, %opts);
             $res->add_elements($value);
-            #$str = update($fh, $str);   # str might just be exhausted!
-            updateRef($fh, \$str);   # str might just be exhausted!
+            $str = update($fh, $str);   # str might just be exhausted!
+            ## updateRef($fh, \$str);   # str might just be exhausted!
         }
         $str =~ s/^\]//o;
     } 

@@ -118,6 +118,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 1.2  2005/11/16 01:27:50  areibens
+    genesis2
+
     Revision 1.1  2005/11/16 01:19:27  areibens
     genesis
 
