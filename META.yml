@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         PDF-API2
-version:      0.50
+version:      0.51
 version_from: lib/PDF/API2/Version.pm
 installdirs:  site
 requires:
