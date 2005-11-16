@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+#=======================================================================
+#    ____  ____  _____              _    ____ ___   ____
+#   |  _ \|  _ \|  ___|  _   _     / \  |  _ \_ _| |___ \
+#   | |_) | | | | |_    (_) (_)   / _ \ | |_) | |    __) |
+#   |  __/| |_| |  _|    _   _   / ___ \|  __/| |   / __/
+#   |_|   |____/|_|     (_) (_) /_/   \_\_|  |___| |_____|
+#
+#   A Perl Module Chain to faciliate the Creation and Modification
+#   of High-Quality "Portable Document Format (PDF)" Files.
+#
+#   Copyright 1999-2004 Alfred Reibenschuh <areibens@cpan.org>.
+#
+#=======================================================================
+#
+#   PERMISSION TO USE, COPY, MODIFY, AND DISTRIBUTE THIS FILE FOR
+#   ANY PURPOSE WITH OR WITHOUT FEE IS HEREBY GRANTED, PROVIDED THAT
+#   THE ABOVE COPYRIGHT NOTICE AND THIS PERMISSION NOTICE APPEAR IN ALL
+#   COPIES.
+#
+#   THIS FILE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#   IN NO EVENT SHALL THE AUTHORS AND COPYRIGHT HOLDERS AND THEIR
+#   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+#   USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+#   OF THE USE OF THIS FILE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#   SUCH DAMAGE.
+#
+#   $Id$
+#
+#=======================================================================
+
+use PDF::API2;
+use PDF::API2::Util;
+use POSIX;
+use Math::Trig;
+
+my $cx=300;
+my $cy=400;
+my $cr=15;
+my $cs=32;
+my $ang=30;
+
+$pdf=PDF::API2->new;
+$pdf->mediabox(595,842);
+
+$fnt=$pdf->corefont('Verdana-Bold');
+
+foreach my $z (0xf,0xE,0xd,0xC,0xb,0xA,0x8) {
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'HSV Colorspace',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+    foreach my $s (0 .. 0x7) {
+        my $ha=$s/2;
+        foreach my $h (0 .. (12*$ha)-1) {
+            my $t=sprintf('&%02X%02X%02X',floor(256*$h/(12*$ha)),(($s*2)<<4|($s*2)),($z<<4|$z));
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+cos(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cy+sin(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+cos(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cy-2+sin(deg2rad(360*$h/(12*$ha)))*$cs*$s,$fnt,6,$t,-color=>'#000',-hspace=>80,-center=>1);
+        }
+    }
+}
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__
+
+    

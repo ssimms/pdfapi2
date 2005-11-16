@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+#=======================================================================
+#    ____  ____  _____              _    ____ ___   ____
+#   |  _ \|  _ \|  ___|  _   _     / \  |  _ \_ _| |___ \
+#   | |_) | | | | |_    (_) (_)   / _ \ | |_) | |    __) |
+#   |  __/| |_| |  _|    _   _   / ___ \|  __/| |   / __/
+#   |_|   |____/|_|     (_) (_) /_/   \_\_|  |___| |_____|
+#
+#   A Perl Module Chain to faciliate the Creation and Modification
+#   of High-Quality "Portable Document Format (PDF)" Files.
+#
+#   Copyright 1999-2004 Alfred Reibenschuh <areibens@cpan.org>.
+#
+#=======================================================================
+#
+#   PERMISSION TO USE, COPY, MODIFY, AND DISTRIBUTE THIS FILE FOR
+#   ANY PURPOSE WITH OR WITHOUT FEE IS HEREBY GRANTED, PROVIDED THAT
+#   THE ABOVE COPYRIGHT NOTICE AND THIS PERMISSION NOTICE APPEAR IN ALL
+#   COPIES.
+#
+#   THIS FILE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#   IN NO EVENT SHALL THE AUTHORS AND COPYRIGHT HOLDERS AND THEIR
+#   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+#   USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+#   OF THE USE OF THIS FILE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#   SUCH DAMAGE.
+#
+#   $Id$
+#
+#=======================================================================
+
+use File::Basename;
+use PDF::API2;
+use PDF::API2::Util;
+use PDF::API2::Win32;
+use Unicode::UCD 'charinfo';
+use Encode qw[:all];
+use Getopt::Long;
+use Data::Dumper;
+use utf8;
+
+%wxf=PDF::API2->enumwinfonts;
+
+foreach $k (sort keys %wxf)
+{
+	print "font '$wxf{$k}' has key '$k'\n";
+}
+
+$api=PDF::API2->new();
+
+$api->mediabox(595,842);
+
+$helv=$api->corefont('Helvetica-Bold',-encode=>'latin1');
+
+
+my $sx=33;
+my $sy=45;
+my $fx=20;
+
+foreach my $k (sort keys %wxf)
+{
+    print STDERR "$wxf{$k}.\n";
+    my $xf=$api->winfont($k,-encode=>'latin1');
+
+    my $page = $api->page;
+    $page->mediabox(595,842);
+
+    my $gfx=$page->gfx;
+
+    $gfx->textlabel(50,800,$helv,20,$wxf{$k},-hspace=>90);
+    
+    foreach $x (0..15) 
+    {
+        foreach $y (0..15) 
+        {
+            $gfx->textlabel(50+($sx*$x),50+($sy*$y),$xf,$fx,pack('C',$y*16+$x));
+            $gfx->textlabel(50+($sx*$x),50+($sy*$y)-6,$helv,6,nameByUni($y*16+$x),-color=>'#a00000',-hspace=>80,-rotate=>-15);
+        }
+    }
+}
+
+$api->saveas("$0.pdf");
+$api->end;
+
+
+#print Dumper($PDF::API2::wf);
+
+
+__END__

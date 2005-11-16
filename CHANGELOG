@@ -1,0 +1,2950 @@
+2005-11-02 19:21  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added kerning
+	  lookup strategy
+
+2005-11-02 19:18  fredo
+
+	* lib/PDF/API2/Page.pm: added get_(crop/bleed/trim/art)box methods
+
+2005-10-22 21:56  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added mor
+	  agressive kerning strategy
+
+2005-10-21 23:42  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: speedup reading large
+	  dictionaries/structs
+
+2005-10-21 23:42  fredo
+
+	* lib/PDF/API2/IOString.pm: fixed tell tier
+
+2005-10-21 21:52  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fixed readxrtr to be more strict
+	  to the latest pdf-spec
+
+2005-10-21 21:51  fredo
+
+	* lib/PDF/API2.pm: fixed proc_pages
+
+2005-10-20 23:06  fredo
+
+	* lib/PDF/API2.pm: documented '-dokern' option for ttfonts
+
+2005-10-20 23:04  fredo
+
+	* lib/PDF/API2/Resource/: CIDFont/TrueType.pm, CIDFont.pm,
+	  CIDFont/TrueType/FontFile.pm: added handling of optional kerning
+
+2005-10-20 01:05  fredo
+
+	* lib/PDF/API2/Resource/Font/Postscript.pm: silenced 'cannot parse'
+	  since it is usually no error
+
+2005-10-19 23:23  fredo
+
+	* lib/PDF/API2.pm: documented '-dokern' option for core- and
+	  psfonts
+
+2005-10-19 21:12  fredo
+
+	* lib/PDF/API2/Resource/Font/: Postscript.pm, CoreFont.pm: added
+	  handling of optional kerning
+
+2005-10-19 21:08  fredo
+
+	* lib/PDF/API2/Resource/UniFont.pm: added extended typographic text
+	  handling call
+
+2005-10-19 21:07  fredo
+
+	* lib/PDF/API2/Resource/Font.pm: added handling of composites in
+	  automap
+
+2005-10-19 21:06  fredo
+
+	* lib/PDF/API2/Resource/BaseFont.pm: added handling of kerning
+
+2005-10-19 21:05  fredo
+
+	* lib/PDF/API2/IOString.pm: ...
+
+2005-10-19 21:04  fredo
+
+	* lib/PDF/API2/Content.pm: added extended typographic text handling
+	  call
+
+2005-10-02 01:38  fredo
+
+	* lib/PDF/API2/Resource/Font/Postscript.pm: added kerning+composite
+	  parsing added nonembedding check
+
+2005-10-02 00:41  fredo
+
+	* lib/PDF/API2/Resource/Font/: BdFont.pm, CoreFont.pm,
+	  Postscript.pm: fixed font-naming race condition for multiple
+	  document updates
+
+2005-10-02 00:30  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType.pm: fixed font-naming race
+	  condition for multiple document updates
+
+2005-10-02 00:10  fredo
+
+	* lib/PDF/API2/Content.pm: added more docs for textlabel
+
+2005-09-28 19:02  fredo
+
+	* lib/PDF/API2/Resource/XObject/Image/JPEG.pm: fixed iostring
+	  handling
+
+2005-09-28 19:00  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont/courier.pm: added composites
+
+2005-09-28 19:00  fredo
+
+	* lib/PDF/API2/Resource/uniglyph.txt: added combiners
+
+2005-09-26 22:07  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont.pm: added fontmetric stub
+
+2005-09-26 22:06  fredo
+
+	* lib/PDF/API2/Resource/Font.pm: removed composite glyphs from
+	  automap
+
+2005-09-26 21:28  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont/courier.pm: no message
+
+2005-09-12 18:56  fredo
+
+	* lib/PDF/API2/Resource/Font/: CoreFont.pm, CoreFont/bankgothic.pm,
+	  CoreFont/courier.pm, CoreFont/courierbold.pm,
+	  CoreFont/courierboldoblique.pm, CoreFont/courieroblique.pm,
+	  CoreFont/georgia.pm, CoreFont/georgiabold.pm,
+	  CoreFont/georgiabolditalic.pm, CoreFont/georgiaitalic.pm,
+	  CoreFont/helvetica.pm, CoreFont/helveticabold.pm,
+	  CoreFont/helveticaboldoblique.pm, CoreFont/helveticaoblique.pm,
+	  CoreFont/symbol.pm, CoreFont/timesbold.pm,
+	  CoreFont/timesbolditalic.pm, CoreFont/timesitalic.pm,
+	  CoreFont/timesroman.pm, CoreFont/trebuchet.pm,
+	  CoreFont/trebuchetbold.pm, CoreFont/trebuchetbolditalic.pm,
+	  CoreFont/trebuchetitalic.pm, CoreFont/verdana.pm,
+	  CoreFont/verdanabold.pm, CoreFont/verdanabolditalic.pm,
+	  CoreFont/verdanaitalic.pm, CoreFont/webdings.pm,
+	  CoreFont/wingdings.pm, CoreFont/zapfdingbats.pm: applied mod_perl
+	  patch by Paul Schilling <pfschill@sbcglobal.net>
+
+2005-09-12 18:55  fredo
+
+	* MANIFEST: added META.yml
+
+2005-09-12 18:55  fredo
+
+	* examples/: 020_corefonts, 022_truefonts, 023_cjkfonts,
+	  025_unifonts, 027_winfont: various updates
+
+2005-09-12 18:53  fredo
+
+	* lib/PDF/: API2/Resource/CIDFont/TrueType.pm,
+	  API2/Basic/TTF/Cmap.pm, API2.pm: added -isocmap option
+
+2005-09-12 18:52  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added
+	  -isocmap option; fixed cmap handling for fallback entries
+
+2005-08-07 04:14  fredo
+
+	* Makefile.PL: upd
+
+2005-08-06 22:59  fredo
+
+	* lib/PDF/API2/Page.pm: fixed anotation pdf-array again for other
+	  braindead softs
+
+2005-06-17 21:43  fredo
+
+	* lib/PDF/: API2.pm, API2/Annotation.pm, API2/Content.pm,
+	  API2/IOString.pm, API2/Lite.pm, API2/Matrix.pm,
+	  API2/NamedDestination.pm, API2/Outline.pm, API2/Outlines.pm,
+	  API2/Page.pm, API2/Resource.pm, API2/Shape.pm, API2/UniWrap.pm,
+	  API2/Util.pm, API2/Content/Text.pm, API2/Resource/BaseFont.pm,
+	  API2/Resource/CIDFont.pm, API2/Resource/ColorSpace.pm,
+	  API2/Resource/ExtGState.pm, API2/Resource/Font.pm,
+	  API2/Resource/Pattern.pm, API2/Resource/Shading.pm,
+	  API2/Resource/UniFont.pm, API2/Resource/XObject.pm,
+	  API2/Resource/CIDFont/CJKFont.pm,
+	  API2/Resource/CIDFont/TrueType.pm,
+	  API2/Resource/CIDFont/TrueType/FontFile.pm,
+	  API2/Resource/ColorSpace/DeviceN.pm,
+	  API2/Resource/ColorSpace/Indexed.pm,
+	  API2/Resource/ColorSpace/Separation.pm,
+	  API2/Resource/ColorSpace/Indexed/ACTFile.pm,
+	  API2/Resource/ColorSpace/Indexed/Hue.pm,
+	  API2/Resource/ColorSpace/Indexed/WebColor.pm,
+	  API2/Resource/Font/BdFont.pm, API2/Resource/Font/CoreFont.pm,
+	  API2/Resource/Font/Postscript.pm, API2/Resource/Font/SynFont.pm,
+	  API2/Resource/Shading/axial.pm, API2/Resource/XObject/Form.pm,
+	  API2/Resource/XObject/Image.pm,
+	  API2/Resource/XObject/Form/BarCode.pm,
+	  API2/Resource/XObject/Form/Hybrid.pm,
+	  API2/Resource/XObject/Form/BarCode/codabar.pm,
+	  API2/Resource/XObject/Form/BarCode/code128.pm,
+	  API2/Resource/XObject/Form/BarCode/code3of9.pm,
+	  API2/Resource/XObject/Form/BarCode/ean13.pm,
+	  API2/Resource/XObject/Form/BarCode/int2of5.pm,
+	  API2/Resource/XObject/Image/GD.pm,
+	  API2/Resource/XObject/Image/GIF.pm,
+	  API2/Resource/XObject/Image/JPEG.pm,
+	  API2/Resource/XObject/Image/PNG.pm,
+	  API2/Resource/XObject/Image/PNM.pm,
+	  API2/Resource/XObject/Image/TIFF.pm: fixed CPAN modulefile
+	  versioning (again)
+
+2005-06-17 20:53  fredo
+
+	* lib/PDF/: API2.pm, API2/Annotation.pm, API2/Content.pm,
+	  API2/IOString.pm, API2/Lite.pm, API2/Matrix.pm,
+	  API2/NamedDestination.pm, API2/Outline.pm, API2/Outlines.pm,
+	  API2/Page.pm, API2/Resource.pm, API2/Shape.pm, API2/UniWrap.pm,
+	  API2/Util.pm, API2/Version.pm, API2/Content/Text.pm,
+	  API2/Resource/BaseFont.pm, API2/Resource/CIDFont.pm,
+	  API2/Resource/ColorSpace.pm, API2/Resource/ExtGState.pm,
+	  API2/Resource/Font.pm, API2/Resource/Pattern.pm,
+	  API2/Resource/Shading.pm, API2/Resource/UniFont.pm,
+	  API2/Resource/XObject.pm, API2/Resource/CIDFont/CJKFont.pm,
+	  API2/Resource/CIDFont/TrueType.pm,
+	  API2/Resource/CIDFont/TrueType/FontFile.pm,
+	  API2/Resource/ColorSpace/DeviceN.pm,
+	  API2/Resource/ColorSpace/Indexed.pm,
+	  API2/Resource/ColorSpace/Separation.pm,
+	  API2/Resource/ColorSpace/Indexed/ACTFile.pm,
+	  API2/Resource/ColorSpace/Indexed/Hue.pm,
+	  API2/Resource/ColorSpace/Indexed/WebColor.pm,
+	  API2/Resource/Font/BdFont.pm, API2/Resource/Font/CoreFont.pm,
+	  API2/Resource/Font/Postscript.pm, API2/Resource/Font/SynFont.pm,
+	  API2/Resource/Shading/axial.pm, API2/Resource/XObject/Form.pm,
+	  API2/Resource/XObject/Image.pm,
+	  API2/Resource/XObject/Form/BarCode.pm,
+	  API2/Resource/XObject/Form/Hybrid.pm,
+	  API2/Resource/XObject/Form/BarCode/codabar.pm,
+	  API2/Resource/XObject/Form/BarCode/code128.pm,
+	  API2/Resource/XObject/Form/BarCode/code3of9.pm,
+	  API2/Resource/XObject/Form/BarCode/ean13.pm,
+	  API2/Resource/XObject/Form/BarCode/int2of5.pm,
+	  API2/Resource/XObject/Image/GD.pm,
+	  API2/Resource/XObject/Image/GIF.pm,
+	  API2/Resource/XObject/Image/JPEG.pm,
+	  API2/Resource/XObject/Image/PNG.pm,
+	  API2/Resource/XObject/Image/PNM.pm,
+	  API2/Resource/XObject/Image/TIFF.pm: fixed CPAN modulefile
+	  versioning (dislikes cvs)
+
+2005-06-17 20:37  fredo
+
+	* lib/PDF/API2/Basic/PDF/Pages.pm: added find_prop undef fix
+
+2005-06-14 14:55  fredo
+
+	* lib/PDF/API2/Annotation.pm: fixed typo for text annotation
+	  leaving it empty
+
+2005-06-14 14:54  fredo
+
+	* lib/PDF/API2/Page.pm: fix for existing annotation dictionary (ex.
+	  ScanSoft PDF)
+
+2005-06-10 18:12  fredo
+
+	* lib/PDF/API2.pm: documentation update
+
+2005-06-08 01:21  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont/: bankgothic.pm, courier.pm,
+	  courierbold.pm, courierboldoblique.pm, courieroblique.pm,
+	  georgia.pm, georgiabold.pm, georgiabolditalic.pm,
+	  georgiaitalic.pm, helvetica.pm, helveticabold.pm,
+	  helveticaboldoblique.pm, helveticaoblique.pm, timesbold.pm,
+	  timesbolditalic.pm, timesitalic.pm, timesroman.pm, trebuchet.pm,
+	  trebuchetbold.pm, trebuchetbolditalic.pm, trebuchetitalic.pm,
+	  verdana.pm, verdanabold.pm, verdanabolditalic.pm,
+	  verdanaitalic.pm, wingdings.pm: fontkey correction
+
+2005-06-02 14:59  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: relaxed pdf-header detection
+
+2005-05-29 11:48  fredo
+
+	* lib/PDF/API2/Content.pm: added conditional textstate2 method
+
+2005-05-29 11:47  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont.pm: cosmetic changes
+
+2005-05-28 18:13  fredo
+
+	* MANIFEST: added unicolor/unipaper.txt
+
+2005-05-28 17:58  fredo
+
+	* lib/PDF/API2/Resource/: unicolor.txt, unipaper.txt: genesis
+
+2005-05-28 17:58  fredo
+
+	* lib/PDF/API2/Util.pm: added xmldecl for markup code moved
+	  colors/pagesizes to separate files
+
+2005-03-25 14:30  fredo
+
+	* Makefile.PL: changed release level versioning vs. maintainance
+	  level
+
+2005-03-25 14:19  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fixed string exhaustion in array
+	  reading
+
+2005-03-23 17:42  fredo
+
+	* lib/PDF/API2.pm: fixed typo in infoMetaAttributes
+
+2005-03-21 23:36  fredo
+
+	* lib/PDF/API2.pm: fix for landscape imports
+
+2005-03-21 18:31  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType.pm: cleanup
+
+2005-03-21 00:24  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added
+	  workaround for broken truetype naming-tables
+
+2005-03-16 20:40  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/: CJKFont/adobesongstdlightacro.pm,
+	  CMap/simplified.pm: updated to latest spec (gb1-4)
+
+2005-03-16 19:27  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont/adobemingstdlightacro.pm:
+	  updated to latest spec
+
+2005-03-16 19:27  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/traditional.pm: added ccs
+
+2005-03-16 18:59  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/traditional.pm: updated to
+	  adobe cmap cns-1-4
+
+2005-03-16 03:27  fredo
+
+	* CONTACT: updated website and twiki
+
+2005-03-15 18:31  fredo
+
+	* lib/PDF/API2.pm: corrected utf8 handling in info tags
+
+2005-03-15 18:29  fredo
+
+	* Makefile.PL: fixed ppm creation
+
+2005-03-15 03:20  fredo
+
+	* lib/PDF/API2/Content.pm: added metadata stubs
+
+2005-03-15 01:59  fredo
+
+	* lib/PDF/API2/Util.pm: cleanup
+
+2005-03-15 00:53  fredo
+
+	* lib/PDF/API2.pm: added xmpMetadata method to get/set XMP document
+	  data
+
+2005-03-15 00:51  fredo
+
+	* lib/PDF/API2/Util.pm: beatification
+
+2005-03-14 23:05  fredo
+
+	* release.sh: genesis
+
+2005-03-14 23:01  fredo
+
+	* Makefile.PL, lib/PDF/API2.pm, lib/PDF/API2/Annotation.pm,
+	  lib/PDF/API2/Content.pm, lib/PDF/API2/HOWTO.pod,
+	  lib/PDF/API2/IOString.pm, lib/PDF/API2/Lite.pm,
+	  lib/PDF/API2/NamedDestination.pm, lib/PDF/API2/Outline.pm,
+	  lib/PDF/API2/Outlines.pm, lib/PDF/API2/Page.pm,
+	  lib/PDF/API2/Resource.pm, lib/PDF/API2/Shape.pm,
+	  lib/PDF/API2/UniWrap.pm, lib/PDF/API2/Util.pm,
+	  lib/PDF/API2/Version.pm, lib/PDF/API2/Win32.pm,
+	  lib/PDF/API2/Basic/PDF/Literal.pm, lib/PDF/API2/Content/Text.pm,
+	  lib/PDF/API2/Content/symbols.pm,
+	  lib/PDF/API2/Content/Text/Markup.pm,
+	  lib/PDF/API2/Resource/BaseFont.pm,
+	  lib/PDF/API2/Resource/CIDFont.pm,
+	  lib/PDF/API2/Resource/ColorSpace.pm,
+	  lib/PDF/API2/Resource/ExtGState.pm,
+	  lib/PDF/API2/Resource/Font.pm, lib/PDF/API2/Resource/Pattern.pm,
+	  lib/PDF/API2/Resource/Shading.pm,
+	  lib/PDF/API2/Resource/UniFont.pm,
+	  lib/PDF/API2/Resource/XObject.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont.pm,
+	  lib/PDF/API2/Resource/CIDFont/TrueType.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/kozgopromediumacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/kozminproregularacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/japanese.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/korean.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/simplified.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/traditional.pm,
+	  lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm,
+	  lib/PDF/API2/Resource/ColorSpace/DeviceN.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Separation.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/ACTFile.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/Hue.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/WebColor.pm,
+	  lib/PDF/API2/Resource/Font/BdFont.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont.pm,
+	  lib/PDF/API2/Resource/Font/Postscript.pm,
+	  lib/PDF/API2/Resource/Font/SynFont.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/bankgothic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courier.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courierbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courierboldoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courieroblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgia.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiabolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiaitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helvetica.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticaboldoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticaoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/symbol.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesbolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesroman.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchet.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetbolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdana.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanabolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanaitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/webdings.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/wingdings.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/zapfdingbats.pm,
+	  lib/PDF/API2/Resource/Shading/axial.pm,
+	  lib/PDF/API2/Resource/XObject/Form.pm,
+	  lib/PDF/API2/Resource/XObject/Image.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode.pm,
+	  lib/PDF/API2/Resource/XObject/Form/Hybrid.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/codabar.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/code128.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/code3of9.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/ean13.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/int2of5.pm,
+	  lib/PDF/API2/Resource/XObject/Image/GD.pm,
+	  lib/PDF/API2/Resource/XObject/Image/GIF.pm,
+	  lib/PDF/API2/Resource/XObject/Image/JPEG.pm,
+	  lib/PDF/API2/Resource/XObject/Image/PNG.pm,
+	  lib/PDF/API2/Resource/XObject/Image/PNM.pm,
+	  lib/PDF/API2/Resource/XObject/Image/TIFF.pm,
+	  lib/PDF/API2/Shape/line.pm, lib/PDF/API2/Shape/polygon.pm,
+	  lib/PDF/API2/Shape/polyline.pm, lib/PDF/API2/Shape/sline.pm: upd
+	  2005
+
+2005-03-14 22:49  fredo
+
+	* LICENSE: upd 2005
+
+2005-03-14 22:48  fredo
+
+	* Makefile.PL: merged manify patch by gunnar wolf
+
+2005-03-14 21:26  fredo
+
+	* lib/PDF/API2/Content.pm: added 'auto' value for -underline
+	  parameter in text fixed text line construction to to work under
+	  width==0 conditions
+
+2005-02-28 19:00  fredo
+
+	* lib/PDF/API2/Lite.pm: removed color method since businesscolor is
+	  not available anymore in PDF::API2
+
+2005-02-25 19:07  fredo
+
+	* lib/PDF/API2.pm: no message
+
+2005-02-24 00:11  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: workaround for
+	  illustrator/enfocus bug to import objects
+
+2005-02-22 23:59  fredo
+
+	* lib/PDF/API2/Content.pm: fixed infinite loop in paragraph if
+	  words longer than a paragraph are present.
+
+2005-02-21 23:15  fredo
+
+	* lib/PDF/API2/Basic/: PDF/Bool.pm, PDF/Filter.pm, TTF/Bsln.pm,
+	  TTF/Fdsc.pm, TTF/GDEF.pm, TTF/Hhea.pm, TTF/PCLT.pm,
+	  TTF/Ttopen.pm, TTF/Vhea.pm, TTF/Kern/CompactClassArray.pm:
+	  correcting NAME section, thanks to SAPER <SAPER@cpan.org>
+
+2005-02-17 15:50  fredo
+
+	* Makefile: some
+
+2005-02-17 08:03  fredo
+
+	* lib/PDF/API2.pm: added 'pageencaps' default option to fix unusual
+	  styled content streams
+
+2005-02-14 21:09  fredo
+
+	* lib/PDF/API2.pm: fixed an openpage recompression bug / thanks to
+	  steve_wu@iinet.net.au
+
+2005-02-11 20:11  fredo
+
+	* lib/PDF/API2/IOString.pm: added binmode hack
+
+2005-02-11 19:48  fredo
+
+	* lib/PDF/API2/Util.pm: added getPaperSizes method to help fix
+	  PDF::Report.
+
+2005-02-07 20:34  fredo
+
+	* Makefile.PL: added ppmdist target for our windows friends
+
+2005-02-07 20:31  fredo
+
+	* lib/PDF/API2/Content.pm: fixed reset of textlinematrix on
+	  textmatrix set/resets
+
+2005-01-24 12:46  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fixed rt.cpan.org: Ticket #11137
+	  Error in File.pm & FileAPI.pm
+
+2005-01-21 11:19  fredo
+
+	* lib/PDF/API2/Content.pm: added spline operator
+
+2005-01-21 11:04  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont.pm: rewrite fontproxy comment
+
+2005-01-21 11:03  fredo
+
+	* lib/PDF/API2/Resource/BaseFont.pm: added object saver for cmap
+
+2005-01-21 11:01  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType.pm: added -nosubset option
+
+2005-01-21 11:00  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added
+	  handling of nosubset option
+
+2005-01-21 02:27  fredo
+
+	* lib/PDF/API2/Basic/PDF/Dict.pm: added object saver for prepared
+	  stream+filter
+
+2005-01-20 20:58  fredo
+
+	* lib/PDF/API2/Resource/XObject/Image/TIFF.pm: cleaned up handler
+	  and ccitt mode
+
+2005-01-03 06:01  fredo
+
+	* examples/040_named_dest: genesis
+
+2005-01-03 06:00  fredo
+
+	* lib/PDF/API2/Annotation.pm: changed default behavior of border
+
+2005-01-03 05:17  fredo
+
+	* lib/PDF/API2/NamedDestination.pm: fixed dict creation
+
+2005-01-03 05:17  fredo
+
+	* lib/PDF/API2/Annotation.pm: fixed link bug
+
+2005-01-03 04:47  fredo
+
+	* lib/PDF/API2.pm: fixed use named destination
+
+2005-01-03 04:46  fredo
+
+	* lib/PDF/API2.pm: added named destination support
+
+2005-01-03 04:34  fredo
+
+	* MANIFEST: added NamedDestination.pm
+
+2005-01-03 04:31  fredo
+
+	* lib/PDF/API2/NamedDestination.pm: genesis
+
+2005-01-03 04:29  fredo
+
+	* lib/PDF/API2/Annotation.pm: removed code duplication
+
+2005-01-03 02:16  fredo
+
+	* lib/PDF/API2/Content.pm: fixed textpos tracking in nl method
+
+2005-01-03 01:33  fredo
+
+	* lib/PDF/API2/Outline.pm: added named destination support
+
+2005-01-03 01:30  fredo
+
+	* lib/PDF/API2/Annotation.pm: added named destination support
+
+2004-12-31 04:59  fredo
+
+	* lib/PDF/API2/Content.pm: fixed paragraph and text_fill_* methods
+	  (thanks to Shawn Corey <shawn.corey@sympatico.ca>)
+
+2004-12-31 04:12  fredo
+
+	* lib/PDF/: API2.pm, API2/Util.pm: no message
+
+2004-12-31 04:08  fredo
+
+	* MANIFEST: added new examples
+
+2004-12-31 04:04  fredo
+
+	* examples/: 024_bmpfonts, 025_unifonts, 026_unifont2, 027_winfont,
+	  020_textrise, 020_textunderline: genesis
+
+2004-12-31 03:58  fredo
+
+	* examples/: 021_synfonts, 022_truefonts, 023_cjkfonts: no message
+
+2004-12-31 03:53  fredo
+
+	* lib/PDF/API2/Content.pm: minor code corrections
+
+2004-12-31 03:06  fredo
+
+	* lib/PDF/API2/Content.pm: fixed textpos calculation, added
+	  underline capability (thanks to Shawn Corey
+	  <shawn.corey@sympatico.ca>)
+
+2004-12-29 23:01  fredo
+
+	* lib/PDF/API2/Content.pm: advancewidth now can take a virtual
+	  textstate
+
+2004-12-29 02:48  fredo
+
+	* lib/PDF/API2/Content.pm: fixed _font method
+
+2004-12-29 02:45  fredo
+
+	* lib/PDF/API2/Win32.pm: fixed no warn for recursion
+
+2004-12-29 02:16  fredo
+
+	* Makefile.PL: added version pod
+
+2004-12-29 02:14  fredo
+
+	* lib/PDF/API2/Content.pm: added virtual attribute support
+
+2004-12-29 02:13  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: documented -caps option
+
+2004-12-29 02:12  fredo
+
+	* lib/PDF/API2/: Resource/CIDFont/TrueType/FontFile.pm, Util.pm:
+	  fixed no warn for recursion
+
+2004-12-29 01:53  fredo
+
+	* lib/PDF/API2/Resource/uniglyph.txt: fixed .notdef glyph
+
+2004-12-28 18:23  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont/: timesroman.pm,
+	  zapfdingbats.pm: updated to new adobe afm
+
+2004-12-28 18:23  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont/bankgothic.pm: added new
+	  'Euro' glyph
+
+2004-12-20 13:11  fredo
+
+	* lib/PDF/API2/Content.pm: added fontset method to not set via 'Tf'
+
+2004-12-17 19:35  fredo
+
+	* lib/PDF/API2/Resource/uniglyph.txt: added adobe combining
+	  characters
+
+2004-12-16 02:09  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont/: courier.pm,
+	  zapfdingbats.pm: updated to new adobe afm
+
+2004-12-16 01:43  fredo
+
+	* examples/020_corefonts: added full list of fonts and encoding
+	  latin1-10
+
+2004-12-16 01:30  fredo
+
+	* lib/PDF/: API2.pm, API2/Annotation.pm, API2/Content.pm,
+	  API2/IOString.pm, API2/Lite.pm, API2/Matrix.pm, API2/Outline.pm,
+	  API2/Outlines.pm, API2/Page.pm, API2/Resource.pm, API2/Shape.pm,
+	  API2/UniWrap.pm, API2/Util.pm, API2/Version.pm, API2/Win32.pm,
+	  API2/Basic/PDF/Array.pm, API2/Basic/PDF/Bool.pm,
+	  API2/Basic/PDF/Dict.pm, API2/Basic/PDF/File.pm,
+	  API2/Basic/PDF/Filter.pm, API2/Basic/PDF/Literal.pm,
+	  API2/Basic/PDF/Name.pm, API2/Basic/PDF/Null.pm,
+	  API2/Basic/PDF/Number.pm, API2/Basic/PDF/Objind.pm,
+	  API2/Basic/PDF/Page.pm, API2/Basic/PDF/Pages.pm,
+	  API2/Basic/PDF/String.pm, API2/Basic/PDF/Utils.pm,
+	  API2/Content/Text.pm, API2/Resource/BaseFont.pm,
+	  API2/Resource/CIDFont.pm, API2/Resource/ColorSpace.pm,
+	  API2/Resource/ExtGState.pm, API2/Resource/Font.pm,
+	  API2/Resource/Pattern.pm, API2/Resource/Shading.pm,
+	  API2/Resource/UniFont.pm, API2/Resource/XObject.pm,
+	  API2/Resource/CIDFont/CJKFont.pm,
+	  API2/Resource/CIDFont/TrueType.pm,
+	  API2/Resource/CIDFont/TrueType/FontFile.pm,
+	  API2/Resource/ColorSpace/DeviceN.pm,
+	  API2/Resource/ColorSpace/Indexed.pm,
+	  API2/Resource/ColorSpace/Separation.pm,
+	  API2/Resource/ColorSpace/Indexed/ACTFile.pm,
+	  API2/Resource/ColorSpace/Indexed/Hue.pm,
+	  API2/Resource/ColorSpace/Indexed/WebColor.pm,
+	  API2/Resource/Font/BdFont.pm, API2/Resource/Font/CoreFont.pm,
+	  API2/Resource/Font/Postscript.pm, API2/Resource/Font/SynFont.pm,
+	  API2/Resource/XObject/Form.pm, API2/Resource/XObject/Image.pm,
+	  API2/Resource/XObject/Form/BarCode.pm,
+	  API2/Resource/XObject/Form/Hybrid.pm,
+	  API2/Resource/XObject/Form/BarCode/codabar.pm,
+	  API2/Resource/XObject/Form/BarCode/code128.pm,
+	  API2/Resource/XObject/Form/BarCode/code3of9.pm,
+	  API2/Resource/XObject/Form/BarCode/ean13.pm,
+	  API2/Resource/XObject/Form/BarCode/int2of5.pm,
+	  API2/Resource/XObject/Image/GD.pm,
+	  API2/Resource/XObject/Image/GIF.pm,
+	  API2/Resource/XObject/Image/JPEG.pm,
+	  API2/Resource/XObject/Image/PNG.pm,
+	  API2/Resource/XObject/Image/PNM.pm,
+	  API2/Resource/XObject/Image/TIFF.pm: added no warn for recursion
+
+2004-12-15 17:44  fredo
+
+	* lib/PDF/API2/Content.pm: added condition to apply font (Tf) only
+	  when needed
+
+2004-11-29 16:57  fredo
+
+	* lib/PDF/API2/Resource/UniFont.pm: added docs for unifont
+
+2004-11-29 16:19  fredo
+
+	* lib/PDF/API2.pm: added docs for bdfont, synfont and unifont
+
+2004-11-29 11:00  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: added charspacer docs
+
+2004-11-26 16:14  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: fixed docs
+
+2004-11-26 16:10  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: added spacer mod option
+
+2004-11-26 02:25  fredo
+
+	* lib/PDF/API2/Resource/Font.pm: added unicode block mapping
+
+2004-11-26 02:24  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont/webdings.pm: fixed unicode
+	  mapping
+
+2004-11-26 00:51  fredo
+
+	* lib/PDF/API2/Resource/UniFont.pm: added -encode option and
+	  handling
+
+2004-11-26 00:50  fredo
+
+	* lib/PDF/API2/Resource/Font.pm: fixed unicode maps for unmapped
+	  corefonts
+
+2004-11-25 21:53  fredo
+
+	* lib/PDF/API2/Content.pm: fixed unifont registration
+
+2004-11-25 20:56  fredo
+
+	* lib/PDF/API2/UniWrap.pm: genesis
+
+2004-11-25 20:55  fredo
+
+	* MANIFEST: added uniwrap
+
+2004-11-25 16:30  fredo
+
+	* lib/PDF/API2/Basic/: PDF/File.pm, PDF/Filter.pm, PDF/Objind.pm,
+	  TTF/Coverage.pm, TTF/Font.pm, TTF/Table.pm: fixed explicit
+	  release on scalar
+
+2004-11-25 16:07  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont.pm: fixed prototype warning
+
+2004-11-24 21:13  fredo
+
+	* MANIFEST: added unifont
+
+2004-11-24 21:12  fredo
+
+	* TODO: update
+
+2004-11-24 21:11  fredo
+
+	* lib/PDF/API2/Resource/UniFont.pm: genesis
+
+2004-11-24 21:10  fredo
+
+	* lib/PDF/API2/Resource/: BaseFont.pm, CIDFont.pm, Font.pm: added
+	  virtual font handling
+
+2004-11-24 21:10  fredo
+
+	* lib/PDF/API2/Content.pm: added virtual font handling, fixed var
+	  shadow bug
+
+2004-11-24 21:09  fredo
+
+	* lib/PDF/API2.pm: added unifont
+
+2004-11-22 22:07  fredo
+
+	* lib/PDF/API2/Resource/: CIDFont.pm, CIDFont/CJKFont.pm,
+	  CIDFont/TrueType.pm, CIDFont/TrueType/FontFile.pm: fixed
+	  multibyte-encoding support to work consistently acress
+	  cjk/ttf/otf
+
+2004-11-22 17:07  fredo
+
+	* MANIFEST: added TODO + uniglyph.txt
+
+2004-11-22 17:07  fredo
+
+	* TODO: genesis
+
+2004-11-22 03:34  fredo
+
+	* lib/PDF/API2/Util.pm: moved unicode+glyphs to better maintainable
+	  uniglyph.txt
+
+2004-11-22 03:31  fredo
+
+	* lib/PDF/API2/Basic/PDF/Utils.pm: added hexstring shortcut
+
+2004-11-22 03:31  fredo
+
+	* lib/PDF/API2/Basic/PDF/String.pm: speed fix
+
+2004-11-22 03:25  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added
+	  advanced attributes
+
+2004-11-22 03:08  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont.pm: aaa
+
+2004-11-22 03:05  fredo
+
+	* lib/PDF/API2/Resource/BaseFont.pm: added pdf-1.5 font param specs
+
+2004-11-22 03:04  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont.pm: added missing
+	  substitutes
+
+2004-11-22 03:02  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont/: kozminproregularacro.pm,
+	  kozgopromediumacro.pm: deleted obsolete character widths
+
+2004-11-22 02:05  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/korean.pm: updated to korea1-2
+	  spec
+
+2004-11-22 02:04  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont/:
+	  adobemyungjostdmediumacro.pm, kozminproregularacro.pm: added
+	  advanced attributes
+
+2004-11-22 02:03  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont.pm: fixed supplement set,
+	  added substitute handling
+
+2004-11-21 04:20  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/japanese.pm: fixed cidmap to
+	  adobe japan1 supl 6
+
+2004-11-21 03:58  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont.pm: fixed multibyte
+	  encoding issues
+
+2004-11-21 03:58  fredo
+
+	* lib/PDF/API2/Resource/uniglyph.txt: genesis
+
+2004-11-21 03:57  fredo
+
+	* lib/PDF/API2/Resource/CIDFont.pm: cosmetic change
+
+2004-10-26 16:46  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont/: adobemingstdlightacro.pm,
+	  adobemyungjostdmediumacro.pm, adobesongstdlightacro.pm,
+	  kozgopromediumacro.pm, kozminproregularacro.pm: added alternative
+	  glyph-width storage
+
+2004-10-26 16:42  fredo
+
+	* lib/PDF/API2/Resource/: CIDFont.pm, CIDFont/CJKFont.pm: added
+	  alternative glyph-width storage/retrieval
+
+2004-10-26 16:41  fredo
+
+	* lib/PDF/API2/Resource/BaseFont.pm: added panose identification
+	  style entry
+
+2004-10-26 13:34  fredo
+
+	* lib/PDF/API2/Content.pm: reworked text_fill for paragraph, but
+	  still being development
+
+2004-10-24 22:31  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/japanese.pm: updated to
+	  Adobe-Japan1 rev 4
+
+2004-10-17 06:07  fredo
+
+	* Makefile.PL: added option shorts and usage
+
+2004-10-17 05:58  fredo
+
+	* Makefile.PL: removed version fuss
+
+2004-10-17 05:57  fredo
+
+	* lib/PDF/API2.pm: added ToUnicode call for supported fonts
+
+2004-10-17 05:55  fredo
+
+	* lib/PDF/API2/Resource/BaseFont.pm: simplified ToUnicode
+	  associated CMap for single-byte fonts
+
+2004-10-17 05:47  fredo
+
+	* lib/PDF/API2/Resource/BaseFont.pm: fixed inclusion of ToUnicode
+	  compatible key and associated CMap
+
+2004-10-17 05:46  fredo
+
+	* lib/PDF/API2/Resource/Font.pm: restructured encoding vs. unicode
+	  vs. glyph-name lookup
+
+2004-10-13 20:30  fredo
+
+	* lib/PDF/API2/Annotation.pm: fixed pdfile method from utf8 back to
+	  ascii
+
+2004-10-11 09:54  fredo
+
+	* lib/PDF/API2/Annotation.pm: fixed file method from utf8 back to
+	  ascii
+
+2004-10-01 03:39  fredo
+
+	* lib/PDF/API2.pm: reverted annotations import fix
+
+2004-10-01 03:20  fredo
+
+	* lib/PDF/API2/Annotation.pm: fixed url link annotation to 7-bit
+	  ascii as per pdf-spec-1.5
+
+2004-10-01 03:06  fredo
+
+	* Makefile.PL: fixed versioning
+
+2004-10-01 02:37  fredo
+
+	* Makefile.PL: modded version hex schema
+
+2004-10-01 01:57  fredo
+
+	* Makefile.PL: implemented devel options
+
+2004-10-01 01:57  fredo
+
+	* lib/PDF/API2.pm: versioning beautify
+
+2004-10-01 00:41  fredo
+
+	* lib/PDF/API2/Version.pm: updated to current state
+
+2004-10-01 00:40  fredo
+
+	* lib/PDF/API2.pm: fixed pdf-producer to include OS
+
+2004-10-01 00:37  fredo
+
+	* MANIFEST: added back Version.pm removed tests
+
+2004-10-01 00:36  fredo
+
+	* Makefile.PL: changed versioning back to version.pm
+
+2004-09-30 23:18  fredo
+
+	* lib/PDF/API2.pm: changed file version back to cvs
+
+2004-09-22 16:12  fredo
+
+	* lib/PDF/API2/Basic/PDF/Dict.pm: fixed stream length calculation
+	  for acrobat 6
+
+2004-09-20 14:01  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: worked around broken dict-key by
+	  acrobat 5
+
+2004-09-20 13:22  fredo
+
+	* lib/PDF/API2.pm: added default param to fix import-rotation added
+	  default param to fix annotation-import
+
+2004-09-13 17:30  fredo
+
+	* examples/032_separation: added All/None Separation CS
+
+2004-09-13 17:27  fredo
+
+	* lib/PDF/API2/Page.pm: added rotate for acrobat-wise pdf-creators
+
+2004-09-03 14:35  fredo
+
+	* lib/PDF/API2.pm: pop'd to new version
+
+2004-09-03 14:33  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fixed binary stream reading by
+	  update method
+
+2004-08-31 15:50  fredo
+
+	* lib/PDF/API2/Content.pm: fixed space vs. whitespace split bug
+
+2004-08-25 05:03  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: removed fuss
+
+2004-08-25 04:59  fredo
+
+	* lib/PDF/API2.pm: disabled memoize since long-running scripts bug
+	  from reused adresses
+
+2004-07-29 13:06  fredo
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/int2of5.pm: fixed
+	  encode
+
+2004-07-29 12:48  fredo
+
+	* lib/PDF/API2/Basic/PDF/Utils.pm: added PDFLiteral and PDFNull
+	  methods
+
+2004-07-29 12:47  fredo
+
+	* lib/PDF/API2/Outline.pm: fixed "null vs. 0" bug of -xyz option
+
+2004-07-29 12:46  fredo
+
+	* lib/PDF/API2/Content.pm: added new text_fill_* methods and a
+	  simple paragraph
+
+2004-07-25 01:38  fredo
+
+	* lib/PDF/API2/Resource/XObject/Image/PNM.pm: added new
+	  headerparser and simplified loading
+
+2004-07-25 01:38  fredo
+
+	* lib/PDF/API2/Basic/PDF/Filter.pm: some
+
+2004-07-25 01:33  fredo
+
+	* lib/PDF/API2/Resource/Font/BdFont.pm: added compression
+
+2004-07-25 01:10  fredo
+
+	* lib/PDF/API2.pm: fixed memoize bug for bdf fonts
+
+2004-07-25 01:09  fredo
+
+	* lib/PDF/API2.pm: added bdf fonts
+
+2004-07-25 01:08  fredo
+
+	* lib/PDF/API2/Resource/Font/BdFont.pm: genesis
+
+2004-07-23 15:41  fredo
+
+	* lib/PDF/API2.pm: fixed in decoding info dictionary
+
+2004-07-21 10:07  fredo
+
+	* lib/PDF/API2.pm: added devicen colorspace
+
+2004-07-20 22:31  fredo
+
+	* MANIFEST: deleted changelog.pre added devicen.pm
+
+2004-07-20 22:28  fredo
+
+	* lib/PDF/API2/Resource/ColorSpace/Separation.pm: added tintname
+	  accessor
+
+2004-07-20 22:27  fredo
+
+	* lib/PDF/API2/Resource/ColorSpace/DeviceN.pm,
+	  examples/033_deviceN: genesis
+
+2004-07-15 16:35  fredo
+
+	* lib/PDF/API2/Resource/ColorSpace.pm: added type accessor
+
+2004-07-15 16:28  fredo
+
+	* lib/PDF/API2.pm: added devicen colorspace
+
+2004-07-15 16:14  fredo
+
+	* lib/PDF/API2/Resource/ColorSpace/Separation.pm: added type and
+	  color accessor
+
+2004-07-15 16:13  fredo
+
+	* lib/PDF/API2/Resource/ColorSpace/Indexed.pm: added type accessor
+
+2004-07-13 20:09  fredo
+
+	* t/020corecoit.t, t/020corecour.t, t/020coreheit.t,
+	  t/020coretiro.t, t/020corevebi.t, t/020coreverd.t,
+	  t/022core____.t, t/028psf_all.t, .cvsignore, .project, Makefile,
+	  t/020corecobi.t, t/020corecobo.t, t/020corehebi.t,
+	  t/020corehebo.t, t/020corehelv.t, t/020coretibi.t,
+	  t/020coretibo.t, t/020coretiit.t, t/020coretrbi.t,
+	  t/020coretrbo.t, t/020coretreb.t, t/020coretrit.t,
+	  t/020corevebo.t, t/020coreveit.t, t/029ttf_all.t: genesis
+
+2004-06-22 03:33  fredo
+
+	* lib/PDF/API2.pm: corrected spelling
+
+2004-06-22 02:38  fredo
+
+	* lib/PDF/API2/Resource/: Pattern.pm, Shading.pm: fixed ISA
+
+2004-06-22 00:40  fredo
+
+	* MANIFEST: added pattern/shading
+
+2004-06-22 00:33  fredo
+
+	* lib/PDF/: API2.pm, API2/Content.pm, API2/Util.pm,
+	  API2/Resource/Pattern.pm, API2/Resource/Shading.pm: added basic
+	  pattern/shading handling
+
+2004-06-22 00:25  fredo
+
+	* lib/PDF/API2/Resource/Font/CoreFont.pm: added custom corefont
+	  handling
+
+2004-06-15 18:48  fredo
+
+	* MANIFEST: removed shapes
+
+2004-06-15 18:44  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: jaws import workaround fix for
+	  broken xrefs
+
+2004-06-15 11:16  fredo
+
+	* MANIFEST: removed Version.pm
+
+2004-06-15 11:14  fredo
+
+	* lib/PDF/API2/: Basic/TTF/Maxp.pm, Basic/TTF/Mort.pm,
+	  Basic/TTF/Name.pm, Basic/TTF/OS_2.pm, Basic/TTF/OldCmap.pm,
+	  Basic/TTF/OldMort.pm, Basic/TTF/PCLT.pm, Basic/TTF/PSNames.pm,
+	  Basic/TTF/Post.pm, Basic/TTF/Prep.pm, Basic/TTF/Prop.pm,
+	  Basic/TTF/Segarr.pm, Basic/TTF/Table.pm, Basic/TTF/Ttc.pm,
+	  Basic/TTF/Ttopen.pm, Basic/TTF/Useall.pm, Basic/TTF/Utils.pm,
+	  Basic/TTF/Vhea.pm, Basic/TTF/Vmtx.pm, Basic/TTF/Win32.pm,
+	  Basic/TTF/XMLparse.pm, Basic/TTF/Kern/ClassArray.pm,
+	  Basic/TTF/Kern/CompactClassArray.pm,
+	  Basic/TTF/Kern/OrderedList.pm, Basic/TTF/Kern/StateTable.pm,
+	  Basic/TTF/Kern/Subtable.pm, Basic/TTF/Mort/Chain.pm,
+	  Basic/TTF/Mort/Contextual.pm, Basic/TTF/Mort/Insertion.pm,
+	  Basic/TTF/Mort/Ligature.pm, Basic/TTF/Mort/Noncontextual.pm,
+	  Basic/TTF/Mort/Rearrangement.pm, Basic/TTF/Mort/Subtable.pm,
+	  Content/Text.pm, Content/symbols.pm, Content/Text/Markup.pm,
+	  Resource/BaseFont.pm, Resource/CIDFont.pm,
+	  Resource/ColorSpace.pm, Resource/ExtGState.pm, Resource/Font.pm,
+	  Resource/Shading.pm, Resource/XObject.pm,
+	  Resource/CIDFont/CJKFont.pm, Resource/CIDFont/TrueType.pm,
+	  Resource/CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  Resource/CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  Resource/CIDFont/CJKFont/kozgopromediumacro.pm,
+	  Resource/CIDFont/CJKFont/kozminproregularacro.pm,
+	  Resource/CIDFont/CMap/japanese.pm,
+	  Resource/CIDFont/CMap/korean.pm,
+	  Resource/CIDFont/CMap/simplified.pm,
+	  Resource/CIDFont/CMap/traditional.pm,
+	  Resource/CIDFont/TrueType/FontFile.pm,
+	  Resource/ColorSpace/Indexed.pm,
+	  Resource/ColorSpace/Separation.pm,
+	  Resource/ColorSpace/Indexed/ACTFile.pm,
+	  Resource/ColorSpace/Indexed/Hue.pm,
+	  Resource/ColorSpace/Indexed/WebColor.pm,
+	  Resource/Font/CoreFont.pm, Resource/Font/Postscript.pm,
+	  Resource/Font/SynFont.pm, Resource/Font/CoreFont/bankgothic.pm,
+	  Resource/Font/CoreFont/courier.pm,
+	  Resource/Font/CoreFont/courierbold.pm,
+	  Resource/Font/CoreFont/courierboldoblique.pm,
+	  Resource/Font/CoreFont/courieroblique.pm,
+	  Resource/Font/CoreFont/georgia.pm,
+	  Resource/Font/CoreFont/georgiabold.pm,
+	  Resource/Font/CoreFont/georgiabolditalic.pm,
+	  Resource/Font/CoreFont/georgiaitalic.pm,
+	  Resource/Font/CoreFont/helvetica.pm,
+	  Resource/Font/CoreFont/helveticabold.pm,
+	  Resource/Font/CoreFont/helveticaboldoblique.pm,
+	  Resource/Font/CoreFont/helveticaoblique.pm,
+	  Resource/Font/CoreFont/symbol.pm,
+	  Resource/Font/CoreFont/timesbold.pm,
+	  Resource/Font/CoreFont/timesbolditalic.pm,
+	  Resource/Font/CoreFont/timesitalic.pm,
+	  Resource/Font/CoreFont/timesroman.pm,
+	  Resource/Font/CoreFont/trebuchet.pm,
+	  Resource/Font/CoreFont/trebuchetbold.pm,
+	  Resource/Font/CoreFont/trebuchetbolditalic.pm,
+	  Resource/Font/CoreFont/trebuchetitalic.pm,
+	  Resource/Font/CoreFont/verdana.pm,
+	  Resource/Font/CoreFont/verdanabold.pm,
+	  Resource/Font/CoreFont/verdanabolditalic.pm,
+	  Resource/Font/CoreFont/verdanaitalic.pm,
+	  Resource/Font/CoreFont/webdings.pm,
+	  Resource/Font/CoreFont/wingdings.pm,
+	  Resource/Font/CoreFont/zapfdingbats.pm,
+	  Resource/Shading/axial.pm, Resource/XObject/Form.pm,
+	  Resource/XObject/Image.pm, Resource/XObject/Form/BarCode.pm,
+	  Resource/XObject/Form/Hybrid.pm,
+	  Resource/XObject/Form/BarCode/codabar.pm,
+	  Resource/XObject/Form/BarCode/code128.pm,
+	  Resource/XObject/Form/BarCode/code3of9.pm,
+	  Resource/XObject/Form/BarCode/ean13.pm,
+	  Resource/XObject/Form/BarCode/int2of5.pm,
+	  Resource/XObject/Image/GD.pm, Resource/XObject/Image/GIF.pm,
+	  Resource/XObject/Image/JPEG.pm, Resource/XObject/Image/PNG.pm,
+	  Resource/XObject/Image/PNM.pm, Resource/XObject/Image/TIFF.pm,
+	  Shape/line.pm, Shape/polygon.pm, Shape/polyline.pm,
+	  Shape/sline.pm: removed cr+lf
+
+2004-06-15 11:11  fredo
+
+	* lib/PDF/API2/: Annotation.pm, Content.pm, IOString.pm, Lite.pm,
+	  Matrix.pm, Outline.pm, Outlines.pm, Page.pm, Resource.pm,
+	  Shape.pm, Util.pm, Win32.pm, Basic/PDF/Array.pm,
+	  Basic/PDF/Bool.pm, Basic/PDF/Dict.pm, Basic/PDF/File.pm,
+	  Basic/PDF/Filter.pm, Basic/PDF/Literal.pm, Basic/PDF/Name.pm,
+	  Basic/PDF/Null.pm, Basic/PDF/Number.pm, Basic/PDF/Objind.pm,
+	  Basic/PDF/Page.pm, Basic/PDF/Pages.pm, Basic/PDF/String.pm,
+	  Basic/PDF/Utils.pm, Basic/TTF/AATKern.pm, Basic/TTF/AATutils.pm,
+	  Basic/TTF/Anchor.pm, Basic/TTF/Bsln.pm, Basic/TTF/Cmap.pm,
+	  Basic/TTF/Coverage.pm, Basic/TTF/Cvt_.pm, Basic/TTF/Delta.pm,
+	  Basic/TTF/Fdsc.pm, Basic/TTF/Feat.pm, Basic/TTF/Fmtx.pm,
+	  Basic/TTF/Font.pm, Basic/TTF/Fpgm.pm, Basic/TTF/GDEF.pm,
+	  Basic/TTF/GPOS.pm, Basic/TTF/GSUB.pm, Basic/TTF/Glyf.pm,
+	  Basic/TTF/Glyph.pm, Basic/TTF/Hdmx.pm, Basic/TTF/Head.pm,
+	  Basic/TTF/Hhea.pm, Basic/TTF/Hmtx.pm, Basic/TTF/Kern.pm,
+	  Basic/TTF/LTSH.pm, Basic/TTF/Loca.pm: removed cr+lf
+
+2004-06-15 11:06  fredo
+
+	* lib/PDF/API2.pm: forced version to 1.50 for beta state
+
+2004-06-15 11:03  fredo
+
+	* lib/PDF/: API2.pm: changed versioning back to API.pm
+
+2004-06-15 11:00  fredo
+
+	* Makefile.PL: changed versioning to API.pm
+
+2004-06-15 10:09  fredo
+
+	* lib/PDF/API2.pm: fixed memoized bug
+
+2004-06-11 14:56  fredo
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/code128.pm: fixed
+	  encode bug
+
+2004-06-09 18:30  fredo
+
+	* lib/PDF/API2/Version.pm: release 0.40_22
+
+2004-06-09 18:29  fredo
+
+	* lib/PDF/API2/Page.pm: fixed named page size handling for *box
+	  methods
+
+2004-06-07 21:43  fredo
+
+	* lib/PDF/API2/Annotation.pm, lib/PDF/API2/Content.pm,
+	  lib/PDF/API2/HOWTO.pod, lib/PDF/API2/IOString.pm,
+	  lib/PDF/API2/Lite.pm, lib/PDF/API2/Matrix.pm,
+	  lib/PDF/API2/Outline.pm, lib/PDF/API2/Outlines.pm,
+	  lib/PDF/API2/Page.pm, lib/PDF/API2/Resource.pm,
+	  lib/PDF/API2/Shape.pm, lib/PDF/API2/Util.pm,
+	  lib/PDF/API2/Version.pm, lib/PDF/API2/Win32.pm,
+	  lib/PDF/API2/Basic/PDF/Array.pm, lib/PDF/API2/Basic/PDF/Bool.pm,
+	  lib/PDF/API2/Basic/PDF/Dict.pm, lib/PDF/API2/Basic/PDF/File.pm,
+	  lib/PDF/API2/Basic/PDF/Filter.pm,
+	  lib/PDF/API2/Basic/PDF/Literal.pm,
+	  lib/PDF/API2/Basic/PDF/Name.pm, lib/PDF/API2/Basic/PDF/Null.pm,
+	  lib/PDF/API2/Basic/PDF/Number.pm,
+	  lib/PDF/API2/Basic/PDF/Objind.pm, lib/PDF/API2/Basic/PDF/Page.pm,
+	  lib/PDF/API2/Basic/PDF/Pages.pm,
+	  lib/PDF/API2/Basic/PDF/String.pm,
+	  lib/PDF/API2/Basic/PDF/Utils.pm,
+	  lib/PDF/API2/Basic/TTF/AATKern.pm,
+	  lib/PDF/API2/Basic/TTF/AATutils.pm,
+	  lib/PDF/API2/Basic/TTF/Anchor.pm, lib/PDF/API2/Basic/TTF/Bsln.pm,
+	  lib/PDF/API2/Basic/TTF/Changes, lib/PDF/API2/Basic/TTF/Cmap.pm,
+	  lib/PDF/API2/Basic/TTF/Coverage.pm,
+	  lib/PDF/API2/Basic/TTF/Cvt_.pm, lib/PDF/API2/Basic/TTF/Delta.pm,
+	  lib/PDF/API2/Basic/TTF/Fdsc.pm, lib/PDF/API2/Basic/TTF/Feat.pm,
+	  lib/PDF/API2/Basic/TTF/Fmtx.pm, lib/PDF/API2/Basic/TTF/Font.pm,
+	  lib/PDF/API2/Basic/TTF/Fpgm.pm, lib/PDF/API2/Basic/TTF/GDEF.pm,
+	  lib/PDF/API2/Basic/TTF/GPOS.pm, lib/PDF/API2/Basic/TTF/GSUB.pm,
+	  lib/PDF/API2/Basic/TTF/Glyf.pm, lib/PDF/API2/Basic/TTF/Glyph.pm,
+	  lib/PDF/API2/Basic/TTF/Hdmx.pm, lib/PDF/API2/Basic/TTF/Head.pm,
+	  lib/PDF/API2/Basic/TTF/Hhea.pm, lib/PDF/API2/Basic/TTF/Hmtx.pm,
+	  lib/PDF/API2/Basic/TTF/Kern.pm, lib/PDF/API2/Basic/TTF/LTSH.pm,
+	  lib/PDF/API2/Basic/TTF/Loca.pm,
+	  lib/PDF/API2/Basic/TTF/Manual.pod,
+	  lib/PDF/API2/Basic/TTF/Maxp.pm, lib/PDF/API2/Basic/TTF/Mort.pm,
+	  lib/PDF/API2/Basic/TTF/Name.pm, lib/PDF/API2/Basic/TTF/OS_2.pm,
+	  lib/PDF/API2/Basic/TTF/OldCmap.pm,
+	  lib/PDF/API2/Basic/TTF/OldMort.pm,
+	  lib/PDF/API2/Basic/TTF/PCLT.pm,
+	  lib/PDF/API2/Basic/TTF/PSNames.pm,
+	  lib/PDF/API2/Basic/TTF/Post.pm, lib/PDF/API2/Basic/TTF/Prep.pm,
+	  lib/PDF/API2/Basic/TTF/Prop.pm, lib/PDF/API2/Basic/TTF/Segarr.pm,
+	  lib/PDF/API2/Basic/TTF/Table.pm, lib/PDF/API2/Basic/TTF/Ttc.pm,
+	  lib/PDF/API2/Basic/TTF/Ttopen.pm,
+	  lib/PDF/API2/Basic/TTF/Useall.pm,
+	  lib/PDF/API2/Basic/TTF/Utils.pm, lib/PDF/API2/Basic/TTF/Vhea.pm,
+	  lib/PDF/API2/Basic/TTF/Vmtx.pm, lib/PDF/API2/Basic/TTF/Win32.pm,
+	  lib/PDF/API2/Basic/TTF/XMLparse.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/ClassArray.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/CompactClassArray.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/OrderedList.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/StateTable.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/Subtable.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Chain.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Contextual.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Insertion.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Ligature.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Noncontextual.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Rearrangement.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Subtable.pm,
+	  lib/PDF/API2/Content/Text.pm, lib/PDF/API2/Content/symbols.pm,
+	  lib/PDF/API2/Content/Text/Markup.pm,
+	  lib/PDF/API2/Resource/BaseFont.pm,
+	  lib/PDF/API2/Resource/CIDFont.pm,
+	  lib/PDF/API2/Resource/ColorSpace.pm,
+	  lib/PDF/API2/Resource/ExtGState.pm,
+	  lib/PDF/API2/Resource/Font.pm, lib/PDF/API2/Resource/Shading.pm,
+	  lib/PDF/API2/Resource/XObject.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont.pm,
+	  lib/PDF/API2/Resource/CIDFont/TrueType.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/kozgopromediumacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/kozminproregularacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/japanese.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/korean.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/simplified.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/traditional.pm,
+	  lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Separation.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/ACTFile.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/Hue.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/WebColor.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont.pm,
+	  lib/PDF/API2/Resource/Font/Postscript.pm,
+	  lib/PDF/API2/Resource/Font/SynFont.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/bankgothic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courier.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courierbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courierboldoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courieroblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgia.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiabolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiaitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helvetica.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticaboldoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticaoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/symbol.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesbolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesroman.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchet.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetbolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdana.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanabolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanaitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/webdings.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/wingdings.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/zapfdingbats.pm,
+	  lib/PDF/API2/Resource/Shading/axial.pm,
+	  lib/PDF/API2/Resource/XObject/Form.pm,
+	  lib/PDF/API2/Resource/XObject/Image.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode.pm,
+	  lib/PDF/API2/Resource/XObject/Form/Hybrid.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/codabar.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/code128.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/code3of9.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/ean13.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/int2of5.pm,
+	  lib/PDF/API2/Resource/XObject/Image/GD.pm,
+	  lib/PDF/API2/Resource/XObject/Image/GIF.pm,
+	  lib/PDF/API2/Resource/XObject/Image/JPEG.pm,
+	  lib/PDF/API2/Resource/XObject/Image/PNG.pm,
+	  lib/PDF/API2/Resource/XObject/Image/PNM.pm,
+	  lib/PDF/API2/Resource/XObject/Image/TIFF.pm,
+	  lib/PDF/API2/Shape/line.pm, lib/PDF/API2/Shape/polygon.pm,
+	  lib/PDF/API2/Shape/polyline.pm, lib/PDF/API2/Shape/sline.pm,
+	  contrib/pdf-deoptimize.pl, MANIFEST, LICENSE: cleaned out cr+lf
+	  for lf
+
+2004-06-01 02:17  fredo
+
+	* contrib/pdf-merge.pl: genesis
+
+2004-06-01 02:14  fredo
+
+	* README: fixed spelling errors added Memoize as req. module
+
+2004-06-01 02:09  fredo
+
+	* lib/PDF/API2.pm: memoized *font methods for braindead invokers
+
+2004-06-01 01:20  fredo
+
+	* lib/PDF/API2/Content.pm: added basic platform encoding
+	  independency
+
+2004-05-28 13:33  fredo
+
+	* MANIFEST: added test scripts for corefonts: helvetica, times,
+	  courior
+
+2004-05-28 13:30  fredo
+
+	* lib/PDF/API2/Version.pm: update to 0.40_21
+
+2004-05-28 13:29  fredo
+
+	* lib/PDF/: API2.pm, API2/Resource/XObject/Image/GD.pm: added
+	  -lossless param to gd images
+
+2004-05-21 18:36  fredo
+
+	* lib/PDF/API2/Version.pm: update to 0.40_20
+
+2004-05-21 17:10  fredo
+
+	* lib/PDF/API2/Resource/Font.pm: worked around some unicode probs
+
+2004-05-21 17:04  fredo
+
+	* lib/PDF/API2/Lite.pm: fixed NAME pod bug for cpan indexer
+
+2004-05-21 12:12  fredo
+
+	* lib/PDF/API2.pm: fixed slight importpage quirk
+
+2004-04-20 11:47  fredo
+
+	* lib/PDF/API2/Resource/BaseFont.pm: fixed unicode to
+	  font-encoding-vector conversion
+
+2004-04-20 11:46  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added
+	  glyph->read fix for subset-vector
+
+2004-04-20 00:01  fredo
+
+	* lib/PDF/API2/Resource/XObject/Image/TIFF.pm: additional tag
+	  handling and tag-accessor
+
+2004-04-18 20:07  fredo
+
+	* lib/PDF/API2.pm: fixed _findFont method
+
+2004-04-18 19:56  fredo
+
+	* lib/PDF/API2/Basic/TTF/Glyph.pm: fixed processing unusual/broken
+	  ttfs
+
+2004-04-18 17:51  fredo
+
+	* t/022corefunc.t: genesis
+
+2004-04-18 16:11  fredo
+
+	* t/020coreuse.t: fixed test for symbol fonts
+
+2004-04-18 16:01  fredo
+
+	* t/020coreuse.t: added defined/undefined test
+
+2004-04-18 15:54  fredo
+
+	* t/020coreuse.t: genesis
+
+2004-04-18 15:46  fredo
+
+	* t/021corebyte.t: added cvs-log tag
+
+2004-04-18 15:43  fredo
+
+	* t/021corebyte.t: genesis
+
+2004-04-07 19:39  fredo
+
+	* lib/PDF/API2/Shape/sline.pm: genesis
+
+2004-04-07 19:38  fredo
+
+	* lib/PDF/API2.pm: added infoMetaAttributes and support code
+
+2004-04-07 12:51  fredo
+
+	* lib/PDF/API2/Version.pm: updated to 0.40_18b quick-fix release
+
+2004-04-07 12:50  fredo
+
+	* lib/PDF/API2/Resource/ColorSpace/Separation.pm: fixed RGB
+	  semantics to match CMYK `tint´ behaviour
+
+2004-04-07 12:49  fredo
+
+	* lib/PDF/API2/Content.pm: fixed handling of colorSpaces for
+	  fill/strokecolor
+
+2004-04-07 12:48  fredo
+
+	* lib/PDF/API2.pm: fixed handling of ColorSpace/Separation
+
+2004-04-07 12:48  fredo
+
+	* examples/032_separation: genesis
+
+2004-04-07 12:47  fredo
+
+	* MANIFEST: added examples/032_separation
+
+2004-04-07 01:09  fredo
+
+	* MANIFEST: added missing examples/023_cjkfonts
+
+2004-04-07 01:08  fredo
+
+	* examples/023_cjkfonts: genesis
+
+2004-04-07 01:05  fredo
+
+	* MANIFEST: added missing examples/022_truefonts
+
+2004-04-07 01:04  fredo
+
+	* examples/022_truefonts: genesis
+
+2004-04-07 00:59  fredo
+
+	* MANIFEST: added missing examples/031_color_hsv
+
+2004-04-06 23:08  fredo
+
+	* MANIFEST: added .../Resource/ColorSpace/Separation
+
+2004-04-06 23:00  fredo
+
+	* lib/PDF/API2.pm: separation colorspace now a full resource
+
+2004-04-06 22:57  fredo
+
+	* lib/PDF/API2/Resource/ColorSpace/Separation.pm: separation
+	  colorspace promoted to full object
+
+2004-04-05 01:52  fredo
+
+	* lib/PDF/API2/Version.pm: updated for release 0.40_18
+
+2004-04-05 01:44  fredo
+
+	* lib/PDF/API2/Shape/: polygon.pm, polyline.pm: updated stroke/fill
+	  behaviour
+
+2004-04-05 01:42  fredo
+
+	* lib/PDF/API2.pm: fixed 270 degree rotation in openpage
+
+2004-04-05 01:36  fredo
+
+	* lib/PDF/API2.pm: added simple separation colorspace
+
+2004-03-20 10:11  fredo
+
+	* lib/PDF/API2.pm: modified font search path methodname
+
+2004-03-20 09:38  fredo
+
+	* lib/PDF/API2.pm: added isEncrypted determinator
+
+2004-03-20 09:37  fredo
+
+	* lib/PDF/API2/Resource/XObject/Image/GIF.pm: added de-interlacing
+
+2004-03-18 10:43  fredo
+
+	* lib/PDF/API2.pm: added font search path handling
+
+2004-03-18 07:47  fredo
+
+	* lib/PDF/API2/Outline.pm: fixed yank/paste error in dest method
+	  with -xyz parameter
+
+2004-03-02 22:55  fredo
+
+	* lib/PDF/API2/Resource/XObject/Image/JPEG.pm: fixed reading jpeg
+	  image info marker according to ITU-T T.81 spec
+
+2004-03-02 20:22  fredo
+
+	* lib/PDF/API2/Basic/PDF/Literal.pm: added missing 'use vars' and
+	  fixed xmlexport method
+
+2004-03-02 20:21  fredo
+
+	* MANIFEST: added missing Version.pm definition
+
+2004-02-24 03:09  fredo
+
+	* lib/PDF/API2/Basic/PDF/Literal.pm: added initializer code
+
+2004-02-24 03:08  fredo
+
+	* lib/PDF/API2/Basic/PDF/Utils.pm, MANIFEST: added literal
+
+2004-02-24 02:59  fredo
+
+	* lib/PDF/API2/Basic/PDF/Literal.pm: genesis
+
+2004-02-24 01:08  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont.pm: added utf8 fallback for
+	  encoding
+
+2004-02-24 01:07  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/: simplified.pm,
+	  traditional.pm: fixed unicode mapping based on adobe's
+	  utf32/utf16 specification
+
+2004-02-24 00:34  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/korean.pm: fixed unicode
+	  mapping based on adobe's utf32/utf16 specification
+
+2004-02-24 00:19  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/japanese.pm: fixed unicode
+	  mapping based on adobe's ucs2 specification with added vertical
+	  encoding
+
+2004-02-23 00:55  fredo
+
+	* lib/PDF/API2/Annotation.pm: full utf8 awareness
+
+2004-02-23 00:49  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/japanese.pm: fixed unicode
+	  mapping based on adobe's ucs2 specification
+
+2004-02-23 00:45  fredo
+
+	* lib/PDF/API2/HOWTO.pod: added pdftk tool comment
+
+2004-02-19 03:07  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont/: adobemingstdlightacro.pm,
+	  adobemyungjostdmediumacro.pm, adobesongstdlightacro.pm: updated
+	  to acrobat 6 standard
+
+2004-02-19 01:37  fredo
+
+	* lib/PDF/API2/HOWTO.pod: added interoperability section
+
+2004-02-18 15:05  fredo
+
+	* lib/PDF/API2/Basic/PDF/Filter.pm: updated lzwdecode with code
+	  take from the gif module
+
+2004-02-18 15:04  fredo
+
+	* lib/PDF/API2/Basic/PDF/: Dict.pm, Name.pm: fixed name/key
+	  encoding regardless of pdf-version (who uses ancient but
+	  conforming pdf 1.0/1.1 anymore?)
+
+2004-02-13 11:56  fredo
+
+	* lib/PDF/API2/HOWTO.pod: added hello world example
+
+2004-02-12 21:33  fredo
+
+	* MANIFEST: added shapes: line, polyline, polygon
+
+2004-02-12 21:26  fredo
+
+	* lib/PDF/API2/Shape/polygon.pm: initial import
+
+2004-02-12 21:20  fredo
+
+	* lib/PDF/API2/: Shape.pm, Shape/line.pm, Shape/polyline.pm:
+	  updated new method for options
+
+2004-02-12 21:10  fredo
+
+	* lib/PDF/API2/Shape/: line.pm, polyline.pm: initial import
+
+2004-02-12 17:55  fredo
+
+	* lib/PDF/API2/Shape.pm: added release method, fixed render methods
+
+2004-02-12 17:40  fredo
+
+	* lib/PDF/API2/Shape.pm: initial import
+
+2004-02-12 15:48  fredo
+
+	* lib/PDF/API2/Resource/XObject/Image/: PNG.pm, GIF.pm: removed
+	  duplicate definition of $fh
+
+2004-02-12 15:46  fredo
+
+	* lib/PDF/API2/Content.pm: removed duplicate definition of egstate
+	  method
+
+2004-02-12 15:41  fredo
+
+	* examples/031_color_hsv: initial import
+
+2004-02-12 15:40  fredo
+
+	* examples/030_colorspecs: moved HSV to own example
+
+2004-02-12 15:39  fredo
+
+	* lib/PDF/API2/Util.pm: start work on better HSV code
+
+2004-02-12 15:38  fredo
+
+	* lib/PDF/API2.pm: added openScalar method
+
+2004-02-12 15:38  fredo
+
+	* lib/PDF/API2/IOString.pm: added import_from_scalar method
+
+2004-02-10 16:55  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: fixed glyph generation for
+	  .notdef glyphs
+
+2004-02-10 16:54  fredo
+
+	* examples/021_synfonts: modified to use all corefonts
+
+2004-02-10 16:53  fredo
+
+	* lib/PDF/API2/Util.pm: corrected pdfkeys
+
+2004-02-06 03:01  fredo
+
+	* lib/PDF/API2/Content.pm: added save/restore around textlabel
+
+2004-02-06 00:24  fredo
+
+	* lib/PDF/API2/Content.pm: fixed lab behavior
+
+2004-02-05 23:35  fredo
+
+	* examples/030_colorspecs: added rgb gamma
+
+2004-02-05 23:21  fredo
+
+	* lib/PDF/API2/Util.pm: fixed lab behavior
+
+2004-02-05 23:17  fredo
+
+	* examples/030_colorspecs: initial import
+
+2004-02-05 17:13  fredo
+
+	* lib/PDF/API2/Util.pm: fixed namecolor methods
+
+2004-02-05 14:33  fredo
+
+	* lib/PDF/API2/Annotation.pm: added unicode handling to strings
+
+2004-02-05 14:27  fredo
+
+	* lib/PDF/API2/Basic/PDF/String.pm: corrected utf8 behavior
+	  according to '3.8.1 Text Strings', U+FEFF indicating UTF-16BE
+	  (big-endian)
+
+2004-02-05 14:18  fredo
+
+	* lib/PDF/API2.pm: corrected info hash utf8 usage
+
+2004-02-05 13:28  fredo
+
+	* MANIFEST: added colorspecs example
+
+2004-02-05 13:26  fredo
+
+	* lib/PDF/API2/Content.pm: revised '_makecolor' to use Lab for
+	  hsv/hsl, added textlabel method
+
+2004-02-05 12:28  fredo
+
+	* lib/PDF/API2/Util.pm: simplified namecolor, added *_lab/*_cmyk
+	  methods, corrected rgb->cmyk conversion to practical parameters
+
+2004-02-05 01:54  fredo
+
+	* lib/PDF/API2/Basic/PDF/Utils.pm: added "PDFUtf" util method
+
+2004-02-05 01:52  fredo
+
+	* lib/PDF/API2/Basic/PDF/String.pm: added utf output capability
+
+2004-02-05 00:43  fredo
+
+	* lib/PDF/API2.pm: pdf info method now properly recognized utf8
+	  parameters
+
+2004-02-02 01:25  fredo
+
+	* examples/021_synfonts: added caps example
+
+2004-02-01 23:06  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: beautified caps generation
+
+2004-02-01 22:34  fredo
+
+	* MANIFEST: added PDF::API2::Content::Text::Markup
+
+2004-02-01 22:32  fredo
+
+	* lib/PDF/API2/Content/Text/Markup.pm: added basic (yet unfinished)
+	  parsing code
+
+2004-02-01 20:27  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: fixed width calc for caps
+
+2004-02-01 20:04  fredo
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: added caps capability
+
+2004-01-29 10:03  fredo
+
+	* lib/PDF/API2/Content/Text/Markup.pm: genesis
+
+2004-01-29 09:37  fredo
+
+	* lib/PDF/API2/Content/symbols.pm: updated comments, added symbol
+	  aliases
+
+2004-01-28 15:12  fredo
+
+	* contrib/: pdf-deoptimize.pl, pdf-optimize.pl: updated licence
+	  statement
+
+2004-01-22 15:19  fredo
+
+	* Makefile.PL: final versioning update for 0.40_17 and beyond
+
+2004-01-22 15:17  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: added internal object comments
+	  feature for future debugging
+
+2004-01-22 00:21  fredo
+
+	* Makefile.PL: updated logo string
+
+2004-01-21 14:24  fredo
+
+	* lib/PDF/API2/Version.pm: fixed errorneous use/require behaviour
+
+2004-01-21 13:44  fredo
+
+	* Makefile.PL: fixed MakeMaker VERSION_FROM parameter
+
+2004-01-21 13:35  fredo
+
+	* MANIFEST: added changelog.pre
+
+2004-01-21 13:29  fredo
+
+	* Makefile.PL, lib/PDF/API2.pm, lib/PDF/API2/Version.pm: moved
+	  release versioning to PDF::API2::Version
+
+2004-01-21 13:18  fredo
+
+	* MANIFEST: added full changelog
+
+2004-01-19 21:02  fredo
+
+	* MANIFEST: added contrib pdf optimize/deoptimize
+
+2004-01-19 20:59  fredo
+
+	* contrib/: pdf-deoptimize.pl, pdf-optimize.pl: initial import
+
+2004-01-19 15:16  fredo
+
+	* Makefile.PL, lib/PDF/API2.pm: update for 0.40_16
+
+2004-01-19 15:09  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fixed odd ends commenting
+	  practice import
+
+2004-01-19 13:51  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fix for reportlab's starnge
+	  commenting -- removed
+
+2004-01-19 13:47  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fix for reportlab's starnge
+	  commenting -- ad 1
+
+2004-01-19 13:34  fredo
+
+	* lib/PDF/API2/Basic/PDF/File.pm: fix for reportlab's starnge
+	  commenting
+
+2004-01-15 22:26  fredo
+
+	* lib/PDF/API2.pm: docbug: fixed inconsistent links
+
+2004-01-14 19:25  fredo
+
+	* Makefile.PL, lib/PDF/API2.pm: release update 0.40_15
+
+2004-01-14 19:24  fredo
+
+	* MANIFEST: added missing code128.pm entry
+
+2004-01-12 14:52  fredo
+
+	* Makefile.PL, lib/PDF/API2.pm: update for 0.40_14
+
+2004-01-09 00:56  fredo
+
+	* lib/PDF/API2.pm: corrected producer tag versioning, updated to
+	  release 0.40_13
+
+2004-01-09 00:54  fredo
+
+	* lib/PDF/API2/Basic/PDF/String.pm: corrected hex-string
+	  import/export with looser spec.
+
+2004-01-08 13:00  fredo
+
+	* LICENSE: patent statement reformatted
+
+2003-12-08 23:46  Administrator
+
+	* MANIFEST: added howto and examples: corefont, synfont
+
+2003-12-08 23:42  Administrator
+
+	* lib/PDF/API2/HOWTO.pod: rudimentary skeleton
+
+2003-12-08 23:12  Administrator
+
+	* examples/: 020_corefonts, 021_synfonts: inital import
+
+2003-12-08 22:37  Administrator
+
+	* Makefile.PL: updated	copyright date
+
+2003-12-08 14:51  Administrator
+
+	* README: updated general changelog for 0.40_13
+
+2003-12-08 14:20  Administrator
+
+	* Makefile: makefile autogen update
+
+2003-12-08 14:15  Administrator
+
+	* MANIFEST: deleted obsolete docs-dir; added t/00use.t
+
+2003-12-08 14:13  Administrator
+
+	* t/00use.t: added Log tag
+
+2003-12-08 14:11  Administrator
+
+	* t/00use.t: new import with proper licencing statement
+
+2003-12-08 14:05  Administrator
+
+	* lib/PDF/: API2.pm, API2/Annotation.pm, API2/Content.pm,
+	  API2/IOString.pm, API2/Lite.pm, API2/Matrix.pm, API2/Outline.pm,
+	  API2/Outlines.pm, API2/Page.pm, API2/Resource.pm, API2/Util.pm,
+	  API2/Win32.pm, API2/Basic/PDF/Array.pm, API2/Basic/PDF/Bool.pm,
+	  API2/Basic/PDF/Dict.pm, API2/Basic/PDF/File.pm,
+	  API2/Basic/PDF/Filter.pm, API2/Basic/PDF/Name.pm,
+	  API2/Basic/PDF/Null.pm, API2/Basic/PDF/Number.pm,
+	  API2/Basic/PDF/Objind.pm, API2/Basic/PDF/Page.pm,
+	  API2/Basic/PDF/Pages.pm, API2/Basic/PDF/String.pm,
+	  API2/Basic/PDF/Utils.pm, API2/Basic/TTF/AATKern.pm,
+	  API2/Basic/TTF/AATutils.pm, API2/Basic/TTF/Anchor.pm,
+	  API2/Basic/TTF/Bsln.pm, API2/Basic/TTF/Cmap.pm,
+	  API2/Basic/TTF/Coverage.pm, API2/Basic/TTF/Cvt_.pm,
+	  API2/Basic/TTF/Delta.pm, API2/Basic/TTF/Fdsc.pm,
+	  API2/Basic/TTF/Feat.pm, API2/Basic/TTF/Fmtx.pm,
+	  API2/Basic/TTF/Font.pm, API2/Basic/TTF/Fpgm.pm,
+	  API2/Basic/TTF/GDEF.pm, API2/Basic/TTF/GPOS.pm,
+	  API2/Basic/TTF/GSUB.pm, API2/Basic/TTF/Glyf.pm,
+	  API2/Basic/TTF/Glyph.pm, API2/Basic/TTF/Hdmx.pm,
+	  API2/Basic/TTF/Head.pm, API2/Basic/TTF/Hhea.pm,
+	  API2/Basic/TTF/Hmtx.pm, API2/Basic/TTF/Kern.pm,
+	  API2/Basic/TTF/LTSH.pm, API2/Basic/TTF/Loca.pm,
+	  API2/Basic/TTF/Manual.pod, API2/Basic/TTF/Maxp.pm,
+	  API2/Basic/TTF/Mort.pm, API2/Basic/TTF/Name.pm,
+	  API2/Basic/TTF/OS_2.pm, API2/Basic/TTF/OldCmap.pm,
+	  API2/Basic/TTF/OldMort.pm, API2/Basic/TTF/PCLT.pm,
+	  API2/Basic/TTF/Post.pm, API2/Basic/TTF/PSNames.pm,
+	  API2/Basic/TTF/Prep.pm, API2/Basic/TTF/Prop.pm,
+	  API2/Basic/TTF/Segarr.pm, API2/Basic/TTF/Table.pm,
+	  API2/Basic/TTF/Ttc.pm, API2/Basic/TTF/Ttopen.pm,
+	  API2/Basic/TTF/Utils.pm, API2/Basic/TTF/Vhea.pm,
+	  API2/Basic/TTF/Vmtx.pm, API2/Basic/TTF/Win32.pm,
+	  API2/Basic/TTF/XMLparse.pm, API2/Basic/TTF/Kern/ClassArray.pm,
+	  API2/Basic/TTF/Kern/CompactClassArray.pm,
+	  API2/Basic/TTF/Kern/OrderedList.pm,
+	  API2/Basic/TTF/Kern/StateTable.pm,
+	  API2/Basic/TTF/Kern/Subtable.pm, API2/Basic/TTF/Mort/Chain.pm,
+	  API2/Basic/TTF/Mort/Contextual.pm,
+	  API2/Basic/TTF/Mort/Insertion.pm,
+	  API2/Basic/TTF/Mort/Ligature.pm,
+	  API2/Basic/TTF/Mort/Noncontextual.pm,
+	  API2/Basic/TTF/Mort/Rearrangement.pm,
+	  API2/Basic/TTF/Mort/Subtable.pm, API2/Content/symbols.pm,
+	  API2/Content/Text.pm, API2/Resource/BaseFont.pm,
+	  API2/Resource/CIDFont.pm, API2/Resource/ColorSpace.pm,
+	  API2/Resource/ExtGState.pm, API2/Resource/Font.pm,
+	  API2/Resource/Shading.pm, API2/Resource/XObject.pm,
+	  API2/Resource/CIDFont/CJKFont.pm,
+	  API2/Resource/CIDFont/TrueType.pm,
+	  API2/Resource/CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  API2/Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  API2/Resource/CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  API2/Resource/CIDFont/CJKFont/kozgopromediumacro.pm,
+	  API2/Resource/CIDFont/CJKFont/kozminproregularacro.pm,
+	  API2/Resource/CIDFont/CMap/japanese.pm,
+	  API2/Resource/CIDFont/CMap/korean.pm,
+	  API2/Resource/CIDFont/CMap/simplified.pm,
+	  API2/Resource/CIDFont/CMap/traditional.pm,
+	  API2/Resource/CIDFont/TrueType/FontFile.pm,
+	  API2/Resource/ColorSpace/Indexed.pm,
+	  API2/Resource/ColorSpace/Indexed/ACTFile.pm,
+	  API2/Resource/ColorSpace/Indexed/Hue.pm,
+	  API2/Resource/ColorSpace/Indexed/WebColor.pm,
+	  API2/Resource/Font/CoreFont.pm, API2/Resource/Font/Postscript.pm,
+	  API2/Resource/Font/SynFont.pm,
+	  API2/Resource/Font/CoreFont/bankgothic.pm,
+	  API2/Resource/Font/CoreFont/courier.pm,
+	  API2/Resource/Font/CoreFont/courierbold.pm,
+	  API2/Resource/Font/CoreFont/courierboldoblique.pm,
+	  API2/Resource/Font/CoreFont/courieroblique.pm,
+	  API2/Resource/Font/CoreFont/georgia.pm,
+	  API2/Resource/Font/CoreFont/georgiabold.pm,
+	  API2/Resource/Font/CoreFont/georgiabolditalic.pm,
+	  API2/Resource/Font/CoreFont/georgiaitalic.pm,
+	  API2/Resource/Font/CoreFont/helvetica.pm,
+	  API2/Resource/Font/CoreFont/helveticabold.pm,
+	  API2/Resource/Font/CoreFont/helveticaboldoblique.pm,
+	  API2/Resource/Font/CoreFont/helveticaoblique.pm,
+	  API2/Resource/Font/CoreFont/symbol.pm,
+	  API2/Resource/Font/CoreFont/timesbold.pm,
+	  API2/Resource/Font/CoreFont/timesbolditalic.pm,
+	  API2/Resource/Font/CoreFont/timesitalic.pm,
+	  API2/Resource/Font/CoreFont/timesroman.pm,
+	  API2/Resource/Font/CoreFont/trebuchet.pm,
+	  API2/Resource/Font/CoreFont/trebuchetbold.pm,
+	  API2/Resource/Font/CoreFont/trebuchetbolditalic.pm,
+	  API2/Resource/Font/CoreFont/trebuchetitalic.pm,
+	  API2/Resource/Font/CoreFont/verdana.pm,
+	  API2/Resource/Font/CoreFont/verdanabold.pm,
+	  API2/Resource/Font/CoreFont/verdanabolditalic.pm,
+	  API2/Resource/Font/CoreFont/verdanaitalic.pm,
+	  API2/Resource/Font/CoreFont/webdings.pm,
+	  API2/Resource/Font/CoreFont/wingdings.pm,
+	  API2/Resource/Font/CoreFont/zapfdingbats.pm,
+	  API2/Resource/Shading/axial.pm, API2/Resource/XObject/Form.pm,
+	  API2/Resource/XObject/Image.pm,
+	  API2/Resource/XObject/Form/BarCode.pm,
+	  API2/Resource/XObject/Form/Hybrid.pm,
+	  API2/Resource/XObject/Form/BarCode/codabar.pm,
+	  API2/Resource/XObject/Form/BarCode/code128.pm,
+	  API2/Resource/XObject/Form/BarCode/code3of9.pm,
+	  API2/Resource/XObject/Form/BarCode/ean13.pm,
+	  API2/Resource/XObject/Form/BarCode/int2of5.pm,
+	  API2/Resource/XObject/Image/GD.pm,
+	  API2/Resource/XObject/Image/GIF.pm,
+	  API2/Resource/XObject/Image/JPEG.pm,
+	  API2/Resource/XObject/Image/PNG.pm,
+	  API2/Resource/XObject/Image/PNM.pm,
+	  API2/Resource/XObject/Image/TIFF.pm: corrected to proper
+	  licencing statement
+
+2003-12-08 12:55  Administrator
+
+	* lib/PDF/API2/Annotation.pm: change for proper module versioning
+
+2003-12-08 12:47  Administrator
+
+	* lib/PDF/API2.pm: change step 3 for proper module versioning
+
+2003-12-08 12:46  Administrator
+
+	* lib/PDF/API2.pm: change step 2 for proper module versioning
+
+2003-12-08 12:43  Administrator
+
+	* lib/PDF/API2.pm: change step 1 for proper module versioning
+
+2003-12-08 12:39  Administrator
+
+	* Makefile.PL: updated for req. perl >= 5.8 of 0.40_13 release
+
+2003-11-30 20:00  Administrator
+
+	* lib/PDF/API2.pm: added Code128/EAN128
+
+2003-11-30 19:55  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/code128.pm: added
+	  EAN128
+
+2003-11-30 19:53  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/code128.pm: inital
+	  import
+
+2003-11-30 19:16  Administrator
+
+	* AUTHORS: added fredo as default author
+
+2003-11-30 18:36  Administrator
+
+	* lib/PDF/API2/Resource/XObject/: Form/BarCode/codabar.pm,
+	  Form/BarCode/code3of9.pm, Form/BarCode/ean13.pm,
+	  Form/BarCode/int2of5.pm, Image/GD.pm, Image/GIF.pm,
+	  Image/JPEG.pm, Image/PNG.pm, Image/PNM.pm, Image/TIFF.pm: merged
+	  into default
+
+2003-11-30 18:32  Administrator
+
+	* lib/PDF/API2/Resource/: ColorSpace/Indexed.pm,
+	  ColorSpace/Indexed/ACTFile.pm, ColorSpace/Indexed/Hue.pm,
+	  ColorSpace/Indexed/WebColor.pm, Font/CoreFont.pm,
+	  Font/Postscript.pm, Font/SynFont.pm, Font/CoreFont/bankgothic.pm,
+	  Font/CoreFont/courier.pm, Font/CoreFont/courierbold.pm,
+	  Font/CoreFont/courierboldoblique.pm,
+	  Font/CoreFont/courieroblique.pm, Font/CoreFont/georgia.pm,
+	  Font/CoreFont/georgiabold.pm, Font/CoreFont/georgiabolditalic.pm,
+	  Font/CoreFont/georgiaitalic.pm, Font/CoreFont/helvetica.pm,
+	  Font/CoreFont/helveticabold.pm,
+	  Font/CoreFont/helveticaboldoblique.pm,
+	  Font/CoreFont/helveticaoblique.pm, Font/CoreFont/symbol.pm,
+	  Font/CoreFont/timesbold.pm, Font/CoreFont/timesbolditalic.pm,
+	  Font/CoreFont/timesitalic.pm, Font/CoreFont/timesroman.pm,
+	  Font/CoreFont/trebuchet.pm, Font/CoreFont/trebuchetbold.pm,
+	  Font/CoreFont/trebuchetbolditalic.pm,
+	  Font/CoreFont/trebuchetitalic.pm, Font/CoreFont/verdana.pm,
+	  Font/CoreFont/verdanabold.pm, Font/CoreFont/verdanabolditalic.pm,
+	  Font/CoreFont/verdanaitalic.pm, Font/CoreFont/webdings.pm,
+	  Font/CoreFont/wingdings.pm, Font/CoreFont/zapfdingbats.pm,
+	  Shading/axial.pm, XObject/Form.pm, XObject/Image.pm,
+	  XObject/Form/BarCode.pm, XObject/Form/Hybrid.pm: merged into
+	  default
+
+2003-11-30 18:28  Administrator
+
+	* lib/PDF/API2/Resource/: BaseFont.pm, CIDFont.pm, ColorSpace.pm,
+	  ExtGState.pm, Font.pm, Shading.pm, XObject.pm,
+	  CIDFont/CJKFont.pm, CIDFont/TrueType.pm,
+	  CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  CIDFont/CJKFont/kozgopromediumacro.pm,
+	  CIDFont/CJKFont/kozminproregularacro.pm,
+	  CIDFont/CMap/japanese.pm, CIDFont/CMap/korean.pm,
+	  CIDFont/CMap/simplified.pm, CIDFont/CMap/traditional.pm,
+	  CIDFont/TrueType/FontFile.pm: merged into default
+
+2003-11-30 18:23  Administrator
+
+	* lib/PDF/API2/: Basic/TTF/Mort/Chain.pm,
+	  Basic/TTF/Mort/Contextual.pm, Basic/TTF/Mort/Insertion.pm,
+	  Basic/TTF/Mort/Ligature.pm, Basic/TTF/Mort/Noncontextual.pm,
+	  Basic/TTF/Mort/Rearrangement.pm, Basic/TTF/Mort/Subtable.pm,
+	  Content/Text.pm, Content/symbols.pm: merged into default
+
+2003-11-30 18:20  Administrator
+
+	* lib/PDF/API2/: Util.pm, Win32.pm, Basic/PDF/Array.pm,
+	  Basic/PDF/Bool.pm, Basic/PDF/Dict.pm, Basic/PDF/File.pm,
+	  Basic/PDF/Filter.pm, Basic/PDF/Name.pm, Basic/PDF/Null.pm,
+	  Basic/PDF/Number.pm, Basic/PDF/Objind.pm, Basic/PDF/Page.pm,
+	  Basic/PDF/Pages.pm, Basic/PDF/String.pm, Basic/PDF/Utils.pm,
+	  Basic/TTF/AATKern.pm, Basic/TTF/AATutils.pm, Basic/TTF/Anchor.pm,
+	  Basic/TTF/Bsln.pm, Basic/TTF/Changes, Basic/TTF/Cmap.pm,
+	  Basic/TTF/Coverage.pm, Basic/TTF/Cvt_.pm, Basic/TTF/Delta.pm,
+	  Basic/TTF/Fdsc.pm, Basic/TTF/Feat.pm, Basic/TTF/Fmtx.pm,
+	  Basic/TTF/Font.pm, Basic/TTF/Fpgm.pm, Basic/TTF/GDEF.pm,
+	  Basic/TTF/GPOS.pm, Basic/TTF/GSUB.pm, Basic/TTF/Glyf.pm,
+	  Basic/TTF/Glyph.pm, Basic/TTF/Hdmx.pm, Basic/TTF/Head.pm,
+	  Basic/TTF/Hhea.pm, Basic/TTF/Hmtx.pm, Basic/TTF/Kern.pm,
+	  Basic/TTF/LTSH.pm, Basic/TTF/Loca.pm, Basic/TTF/Manual.pod,
+	  Basic/TTF/Maxp.pm, Basic/TTF/Mort.pm, Basic/TTF/Name.pm,
+	  Basic/TTF/OS_2.pm, Basic/TTF/OldCmap.pm, Basic/TTF/OldMort.pm,
+	  Basic/TTF/PCLT.pm, Basic/TTF/PSNames.pm, Basic/TTF/Post.pm,
+	  Basic/TTF/Prep.pm, Basic/TTF/Prop.pm, Basic/TTF/Segarr.pm,
+	  Basic/TTF/Table.pm, Basic/TTF/Ttc.pm, Basic/TTF/Ttopen.pm,
+	  Basic/TTF/Useall.pm, Basic/TTF/Utils.pm, Basic/TTF/Vhea.pm,
+	  Basic/TTF/Vmtx.pm, Basic/TTF/Win32.pm, Basic/TTF/XMLparse.pm,
+	  Basic/TTF/Kern/ClassArray.pm,
+	  Basic/TTF/Kern/CompactClassArray.pm,
+	  Basic/TTF/Kern/OrderedList.pm, Basic/TTF/Kern/StateTable.pm,
+	  Basic/TTF/Kern/Subtable.pm: merged into default
+
+2003-11-30 18:16  Administrator
+
+	* lib/PDF/API2/: Outlines.pm, Page.pm, Resource.pm: merged into
+	  default
+
+2003-11-30 18:11  Administrator
+
+	* lib/PDF/API2/: Lite.pm, Matrix.pm, Outline.pm: merged into
+	  default
+
+2003-11-30 18:08  Administrator
+
+	* lib/PDF/API2/: Annotation.pm, Content.pm, IOString.pm: merged
+	  into default
+
+2003-11-30 18:05  Administrator
+
+	* INSTALL: added cvs id
+
+2003-11-30 18:04  Administrator
+
+	* README, VERSION, lib/PDF/API2.pm: merged into default
+
+2003-11-30 18:01  Administrator
+
+	* AUTHORS, CONTACT, COPYING, INSTALL, LICENSE, Makefile,
+	  Makefile.PL, MANIFEST: merged into default
+
+2003-11-30 17:56  Administrator
+
+	* AUTHORS, CONTACT, COPYING, INSTALL, LICENSE, MANIFEST, Makefile,
+	  Makefile.PL, README, VERSION, lib/PDF/API2.pm,
+	  lib/PDF/API2/Annotation.pm, lib/PDF/API2/Content.pm,
+	  lib/PDF/API2/IOString.pm, lib/PDF/API2/Lite.pm,
+	  lib/PDF/API2/Matrix.pm, lib/PDF/API2/Outline.pm,
+	  lib/PDF/API2/Outlines.pm, lib/PDF/API2/Page.pm,
+	  lib/PDF/API2/Resource.pm, lib/PDF/API2/Util.pm,
+	  lib/PDF/API2/Win32.pm, lib/PDF/API2/Basic/PDF/Array.pm,
+	  lib/PDF/API2/Basic/PDF/Bool.pm, lib/PDF/API2/Basic/PDF/Dict.pm,
+	  lib/PDF/API2/Basic/PDF/File.pm, lib/PDF/API2/Basic/PDF/Filter.pm,
+	  lib/PDF/API2/Basic/PDF/Name.pm, lib/PDF/API2/Basic/PDF/Null.pm,
+	  lib/PDF/API2/Basic/PDF/Number.pm,
+	  lib/PDF/API2/Basic/PDF/Objind.pm, lib/PDF/API2/Basic/PDF/Page.pm,
+	  lib/PDF/API2/Basic/PDF/Pages.pm,
+	  lib/PDF/API2/Basic/PDF/String.pm,
+	  lib/PDF/API2/Basic/PDF/Utils.pm,
+	  lib/PDF/API2/Basic/TTF/AATKern.pm,
+	  lib/PDF/API2/Basic/TTF/AATutils.pm,
+	  lib/PDF/API2/Basic/TTF/Anchor.pm, lib/PDF/API2/Basic/TTF/Bsln.pm,
+	  lib/PDF/API2/Basic/TTF/Changes, lib/PDF/API2/Basic/TTF/Cmap.pm,
+	  lib/PDF/API2/Basic/TTF/Coverage.pm,
+	  lib/PDF/API2/Basic/TTF/Cvt_.pm, lib/PDF/API2/Basic/TTF/Delta.pm,
+	  lib/PDF/API2/Basic/TTF/Fdsc.pm, lib/PDF/API2/Basic/TTF/Feat.pm,
+	  lib/PDF/API2/Basic/TTF/Fmtx.pm, lib/PDF/API2/Basic/TTF/Font.pm,
+	  lib/PDF/API2/Basic/TTF/Fpgm.pm, lib/PDF/API2/Basic/TTF/GDEF.pm,
+	  lib/PDF/API2/Basic/TTF/GPOS.pm, lib/PDF/API2/Basic/TTF/GSUB.pm,
+	  lib/PDF/API2/Basic/TTF/Glyf.pm, lib/PDF/API2/Basic/TTF/Glyph.pm,
+	  lib/PDF/API2/Basic/TTF/Hdmx.pm, lib/PDF/API2/Basic/TTF/Head.pm,
+	  lib/PDF/API2/Basic/TTF/Hhea.pm, lib/PDF/API2/Basic/TTF/Hmtx.pm,
+	  lib/PDF/API2/Basic/TTF/Kern.pm, lib/PDF/API2/Basic/TTF/LTSH.pm,
+	  lib/PDF/API2/Basic/TTF/Loca.pm,
+	  lib/PDF/API2/Basic/TTF/Manual.pod,
+	  lib/PDF/API2/Basic/TTF/Maxp.pm, lib/PDF/API2/Basic/TTF/Mort.pm,
+	  lib/PDF/API2/Basic/TTF/Name.pm, lib/PDF/API2/Basic/TTF/OS_2.pm,
+	  lib/PDF/API2/Basic/TTF/OldCmap.pm,
+	  lib/PDF/API2/Basic/TTF/OldMort.pm,
+	  lib/PDF/API2/Basic/TTF/PCLT.pm,
+	  lib/PDF/API2/Basic/TTF/PSNames.pm,
+	  lib/PDF/API2/Basic/TTF/Post.pm, lib/PDF/API2/Basic/TTF/Prep.pm,
+	  lib/PDF/API2/Basic/TTF/Prop.pm, lib/PDF/API2/Basic/TTF/Segarr.pm,
+	  lib/PDF/API2/Basic/TTF/Table.pm, lib/PDF/API2/Basic/TTF/Ttc.pm,
+	  lib/PDF/API2/Basic/TTF/Ttopen.pm,
+	  lib/PDF/API2/Basic/TTF/Useall.pm,
+	  lib/PDF/API2/Basic/TTF/Utils.pm, lib/PDF/API2/Basic/TTF/Vhea.pm,
+	  lib/PDF/API2/Basic/TTF/Vmtx.pm, lib/PDF/API2/Basic/TTF/Win32.pm,
+	  lib/PDF/API2/Basic/TTF/XMLparse.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/ClassArray.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/CompactClassArray.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/OrderedList.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/StateTable.pm,
+	  lib/PDF/API2/Basic/TTF/Kern/Subtable.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Chain.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Contextual.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Insertion.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Ligature.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Noncontextual.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Rearrangement.pm,
+	  lib/PDF/API2/Basic/TTF/Mort/Subtable.pm,
+	  lib/PDF/API2/Content/Text.pm, lib/PDF/API2/Content/symbols.pm,
+	  lib/PDF/API2/Resource/BaseFont.pm,
+	  lib/PDF/API2/Resource/CIDFont.pm,
+	  lib/PDF/API2/Resource/ColorSpace.pm,
+	  lib/PDF/API2/Resource/ExtGState.pm,
+	  lib/PDF/API2/Resource/Font.pm, lib/PDF/API2/Resource/Shading.pm,
+	  lib/PDF/API2/Resource/XObject.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont.pm,
+	  lib/PDF/API2/Resource/CIDFont/TrueType.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/kozgopromediumacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CJKFont/kozminproregularacro.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/japanese.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/korean.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/simplified.pm,
+	  lib/PDF/API2/Resource/CIDFont/CMap/traditional.pm,
+	  lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/ACTFile.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/Hue.pm,
+	  lib/PDF/API2/Resource/ColorSpace/Indexed/WebColor.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont.pm,
+	  lib/PDF/API2/Resource/Font/Postscript.pm,
+	  lib/PDF/API2/Resource/Font/SynFont.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/bankgothic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courier.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courierbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courierboldoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/courieroblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgia.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiabolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/georgiaitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helvetica.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticaboldoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/helveticaoblique.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/symbol.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesbolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/timesroman.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchet.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetbold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetbolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/trebuchetitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdana.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanabold.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanabolditalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/verdanaitalic.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/webdings.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/wingdings.pm,
+	  lib/PDF/API2/Resource/Font/CoreFont/zapfdingbats.pm,
+	  lib/PDF/API2/Resource/Shading/axial.pm,
+	  lib/PDF/API2/Resource/XObject/Form.pm,
+	  lib/PDF/API2/Resource/XObject/Image.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode.pm,
+	  lib/PDF/API2/Resource/XObject/Form/Hybrid.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/codabar.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/code3of9.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/ean13.pm,
+	  lib/PDF/API2/Resource/XObject/Form/BarCode/int2of5.pm,
+	  lib/PDF/API2/Resource/XObject/Image/GD.pm,
+	  lib/PDF/API2/Resource/XObject/Image/GIF.pm,
+	  lib/PDF/API2/Resource/XObject/Image/JPEG.pm,
+	  lib/PDF/API2/Resource/XObject/Image/PNG.pm,
+	  lib/PDF/API2/Resource/XObject/Image/PNM.pm,
+	  lib/PDF/API2/Resource/XObject/Image/TIFF.pm: merged into default
+
+2003-11-30 17:47  Administrator
+
+	* COPYING, LICENSE, lib/PDF/API2.pm: merged into default
+
+2003-11-30 17:00  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Image/: GD.pm, GIF.pm, JPEG.pm,
+	  PNG.pm, PNM.pm, TIFF.pm: added CVS id/log
+
+2003-11-30 16:55  Administrator
+
+	* lib/PDF/API2/Resource/Shading/axial.pm: added CVS id/log
+
+2003-11-30 16:52  Administrator
+
+	* lib/PDF/API2/Resource/Font/CoreFont/: bankgothic.pm, courier.pm,
+	  courierbold.pm, courierboldoblique.pm, courieroblique.pm,
+	  georgia.pm, georgiabold.pm, georgiabolditalic.pm,
+	  georgiaitalic.pm, helvetica.pm, helveticabold.pm,
+	  helveticaboldoblique.pm, helveticaoblique.pm, symbol.pm,
+	  timesbold.pm, timesbolditalic.pm, timesitalic.pm, timesroman.pm,
+	  trebuchet.pm, trebuchetbold.pm, trebuchetbolditalic.pm,
+	  trebuchetitalic.pm, verdana.pm, verdanabold.pm,
+	  verdanabolditalic.pm, verdanaitalic.pm, webdings.pm,
+	  wingdings.pm, zapfdingbats.pm: added CVS id/log
+
+2003-11-30 15:45  Administrator
+
+	* lib/PDF/API2/Resource/Font/: CoreFont.pm, Postscript.pm,
+	  SynFont.pm: added CVS id/log
+
+2003-11-30 15:31  Administrator
+
+	* lib/PDF/API2/Resource/ColorSpace/Indexed/: ACTFile.pm, Hue.pm,
+	  WebColor.pm: added CVS id/log
+
+2003-11-30 15:27  Administrator
+
+	* lib/PDF/API2/Resource/: CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  CIDFont/CJKFont/kozgopromediumacro.pm,
+	  CIDFont/CJKFont/kozminproregularacro.pm, ColorSpace/Indexed.pm:
+	  added CVS id/log
+
+2003-11-30 15:21  Administrator
+
+	* lib/PDF/API2/Resource/CIDFont/CMap/: japanese.pm, korean.pm,
+	  simplified.pm, traditional.pm: added CVS id/log
+
+2003-11-30 15:16  Administrator
+
+	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added CVS
+	  id/log
+
+2003-11-30 15:13  Administrator
+
+	* lib/PDF/API2/Resource/CIDFont/: CJKFont.pm, TrueType.pm: added
+	  CVS id/log
+
+2003-11-30 14:57  Administrator
+
+	* README: updated reqirements and support statement
+
+2003-11-30 12:50  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/: BarCode.pm, Hybrid.pm,
+	  BarCode/codabar.pm, BarCode/code3of9.pm, BarCode/ean13.pm,
+	  BarCode/int2of5.pm: added CVS id/log
+
+2003-11-30 12:44  Administrator
+
+	* lib/PDF/API2/Resource/: BaseFont.pm, CIDFont.pm, ColorSpace.pm,
+	  ExtGState.pm, Font.pm, Shading.pm, XObject.pm, XObject/Form.pm,
+	  XObject/Image.pm: added CVS id/log
+
+2003-11-30 12:32  Administrator
+
+	* lib/PDF/API2/: Util.pm, Page.pm, Outline.pm, Matrix.pm, Lite.pm,
+	  IOString.pm, Annotation.pm, Content.pm: added CVS id/log
+
+2003-11-30 00:31  Administrator
+
+	* lib/PDF/API2/: Outlines.pm, Resource.pm, Win32.pm: added CVS
+	  id/log
+
+2003-11-30 00:22  Administrator
+
+	* MANIFEST: added symbols.pm
+
+2003-11-30 00:20  Administrator
+
+	* COPYING: removed adobe patent clarification
+
+2003-11-30 00:20  Administrator
+
+	* LICENSE: addedd CVS Id/Log adobe patent clarification
+
+2003-11-30 00:16  Administrator
+
+	* README: addedd CVS Id/Log
+
+2003-11-30 00:12  Administrator
+
+	* lib/PDF/: API2/Content/Text.pm, API2.pm: addedd CVS Id/Log
+
+2003-11-30 00:08  Administrator
+
+	* lib/PDF/API2/Content/symbols.pm: added arrow and arrowfull
+	  definitions
+
+2003-11-29 23:27  Administrator
+
+	* lib/PDF/API2/Content/symbols.pm: Added CVS Id/Log
+
+2003-11-29 23:26  Administrator
+
+	* Makefile.PL: Added CVS Id
+
+2003-11-29 23:20  Administrator
+
+	* Makefile.PL: Added CVS log
+
+2003-11-29 23:17  Administrator
+
+	* Makefile.PL: Compress::Zlib prereq. downgraded to 1.0
+
+2003-11-16 23:24  Administrator
+
+	* lib/PDF/API2/Resource/Shading/axial.pm: Initial revision
+
+2003-11-16 23:24  Administrator
+
+	* lib/PDF/API2/Resource/Shading/axial.pm: no message
+
+2003-11-16 22:55  Administrator
+
+	* lib/PDF/API2/Resource/Shading.pm: Initial revision
+
+2003-11-16 22:55  Administrator
+
+	* lib/PDF/API2/Resource/Shading.pm: no message
+
+2003-11-16 05:01  Administrator
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: Initial revision
+
+2003-11-16 05:01  Administrator
+
+	* lib/PDF/API2/Resource/Font/SynFont.pm: no message
+
+2003-11-16 04:05  Administrator
+
+	* MANIFEST, lib/PDF/API2.pm, Makefile: Initial revision
+
+2003-11-16 04:05  Administrator
+
+	* MANIFEST, lib/PDF/API2.pm, Makefile: no message
+
+2003-11-16 01:45  Administrator
+
+	* lib/PDF/API2/Resource/ColorSpace.pm: Initial revision
+
+2003-11-16 01:45  Administrator
+
+	* lib/PDF/API2/Resource/ColorSpace.pm: no message
+
+2003-11-16 00:57  Administrator
+
+	* Makefile.PL: Initial revision
+
+2003-11-16 00:57  Administrator
+
+	* Makefile.PL: no message
+
+2003-11-16 00:41  Administrator
+
+	* lib/PDF/API2/Resource/Font/CoreFont.pm: Initial revision
+
+2003-11-16 00:41  Administrator
+
+	* lib/PDF/API2/Resource/Font/CoreFont.pm: no message
+
+2003-11-15 19:51  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/: ean13.pm,
+	  code3of9.pm: Initial revision
+
+2003-11-15 19:51  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/: ean13.pm,
+	  code3of9.pm: no message
+
+2003-11-15 19:46  Administrator
+
+	* AUTHORS: Initial revision
+
+2003-11-15 19:46  Administrator
+
+	* AUTHORS: no message
+
+2003-11-15 02:45  Administrator
+
+	* INSTALL, CONTACT, VERSION: Initial revision
+
+2003-11-15 02:45  Administrator
+
+	* INSTALL, CONTACT, VERSION: no message
+
+2003-11-15 02:41  Administrator
+
+	* README, LICENSE: Initial revision
+
+2003-11-15 02:41  Administrator
+
+	* README, LICENSE: no message
+
+2003-11-01 01:36  Administrator
+
+	* lib/PDF/API2/Content.pm: Initial revision
+
+2003-11-01 01:36  Administrator
+
+	* lib/PDF/API2/Content.pm: no message
+
+2003-11-01 01:21  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/int2of5.pm: Initial
+	  revision
+
+2003-11-01 01:21  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/int2of5.pm: no message
+
+2003-11-01 00:59  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode.pm: Initial revision
+
+2003-11-01 00:59  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode.pm: no message
+
+2003-11-01 00:50  Administrator
+
+	* lib/PDF/API2/Resource/BaseFont.pm: Initial revision
+
+2003-11-01 00:50  Administrator
+
+	* lib/PDF/API2/Resource/BaseFont.pm: no message
+
+2003-11-01 00:06  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/codabar.pm: Initial
+	  revision
+
+2003-11-01 00:06  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Form/BarCode/codabar.pm: no message
+
+2003-10-08 17:02  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Image/GD.pm: Initial revision
+
+2003-10-08 17:02  Administrator
+
+	* lib/PDF/API2/Resource/XObject/Image/GD.pm: no message
+
+2003-10-06 19:39  Administrator
+
+	* lib/PDF/API2/: Annotation.pm, Basic/PDF/Array.pm,
+	  Basic/PDF/Bool.pm, Basic/PDF/Dict.pm, Basic/PDF/File.pm,
+	  Basic/PDF/Filter.pm, Basic/PDF/Name.pm, Basic/PDF/Null.pm,
+	  Basic/PDF/Number.pm, Basic/PDF/Objind.pm, Basic/PDF/Page.pm,
+	  Basic/PDF/Pages.pm, Basic/PDF/String.pm, Basic/PDF/Utils.pm,
+	  Basic/TTF/AATKern.pm, Basic/TTF/AATutils.pm, Basic/TTF/Anchor.pm,
+	  Basic/TTF/Bsln.pm, Basic/TTF/Cmap.pm, Basic/TTF/Coverage.pm,
+	  Basic/TTF/Cvt_.pm, Basic/TTF/Delta.pm, Basic/TTF/Fdsc.pm,
+	  Basic/TTF/Feat.pm, Basic/TTF/Fmtx.pm, Basic/TTF/Font.pm,
+	  Basic/TTF/Fpgm.pm, Basic/TTF/GDEF.pm, Basic/TTF/GPOS.pm,
+	  Basic/TTF/GSUB.pm, Basic/TTF/Glyf.pm, Basic/TTF/Glyph.pm,
+	  Basic/TTF/Hdmx.pm, Basic/TTF/Head.pm, Basic/TTF/Hhea.pm,
+	  Basic/TTF/Hmtx.pm, Basic/TTF/Kern.pm, Basic/TTF/LTSH.pm,
+	  Basic/TTF/Loca.pm, Basic/TTF/Maxp.pm,
+	  Basic/TTF/Kern/ClassArray.pm,
+	  Basic/TTF/Kern/CompactClassArray.pm,
+	  Basic/TTF/Kern/OrderedList.pm, Basic/TTF/Kern/StateTable.pm,
+	  Basic/TTF/Kern/Subtable.pm, Basic/TTF/Mort/Chain.pm,
+	  Basic/TTF/Mort/Contextual.pm, Basic/TTF/Mort/Insertion.pm,
+	  IOString.pm, Lite.pm, Matrix.pm, Outline.pm, Outlines.pm,
+	  Page.pm, Basic/TTF/Mort.pm, Basic/TTF/Name.pm, Basic/TTF/OS_2.pm,
+	  Basic/TTF/OldCmap.pm, Basic/TTF/OldMort.pm, Basic/TTF/PCLT.pm,
+	  Basic/TTF/PSNames.pm, Basic/TTF/Post.pm, Basic/TTF/Prep.pm,
+	  Basic/TTF/Prop.pm, Basic/TTF/Segarr.pm, Basic/TTF/Table.pm,
+	  Basic/TTF/Ttc.pm, Basic/TTF/Ttopen.pm, Basic/TTF/Useall.pm,
+	  Basic/TTF/Utils.pm, Basic/TTF/Vhea.pm, Basic/TTF/Vmtx.pm,
+	  Basic/TTF/Win32.pm, Basic/TTF/XMLparse.pm,
+	  Basic/TTF/Mort/Ligature.pm, Basic/TTF/Mort/Noncontextual.pm,
+	  Basic/TTF/Mort/Rearrangement.pm, Basic/TTF/Mort/Subtable.pm,
+	  Content/Text.pm,
+	  Resource/CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  Resource/CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  Resource/CIDFont/CJKFont/kozgopromediumacro.pm,
+	  Resource/CIDFont/CJKFont.pm,
+	  Resource/CIDFont/CJKFont/kozminproregularacro.pm,
+	  Resource/CIDFont/CMap/japanese.pm,
+	  Resource/CIDFont/CMap/korean.pm,
+	  Resource/CIDFont/CMap/simplified.pm, Resource/CIDFont.pm,
+	  Resource/ExtGState.pm, Resource/CIDFont/TrueType.pm,
+	  Resource/CIDFont/CMap/traditional.pm,
+	  Resource/CIDFont/TrueType/FontFile.pm,
+	  Resource/ColorSpace/Indexed.pm,
+	  Resource/ColorSpace/Indexed/ACTFile.pm,
+	  Resource/ColorSpace/Indexed/Hue.pm,
+	  Resource/ColorSpace/Indexed/WebColor.pm,
+	  Resource/Font/CoreFont/bankgothic.pm,
+	  Resource/Font/CoreFont/courier.pm,
+	  Resource/Font/CoreFont/courierbold.pm,
+	  Resource/Font/CoreFont/courierboldoblique.pm,
+	  Resource/Font/CoreFont/courieroblique.pm,
+	  Resource/Font/CoreFont/georgia.pm,
+	  Resource/Font/CoreFont/georgiabold.pm,
+	  Resource/Font/CoreFont/georgiabolditalic.pm,
+	  Resource/Font/CoreFont/georgiaitalic.pm,
+	  Resource/Font/CoreFont/helvetica.pm,
+	  Resource/Font/CoreFont/helveticabold.pm,
+	  Resource/Font/CoreFont/helveticaboldoblique.pm,
+	  Resource/Font/CoreFont/helveticaoblique.pm,
+	  Resource/Font/CoreFont/symbol.pm,
+	  Resource/Font/CoreFont/timesbold.pm,
+	  Resource/Font/CoreFont/timesbolditalic.pm,
+	  Resource/Font/CoreFont/timesitalic.pm,
+	  Resource/Font/CoreFont/timesroman.pm,
+	  Resource/Font/CoreFont/trebuchet.pm,
+	  Resource/Font/CoreFont/trebuchetbold.pm,
+	  Resource/Font/CoreFont/trebuchetbolditalic.pm,
+	  Resource/Font/CoreFont/trebuchetitalic.pm, Resource.pm, Util.pm,
+	  Win32.pm, Resource/Font.pm, Resource/XObject.pm,
+	  Resource/Font/Postscript.pm, Resource/Font/CoreFont/verdana.pm,
+	  Resource/Font/CoreFont/verdanabold.pm,
+	  Resource/Font/CoreFont/verdanabolditalic.pm,
+	  Resource/Font/CoreFont/verdanaitalic.pm,
+	  Resource/Font/CoreFont/webdings.pm,
+	  Resource/Font/CoreFont/wingdings.pm,
+	  Resource/Font/CoreFont/zapfdingbats.pm, Resource/XObject/Form.pm,
+	  Resource/XObject/Image.pm, Resource/XObject/Form/Hybrid.pm,
+	  Resource/XObject/Image/GIF.pm, Resource/XObject/Image/JPEG.pm,
+	  Resource/XObject/Image/PNG.pm, Resource/XObject/Image/PNM.pm,
+	  Resource/XObject/Image/TIFF.pm: Initial revision
+
+2003-10-06 19:39  Administrator
+
+	* lib/PDF/API2/: Annotation.pm, Basic/PDF/Array.pm,
+	  Basic/PDF/Bool.pm, Basic/PDF/Dict.pm, Basic/PDF/File.pm,
+	  Basic/PDF/Filter.pm, Basic/PDF/Name.pm, Basic/PDF/Null.pm,
+	  Basic/PDF/Number.pm, Basic/PDF/Objind.pm, Basic/PDF/Page.pm,
+	  Basic/PDF/Pages.pm, Basic/PDF/String.pm, Basic/PDF/Utils.pm,
+	  Basic/TTF/AATKern.pm, Basic/TTF/AATutils.pm, Basic/TTF/Anchor.pm,
+	  Basic/TTF/Bsln.pm, Basic/TTF/Cmap.pm, Basic/TTF/Coverage.pm,
+	  Basic/TTF/Cvt_.pm, Basic/TTF/Delta.pm, Basic/TTF/Fdsc.pm,
+	  Basic/TTF/Feat.pm, Basic/TTF/Fmtx.pm, Basic/TTF/Font.pm,
+	  Basic/TTF/Fpgm.pm, Basic/TTF/GDEF.pm, Basic/TTF/GPOS.pm,
+	  Basic/TTF/GSUB.pm, Basic/TTF/Glyf.pm, Basic/TTF/Glyph.pm,
+	  Basic/TTF/Hdmx.pm, Basic/TTF/Head.pm, Basic/TTF/Hhea.pm,
+	  Basic/TTF/Hmtx.pm, Basic/TTF/Kern.pm, Basic/TTF/LTSH.pm,
+	  Basic/TTF/Loca.pm, Basic/TTF/Maxp.pm,
+	  Basic/TTF/Kern/ClassArray.pm,
+	  Basic/TTF/Kern/CompactClassArray.pm,
+	  Basic/TTF/Kern/OrderedList.pm, Basic/TTF/Kern/StateTable.pm,
+	  Basic/TTF/Kern/Subtable.pm, Basic/TTF/Mort/Chain.pm,
+	  Basic/TTF/Mort/Contextual.pm, Basic/TTF/Mort/Insertion.pm,
+	  IOString.pm, Lite.pm, Matrix.pm, Outline.pm, Outlines.pm,
+	  Page.pm, Basic/TTF/Mort.pm, Basic/TTF/Name.pm, Basic/TTF/OS_2.pm,
+	  Basic/TTF/OldCmap.pm, Basic/TTF/OldMort.pm, Basic/TTF/PCLT.pm,
+	  Basic/TTF/PSNames.pm, Basic/TTF/Post.pm, Basic/TTF/Prep.pm,
+	  Basic/TTF/Prop.pm, Basic/TTF/Segarr.pm, Basic/TTF/Table.pm,
+	  Basic/TTF/Ttc.pm, Basic/TTF/Ttopen.pm, Basic/TTF/Useall.pm,
+	  Basic/TTF/Utils.pm, Basic/TTF/Vhea.pm, Basic/TTF/Vmtx.pm,
+	  Basic/TTF/Win32.pm, Basic/TTF/XMLparse.pm,
+	  Basic/TTF/Mort/Ligature.pm, Basic/TTF/Mort/Noncontextual.pm,
+	  Basic/TTF/Mort/Rearrangement.pm, Basic/TTF/Mort/Subtable.pm,
+	  Content/Text.pm,
+	  Resource/CIDFont/CJKFont/adobemingstdlightacro.pm,
+	  Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.pm,
+	  Resource/CIDFont/CJKFont/adobesongstdlightacro.pm,
+	  Resource/CIDFont/CJKFont/kozgopromediumacro.pm,
+	  Resource/CIDFont/CJKFont.pm,
+	  Resource/CIDFont/CJKFont/kozminproregularacro.pm,
+	  Resource/CIDFont/CMap/japanese.pm,
+	  Resource/CIDFont/CMap/korean.pm,
+	  Resource/CIDFont/CMap/simplified.pm, Resource/CIDFont.pm,
+	  Resource/ExtGState.pm, Resource/CIDFont/TrueType.pm,
+	  Resource/CIDFont/CMap/traditional.pm,
+	  Resource/CIDFont/TrueType/FontFile.pm,
+	  Resource/ColorSpace/Indexed.pm,
+	  Resource/ColorSpace/Indexed/ACTFile.pm,
+	  Resource/ColorSpace/Indexed/Hue.pm,
+	  Resource/ColorSpace/Indexed/WebColor.pm,
+	  Resource/Font/CoreFont/bankgothic.pm,
+	  Resource/Font/CoreFont/courier.pm,
+	  Resource/Font/CoreFont/courierbold.pm,
+	  Resource/Font/CoreFont/courierboldoblique.pm,
+	  Resource/Font/CoreFont/courieroblique.pm,
+	  Resource/Font/CoreFont/georgia.pm,
+	  Resource/Font/CoreFont/georgiabold.pm,
+	  Resource/Font/CoreFont/georgiabolditalic.pm,
+	  Resource/Font/CoreFont/georgiaitalic.pm,
+	  Resource/Font/CoreFont/helvetica.pm,
+	  Resource/Font/CoreFont/helveticabold.pm,
+	  Resource/Font/CoreFont/helveticaboldoblique.pm,
+	  Resource/Font/CoreFont/helveticaoblique.pm,
+	  Resource/Font/CoreFont/symbol.pm,
+	  Resource/Font/CoreFont/timesbold.pm,
+	  Resource/Font/CoreFont/timesbolditalic.pm,
+	  Resource/Font/CoreFont/timesitalic.pm,
+	  Resource/Font/CoreFont/timesroman.pm,
+	  Resource/Font/CoreFont/trebuchet.pm,
+	  Resource/Font/CoreFont/trebuchetbold.pm,
+	  Resource/Font/CoreFont/trebuchetbolditalic.pm,
+	  Resource/Font/CoreFont/trebuchetitalic.pm, Resource.pm, Util.pm,
+	  Win32.pm, Resource/Font.pm, Resource/XObject.pm,
+	  Resource/Font/Postscript.pm, Resource/Font/CoreFont/verdana.pm,
+	  Resource/Font/CoreFont/verdanabold.pm,
+	  Resource/Font/CoreFont/verdanabolditalic.pm,
+	  Resource/Font/CoreFont/verdanaitalic.pm,
+	  Resource/Font/CoreFont/webdings.pm,
+	  Resource/Font/CoreFont/wingdings.pm,
+	  Resource/Font/CoreFont/zapfdingbats.pm, Resource/XObject/Form.pm,
+	  Resource/XObject/Image.pm, Resource/XObject/Form/Hybrid.pm,
+	  Resource/XObject/Image/GIF.pm, Resource/XObject/Image/JPEG.pm,
+	  Resource/XObject/Image/PNG.pm, Resource/XObject/Image/PNM.pm,
+	  Resource/XObject/Image/TIFF.pm: no message
+
+2003-09-13 20:37  Administrator
+
+	* COPYING: Initial revision
+
+2003-09-13 20:37  Administrator
+
+	* COPYING: no message
+
+2003-07-16 17:51  Administrator
+
+	* lib/PDF/API2/Basic/TTF/Manual.pod: Initial revision
+
+2003-07-16 17:51  Administrator
+
+	* lib/PDF/API2/Basic/TTF/Manual.pod: no message
+
+2003-04-09 13:13  fredo
+
+	* lib/PDF/API2/Resource/CIDFont/CJKFont.pm: added/fixed proper
+	  alias/substitutions
+
+2003-04-09 13:12  fredo
+
+	* lib/PDF/API2/Content.pm: documented form-image
+
+2002-10-02 18:47  Administrator
+
+	* lib/PDF/API2/Basic/TTF/Changes: Initial revision
+
+2002-10-02 18:47  Administrator
+
+	* lib/PDF/API2/Basic/TTF/Changes: no message
+
