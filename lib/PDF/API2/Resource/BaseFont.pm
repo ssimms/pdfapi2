@@ -491,7 +491,7 @@ Returns the character by the given unicode of the fonts encoding map.
 
 =cut
 
-sub encByUni { return( $_[0]->data->{u2c}->{$_[1]} || $_[0]->data->{u2e}->{$_[1]} || 0 ); }
+sub encByUni { return( $_[0]->data->{u2e}->{$_[1]} || $_[0]->data->{u2c}->{$_[1]} || 0 ); }
 
 =item $char = $font->mapByGlyph $glyph
 
@@ -748,6 +748,9 @@ alfred reibenschuh.
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2006/06/14 16:53:00  areibens
+    fixed unicode lookup to use actual encoding rather than default
+
     Revision 2.0  2005/11/16 02:16:04  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
