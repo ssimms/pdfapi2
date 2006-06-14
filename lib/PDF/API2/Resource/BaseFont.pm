@@ -169,7 +169,7 @@ sub tounicodemap {
         $cmap.=qq|1 begincodespacerange\n<00> <FF>\nendcodespacerange\n|;
         $cmap.=qq|256 beginbfchar\n|; 
         for(my $j=0; $j<256;$j++) {
-            $cmap.=sprintf(qq|<%02X> <%04X>\n|,$j,$self->uniByMap($j));
+            $cmap.=sprintf(qq|<%02X> <%04X>\n|,$j,$self->uniByEnc($j));
         }
         $cmap.=qq|endbfchar\n|;
     }
@@ -748,6 +748,9 @@ alfred reibenschuh.
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2006/06/14 16:57:52  areibens
+    fixed ToUnicode cmap greneration to use actual encoden rather than the default
+
     Revision 2.1  2006/06/14 16:53:00  areibens
     fixed unicode lookup to use actual encoding rather than default
 
