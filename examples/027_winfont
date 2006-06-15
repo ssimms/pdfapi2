@@ -47,25 +47,20 @@ use utf8;
 
 %wxf=PDF::API2->enumwinfonts;
 
-foreach $k (sort keys %wxf)
-{
-	print "font '$wxf{$k}' has key '$k'\n";
-}
-
-$api=PDF::API2->new();
-
-$api->mediabox(595,842);
-
-$helv=$api->corefont('Helvetica-Bold',-encode=>'latin1');
-
-
-my $sx=33;
-my $sy=45;
-my $fx=20;
-
 foreach my $k (sort keys %wxf)
 {
-    print STDERR "$wxf{$k}.\n";
+	print "font '$wxf{$k}' has key '$k'\n";
+
+    $api=PDF::API2->new();
+    
+    $api->mediabox(595,842);
+    
+    $helv=$api->corefont('Helvetica-Bold',-encode=>'latin1');
+    
+    my $sx=33;
+    my $sy=45;
+    my $fx=20;
+
     my $xf=$api->winfont($k,-encode=>'latin1');
 
     my $page = $api->page;
@@ -73,7 +68,8 @@ foreach my $k (sort keys %wxf)
 
     my $gfx=$page->gfx;
 
-    $gfx->textlabel(50,800,$helv,20,$wxf{$k},-hspace=>90);
+#    $gfx->textlabel(50,800,$helv,20,$wxf{$k},-hspace=>90);
+    $gfx->textlabel(50,800,$helv,20,$wxf{$k});
     
     foreach $x (0..15) 
     {
@@ -83,13 +79,101 @@ foreach my $k (sort keys %wxf)
             $gfx->textlabel(50+($sx*$x),50+($sy*$y)-6,$helv,6,nameByUni($y*16+$x),-color=>'#a00000',-hspace=>80,-rotate=>-15);
         }
     }
+
+    if(UNIVERSAL::can($xf,'uniByCId') && UNIVERSAL::can($xf,'glyphNum')) 
+    {
+        my @cids=(0 .. $xf->glyphNum-1);
+        my @fbbx = $xf->fontbbox;
+        my $xw = int(($fbbx[2]-$fbbx[0])/20)*20;
+        my $yw = int(($fbbx[3]-$fbbx[1])/20)*20;
+        my $fw = $xw>$yw ? $yw : $xw;
+        my $mw=800/$fw;
+        my $y0=int((20-$fbbx[1])/20)*20*$mw;
+    
+        while(scalar @cids>0) 
+        {
+            $page = $api->page;
+            $page->mediabox(595,842);
+    
+            $gfx=$page->gfx;
+    
+            foreach my $y (750,700,650,600,550,500,450,400,350,300,250,200,150,100,50) {
+                foreach my $x (50,100,150,200,250,300,350,400,450,500) {
+                    my $xo=shift @cids;
+                    $gfx->save;
+                    $gfx->fillcolor('black');
+                    $gfx->transform(-translate => [$x, $y], -scale => [0.045, 0.045]);
+    
+                    $gfx->linewidth(10);
+                    $gfx->rect(0,0,1000,1000);
+                    $gfx->stroke;
+    
+                    my $wx=$xf->wxByCId($xo)*$mw;
+                    my $x0=(1000-$wx)/2;
+    
+                    $gfx->linedash(10,20);
+                    $gfx->linewidth(0.5);
+                    $gfx->move($x0,0);
+                    $gfx->line($x0,1000);
+                    $gfx->move($x0+$wx,1000);
+                    $gfx->line($x0+$wx,0);
+                    $gfx->move(0,$y0);
+                    $gfx->line(1000,$y0);
+                    $gfx->stroke;
+    
+                    $gfx->textstart;
+                    $gfx->font($xf,1000*$mw);
+                    $gfx->translate($x0,$y0);
+                    $gfx->add($xf->text_cid(pack('n',$xo)),'Tj');
+    
+                    $gfx->font($helv,100);
+                    $gfx->hspace(80);
+                    $gfx->translate(25,860);
+                    $gfx->text("G+$xo"); 
+                    $gfx->translate(25,10);
+                    $gfx->text(sprintf('U+0x%04X',$xf->uniByCId($xo)));
+    
+                    my $name=$xf->glyphByCId($xo);
+                    if($name eq '') {
+                        $gfx->fillcolor('red');
+                        $name="NONE";
+                    } else {
+                        $gfx->fillcolor('blue');
+                    }
+    
+                    $gfx->hspace(70);
+                    $gfx->translate(975,860);
+                    $gfx->text_right($name);
+    
+                    $gfx->fillcolor('black');
+                    $gfx->translate(975,10);
+                    $gfx->text_right('wx='.$xf->wxByCId($xo));
+    
+                    $gfx->fillcolor('#008000');
+                    $gfx->translate(500,950);
+                    $gfx->hspace(70);
+                    my $ci = charinfo($xf->uniByCId($xo) || 0);
+                    $gfx->font($helv,50);
+                    $gfx->text_center($ci->{name});
+    
+                    $gfx->textend;
+                    $gfx->restore;
+    
+                    last unless(scalar @cids>0);
+                }
+                last unless(scalar @cids>0);
+            }
+            print STDERR ".";
+            ## $api->finishobjects($page,$gfx);
+        }
+    }
+
+    $api->saveas("$0.$k.pdf");
+    $api->end;
 }
-
-$api->saveas("$0.pdf");
-$api->end;
-
 
 #print Dumper($PDF::API2::wf);
 
 
 __END__
+
