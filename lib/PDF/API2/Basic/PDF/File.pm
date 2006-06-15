@@ -683,46 +683,54 @@ sub readval
         $value = $1;
         $str =~ s|^/($reg_char+)||so;
         $res = PDF::API2::Basic::PDF::Name->from_pdf($value, $self);
-    } elsif ($str =~ m/^\(/o)  # literal string
+    } 
+    elsif ($str =~ m/^\(/o)  # literal string
     {
         $str =~ s/^\(//o;
-    # We now need to find an unbalanced, unescaped right-paren.
-    # This can't be done with regexps.
-    my ($value) = "";
-    # The current level of nesting, when this reaches 0 we have finished.
-    my ($nested) = 1;
-    while (1) {
-        # Remove everything up to the first (possibly escaped) paren.
-        $str =~ /^((?:[^\\()]|\\[^()])*)(.*)/so;
-        $value .= $1;
-        $str = $2;
-
-        if ($str =~ /^(\\[()])/o) {
-        # An escaped paren.  This would be tricky to do with
-        # the regexp above (it's very difficult to be certain
-        # that all cases are covered so I think it's better to
-        # deal with them explicitly).
-        $str = substr ($str, 2);
-        $value = $value . $1;
-        } elsif ($str =~ /^\)/o) {
-        # Right paren
-        $nested--;
-        $str = substr ($str, 1);
-        if ($nested == 0)
-            { last; }
-        $value = $value . ')';
-        } elsif ($str =~ /^\(/o) {
-        # Left paren
-        $nested++;
-        $str = substr ($str, 1);
-        $value = $value . '(';
-        } else {
-        # No parens, we must read more.  We don't use update
-        # because we don't want to remove whitespace or
-        # comments.
-        $fh->read($str, 255, length($str)) or die "Unterminated string.";
+        # We now need to find an unbalanced, unescaped right-paren.
+        # This can't be done with regexps.
+        my ($value) = "";
+        # The current level of nesting, when this reaches 0 we have finished.
+        my ($nested) = 1;
+        while (1) {
+            # Remove everything up to the first (possibly escaped) paren.
+            $str =~ /^((?:[^\\()]|\\[^()])*)(.*)/so;
+            $value .= $1;
+            $str = $2;
+    
+            if ($str =~ /^(\\[()])/o) 
+            {
+                # An escaped paren.  This would be tricky to do with
+                # the regexp above (it's very difficult to be certain
+                # that all cases are covered so I think it's better to
+                # deal with them explicitly).
+                $str = substr ($str, 2);
+                $value = $value . $1;
+            } 
+            elsif ($str =~ /^\)/o) 
+            {
+                # Right paren
+                $nested--;
+                $str = substr ($str, 1);
+                if ($nested == 0)
+                    { last; }
+                $value = $value . ')';
+            } 
+            elsif ($str =~ /^\(/o) 
+            {
+                # Left paren
+                $nested++;
+                $str = substr ($str, 1);
+                $value = $value . '(';
+            } 
+            else 
+            {
+                # No parens, we must read more.  We don't use update
+                # because we don't want to remove whitespace or
+                # comments.
+                $fh->read($str, 255, length($str)) or die "Unterminated string.";
+            }
         }
-    }
 
         $res = PDF::API2::Basic::PDF::String->from_pdf($value);
     } 
