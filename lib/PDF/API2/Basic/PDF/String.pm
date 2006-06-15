@@ -113,30 +113,32 @@ sub convert
 {
     my ($self, $str) = @_;
 
-    if($str=~m|^\s*\<|o) { 
+    if($str=~m|^\s*\<|o) 
+    { 
         # cleaning up hex-strings, since spec is very loose,
         # at least openoffice exporter needs this ! - fredo
         $str=~s|[^0-9a-f]+||gio;
         $str="<$str>";
         $self->{' ishex'}=1;
+
+        1 while $str =~ s/\<([0-9a-f]{2})/chr(hex($1))."\<"/oige;
+        $str =~ s/\<([0-9a-f]?)\>/chr(hex($1."0"))/oige;
+        $str =~ s/\<\>//og;
     }
-    
-    $str =~ s/\\([nrtbf\\()])/$trans{$1}/ogi;
-    $str =~ s/\\([0-7]+)/chr(oct($1))/oeg;              # thanks to kundrat@kundrat.sk
-    1 while $str =~ s/\<([0-9a-f]{2})/chr(hex($1))."\<"/oige;
-    $str =~ s/\<([0-9a-f]?)\>/chr(hex($1."0"))/oige;
-    $str =~ s/\<\>//og;
-    
-#    if(unpack('n',$str)==0xfffe) {
-#        my ($mark,@c)=unpack('n*',$str);
-#        $str=pack('U*',@c);
-#        $self->{' isutf'}=1;
-#    } elsif(unpack('n',$str)==0xfeff) {
-#        my ($mark,@c)=unpack('v*',$str);
-#        $str=pack('U*',@c);
-#        $self->{' isutf'}=1;
-#    }
-    
+    else
+    {
+        # if we import binary escapes,
+        # let it be hex on output -- fredo
+        if($str =~ s/\\([nrtbf\\()])/$trans{$1}/ogi)
+        {
+            $self->{' ishex'}=1;
+        }  
+        if($str =~ s/\\([0-7]{1,3})/chr(oct($1))/oeg)
+        {
+            $self->{' ishex'}=1;
+        }  
+    }
+        
     return $str;
 }
 
