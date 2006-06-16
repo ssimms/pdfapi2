@@ -9,18 +9,18 @@
 package PDF::API2::Version;
 BEGIN {
     use vars qw( $VERSION %CVersion );
-    $VERSION = '0.51';
+    $VERSION = '0.52';
     %CVersion = (
-        'vFredo' => 'PDF::API2 0.51 (fix-3328 / 2005-11-16)',
-        'vGNU' => 'PDF::API2 0.51 (2005-11-16 03:26:05)',
-        'vHex' => '0x00033D00',
-        'vLong' => '0.51 (2005-11-16 03:26:05)',
-        'vPerl' => '0.51',
-        'vShort' => '0.51',
-        'vSquid' => '0.51-fix-3328',
-        'vTeX' => 'This is PDF::API2, Version 0.51 (2005-11-16 03:26:05)',
-        'vWeb' => 'PDF::API2/0.51',
-        'vWin' => '0.51 build 3328',
+        'vFredo' => 'PDF::API2 0.52 (fix-3328 / 2006-06-15)',
+        'vGNU' => 'PDF::API2 0.52 (2006-06-15 23:00:01)',
+        'vHex' => '0x00034D00',
+        'vLong' => '0.52 (2006-06-15 23:00:01)',
+        'vPerl' => '0.52',
+        'vShort' => '0.52',
+        'vSquid' => '0.52-fix-3328',
+        'vTeX' => 'This is PDF::API2, Version 0.52 (2006-06-15 23:00:01)',
+        'vWeb' => 'PDF::API2/0.52',
+        'vWin' => '0.52 build 3328',
     );
 }
 1;
@@ -36,16 +36,16 @@ PDF::API2::Version
 
 =head1 VERSION
 
-  vFredo: PDF::API2 0.51 (fix-3328 / 2005-11-16) 
-    vGNU: PDF::API2 0.51 (2005-11-16 03:26:05) 
-    vHex: 0x00033D00 
-   vLong: 0.51 (2005-11-16 03:26:05) 
-   vPerl: 0.51 
-  vShort: 0.51 
-  vSquid: 0.51-fix-3328 
-    vTeX: This is PDF::API2, Version 0.51 (2005-11-16 03:26:05) 
-    vWeb: PDF::API2/0.51 
-    vWin: 0.51 build 3328 
+  vFredo: PDF::API2 0.52 (fix-3328 / 2006-06-15) 
+    vGNU: PDF::API2 0.52 (2006-06-15 23:00:01) 
+    vHex: 0x00034D00 
+   vLong: 0.52 (2006-06-15 23:00:01) 
+   vPerl: 0.52 
+  vShort: 0.52 
+  vSquid: 0.52-fix-3328 
+    vTeX: This is PDF::API2, Version 0.52 (2006-06-15 23:00:01) 
+    vWeb: PDF::API2/0.52 
+    vWin: 0.52 build 3328 
 
 =cut
 
