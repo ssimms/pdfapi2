@@ -43,7 +43,7 @@ BEGIN {
     use PDF::API2::Matrix;
     use Math::Trig;
     use Encode;
-    use Compress::Zlib;
+    use Compress::Zlib qw[];
 
     @ISA = qw(PDF::API2::Basic::PDF::Dict);
     
@@ -2163,6 +2163,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2006/06/19 19:25:44  areibens
+    fixed compress vs. Compress::ZLib subs
+
     Revision 2.0  2005/11/16 02:16:00  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
