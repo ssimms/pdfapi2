@@ -32,7 +32,8 @@
 #=======================================================================
 package PDF::API2::Resource::CIDFont;
 
-BEGIN {
+BEGIN 
+{
 
     use utf8;
     use Encode qw(:all);
@@ -49,8 +50,8 @@ BEGIN {
     @ISA = qw( PDF::API2::Resource::BaseFont );
 
     ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
-
 }
+
 no warnings qw[ deprecated recursion uninitialized ];
 
 =item $font = PDF::API2::Resource::CIDFont->new $pdf, $name
@@ -59,7 +60,8 @@ Returns a cid-font object. base class form all CID based fonts.
 
 =cut
 
-sub new {
+sub new 
+{
     my ($class,$pdf,$name,@opts) = @_;
     my %opts=();
     %opts=@opts if((scalar @opts)%2 == 0);
@@ -95,7 +97,8 @@ it needs an PDF::API2-object rather than a Text::PDF::File-object.
 
 =cut
 
-sub new_api {
+sub new_api 
+{
     my ($class,$api,@opts)=@_;
 
     my $obj=$class->new($api->{pdf},@opts);
@@ -113,16 +116,22 @@ sub cidByUni { return( $_[0]->data->{u2g}->{$_[1]} ); }
 
 sub cidByEnc { return( $_[0]->data->{e2g}->[$_[1]] ); }
 
-sub wxByCId {
+sub wxByCId 
+{
     my $self=shift @_;
     my $g=shift @_;
     my $w;
 
-    if(ref($self->data->{wx}) eq 'ARRAY' && defined $self->data->{wx}->[$g]) {
+    if(ref($self->data->{wx}) eq 'ARRAY' && defined $self->data->{wx}->[$g]) 
+    {
         $w = int($self->data->{wx}->[$g]);
-    } elsif(ref($self->data->{wx}) eq 'HASH' && defined $self->data->{wx}->{$g}) {
+    } 
+    elsif(ref($self->data->{wx}) eq 'HASH' && defined $self->data->{wx}->{$g}) 
+    {
         $w = int($self->data->{wx}->{$g});
-    } else {
+    } 
+    else 
+    {
         $w = $self->missingwidth;
     }
 
@@ -132,15 +141,19 @@ sub wxByCId {
 sub wxByUni { return( $_[0]->wxByCId($_[0]->data->{u2g}->{$_[1]}) ); }
 sub wxByEnc { return( $_[0]->wxByCId($_[0]->data->{e2g}->[$_[1]]) ); }
 
-sub width {
+sub width 
+{
     my ($self,$text)=@_;
     return($self->width_cid($self->cidsByStr($text)));
 }
-sub width_cid {
+
+sub width_cid 
+{
     my ($self,$text)=@_;
     my $width=0;
     my $lastglyph=0;
-    foreach my $n (unpack('n*',$text)) {
+    foreach my $n (unpack('n*',$text)) 
+    {
         $width+=$self->wxByCId($n);
         if($self->{-dokern} && $self->haveKernPairs())
         {
@@ -161,7 +174,8 @@ Returns the cid-string from string based on the fonts encoding map.
 
 =cut
 
-sub _cidsByStr {
+sub _cidsByStr 
+{
     my ($self,$s)=@_;
     $s=pack('n*',map { $self->cidByEnc($_) } unpack('C*',$s));
     return($s);
@@ -243,7 +257,8 @@ sub text_cid
     my ($self,$text,$size)=@_;
     if(UNIVERSAL::can($self,'fontfile'))
     {
-        foreach my $g (unpack('n*',$text)) {
+        foreach my $g (unpack('n*',$text)) 
+        {
             $self->fontfile->subsetByCId($g);
         }
     }
@@ -322,34 +337,36 @@ sub encodeByName
     $self->data->{e2g}=[ map { $self->data->{u2g}->{$_} || 0 } @{$self->data->{e2u}} ];
 
     $self->data->{u2e}={};
-    foreach my $n (reverse 0..255) {
+    foreach my $n (reverse 0..255) 
+    {
         $self->data->{u2e}->{$self->data->{e2u}->[$n]}=$n unless(defined $self->data->{u2e}->{$self->data->{e2u}->[$n]});
     }
 
     return($self);
 }
 
-sub kernPairCid {
-    return(0);
-}
-
-sub subsetByCId {
+sub subsetByCId 
+{
     return(1);
 }
 
-sub subvec {
+sub subvec 
+{
     return(1);
 }
 
-sub glyphNum { 
+sub glyphNum 
+{ 
     my $self=shift @_;
-    if(defined $self->data->{glyphs}) {
+    if(defined $self->data->{glyphs}) 
+    {
         return ( $self->data->{glyphs} ); 
     }
     return ( scalar @{$self->data->{wx}} ); 
 }
 
-sub outobjdeep {
+sub outobjdeep 
+{
     my ($self, $fh, $pdf, %opts) = @_;
 
     return $self->SUPER::outobjdeep($fh, $pdf) if defined $opts{'passthru'};
@@ -369,6 +386,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2006/06/19 19:22:07  areibens
+    removed dup sub
+
     Revision 2.0  2005/11/16 02:16:04  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
