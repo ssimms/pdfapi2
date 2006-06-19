@@ -133,7 +133,7 @@ foreach $fn (@ARGV) {
         $page->mediabox(595,842);
 
         $gfx=$page->gfx;
-        delete $gfx->{Filter};
+        #delete $gfx->{Filter};
 
         foreach my $y (750,700,650,600,550,500,450,400,350,300,250,200,150,100,50) {
             foreach my $x (50,100,150,200,250,300,350,400,450,500) {
@@ -215,6 +215,9 @@ __END__
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2006/06/19 19:20:13  areibens
+    added details
+
     Revision 2.0  2005/11/16 02:16:00  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
