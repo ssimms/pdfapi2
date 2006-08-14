@@ -545,7 +545,19 @@ Returns the glyphs width.
 
 =cut
 
-sub wxByGlyph { return ( (ref($_[0]->data->{wx}) eq 'HASH' ? $_[0]->data->{wx}->{$_[1]} : $_[0]->data->{wx}->[$_[1]]) || $_[0]->missingwidth || 300 ); }
+sub wxByGlyph 
+{
+    my $self=shift;
+    my $val=shift; 
+    if(ref($self->data->{wx}) eq 'HASH')
+    {
+        return ( $self->data->{wx}->{$val} || $self->missingwidth || 300 ); 
+    }
+    else
+    {
+        return ( $self->data->{wx}->[$val] || $self->missingwidth || 300 ); 
+    }
+}
 
 =item $width = $font->wxByUni $uni
 
@@ -748,6 +760,9 @@ alfred reibenschuh.
 =head1 HISTORY
 
     $Log$
+    Revision 2.3  2006/08/14 18:11:47  areibens
+    fixed wxByGlyph
+
     Revision 2.2  2006/06/14 16:57:52  areibens
     fixed ToUnicode cmap greneration to use actual encoden rather than the default
 
