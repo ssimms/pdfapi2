@@ -43,7 +43,7 @@ BEGIN {
     use POSIX;
     use Compress::Zlib;
     use File::Find;
-
+    use IO::File;
     use vars qw(@ISA $VERSION);
 
     @ISA = qw( PDF::API2::Resource::Font );
@@ -337,7 +337,6 @@ sub readAFM
 
 sub readPFM {
     my ($self,$file)=@_;
-    use IO::File;
     if(! -e $file) {die "pfmfile='$file' not existant.";}
     my $fh=IO::File->new();
     my $data={};
@@ -564,6 +563,9 @@ __END__
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2006/08/14 18:08:16  areibens
+    moved "use io-file" to begin section
+
     Revision 2.0  2005/11/16 02:18:14  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
