@@ -269,7 +269,7 @@ sub width {
 
 sub text 
 { 
-    my ($self,$text,$size)=@_;
+    my ($self,$text,$size,$ident)=@_;
     $text=decode($self->{encode},$text) unless(is_utf8($text));
     die 'textsize not specified' unless(defined $size);
     my $newtext='';
@@ -291,7 +291,15 @@ sub text
         if($thisfont!=$lastfont && $lastfont!=-1)
         {
             my $f=$self->fontlist->[$lastfont];
-            $newtext.='/'.$f->name.' '.$size.' Tf '.$f->text(pack('U*',@codes)).' Tj ';
+            if(defined($ident) && $ident!=0)
+            {
+	            $newtext.='/'.$f->name.' '.$size.' Tf ['.$ident.' '.$f->text(pack('U*',@codes)).'] TJ ';
+	            $ident=undef;
+            }
+            else
+            {
+	            $newtext.='/'.$f->name.' '.$size.' Tf '.$f->text(pack('U*',@codes)).' Tj ';
+            }
             @codes=();
         }
         
@@ -302,7 +310,6 @@ sub text
     if(scalar @codes > 0)
     {
         my $f=$self->fontlist->[$lastfont];
-        ## $newtext.='/'.$f->name.' '.$size.' Tf '.$f->text(pack('U*',@codes)).' Tj ';
         $newtext.='/'.$f->name.' '.$size.' Tf '.$f->text(pack('U*',@codes),$size).' ';
     }
 

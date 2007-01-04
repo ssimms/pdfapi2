@@ -229,22 +229,29 @@ sub textByStr
 
 sub textByStrKern 
 {
-    my ($self,$text,$size)=@_;
-    return($self->text_cid_kern($self->cidsByStr($text),$size));
+    my ($self,$text,$size,$ident)=@_;
+    return($self->text_cid_kern($self->cidsByStr($text),$size,$ident));
 }
 
 sub text 
 { 
-    my ($self,$text,$size)=@_;
+    my ($self,$text,$size,$ident)=@_;
     my $newtext=$self->textByStr($text);
     if(defined $size && $self->{-dokern})
     {
-        $newtext=$self->textByStrKern($text,$size);
+        $newtext=$self->textByStrKern($text,$size,$ident);
         return($newtext);
     }
     elsif(defined $size)
     {
-        return("$newtext Tj");
+        if(defined($ident) && $ident!=0)
+        {
+	        return("[ $ident $newtext ] TJ");
+        }
+        else
+        {
+	        return("$newtext Tj");
+        }        
     }
     else
     {
@@ -275,7 +282,7 @@ sub text_cid
 
 sub text_cid_kern 
 {
-    my ($self,$text,$size)=@_;
+    my ($self,$text,$size,$ident)=@_;
     if(UNIVERSAL::can($self,'fontfile'))
     {
         foreach my $g (unpack('n*',$text)) 
@@ -285,30 +292,44 @@ sub text_cid_kern
     }
     if(defined $size && $self->{-dokern} && $self->haveKernPairs())
     {
-            my $newtext=' ';
-            my $lastglyph=0;
-            my $tBefore=0;
-            foreach my $n (unpack('n*',$text)) 
+        my $newtext=' ';
+        my $lastglyph=0;
+        my $tBefore=0;
+        foreach my $n (unpack('n*',$text)) 
+        {
+            if($self->kernPairCid($lastglyph, $n))
             {
-                if($self->kernPairCid($lastglyph, $n))
-                {
-                    $newtext.='> ' if($tBefore);
-                    $newtext.=sprintf('%i ',$self->kernPairCid($lastglyph, $n));
-                    $tBefore=0;
-                }
-                $lastglyph=$n;
-                my $t=sprintf('%04X',$n);
-                $newtext.='<' if(!$tBefore);
-                $newtext.=$t;
-                $tBefore=1;
+                $newtext.='> ' if($tBefore);
+                $newtext.=sprintf('%i ',$self->kernPairCid($lastglyph, $n));
+                $tBefore=0;
             }
-            $newtext.='> ' if($tBefore);
+            $lastglyph=$n;
+            my $t=sprintf('%04X',$n);
+            $newtext.='<' if(!$tBefore);
+            $newtext.=$t;
+            $tBefore=1;
+        }
+        $newtext.='> ' if($tBefore);
+        if(defined($ident) && $ident!=0)
+        {
+	        return("[ $ident $newtext ] TJ");
+        }
+        else
+        {
             return("[ $newtext ] TJ");
+        }
     }
     elsif(defined $size)
     {
         my $newtext=unpack('H*',$text);
-        return("<$newtext> Tj");
+        if(defined($ident) && $ident!=0)
+        {
+	        return("[ $ident <$newtext> ] TJ");
+        }
+        else
+        {
+	        return("<$newtext> Tj");
+        }
     }
     else
     {
@@ -386,6 +407,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/01/04 16:02:28  areibens
+    applied untested fix for acrobat 8 "<ident> TJ" bug
+
     Revision 2.1  2006/06/19 19:22:07  areibens
     removed dup sub
 

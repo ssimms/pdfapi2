@@ -1813,19 +1813,22 @@ sub text
     }
     if(defined $opt{-indent}) 
     {
-        $self->add('[',(-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hspace)),']','TJ');
         $wd+=$opt{-indent};
         $self->matrix_update($wd,0);
     }
     my $ulxy1=[$self->textpos2];
-    #if($self->{' font'}->isvirtual)
-    #{
-        $self->add($self->{' font'}->text($text,$self->{' fontsize'}));
-    #} 
-    #else 
-    #{
-    #    $self->add($self->{' font'}->text($text),'Tj');
-    #}
+
+    if(defined $opt{-indent}) 
+    {
+    # changed fot acrobat 8 and possible others
+    #    $self->add('[',(-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hspace)),']','TJ');
+	    $self->add($self->{' font'}->text($text, $self->{' fontsize'}, (-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hspace))));
+    }
+    else
+    {
+	    $self->add($self->{' font'}->text($text,$self->{' fontsize'}));
+    }
+
     $wd=$self->advancewidth($text);
     $self->matrix_update($wd,0);
 
@@ -2163,6 +2166,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/01/04 16:02:28  areibens
+    applied untested fix for acrobat 8 "<ident> TJ" bug
+
     Revision 2.1  2006/06/19 19:25:44  areibens
     fixed compress vs. Compress::ZLib subs
 
