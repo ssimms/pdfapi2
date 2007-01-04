@@ -636,6 +636,12 @@ sub new {
     
     $data->{kern}=read_kern_table($font,$data->{upem},$self);
     delete $data->{kern} unless(defined $data->{kern});
+
+    $data->{fontname}=~s/[^a-zA-Z0-9]//og;
+    $data->{fontfamily}=~s/[^a-zA-Z0-9]//og;
+    $data->{apiname}=~s/[^a-zA-Z0-9]//og;
+    $data->{altname}=~s/[^a-zA-Z0-9]//og;
+    $data->{subname}=~s/[^a-zA-Z0-9]//og;
     
     return($self,$data);
 }
@@ -716,6 +722,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/01/04 17:39:40  areibens
+    fixed [rt.cpan.org #24203] Incompatibility in Wide character handling
+
     Revision 2.0  2005/11/16 02:18:14  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
