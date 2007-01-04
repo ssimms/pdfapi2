@@ -746,11 +746,11 @@ sub text
     {
         if(defined($ident) && $ident!=0)
         {
-	        return("[ $ident $newtext ] TJ");
+	        return("[ $ident ($newtext) ] TJ");
         }
         else
         {
-	        return("[ $newtext ] TJ");
+	        return("[ ($newtext) ] TJ");
         }
     }
     else
@@ -774,6 +774,9 @@ alfred reibenschuh.
 =head1 HISTORY
 
     $Log$
+    Revision 2.5  2007/01/04 16:33:20  areibens
+    fix acro 8 fix
+
     Revision 2.4  2007/01/04 16:02:28  areibens
     applied untested fix for acrobat 8 "<ident> TJ" bug
 
