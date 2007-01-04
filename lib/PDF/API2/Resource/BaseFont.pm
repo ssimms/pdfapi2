@@ -726,18 +726,32 @@ sub textByStrKern
 
 sub text 
 {
-    my ($self,$text,$size)=@_;
+    my ($self,$text,$size,$ident)=@_;
 
     my $newtext=$self->textByStr($text);
 
     if(defined $size && $self->{-dokern})
     {
         $newtext=$self->textByStrKern($text);
-        return("[ $newtext ] TJ");
+        if(defined($ident) && $ident!=0)
+        {
+	        return("[ $ident $newtext ] TJ");
+        }
+        else
+        {
+	        return("[ $newtext ] TJ");
+        }
     }
     elsif(defined $size)
     {
-        return("[ ($newtext) ] TJ");
+        if(defined($ident) && $ident!=0)
+        {
+	        return("[ $ident $newtext ] TJ");
+        }
+        else
+        {
+	        return("[ $newtext ] TJ");
+        }
     }
     else
     {
@@ -760,6 +774,9 @@ alfred reibenschuh.
 =head1 HISTORY
 
     $Log$
+    Revision 2.4  2007/01/04 16:02:28  areibens
+    applied untested fix for acrobat 8 "<ident> TJ" bug
+
     Revision 2.3  2006/08/14 18:11:47  areibens
     fixed wxByGlyph
 
