@@ -442,15 +442,9 @@ sub append_file
     # hack to upgrade pdf-version number to support
     # requested features in higher versions that
     # the pdf was originally created.
-    $fh->seek(7,0);
-    $fh->read($buf, 3);
-    $buf=~s/[^\d]+$//g;
-    $ver=$self->{' version'} || 2;
-    if($buf < $ver) {
-    ##  print STDERR "files version was 1.$buf upgraded to 1.$ver.\n";
-        $fh->seek(0,0);
-        $fh->print("%PDF-1.$ver\n");
-    }
+    $ver=$self->{' version'} || 4;
+    $fh->seek(0,0);
+    $fh->print("%PDF-1.$ver\n");
 
     $tdict = PDFDict();
     $tdict->{'Prev'} = PDFNum($self->{' loc'});
@@ -514,7 +508,7 @@ sub create_file
 
     $self->{' OUTFILE'} = $fh;
     $fh->print('%PDF-1.' . ($self->{' version'} || '2') . "\n");
-    $fh->print("%Çì¢\n");              # and some binary stuff in a comment
+    $fh->print("%\xC7\xEC\xF3\xA2\n");   # and some binary stuff in a comment
     $self;
 }
 
