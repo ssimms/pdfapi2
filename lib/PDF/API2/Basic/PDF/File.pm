@@ -201,8 +201,7 @@ use PDF::API2::Basic::PDF::Null;
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-    # $Revisioning: 0.40_11 on Mon Oct  6 18:39:40 2003 $
-    ( $VERSION ) = '0.40_10';
+    ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
 
 #IMPORTED INTO PDF::API2
 
