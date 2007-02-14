@@ -1695,8 +1695,7 @@ sub advancewidth
             $opts{$k}=$self->{" $k"} unless(defined $opts{$k});
         }
         my $glyph_width=$opts{font}->width($text)*$opts{fontsize};
-        my @txt=split(/\x20/,$text);
-        my $num_space=(scalar @txt)-1;
+        my $num_space = $text =~ y/\x20/\x20/;
         my $num_char=length($text);
         my $word_spaces=$opts{wordspace}*$num_space;
         my $char_spaces=$opts{charspace}*$num_char;
@@ -1706,8 +1705,7 @@ sub advancewidth
     else
     {
         my $glyph_width=$self->{' font'}->width($text)*$self->{' fontsize'};
-        my @txt=split(/\x20/,$text);
-        my $num_space=(scalar @txt)-1;
+        my $num_space = $text =~ y/\x20/\x20/;
         my $num_char=length($text);
         my $word_spaces=$self->wordspace*$num_space;
         my $char_spaces=$self->charspace*$num_char;
@@ -2166,6 +2164,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.3  2007/02/14 11:26:21  areibens
+    fixed advancewidth for space calculation
+
     Revision 2.2  2007/01/04 16:02:28  areibens
     applied untested fix for acrobat 8 "<ident> TJ" bug
 
