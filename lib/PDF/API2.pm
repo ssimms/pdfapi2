@@ -1097,6 +1097,8 @@ sub importPageIntoForm {
     my $s_pdf=shift @_;
     my $s_idx=shift @_||0;
 
+	UNIVERSAL::isa($s_pdf, 'PDF::API2') || die "Invalid usage: 1st argument must be PDF::API2 instance, not: ".ref($s_pdf);
+
     my ($s_page,$xo);
 
     $xo=$self->xo_form;
@@ -1197,6 +1199,8 @@ sub importpage {
     my $t_idx=shift @_||0;
     my ($s_page,$t_page);
 
+	UNIVERSAL::isa($s_pdf, 'PDF::API2') || die "Invalid usage: 1st argument must be PDF::API2 instance, not: ".ref($s_pdf);
+	
     if(ref($s_idx) eq 'PDF::API2::Page') {
         $s_page=$s_idx;
     } else {
@@ -2414,6 +2418,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/02/22 08:00:37  areibens
+    changed import* methods to check its first arg -- thanks alankila2@yahoo.ca
+
     Revision 2.0  2005/11/16 02:16:00  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
