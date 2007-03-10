@@ -1247,10 +1247,12 @@ sub readxrtr
         }
     }
 
-    if ($buf !~ /^trailer$cr/oi)
+#    if ($buf !~ /^trailer$cr/oi)
+    if ($buf !~ /^trailer\b/oi)
     { die "Malformed trailer in PDF file $self->{' fname'} at " . ($fh->tell - length($buf)); }
 
-    $buf =~ s/^trailer$cr//oi;
+#    $buf =~ s/^trailer$cr//oi;
+    $buf =~ s/^trailer\b//oi;
 
     ($tdict, $buf) = $self->readval($buf);
     $tdict->{' loc'} = $xpos;
