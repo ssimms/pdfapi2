@@ -60,7 +60,7 @@ Encodes the font in the specified byte-encoding.
 
 sub encodeByData {
     my ($self,$encoding)=@_;
-    my $data=undef;
+    my $data=$self->data;
 
     my ($firstChar,$lastChar);
 
@@ -71,90 +71,90 @@ sub encodeByData {
     if(defined $encoding && $encoding=~m|^uni(\d+)$|o) 
     {
         my $blk=$1;
-        $self->data->{e2u}=[ map { $blk*256+$_ } (0..255) ];
-        $self->data->{e2n}=[ map { nameByUni($_) || '.notdef' } @{$self->data->{e2u}} ];
+        $data->{e2u}=[ map { $blk*256+$_ } (0..255) ];
+        $data->{e2n}=[ map { nameByUni($_) || '.notdef' } @{$data->{e2u}} ];
     }
     elsif(defined $encoding) 
     {
-        $self->data->{e2u}=[ unpack('U*',decode($encoding,pack('C*',(0..255)))) ];
-        $self->data->{e2n}=[ map { nameByUni($_) || '.notdef' } @{$self->data->{e2u}} ];
+        $data->{e2u}=[ unpack('U*',decode($encoding,pack('C*',(0..255)))) ];
+        $data->{e2n}=[ map { nameByUni($_) || '.notdef' } @{$data->{e2u}} ];
     } 
-    elsif(defined $self->data->{uni}) 
+    elsif(defined $data->{uni}) 
     {
-        $self->data->{e2u}=[ @{$self->data->{uni}} ];
-        $self->data->{e2n}=[ map { $_ || '.notdef' } @{$self->data->{char}} ];
+        $data->{e2u}=[ @{$data->{uni}} ];
+        $data->{e2n}=[ map { $_ || '.notdef' } @{$data->{char}} ];
     } 
     else 
     {
-        $self->data->{e2u}=[ map { uniByName($_) } @{$self->data->{char}} ];
-        $self->data->{e2n}=[ map { $_ || '.notdef' } @{$self->data->{char}} ];
+        $data->{e2u}=[ map { uniByName($_) } @{$data->{char}} ];
+        $data->{e2n}=[ map { $_ || '.notdef' } @{$data->{char}} ];
     }
 
-    $self->data->{u2c}={};
-    $self->data->{u2e}={};
-    $self->data->{u2n}={};
-    $self->data->{n2c}={};
-    $self->data->{n2e}={};
-    $self->data->{n2u}={};
+    $data->{u2c}={};
+    $data->{u2e}={};
+    $data->{u2n}={};
+    $data->{n2c}={};
+    $data->{n2e}={};
+    $data->{n2u}={};
 
     foreach my $n (0..255) {
         my $xchar=undef;
         my $xuni=undef;
-        if(defined $self->data->{char}->[$n]) {
-            $xchar=$self->data->{char}->[$n];
+        if(defined $data->{char}->[$n]) {
+            $xchar=$data->{char}->[$n];
         } else {
             $xchar='.notdef';
         }
-        $self->data->{n2c}->{$xchar}=$n unless(defined $self->data->{n2c}->{$xchar});
+        $data->{n2c}->{$xchar}=$n unless(defined $data->{n2c}->{$xchar});
 
-        if(defined $self->data->{e2n}->[$n]) {
-            $xchar=$self->data->{e2n}->[$n];
+        if(defined $data->{e2n}->[$n]) {
+            $xchar=$data->{e2n}->[$n];
         } else {
             $xchar='.notdef';
         }
-        $self->data->{n2e}->{$xchar}=$n unless(defined $self->data->{n2e}->{$xchar});
+        $data->{n2e}->{$xchar}=$n unless(defined $data->{n2e}->{$xchar});
 
-        $self->data->{n2u}->{$xchar}=$self->data->{e2u}->[$n] unless(defined $self->data->{n2u}->{$xchar});
+        $data->{n2u}->{$xchar}=$data->{e2u}->[$n] unless(defined $data->{n2u}->{$xchar});
 
-        if(defined $self->data->{char}->[$n]) {
-            $xchar=$self->data->{char}->[$n];
+        if(defined $data->{char}->[$n]) {
+            $xchar=$data->{char}->[$n];
         } else {
             $xchar='.notdef';
         }
-        if(defined $self->data->{uni}->[$n]) {
-            $xuni=$self->data->{uni}->[$n];
+        if(defined $data->{uni}->[$n]) {
+            $xuni=$data->{uni}->[$n];
         } else {
             $xuni=0;
         }
-        $self->data->{n2u}->{$xchar}=$xuni unless(defined $self->data->{n2u}->{$xchar});
+        $data->{n2u}->{$xchar}=$xuni unless(defined $data->{n2u}->{$xchar});
 
-        $self->data->{u2c}->{$xuni}||=$n unless(defined $self->data->{u2c}->{$xuni});
+        $data->{u2c}->{$xuni}||=$n unless(defined $data->{u2c}->{$xuni});
         
-        if(defined $self->data->{e2u}->[$n]) {
-            $xuni=$self->data->{e2u}->[$n];
+        if(defined $data->{e2u}->[$n]) {
+            $xuni=$data->{e2u}->[$n];
         } else {
             $xuni=0;
         }
-        $self->data->{u2e}->{$xuni}||=$n unless(defined $self->data->{u2e}->{$xuni});
+        $data->{u2e}->{$xuni}||=$n unless(defined $data->{u2e}->{$xuni});
 
-        if(defined $self->data->{e2n}->[$n]) {
-            $xchar=$self->data->{e2n}->[$n];
+        if(defined $data->{e2n}->[$n]) {
+            $xchar=$data->{e2n}->[$n];
         } else {
             $xchar='.notdef';
         }
-        $self->data->{u2n}->{$xuni}=$xchar unless(defined $self->data->{u2n}->{$xuni});
+        $data->{u2n}->{$xuni}=$xchar unless(defined $data->{u2n}->{$xuni});
 
-        if(defined $self->data->{char}->[$n]) {
-            $xchar=$self->data->{char}->[$n];
+        if(defined $data->{char}->[$n]) {
+            $xchar=$data->{char}->[$n];
         } else {
             $xchar='.notdef';
         }
-        if(defined $self->data->{uni}->[$n]) {
-            $xuni=$self->data->{uni}->[$n];
+        if(defined $data->{uni}->[$n]) {
+            $xuni=$data->{uni}->[$n];
         } else {
             $xuni=0;
         }
-        $self->data->{u2n}->{$xuni}=$xchar unless(defined $self->data->{u2n}->{$xuni});
+        $data->{u2n}->{$xuni}=$xchar unless(defined $data->{u2n}->{$xuni});
     }
 
     my $en = PDFDict();
@@ -168,32 +168,33 @@ sub encodeByData {
         $en->{Differences}->add_elements( PDFName($self->glyphByEnc($n) || '.notdef') );
     }
 
-    $self->{'FirstChar'} = PDFNum($self->data->{firstchar});
-    $self->{'LastChar'} = PDFNum($self->data->{lastchar});
+    $self->{'FirstChar'} = PDFNum($data->{firstchar});
+    $self->{'LastChar'} = PDFNum($data->{lastchar});
 
     $self->{Widths}=PDFArray();
-    foreach my $n ($self->data->{firstchar}..$self->data->{lastchar}) {
+    foreach my $n ($data->{firstchar}..$data->{lastchar}) {
         $self->{Widths}->add_elements( PDFNum($self->wxByEnc($n)) );
     }
 
 #use Data::Dumper;
-#    print Dumper($self->data);
+#    print Dumper($data);
 
     return($self);
 }
 
 sub automap {
     my ($self)=@_;
-
-    my %gl=map { $_=>defineName($_) } keys %{$self->data->{wx}};
+	my $data=$self->data;
+	
+    my %gl=map { $_=>defineName($_) } keys %{$data->{wx}};
 
     foreach my $n (0..255) {
-        delete $gl{$self->data->{e2n}->[$n]};
+        delete $gl{$data->{e2n}->[$n]};
     }
     
-    if(defined $self->data->{comps} && !$self->{-nocomps})
+    if(defined $data->{comps} && !$self->{-nocomps})
     {
-        foreach my $n (keys %{$self->data->{comps}}) 
+        foreach my $n (keys %{$data->{comps}}) 
         {
             delete $gl{$n};
         }
@@ -206,7 +207,7 @@ sub automap {
     while(@glyphs=splice(@nm,0,223)) 
     {
         my $obj=$self->SUPER::new($self->{' apipdf'},$self->name.'am'.$count);
-        $obj->{' data'}={ %{$self->data} };
+        $obj->{' data'}={ %{$data} };
         $obj->data->{firstchar}=32;
         $obj->data->{lastchar}=32+scalar(@glyphs);
         push @fnts,$obj;
@@ -266,6 +267,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/03/10 12:05:41  areibens
+    applied improvements to encodeByData proposed by alankila@bel.fi
+
     Revision 2.0  2005/11/16 02:16:04  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
