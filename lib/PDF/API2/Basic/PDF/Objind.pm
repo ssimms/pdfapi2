@@ -124,7 +124,7 @@ dangling circular references will exist.
 
 =cut
 
-sub release
+sub __release
 {
     my ($self, $force) = @_;
     my (@tofree);
@@ -164,6 +164,31 @@ sub release
     }
 }
 
+sub release 
+{
+    my ($self) = @_;
+
+    my @tofree = values %$self;
+    %$self = ();
+
+    while(my $item = shift @tofree) 
+    {
+        my $ref = ref($item) || next; # common case: value is not reference
+        if(UNIVERSAL::can($item, 'release')) 
+        {
+            $item->release();
+        } 
+        elsif($ref eq 'ARRAY') 
+        {
+            push @tofree, @$item;
+        } 
+        elsif(UNIVERSAL::isa($ref, 'HASH')) 
+        {
+            release($item);
+        }
+    }
+    
+} 
 
 =head2 $r->val
 
