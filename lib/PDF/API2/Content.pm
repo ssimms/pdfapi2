@@ -1290,7 +1290,7 @@ sub textstate
         foreach my $k (qw( charspace hspace wordspace lead rise render )) 
         {
             next unless($state{$k});
-            eval ' $self->'.$k.'($state{$k}); ';
+            $self->can($k)->($self, $state{$k});
         }
         if($state{font} && $state{fontsize}) 
         {
@@ -1345,7 +1345,7 @@ sub textstate2
             next unless($state{$k});
             if($self->{" $k"} ne $state{$k})
             {
-                eval ' $self->'.$k.'($state{$k}); ';
+                $self->can($k)->($self, $state{$k});
             }
         }
         if($state{font} && $state{fontsize}) 
@@ -2164,6 +2164,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.4  2007/03/12 16:24:29  areibens
+    removed eval from state calls
+
     Revision 2.3  2007/02/14 11:26:21  areibens
     fixed advancewidth for space calculation
 
