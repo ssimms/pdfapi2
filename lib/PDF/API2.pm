@@ -301,7 +301,7 @@ I<-onecolumn>
 I<-twocolumnleft>
 ... Display the pages in two columns, with oddnumbered pages on the left.
 
-I<-twocolumnrigth>
+I<-twocolumnright>
 ... Display the pages in two columns, with oddnumbered pages on the right.
 
 =cut
@@ -431,7 +431,7 @@ sub preferences {
         $self->{catalog}->{PageLayout}=PDFName('OneColumn');
     } elsif($opt{-twocolumnleft}) {
         $self->{catalog}->{PageLayout}=PDFName('TwoColumnLeft');
-    } elsif($opt{-twocolumnrigth}) {
+    } elsif($opt{-twocolumnright}) {
         $self->{catalog}->{PageLayout}=PDFName('TwoColumnRight');
     } else {
         $self->{catalog}->{PageLayout}=PDFName('SinglePage');
@@ -2418,6 +2418,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/03/14 19:30:25  areibens
+    fixed -twocolumnright option typo
+
     Revision 2.1  2007/02/22 08:00:37  areibens
     changed import* methods to check its first arg -- thanks alankila2@yahoo.ca
 
