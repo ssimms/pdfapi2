@@ -44,17 +44,27 @@ $pdf=PDF::API2->new;
 $f1=$pdf->corefont('Helvetica',-encode=>'latin1');
 $f2=$pdf->corefont('Helvetica-Bold',-encode=>'latin1');
 
-$page = $pdf->page;
-$page->mediabox(595,842);
+foreach my $i (0 .. 25)
+{
+	$page = $pdf->page;
+	$page->mediabox(595,842);
+	
+	$gfx=$page->gfx;
+	$gfx->textlabel(50,700,$f2,20,'Page Index='.$i);
+}
 
-$gfx=$page->gfx;
-$gfx->textlabel(50,700,$f2,20,'Hello World!',-color=>'red');
+$pdf->pageLabel(0, { -style => 'Roman' });
 
-$ant=$page->annotation;
-$ant->text("This is an open note.\nnext line", -rect=>[0,0,100,100], -open=>1);
+$pdf->pageLabel(4, { -start => 1 });
 
-$ant=$page->annotation;
-$ant->text('This is an closed note', -rect=>[100,100,200,200]);
+$pdf->pageLabel(14, { -start => 1, -prefix => 'A-' });
+$pdf->pageLabel(16, { -start => 1, -prefix => 'B-' });
+$pdf->pageLabel(18, { -start => 1, -prefix => 'C-' });
+
+$pdf->pageLabel(20, { -start => 10 });
+
+$pdf->pageLabel(23, { -style => 'Alpha' });
+
 
 $pdf->saveas("$0.pdf");
 $pdf->end();
