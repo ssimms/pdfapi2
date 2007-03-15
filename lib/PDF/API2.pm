@@ -681,6 +681,96 @@ sub xmpMetadata {
     return($md->{' stream'});
 }
 
+=item $pdf->pageLabel $index $options
+
+Sets PageLabel options.
+
+B<Supported Options:>
+
+I<-style> ... 'Roman', 'roman', 'decimal', 'Alpha' or 'alpha'.
+
+I<-start> ... restart numbering at given number.
+
+I<-prefix> ... text prefix for numbering.
+
+B<Example:>
+
+	$pdf->pageLabel( 0, {
+		-style => 'roman',
+	} ); # start with roman numbering
+
+	$pdf->pageLabel( 4, {
+		-style => 'decimal',
+	} ); # switch to arabic
+
+	$pdf->pageLabel( 32, {
+		-start => 1,
+		-prefix => 'A-'
+	} ); # numbering for appendix A
+    
+	$pdf->pageLabel( 36, {
+		-start => 1,
+		-prefix => 'B-'
+	} ); # numbering for appendix B
+    
+	$pdf->pageLabel( 40, {
+		-style => 'Roman'
+		-start => 1,
+		-prefix => 'Index '
+	} ); # numbering for index
+    
+=cut
+
+sub pageLabel {
+    my $self=shift @_;
+
+	$self->{catalog}->{PageLabels}||=PDFDict();
+	$self->{catalog}->{PageLabels}->{Nums}||=PDFArray();
+	
+	my $arr=$self->{catalog}->{PageLabels}->{Nums};
+	while(scalar @_)
+	{
+		my $index=shift @_;
+		my $opts=shift @_;
+		
+		$arr->add_elements(PDFNum($index));
+
+		my $d=PDFDict();
+		if($opts->{-style} eq 'Roman')
+		{
+			$d->{S}=PDFName('R');
+		}
+		elsif($opts->{-style} eq 'roman')
+		{
+			$d->{S}=PDFName('r');
+		}
+		elsif($opts->{-style} eq 'Alpha')
+		{
+			$d->{S}=PDFName('A');
+		}
+		elsif($opts->{-style} eq 'alpha')
+		{
+			$d->{S}=PDFName('a');
+		}
+		else
+		{
+			$d->{S}=PDFName('D');
+		}
+
+		if(defined $opts->{-prefix})
+		{
+			$d->{P}=PDFStr($opts->{-prefix});
+		}
+
+		if(defined $opts->{-start})
+		{
+			$d->{St}=PDFNum($opts->{-start});
+		}
+				
+		$arr->add_elements($d);
+	}
+}
+
 =item $pdf->finishobjects @objects
 
 Force objects to be written to file if available.
@@ -2418,6 +2508,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.3  2007/03/15 14:15:19  areibens
+    added pageLabel method
+
     Revision 2.2  2007/03/14 19:30:25  areibens
     fixed -twocolumnright option typo
 
