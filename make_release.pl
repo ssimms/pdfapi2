@@ -54,7 +54,8 @@ sub write_version ($)
     
     my $triple=sprintf("%u.%02u.%03u",$ver,$rev,$bld);
     my $triple_short=sprintf("%u.%02u",$ver,$rev);
-
+	$triple=$triple_short if($bld==0);
+	
     my %hash=(
         'vHex'     => sprintf('0x%08X',$hex),
         'vShort'   => "$triple_short",
