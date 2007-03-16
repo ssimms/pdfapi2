@@ -52,7 +52,6 @@ BEGIN {
 
     use PDF::API2::Util;
     use PDF::API2::Page;
-    use PDF::API2::IOString;
 
     use PDF::API2::Outlines;
     use PDF::API2::NamedDestination;
@@ -102,6 +101,7 @@ BEGIN {
     use utf8;
     use Encode qw(:all);
 
+	use FileHandle;
 }
 
 no warnings qw[ deprecated recursion uninitialized ];
@@ -195,6 +195,7 @@ sub open {
     my $class=shift(@_);
     my $file=shift(@_);
     my %opt=@_;
+    my $filestr;
     my $self={};
     bless($self,$class);
     $self->default('Compression',1);
@@ -204,9 +205,24 @@ sub open {
         $self->default($para,$opt{$para});
     }
     die "File '$file' does not exist." unless(-f $file);
-    my $fh=PDF::API2::IOString->new();
-    $fh->import_from_file($file);
-    $self->{pdf}=PDF::API2::Basic::PDF::File->open_swallowed($fh,1);
+    
+    $self->{content_ref} = \$filestr;
+    my $fh = new FileHandle;
+    open($fh, "+<", \$filestr) || die "Can't begin scalar IO";
+    binmode($fh,':raw');
+
+    my $inf = new FileHandle;
+    open($inf,$file);
+    binmode($inf,':raw');
+    $inf->seek(0,0);
+    while(!$inf->eof) {
+        $inf->read($in,512);
+        $fh->print($in);
+    }
+    $inf->close;
+    $fh->seek(0,0);
+
+    $self->{pdf}=PDF::API2::Basic::PDF::File->open($fh,1);
     $self->{pdf}->{' fname'}=$file;
     $self->{pdf}->{'Root'}->realise;
     $self->{pages}=$self->{pdf}->{'Root'}->{'Pages'}->realise;
@@ -249,9 +265,10 @@ sub openScalar {
     foreach my $para (keys(%opt)) {
         $self->default($para,$opt{$para});
     }
-    my $fh=PDF::API2::IOString->new();
-    $fh->import_from_scalar($file);
-    $self->{pdf}=PDF::API2::Basic::PDF::File->open_swallowed($fh,1);
+    $self->{content_ref} = \$file;
+    my $fh;
+    open($fh, "+<", \$file) || die "Can't begin scalar IO";
+    $self->{pdf}=PDF::API2::Basic::PDF::File->open($fh,1);
     $self->{pdf}->{'Root'}->realise;
     $self->{pages}=$self->{pdf}->{'Root'}->{'Pages'}->realise;
     $self->{pdf}->{' version'} = 3;
@@ -862,7 +879,7 @@ sub saveas {
         $self->{pdf}->append_file;
         CORE::open(OUTF,">$file");
         binmode(OUTF,':raw');
-        print OUTF ${$self->{pdf}->{' OUTFILE'}->string_ref};
+        print OUTF ${$self->{content_ref}};
         CORE::close(OUTF);
     } elsif($self->{' filed'}) {
         $self->{pdf}->close_file;
@@ -911,15 +928,11 @@ sub stringify {
     my $str;
     if((defined $self->{reopened}) && ($self->{reopened}==1)) {
         $self->{pdf}->append_file;
-        $str=${$self->{pdf}->{' OUTFILE'}->string_ref};
+        $str=${$self->{content_ref}};
     } else {
-        my $fh = PDF::API2::IOString->new();
-        $fh->open();
-        eval {
-            $self->{pdf}->out_file($fh);
-        };
-        $str=${$fh->string_ref};
-        $fh->realclose;
+        my $fh = new FileHandle;
+        open($fh, ">", \$str) || die "Can't begin scalar IO";
+        $self->{pdf}->out_file($fh);
     }
     $self->end;
     return($str);
@@ -2508,6 +2521,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.4  2007/03/16 15:28:30  areibens
+    replaced IOString dep. with scalar IO.
+
     Revision 2.3  2007/03/15 14:15:19  areibens
     added pageLabel method
 
