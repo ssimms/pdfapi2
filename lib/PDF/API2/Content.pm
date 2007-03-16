@@ -579,7 +579,6 @@ sub _makecolor {
         if(!defined $self->resource('ColorSpace','LabS')) {
             my $dc=PDFDict();
             my $cs=PDFArray(PDFName('Lab'),$dc);
-        #    $dc->{WhitePoint}=PDFArray(map { PDFNum($_) } qw(0.9505 1.0000 1.0890));
             $dc->{WhitePoint}=PDFArray(map { PDFNum($_) } qw(1 1 1));
             $dc->{Range}=PDFArray(map { PDFNum($_) } qw(-128 127 -128 127));
             $dc->{Gamma}=PDFArray(map { PDFNum($_) } qw(2.2 2.2 2.2));
@@ -591,8 +590,6 @@ sub _makecolor {
         return('/Pattern',($sf?'cs':'CS'),'/'.($clr[0]->name),($sf?'scn':'SCN'));
     } elsif(scalar @clr == 1) {
         # grey color spec.
-        while($clr[0]>1) { $clr[0]/=255; }
-        # adjusted for 8/16/32bit spec.
         return($clr[0],($sf?'g':'G'));
     } elsif(scalar @clr > 1 && ref($clr[0])) {
         # indexed colorspace plus color-index
@@ -605,14 +602,6 @@ sub _makecolor {
         return('/'.($clr[0]->name),($sf?'cs':'CS'),$clr[0]->param($clr[1]),($sf?'sc':'SC'));
     } elsif(scalar @clr == 3) {
         # legacy rgb color-spec (0 <= x <= 1)
-        #if(!defined $self->resource('ColorSpace','RgbS')) {
-        #    my $dc=PDFDict();
-        #    my $cs=PDFArray(PDFName('CalRGB'),$dc);
-        #    $dc->{WhitePoint}=PDFArray(map { PDFNum($_) } qw(0.9505 1.0000 1.0890));
-        #    $dc->{Gamma}=PDFArray(map { PDFNum($_) } qw(2.2 2.2 2.2));
-        #    $self->resource('ColorSpace','RgbS',$cs);
-        #}
-        #return('/RgbS',($sf?'cs':'CS'),floats5(@clr),($sf?'sc':'SC'));
         return(floats($clr[0],$clr[1],$clr[2]),($sf?'rg':'RG'));
     } elsif(scalar @clr == 4) {
         # legacy cmyk color-spec (0 <= x <= 1)
@@ -2164,6 +2153,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.5  2007/03/16 15:26:44  areibens
+    removed silly grey-level handling
+
     Revision 2.4  2007/03/12 16:24:29  areibens
     removed eval from state calls
 
