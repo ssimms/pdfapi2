@@ -277,56 +277,6 @@ sub open
     if (ref $fname)
     {
         $self->{' INFILE'} = $fname;
-        $fh = $fname;
-    }
-    else
-    {
-        $fh = IO::File->new(($update ? "+" : "") . "<$fname") || return undef;
-        $self->{' INFILE'} = $fh;
-    }
-
-    binmode($fh,':raw');
-    if ($update)
-    {
-        $self->{' update'} = 1;
-        $self->{' OUTFILE'} = $fh;
-        $self->{' fname'} = $fname;
-    }
-    $fh->read($buf, 255);
-    if ($buf !~ m/^\%pdf\-1\.(\d)\s*/moi)
-    { die "$fname not a PDF file version 1.x"; }
-    else
-    { $self->{' Version'} = $1; }
-
-    $fh->seek(0, 2);            # go to end of file
-    $end = $fh->tell();
-    $self->{' epos'} = $end;
-#    if (!$fh->seek(($end > 1024 ? $end - 1024 : 0, 0)))
-#      { die "Seek failed when reading PDF file $fname"; }
-#    $fh->read($buf, 1024);
-    if (!$fh->seek(($end > 64 ? $end - 64 : 0, 0)))
-      { die "Seek failed when reading PDF file $fname"; }
-    $fh->read($buf, 64);
-    if ($buf !~ m/startxref$cr([0-9]+)$cr\%\%eof.*?$/oi)
-    { die "Malformed PDF file $fname"; }
-    $xpos = $1;
-
-    $tdict = $self->readxrtr($xpos, $self);
-    foreach $k (keys %{$tdict})
-    { $self->{$k} = $tdict->{$k}; }
-    return $self;
-}
-
-sub open_swallowed
-{
-    my ($class, $fname, $update) = @_;
-    my ($self, $buf, $xpos, $end, $tdict, $k);
-    my ($fh);
-
-    $self = $class->_new;
-    if (ref $fname)
-    {
-        $self->{' INFILE'} = $fname;
         if ($update)
         {
             $self->{' update'} = 1;
@@ -339,7 +289,6 @@ sub open_swallowed
         die "File '$fname' does not exist !" unless(-f $fname);
         $fh = IO::File->new(($update ? "+" : "") . "<$fname") || return undef;
         $self->{' INFILE'} = $fh;
-        binmode($fh,':raw');
         if ($update)
         {
             $self->{' update'} = 1;
@@ -347,6 +296,7 @@ sub open_swallowed
             $self->{' fname'} = $fname;
         }
     }
+    binmode($fh,':raw');
     $fh->seek(0, 0);            # go to start of file
     $fh->read($buf, 255);
     if ($buf !~ m/^\%PDF\-1\.\d+\s*$cr/mo)
