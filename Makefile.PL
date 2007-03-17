@@ -58,7 +58,7 @@ my %makehash=(
 
 WriteMakefile( %makehash );
 
-print STDERR $PDF::API2::Version::CVersion{vTeX}."\n";
+print STDERR $PDF::API2::Version::CVersion{vWeb}."\n";
 
 exit;
 
