@@ -41,7 +41,6 @@ BEGIN
     use PDF::API2::Util;
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Resource::BaseFont;
-    use PDF::API2::IOString;
 
     use POSIX;
 
@@ -407,6 +406,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.3  2007/03/17 20:38:50  areibens
+    replaced IOString dep. with scalar IO.
+
     Revision 2.2  2007/01/04 16:02:28  areibens
     applied untested fix for acrobat 8 "<ident> TJ" bug
 
