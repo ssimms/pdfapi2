@@ -208,11 +208,11 @@ sub open {
     
     $self->{content_ref} = \$filestr;
     my $fh = new FileHandle;
-    open($fh, "+<", \$filestr) || die "Can't begin scalar IO";
+    CORE::open($fh, "+<", \$filestr) || die "Can't begin scalar IO";
     binmode($fh,':raw');
 
     my $inf = new FileHandle;
-    open($inf,$file);
+    CORE::open($inf,$file);
     binmode($inf,':raw');
     $inf->seek(0,0);
     while(!$inf->eof) {
@@ -267,7 +267,7 @@ sub openScalar {
     }
     $self->{content_ref} = \$file;
     my $fh;
-    open($fh, "+<", \$file) || die "Can't begin scalar IO";
+    CORE::open($fh, "+<", \$file) || die "Can't begin scalar IO";
     $self->{pdf}=PDF::API2::Basic::PDF::File->open($fh,1);
     $self->{pdf}->{'Root'}->realise;
     $self->{pages}=$self->{pdf}->{'Root'}->{'Pages'}->realise;
@@ -931,8 +931,9 @@ sub stringify {
         $str=${$self->{content_ref}};
     } else {
         my $fh = new FileHandle;
-        open($fh, ">", \$str) || die "Can't begin scalar IO";
+        CORE::open($fh, ">", \$str) || die "Can't begin scalar IO";
         $self->{pdf}->out_file($fh);
+        $fh->close;
     }
     $self->end;
     return($str);
@@ -2521,6 +2522,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.5  2007/03/17 20:07:21  areibens
+    fixed open to CORE::open
+
     Revision 2.4  2007/03/16 15:28:30  areibens
     replaced IOString dep. with scalar IO.
 
