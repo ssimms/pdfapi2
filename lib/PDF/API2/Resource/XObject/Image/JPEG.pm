@@ -80,12 +80,7 @@ sub new
 
     $self->read_jpeg($fh);
 
-    if(ref($file) eq 'PDF::API2::IOString') 
-    {
-        $self->{' stream'}=${*$fh->{buf}};
-        $self->{Length}=PDFNum(length $self->{' stream'});
-    } 
-    elsif(ref $file) 
+    if(ref $file) 
     {
         seek($fh,0,0);
         $self->{' stream'}='';
@@ -178,6 +173,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/03/17 20:38:51  areibens
+    replaced IOString dep. with scalar IO.
+
     Revision 2.0  2005/11/16 02:18:23  areibens
     revision workaround for SF cvs import not to screw up CPAN
 

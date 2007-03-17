@@ -381,7 +381,7 @@ sub new {
   my $file=shift @_;
   my $self={};
   bless($self,$class);
-  if(ref($file) eq 'PDF::API2::IOString') {
+  if(ref($file)) {
     $self->{fh} = $file;
     seek($self->{fh},0,0);
   } else {
@@ -641,6 +641,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/03/17 20:38:51  areibens
+    replaced IOString dep. with scalar IO.
+
     Revision 2.0  2005/11/16 02:18:23  areibens
     revision workaround for SF cvs import not to screw up CPAN
 

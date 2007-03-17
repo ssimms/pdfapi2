@@ -37,7 +37,6 @@ BEGIN {
     use utf8;
     use Encode qw(:all);
     use PDF::API2::Util;
-    use PDF::API2::IOString;
 
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Basic::PDF::Dict;
@@ -702,9 +701,12 @@ sub outobjdeep {
         }
 
         $self->{' stream'} = "";
-        my $ffh = PDF::API2::IOString->new(\$self->{' stream'});
+        my $ffh;
+        CORE::open($ffh, '+>', \$self->{' stream'});
+        binmode($ffh,':raw');
         $f->out($ffh, 'cmap', 'cvt ', 'fpgm', 'glyf', 'head', 'hhea', 'hmtx', 'loca', 'maxp', 'prep');
         $self->{'Length1'}=PDFNum(length($self->{' stream'}));
+        CORE::close($ffh);
     }
 
     $self->SUPER::outobjdeep($fh, $pdf, %opts);
@@ -722,6 +724,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/03/17 20:38:51  areibens
+    replaced IOString dep. with scalar IO.
+
     Revision 2.1  2007/01/04 17:39:40  areibens
     fixed [rt.cpan.org #24203] Incompatibility in Wide character handling
 
