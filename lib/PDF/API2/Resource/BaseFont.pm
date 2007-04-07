@@ -555,6 +555,8 @@ sub wxByGlyph
     }
     else
     {
+    #	my $cid=$self->cidByUni(uniByName($val));
+    #    return ( $self->data->{wx}->[$cid] || $self->missingwidth || 300 ); 
         return ( $self->data->{wx}->[$val] || $self->missingwidth || 300 ); 
     }
 }
@@ -774,6 +776,9 @@ alfred reibenschuh.
 =head1 HISTORY
 
     $Log$
+    Revision 2.6  2007/04/07 09:51:16  areibens
+    fix for wxByGlyph not honoring cidfont width arrays
+
     Revision 2.5  2007/01/04 16:33:20  areibens
     fix acro 8 fix
 
