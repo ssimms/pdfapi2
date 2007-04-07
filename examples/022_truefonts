@@ -34,7 +34,7 @@
 #   $Id$
 #
 #=======================================================================
-
+use lib qw{ ../lib };
 use File::Basename;
 use PDF::API2;
 use PDF::API2::Util;
@@ -44,7 +44,7 @@ use Getopt::Long;
 my $sx=33;
 my $sy=45;
 my $fx=20;
-
+my $LoremIpsum=q|Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.|;
 my $encoding='latin1';
 
 GetOptions(
@@ -204,6 +204,26 @@ foreach $fn (@ARGV) {
         print STDERR ".";
         $pdf->finishobjects($page,$gfx);
     }
+    
+    my $text=$LoremIpsum;
+
+    $page = $pdf->page;
+    $page->mediabox(595,842);
+    $gfx=$page->gfx;
+    $gfx->transform(-translate => [50, 800]);
+    $gfx->textstart;
+    $gfx->fillcolor('black');
+    $gfx->font($font,18);
+    $gfx->lead(18*1.25);
+    my $toprint;
+    while($text ne '')
+    {
+    	($toprint,$text)=$gfx->_text_fill_line($text,500,0);
+    	$gfx->text($toprint);
+    	$gfx->nl;
+    }
+    $gfx->textend;
+    
     $pdf->save;
     $pdf->end;
 }
@@ -215,6 +235,9 @@ __END__
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/04/07 10:26:23  areibens
+    added lorem ipsum page
+
     Revision 2.1  2006/06/19 19:20:13  areibens
     added details
 
