@@ -206,7 +206,12 @@ sub new
         $char->{' stream'}.="BT\n";
         $char->{' stream'}.=join(' ',1,0,tan(deg2rad($oblique)),1,0,0)." Tm\n" if($oblique);
         $char->{' stream'}.="2 Tr ".($bold)." w\n" if($bold);
-        my $ci = charinfo($self->data->{uni}->[$w]);
+        # my $ci = charinfo($self->data->{uni}->[$w]);
+        my $ci={};
+  		if ($self->data->{uni}->[$w] ne '')
+  		{
+    		$ci = charinfo($self->data->{uni}->[$w]);
+  		}
         if($opts{-caps} && $ci->{upper}) 
         {
             $char->{' stream'}.="/FSN 800 Tf\n";
@@ -292,6 +297,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/04/18 05:26:48  areibens
+    fixed unicode caos handling for some broken fonts having no unicode for a glyph
+
     Revision 2.0  2005/11/16 02:18:14  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
