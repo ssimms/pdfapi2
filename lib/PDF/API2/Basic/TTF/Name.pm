@@ -92,6 +92,7 @@ An array of arrays, etc.
 =cut
 
 use strict;
+use bytes;
 use vars qw(@ISA $VERSION @apple_encs @apple_encodings $utf8 $cp_1252 @cp_1252);
 use PDF::API2::Basic::TTF::Table;
 use PDF::API2::Basic::TTF::Utils;
@@ -138,7 +139,7 @@ sub read
     ($num, $stroff) = unpack("x2nn", $dat);
     for ($i = 0; $i < $num; $i++)
     {
-        $fh->read($dat, 12);
+        read($fh,$dat, 12);
         ($pid, $eid, $lid, $nid, $len, $off) = unpack("n6", $dat);
         $here = $fh->tell();
         $fh->seek($self->{' OFFSET'} + $stroff + $off, 0);
