@@ -642,6 +642,8 @@ sub new {
     $data->{altname}=~s/[^a-zA-Z0-9]//og;
     $data->{subname}=~s/[^a-zA-Z0-9]//og;
     
+    $self->subsetByCId(0);
+    
     return($self,$data);
 }
 
@@ -724,6 +726,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.3  2007/05/07 20:31:21  areibens
+    fix subsetting
+
     Revision 2.2  2007/03/17 20:38:51  areibens
     replaced IOString dep. with scalar IO.
 
