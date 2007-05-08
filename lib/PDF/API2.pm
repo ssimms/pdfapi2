@@ -1104,7 +1104,7 @@ sub openpage {
 
             ## if we like compress we will do it now to do quicker saves
             if($self->{forcecompress}>0){
-            ##    $content->compress;
+            ##    $content->compressFlate;
                 $content->{' stream'}=dofilter($content->{Filter}, $content->{' stream'});
                 $content->{' nofilt'}=1;
                 delete $content->{-docompress};
@@ -1266,7 +1266,7 @@ sub importPageIntoForm {
           # so we just copy it and add the required "qQ"
             $xo->add('q',$k->{' stream'},'Q');
         }
-        $xo->compress if($self->{forcecompress}>0);
+        $xo->compressFlate if($self->{forcecompress}>0);
     }
 
     return($xo);
@@ -2515,6 +2515,10 @@ __END__
 
 =back
 
+=head1 BUGS
+
+This module does not work with perl's -l commandline switch.
+
 =head1 AUTHOR
 
 alfred reibenschuh
@@ -2522,6 +2526,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.7  2007/05/08 18:32:10  areibens
+    renamed compress to compressFlate
+
     Revision 2.6  2007/05/07 20:33:46  areibens
     fix tounicode option
 
