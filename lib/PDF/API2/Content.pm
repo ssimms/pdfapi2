@@ -923,24 +923,17 @@ sub bogen
     my ($self,$x1,$y1,$x2,$y2,$r,$move,$larc,$spf) = @_;
     my ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
     my $x=$x2-$x1;
-    $x=$x1-$x2 if($spf>0);
     my $y=$y2-$y1;
-    $y=$y1-$y2 if($spf>0);
     my $z=sqrt($x**2+$y**2);
     my $alfa_rad=asin($y/$z);
 
-    if($spf>0) 
-    {
-        $alfa_rad-=pi/2 if($x<0);
-        $alfa_rad=-$alfa_rad if($y>0);
-    } 
-    else 
-    {
-        $alfa_rad+=pi/2 if($x<0);
-        $alfa_rad=-$alfa_rad if($y<0);
-    }
-
+    $alfa_rad+=pi/2 if($x<0 and $y>0);
+    $alfa_rad-=pi/2 if($x<0 and $y<0);
+ 
     my $alfa=rad2deg($alfa_rad);
+    # use the complement angle for span
+    $alfa -= 180 if($spf>0);
+
     my $d=2*$r;
     my ($beta,$beta_rad,@points);
 
@@ -974,8 +967,14 @@ sub bogen
         $p1_y= $y + shift @points;
         $p2_x= $x + shift @points;
         $p2_y= $y + shift @points;
-        $p3_x= $x + shift @points;
-        $p3_y= $y + shift @points;
+        # if we run out of data points, use the end point instead
+        if (scalar @points == 0) {
+            $p3_x = $x2;
+            $p3_y = $y2;
+        } else {
+            $p3_x= $x + shift @points;
+            $p3_y= $y + shift @points;
+        }
         $self->curve($p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
         shift @points;
         shift @points;
@@ -2153,6 +2152,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.6  2007/05/08 18:11:45  areibens
+    fixed bogen
+
     Revision 2.5  2007/03/16 15:26:44  areibens
     removed silly grey-level handling
 
