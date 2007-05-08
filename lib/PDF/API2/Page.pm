@@ -432,7 +432,7 @@ sub gfx {
     my ($self,$dir) = @_;
     my $gfx=PDF::API2::Content->new();
     $self->content($gfx,$dir);
-    $gfx->compress() if($self->{' api'}->{forcecompress});
+    $gfx->compressFlate() if($self->{' api'}->{forcecompress});
     return($gfx);
 }
 
@@ -447,7 +447,7 @@ sub text {
     my ($self,$dir) = @_;
     my $text=PDF::API2::Content::Text->new();
     $self->content($text,$dir);
-    $text->compress() if($self->{' api'}->{forcecompress});
+    $text->compressFlate() if($self->{' api'}->{forcecompress});
     return($text);
 }
 
@@ -561,6 +561,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/05/08 18:32:09  areibens
+    renamed compress to compressFlate
+
     Revision 2.0  2005/11/16 02:16:00  areibens
     revision workaround for SF cvs import not to screw up CPAN
 

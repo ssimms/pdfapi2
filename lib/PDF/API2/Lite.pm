@@ -94,7 +94,7 @@ sub page {
     $self->{page}=$self->{api}->page;
     $self->{page}->mediabox(@_) if($_[0]);
     $self->{gfx}=$self->{page}->gfx;
-#   $self->{gfx}->compress;
+#   $self->{gfx}->compressFlate;
     return $self;
 }
 
@@ -670,6 +670,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/05/08 18:32:09  areibens
+    renamed compress to compressFlate
+
     Revision 2.0  2005/11/16 02:16:00  areibens
     revision workaround for SF cvs import not to screw up CPAN
 

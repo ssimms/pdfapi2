@@ -170,13 +170,13 @@ sub restore
     }
 }
 
-=item $co->compress
+=item $co->compressFlate
 
 Marks content for compression on output.
 
 =cut
 
-sub compress 
+sub compressFlate 
 {
     my $self=shift @_;
     $self->{'Filter'}=PDFArray(PDFName('FlateDecode'));
@@ -2152,6 +2152,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.7  2007/05/08 18:32:09  areibens
+    renamed compress to compressFlate
+
     Revision 2.6  2007/05/08 18:11:45  areibens
     fixed bogen
 
