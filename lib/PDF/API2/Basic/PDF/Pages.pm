@@ -27,12 +27,14 @@
 package PDF::API2::Basic::PDF::Pages;
 
 use strict;
-use vars qw(@ISA);
+use vars qw(@ISA %inst);
 @ISA = qw(PDF::API2::Basic::PDF::Dict);
 no warnings qw[ deprecated recursion uninitialized ];
 
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;
+
+%inst = map {$_ => 1} qw(Parent Type);
 
 =head1 NAME
 
@@ -74,6 +76,13 @@ sub new
 }
 
 
+sub init
+{
+    my ($self, $pdf) = @_;
+    $self->{' outto'} = [$pdf];
+    $self;
+}
+
 =head2 $p->out_obj($isnew)
 
 Tells all the files that this thing is destined for that they should output this
@@ -94,7 +103,7 @@ sub out_obj
         { $_->new_obj($self); }
         else
         { $_->out_obj($self); }
-
+        
         unless (defined $self->{'Parent'})
         {
             $_->{'Root'}{'Pages'} = $self;
@@ -103,142 +112,176 @@ sub out_obj
     }
     $self;
 }
+        
 
-=head2 $p->add_page($page, $index)
+=head2 $p->find_page($pnum)
 
-Appends a page to this pages object. This subroutine only handles adding pages
-at the end of the list. But it does at least make sure there is only 8 entries
-in any pages list, and keep track of all the counts etc.
+Returns the given page, using the page count values in the pages tree. Pages
+start at 0.
 
-$index, if set, specifies the page number that the page should be inserted
-before. If 0, the page is appended to the file. If -ve then counts from the end.
+=cut
+
+sub find_page
+{
+    my ($self, $pnum) = @_;
+    my ($top) = $self->get_top;
+    
+    $top->find_page_recurse(\$pnum);
+}
+
+
+sub find_page_recurse
+{
+    my ($self, $rpnum) = @_;
+    my ($res, $k);
+    
+    if ($self->{'Count'}->realise->val <= $$rpnum)
+    { 
+        $$rpnum -= $self->{'Count'}->val; 
+        return undef;
+    }
+
+    foreach $k ($self->{'Kids'}->realise->elementsof)
+    {
+        if ($k->{'Type'}->realise->val eq 'Page')
+        {
+            return $k if ($$rpnum == 0);
+            $$rpnum--;
+        }
+        elsif ($res = $k->realise->find_page_recurse($rpnum))
+        { return $res; }
+    }
+    return undef;
+}
+        
+=head2 $p->add_page($page, $pnum)
+
+Inserts the page before the given $pnum. $pnum can be -ve to count from the END
+of the document. -1 is after the last page. Likewise $pnum can be greater than the
+number of pages currently in the document, to append.
+
+This method only guarantees to provide a reasonable pages tree if pages are
+appended or prepended to the document. Pages inserted in the middle of the
+document may simply be inserted in the appropriate leaf in the pages tree without
+adding any new branches or leaves. To tidy up such a mess, it is best to call
+$p->rebuild_tree to rebuild the pages tree into something efficient.
 
 =cut
 
 sub add_page
 {
+    my ($self, $page, $pnum) = @_;
+    my ($top) = $self->get_top;
+    my ($ppage, $ppages, $pindex, $ppnum);
+    
+    $pnum = -1 unless (defined $pnum && $pnum <= $top->{'Count'}->val);
+    if ($pnum == -1)
+    { $ppage = $top->find_page($top->{'Count'}->val - 1); }
+    else
+    {
+        $pnum = $top->{'Count'}->val + $pnum + 1 if ($pnum < 0);
+        $ppage = $top->find_page($pnum);
+    }
+    
+    if (defined $ppage->{'Parent'})
+    { $ppages = $ppage->{'Parent'}->realise; }
+    else
+    { $ppages = $self; }
+    
+    $ppnum = scalar $ppages->{'Kids'}->realise->elementsof;
+    
+    if ($pnum == -1)
+    { $pindex = -1; }
+    else
+    {
+        for ($pindex = 0; $pindex < $ppnum; $pindex++)
+        { last if ($ppages->{'Kids'}{' val'}[$pindex] eq $ppage); }
+        $pindex = -1 if ($pindex == $ppnum);
+    }
+    
+    $ppages->add_page_recurse($page->realise, $pindex);
+    for ($ppages = $page->{'Parent'}; defined $ppages->{'Parent'}; $ppages = $ppages->{'Parent'}->realise)
+    { $ppages->out_obj->{'Count'}->realise->{'val'}++; }
+    $ppages->out_obj->{'Count'}->realise->{'val'}++;
+    $page;
+}    
+
+
+sub add_page_recurse
+{
     my ($self, $page, $index) = @_;
-    my ($p, $nt, $s, @path, $c, $m);
-    $index ||= 0;           # keep perl -w happy :(
-
-    for ($p = $self; defined $p->{'Parent'}; $p = $p->{'Parent'})
-    { }
-
-    if (!defined $index or $index <= 0)
+    my ($newpages, $ppages, $pindex, $ppnum);
+    
+    if (scalar $self->{'Kids'}->elementsof >= 8 && $self->{'Parent'} && $index < 1)
     {
-        @path = ([$p, ($#{$p->{'Kids'}{' val'}}) x 2]);
-        for ($s = $p->{'Kids'}{' val'}[-1]; defined $s && $s->realise->{'Type'}{'val'} eq 'Pages'; $s = $s->{'Kids'}{' val'}[-1])
-        { unshift (@path, [$s, ($#{$s->{'Kids'}{' val'}}) x 2]); }
-    } else
-    {
-        @path = ([$p, 0, $#{$p->{'Kids'}{' val'}}]);
-        for ($s = $p->{'Kids'}{' val'}[0]; defined $s && $s->realise->{'Type'}{'val'} eq 'Pages'; $s = $s->{'Kids'}{' val'}[0])
-        { unshift (@path, [$s, 0, $#{$s->{'Kids'}{' val'}}]); }
-    }
-
-    unless (defined $s)
-    {
-        $p->{'Kids'}->add_elements($page);
-        $p->{'Count'}{'val'} = 1;
-        $page->{'Parent'} = $p;
-        return $self;
-    }
-
-    ($p, $c, $m) = @{$path[0]};
-
-    $c++ if ($index == 0);
-
-    $index++ if ($index < 0);
-    while ($index < 0)
-    {
-        ($p, $c, $m) = @{$path[0]};
-        while (--$c < 0)
+        $ppages = $self->{'Parent'}->realise;
+        $newpages = $self->new($self->{' outto'}, $ppages);
+        if ($ppages)
         {
-            shift(@path);
-            return undef if (scalar @path == 0);
-            ($p, $c, $m) = @{$path[0]};
+            $ppnum = scalar $ppages->{'Kids'}->realise->elementsof;
+            for ($pindex = 0; $pindex < $ppnum; $pindex++)
+            { last if ($ppages->{'Kids'}{' val'}[$pindex] eq $self); }
+            $pindex = -1 if ($pindex == $ppnum);
+            $ppages->add_page_recurse($newpages, $pindex);
         }
-        $path[0] = [$p, $c, $m];
-        for ($s = $p->{'Kids'}{' val'}[$c]; defined $s && $s->realise->{'Type'}{'val'} eq 'Pages'; $s = $s->{'Kids'}{' val'}[-1])
-        { unshift (@path, [$s, ($#{$s->{'Kids'}{' val'}}) x 2]); }
-        $index++;
     }
-
-    $index-- if ($index > 0);
-    while ($index > 0)
-    {
-        ($p, $c, $m) = @{$path[0]};
-        while (++$c > $m)
-        {
-            shift(@path);
-            return undef if (scalar @path == 0);
-            ($p, $c, $m) = @{$path[0]};
-        }
-        $path[0] = [$p, $c, $m];
-        for ($s = $p->{'Kids'}{' val'}[$c]; defined $s && $s->realise->{'Type'}{'val'} eq 'Pages'; $s = $s->{'Kids'}{' val'}[0])
-        { unshift (@path, [$s, 0, $#{$s->{'Kids'}{' val'}}]); }
-        $index--;
-    }
-
-    while (scalar @path > 1 && $m >= 7 && ($c == 0 || $c > $m))
-    {
-        shift(@path);
-        if ($c > $m)
-        {
-            ($p, $c, $m) = @{$path[0]};
-            $c++;
-        } else
-        { ($p, $c, $m) = @{$path[0]}; }
-    }
-
-    if ($#path <= 0 && $m >= 7)
-    {
-        $nt = {%$p};
-        delete $nt->{' uid'};
-        bless $nt, ref $p;
-        $nt->{'Kids'} = PDFArray();
-        $nt->{'Count'} = PDFNum($p->{'Count'}{'val'});
-        $nt->{' outto'} = $page->{' outto'} unless defined $nt->{' outto'};
-        $nt->out_obj(1);
-
-        $p->{'Parent'} = $nt;
-        $nt->{'Count'}{'val'} = $p->{'Count'}{'val'};
-        $nt->{'Kids'}->add_elements($p);
-        $p = $nt;
-    }
-
-    if ($p ne $s->{'Parent'})
-    {
-        $nt = $p->new($p->{' outto'} || $page->{' outto'}, $p);
-    if($c >= scalar @{$p->{'Kids'}{' val'}}) {
-            push(@{$p->{'Kids'}{' val'}},$nt);
-    } else {
-        splice(@{$p->{'Kids'}{' val'}}, $c, 0, $nt);
-    }
-        $p->{' outto'} = $page->{' outto'} unless defined $p->{' outto'};
-        $p->out_obj;
-        $p = $nt;
-        unshift(@path, [$p, 0, 1]);
-        $c = 0; $m = 1;
-    }
-    splice(@{$p->{'Kids'}{' val'}}, $c, 0, $page);
-    $page->{'Parent'} = $p;
-    $p->{' outto'} = $page->{' outto'} unless defined $p->{' outto'};
-    $p->out_obj;
-
-    for (; defined $p->{'Parent'}; $p = $p->{'Parent'})
-    {
-        $p->{'Count'}{'val'}++;
-        $p->{' outto'} = $page->{' outto'} unless defined $p->{' outto'};
-        $p->out_obj;
-    }
-    $p->{'Count'}{'val'}++;
-    $p->{' outto'} = $page->{' outto'} unless defined $p->{' outto'};
-    $p->out_obj;
-    $self;
+    else
+    { $newpages = $self->out_obj; }
+    
+    if ($index < 0)
+    { push (@{$newpages->{'Kids'}->realise->{' val'}}, $page); }
+    else
+    { splice (@{$newpages->{'Kids'}{' val'}}, $index, 0, $page); }
+    $page->{'Parent'} = $newpages;
 }
 
 
+=head2 $root_pages = $p->rebuild_tree([@pglist])
+
+Rebuilds the pages tree to make a nice balanced tree that conforms to Adobe
+recommendations. If passed a pglist then the tree is built for that list of
+pages. No check is made of whether the pglist contains pages.  
+
+Returns the top of the tree for insertion in the root object.
+
+=cut
+
+sub rebuild_tree
+{
+    my ($self, @pglist) = @_;
+}
+
+
+=head2 @pglist = $p->get_pages
+
+Returns a list of page objects in the document in page order
+
+=cut
+
+sub get_pages
+{
+    my ($self) = @_;
+    
+    return $self->get_top->get_kids;
+}
+
+
+# only call this on the top level or anything you want pages below
+sub get_kids
+{
+    my ($self) = @_;
+    my ($pgref, @pglist);
+
+    foreach $pgref ($self->{'Kids'}->elementsof)
+    {
+        $pgref->realise;
+        if ($pgref->{'Type'}->val =~ m/^Pages$/oi)
+        { push (@pglist, $pgref->get_kids()); }
+        else
+        { push (@pglist, $pgref); }
+    }
+    @pglist;
+}
 =head2 $p->find_prop($key)
 
 Searches up through the inheritance tree to find a property.
@@ -365,6 +408,27 @@ sub empty
     $self->SUPER::empty;
     $self->{'Parent'} = $parent if defined $parent;
     $self;
+}
+
+sub dont_copy
+{ return $inst{$_[1]} || $_[0]->SUPER::dont_copy($_[1]); }
+
+
+=head2 $p->get_top
+
+Returns the top of the pages tree
+
+=cut
+
+sub get_top
+{
+    my ($self) = @_;
+    my ($p);
+    
+    for ($p = $self; defined $p->{'Parent'}; $p = $p->{'Parent'})
+    { }
+    
+    $p->realise;
 }
 
 1;
