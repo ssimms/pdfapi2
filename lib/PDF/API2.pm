@@ -1194,6 +1194,8 @@ B<Example:>
     $gfx->formimage($xo,0,0,1); # put it on page 1 with scale x1
     $pdf->saveas("our/new.pdf");
 
+B<Note:> you can only import a page from an existing pdf-file!
+
 =cut
 
 sub importPageIntoForm {
@@ -1290,6 +1292,8 @@ B<Example:>
     $old = PDF::API2->open('my/old.pdf');
     $page = $pdf->importPage($old,2); # get page 2 into page 1
     $pdf->saveas("our/new.pdf");
+
+B<Note:> you can only import a page from an existing pdf-file!
 
 =cut
 
@@ -2526,6 +2530,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.8  2007/05/10 23:38:38  areibens
+    added note on importintoform and importpage for existing pdf-file
+
     Revision 2.7  2007/05/08 18:32:10  areibens
     renamed compress to compressFlate
 
