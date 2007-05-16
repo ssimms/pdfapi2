@@ -1290,7 +1290,7 @@ B<Example:>
 
     $pdf = PDF::API2->new;
     $old = PDF::API2->open('my/old.pdf');
-    $page = $pdf->importPage($old,2); # get page 2 into page 1
+    $page = $pdf->importpage($old,2); # get page 2 into page 1
     $pdf->saveas("our/new.pdf");
 
 B<Note:> you can only import a page from an existing pdf-file!
@@ -2530,6 +2530,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.9  2007/05/16 21:45:32  areibens
+    fixed importpage doku bug http://rt.cpan.org/Ticket/Display.html?id=27152
+
     Revision 2.8  2007/05/10 23:38:38  areibens
     added note on importintoform and importpage for existing pdf-file
 
