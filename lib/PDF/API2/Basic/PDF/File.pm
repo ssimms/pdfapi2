@@ -1177,8 +1177,26 @@ sub readxrtr
     $fh->seek($xpos, 0);
     $fh->read($buf, 22);
     $buf=update($fh,$buf); # fix for broken JAWS xref calculation.
+    
+    ## seams that some products calculate wrong prev entries (short)
+    ## so we seek ahead to find one -- fredo; save for now
+    #while($buf !~ m/^xref$cr/oi && !eof($fh))
+    #{
+    #	$buf =~ s/^(\s+|\S+|.)//oi;
+	#    $buf=update($fh,$buf);
+    #}
+    
     if ($buf !~ m/^xref$cr/oi)
-    { die "Malformed xref in PDF file $self->{' fname'}"; }
+    { 
+    	#if($self == $root)
+    	#{
+    		die "Malformed xref in PDF file $self->{' fname'}";
+    	#}
+    	#else # be tolerant if its not the root object
+    	#{
+    	#	return undef;
+    	#} 
+    }
     $buf =~ s/^xref$cr//oi;
 
     $xlist = {};
@@ -1210,6 +1228,7 @@ sub readxrtr
     $self->{' maxobj'} = $xmin if $xmin > $self->{' maxobj'};
     $tdict->{' prev'} = $self->readxrtr($tdict->{'Prev'}->val)
                 if (defined $tdict->{'Prev'} && $tdict->{'Prev'}->val != 0);
+    delete $tdict->{' prev'} unless(defined $tdict->{' prev'});
     return $tdict;
 }
 
