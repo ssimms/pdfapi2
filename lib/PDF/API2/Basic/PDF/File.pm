@@ -305,10 +305,15 @@ sub open
     $fh->seek(0, 2);            # go to end of file
     $end = $fh->tell();
     $self->{' epos'} = $end;
-#    $fh->seek($end - 1024, 0);
-#    $fh->read($buf, 1024);
-    $fh->seek($end - 64, 0);
-    $fh->read($buf, 64);
+    foreach my $eoff (1..64)
+    {
+    	$fh->seek($end - 16*$eoff, 0);
+    	$fh->read($buf, 16*$eoff);
+    	if ($buf =~ m/startxref$cr\s*\d+$cr\%\%eof.*?/oi)
+    	{
+    		last;
+    	}
+    }
     if ($buf !~ m/startxref$cr\s*([0-9]+)$cr\%\%eof.*?/oi)
     { die "Malformed PDF file $fname"; }
     $xpos = $1;
