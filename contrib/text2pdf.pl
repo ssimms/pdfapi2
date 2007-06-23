@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# txt2pdf.pl
+# txt2pdf.pl from mcollins@fcnetwork.com
 #
 # MC's Q&D text to PDF converter.
 #
