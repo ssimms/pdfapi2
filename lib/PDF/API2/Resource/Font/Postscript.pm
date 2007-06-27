@@ -43,7 +43,7 @@ BEGIN {
     use POSIX;
     use Compress::Zlib;
     use File::Find;
-    use IO::File;
+    use IO::File qw();
     use vars qw(@ISA $VERSION);
 
     @ISA = qw( PDF::API2::Resource::Font );
@@ -563,6 +563,9 @@ __END__
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/06/27 20:54:16  areibens
+    fix exporter warnings of IO::File
+
     Revision 2.1  2006/08/14 18:08:16  areibens
     moved "use io-file" to begin section
 
