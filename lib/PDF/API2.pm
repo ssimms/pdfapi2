@@ -607,11 +607,14 @@ sub info {
       foreach my $k (@{$self->{infoMeta}}) {
         next unless(defined $self->{pdf}->{'Info'}->{$k});
         $opt{$k}=$self->{pdf}->{'Info'}->{$k}->val;
-        if(unpack('n',$opt{$k})==0xfffe) {
-            my ($mark,@c)=unpack('n*',$opt{$k});
-            $opt{$k}=pack('U*',@c);
-        } elsif(unpack('n',$opt{$k})==0xfeff) {
+        if(unpack('n',$opt{$k})==0xfffe) 
+        {
             my ($mark,@c)=unpack('v*',$opt{$k});
+            $opt{$k}=pack('U*',@c);
+        } 
+        elsif(unpack('n',$opt{$k})==0xfeff) 
+        {
+            my ($mark,@c)=unpack('n*',$opt{$k});
             $opt{$k}=pack('U*',@c);
         }
       }
@@ -2530,6 +2533,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.10  2007/08/01 23:12:08  areibens
+    fix BOM in info strings
+
     Revision 2.9  2007/05/16 21:45:32  areibens
     fixed importpage doku bug http://rt.cpan.org/Ticket/Display.html?id=27152
 
