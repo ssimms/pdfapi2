@@ -2014,7 +2014,44 @@ sub paragraph
         $self->nl;
     }
 
+	if(wantarray)
+	{
+		return($text,$height);
+	}
     return($text);
+}
+
+=item $overflow_text = $txt->section $text, $width, $height, %options
+
+** DEVELOPER METHOD **
+
+Split paragraphs by newline and loop over them, reassemble leftovers 
+when box is full and apply the text within the rectangle and return 
+any leftover text.
+
+=cut
+
+sub section
+{
+    my ($self,$text,$width,$height,%opts)=@_;
+    my ($para,$overflow) = ("","");
+
+    foreach $para (split(/\n/,$text))
+    {
+		if(length($overflow) > 0)
+		{
+		    $overflow .= "\n" . $para;
+		    next;
+		}
+		($para,$height) = $self->paragraph($para,$width,$height,%opts);
+		$overflow .= $para if (length($para) > 0);
+    }
+    
+	if(wantarray)
+	{
+		return($overflow,$height);
+	}
+    return($overflow);
 }
 
 =item $hyb->textend
@@ -2148,164 +2185,5 @@ __END__
 =head1 AUTHOR
 
 alfred reibenschuh
-
-=head1 HISTORY
-
-    $Log$
-    Revision 2.7  2007/05/08 18:32:09  areibens
-    renamed compress to compressFlate
-
-    Revision 2.6  2007/05/08 18:11:45  areibens
-    fixed bogen
-
-    Revision 2.5  2007/03/16 15:26:44  areibens
-    removed silly grey-level handling
-
-    Revision 2.4  2007/03/12 16:24:29  areibens
-    removed eval from state calls
-
-    Revision 2.3  2007/02/14 11:26:21  areibens
-    fixed advancewidth for space calculation
-
-    Revision 2.2  2007/01/04 16:02:28  areibens
-    applied untested fix for acrobat 8 "<ident> TJ" bug
-
-    Revision 2.1  2006/06/19 19:25:44  areibens
-    fixed compress vs. Compress::ZLib subs
-
-    Revision 2.0  2005/11/16 02:16:00  areibens
-    revision workaround for SF cvs import not to screw up CPAN
-
-    Revision 1.2  2005/11/16 01:27:48  areibens
-    genesis2
-
-    Revision 1.1  2005/11/16 01:19:24  areibens
-    genesis
-
-    Revision 1.40  2005/10/19 19:04:43  fredo
-    added extended typographic text handling call
-
-    Revision 1.39  2005/10/01 22:10:57  fredo
-    added more docs for textlabel
-
-    Revision 1.38  2005/06/17 19:43:46  fredo
-    fixed CPAN modulefile versioning (again)
-
-    Revision 1.37  2005/06/17 18:53:04  fredo
-    fixed CPAN modulefile versioning (dislikes cvs)
-
-    Revision 1.36  2005/05/29 09:48:46  fredo
-    added conditional textstate2 method
-
-    Revision 1.35  2003/04/09 11:12:13  fredo
-    documented form-image
-
-    Revision 1.34  2005/03/15 02:20:46  fredo
-    added metadata stubs
-
-    Revision 1.33  2005/03/14 22:01:05  fredo
-    upd 2005
-
-    Revision 1.32  2005/03/14 20:26:44  fredo
-    added 'auto' value for -underline parameter in text
-    fixed text line construction to to work under width==0 conditions
-
-    Revision 1.31  2005/02/22 22:59:49  fredo
-    fixed infinite loop in paragraph if words longer than a paragraph are present.
-
-    Revision 1.30  2005/02/07 19:31:24  fredo
-    fixed reset of textlinematrix on textmatrix set/resets
-
-    Revision 1.29  2005/01/21 10:19:48  fredo
-    added spline operator
-
-    Revision 1.28  2005/01/03 01:16:51  fredo
-    fixed textpos tracking in nl method
-
-    Revision 1.27  2004/12/31 03:59:09  fredo
-    fixed paragraph and text_fill_* methods
-    (thanks to Shawn Corey <shawn.corey@sympatico.ca>)
-
-    Revision 1.26  2004/12/31 02:53:18  fredo
-    minor code corrections
-
-    Revision 1.25  2004/12/31 02:06:37  fredo
-    fixed textpos calculation,
-    added underline capability
-    (thanks to Shawn Corey <shawn.corey@sympatico.ca>)
-
-    Revision 1.24  2004/12/29 22:01:57  fredo
-    advancewidth now can take a virtual textstate
-
-    Revision 1.23  2004/12/29 01:48:15  fredo
-    fixed _font method
-
-    Revision 1.22  2004/12/29 01:14:57  fredo
-    added virtual attribute support
-
-    Revision 1.21  2004/12/20 12:11:54  fredo
-    added fontset method to not set via 'Tf'
-
-    Revision 1.20  2004/12/16 00:30:51  fredo
-    added no warn for recursion
-
-    Revision 1.19  2004/12/15 16:44:43  fredo
-    added condition to apply font (Tf) only when needed
-
-    Revision 1.18  2004/11/25 20:53:59  fredo
-    fixed unifont registration
-
-    Revision 1.17  2004/11/24 20:10:31  fredo
-    added virtual font handling, fixed var shadow bug
-
-    Revision 1.16  2004/10/26 11:34:22  fredo
-    reworked text_fill for paragraph, but still being development
-
-    Revision 1.15  2004/08/31 13:50:09  fredo
-    fixed space vs. whitespace split bug
-
-    Revision 1.14  2004/07/29 10:46:37  fredo
-    added new text_fill_* methods and a simple paragraph
-
-    Revision 1.13  2004/06/21 22:33:36  fredo
-    added basic pattern/shading handling
-
-    Revision 1.12  2004/06/15 09:11:37  fredo
-    removed cr+lf
-
-    Revision 1.11  2004/06/07 19:44:12  fredo
-    cleaned out cr+lf for lf
-
-    Revision 1.10  2004/05/31 23:20:48  fredo
-    added basic platform encoding independency
-
-    Revision 1.9  2004/04/07 10:49:26  fredo
-    fixed handling of colorSpaces for fill/strokecolor
-
-    Revision 1.8  2004/02/12 14:46:44  fredo
-    removed duplicate definition of egstate method
-
-    Revision 1.7  2004/02/06 02:01:25  fredo
-    added save/restore around textlabel
-
-    Revision 1.6  2004/02/05 23:24:00  fredo
-    fixed lab behavior
-
-    Revision 1.5  2004/02/05 12:26:08  fredo
-    revised '_makecolor' to use Lab for hsv/hsl,
-    added textlabel method
-
-    Revision 1.4  2003/12/08 13:05:19  Administrator
-    corrected to proper licencing statement
-
-    Revision 1.3  2003/11/30 17:09:18  Administrator
-    merged into default
-
-    Revision 1.2.2.1  2003/11/30 16:56:21  Administrator
-    merged into default
-
-    Revision 1.2  2003/11/30 11:33:59  Administrator
-    added CVS id/log
-
 
 =cut
