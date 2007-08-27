@@ -235,21 +235,37 @@ sub find_ms
 {
     my ($self,$iso) = @_;
     my ($i, $s, $alt, $found);
-
+	my %cmap_pref=(
+		'3:10' => 100,
+		'3:1' => 75,
+		'3:0' => 25,
+		'2:0' => 50,
+		'0:4' => 80,
+		'0:3' => 30,
+	);
+	
     return($self->{' mstable'}) if(defined $self->{' mstable'});
 
     $self->read unless($self->{' read'});
 
+    $self->{' mstable'} = $self->{Tables}[0];
+	$self->{' mstable'}->{Pref}=$cmap_pref{$self->{' mstable'}->{Platform}.':'.$self->{' mstable'}->{Encoding}};
     foreach $i (0..($self->{Num}-1))
     {
         $s = $self->{Tables}[$i];
-        if ($s->{'Platform'} == 3)
+		$s->{Pref}=$cmap_pref{$s->{Platform}.':'.$s->{Encoding}};
+        
+        if($s->{Pref} > $self->{' mstable'}->{Pref})
         {
             $self->{' mstable'} = $s;
-            $found = 1 if(($s->{'Encoding'} == 1) || ($s->{'Encoding'} == 0));
-            last if ($found);
-        } elsif ($s->{'Platform'} == 0 || ($s->{'Platform'} == 2 && $s->{'Encoding'} == 1))
-        { $alt = $s; }
+            $found = 1;
+        }
+        elsif (($s->{'Platform'} == 3 && ($s->{'Encoding'} == 1 || $s->{'Encoding'} == 0)) 
+        	|| $s->{'Platform'} == 0 
+        	|| ($s->{'Platform'} == 2 && $s->{'Encoding'} == 1))
+        { 
+        	$alt = $s; 
+        }
     }
     $self->{' mstable'} = $alt unless $found;
 
