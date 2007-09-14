@@ -363,6 +363,7 @@ B<Useful Tags:>
 
     imageDescription, imageId (strings)
     xRes, yRes (dpi)
+    resUnit
 
 =cut
 
@@ -572,6 +573,9 @@ sub readTags {
         $fh->seek($here,0);
         $self->{yRes}=[unpack($self->{rational},$self->{yRes})];
         $self->{yRes}=($self->{yRes}->[0]/$self->{yRes}->[1]);
+      } elsif($valTag==296) {
+        # resolution Unit
+        $self->{resUnit}=$valOffset;
       } elsif($valTag==273) {
         # image data offset/strip offsets
         if($valCount==1) {
@@ -641,6 +645,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/09/14 15:36:39  areibens
+    also read Tiff Tag 296 and make it available as resUnit
+
     Revision 2.1  2007/03/17 20:38:51  areibens
     replaced IOString dep. with scalar IO.
 
