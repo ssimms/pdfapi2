@@ -362,7 +362,7 @@ returns the value of the internal tiff-tag.
 B<Useful Tags:>
 
     imageDescription, imageId (strings)
-    xRes, yRes (dpi)
+    xRes, yRes (dpi; pixel/cm if resUnit==3)
     resUnit
 
 =cut
@@ -645,6 +645,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.3  2007/09/17 16:03:07  areibens
+    update docs for tiffTag
+
     Revision 2.2  2007/09/14 15:36:39  areibens
     also read Tiff Tag 296 and make it available as resUnit
 
