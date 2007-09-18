@@ -352,6 +352,9 @@ I<-afterfullscreenthumbs>
 I<-afterfullscreenoutlines>
         ... Document outline visible after Full-screen mode.
 
+I<-printscalingnone>
+		... Set the default print setting for page scaling to none.
+
 =cut
 
 =pod
@@ -485,6 +488,10 @@ sub preferences {
         $self->{catalog}->{ViewerPreferences}->{NonFullScreenPageMode}=PDFName('UseOutlines');
     } else {
         $self->{catalog}->{ViewerPreferences}->{NonFullScreenPageMode}=PDFName('UseNone');
+    }
+
+    if($opt{-printscalingnone}) {
+		$self->{catalog}->{ViewerPreferences}->{PrintScaling}=PDFName("None");
     }
 
     if($opt{-firstpage}) {
@@ -2533,6 +2540,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.11  2007/09/18 22:29:31  areibens
+    added -printscalingnone option
+
     Revision 2.10  2007/08/01 23:12:08  areibens
     fix BOM in info strings
 
