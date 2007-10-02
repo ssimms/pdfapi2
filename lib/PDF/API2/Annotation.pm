@@ -214,6 +214,29 @@ sub text
     return($self);
 }
 
+=item $ant->movie $file, $contentype, %opts
+
+Defines the annotation as a movie from $file with $contentype and
+options %opts (-rect).
+
+=cut
+
+sub movie
+{
+    my ($self,$file,$contentype,%opts)=@_;
+    $self->{Subtype}=PDFName('Movie');
+    $self->{A}=PDFBool(1);
+    $self->{Movie}=PDFDict();
+    $self->{Movie}->{F}=PDFDict();
+    $self->{' apipdf'}->new_obj($self->{Movie}->{F});
+    my $f=$self->{Movie}->{F};
+    $f->{Type}=PDFName('EmbeddedFile');
+    $f->{Subtype}=PDFName($contentype);
+    $f->{' streamfile'}=$file;
+    $self->rect(@{$opts{-rect}}) if(defined $opts{-rect});
+    return($self);
+}
+
 =item $ant->rect $llx, $lly, $urx, $ury
 
 Sets the rectangle of the annotation.
@@ -408,6 +431,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.1  2007/10/02 19:59:37  areibens
+    added movie annotation
+
     Revision 2.0  2005/11/16 02:16:00  areibens
     revision workaround for SF cvs import not to screw up CPAN
 
