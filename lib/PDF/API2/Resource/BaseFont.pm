@@ -761,7 +761,7 @@ sub text
     }
 }
 
-sub isvirtual { return(undef); }
+sub isvirtual { return(0); }
 
 1;
 
@@ -776,6 +776,9 @@ alfred reibenschuh.
 =head1 HISTORY
 
     $Log$
+    Revision 2.8  2007/10/10 06:18:15  areibens
+    fixed noisy undef handling of isvirtual
+
     Revision 2.7  2007/04/07 10:25:46  areibens
     fixed fix for wxByGlyph not honoring cidfont width arrays
 

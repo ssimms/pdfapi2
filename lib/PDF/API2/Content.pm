@@ -1461,7 +1461,7 @@ B<Only use fontset if you know what you are doing, there is no super-secret fail
 sub _font
 {
     my ($font,$size)=@_;
-    if($font->isvirtual)
+    if($font->isvirtual == 1)
     {
         return('/'.$font->fontlist->[0]->name.' '.float($size).' Tf');
     }
@@ -1485,7 +1485,7 @@ sub fontset {
   $self->{' fontsize'}=$size;
   $self->{' fontset'}=0;
 
-  if($font->isvirtual)
+  if($font->isvirtual == 1)
   {
     foreach my $f (@{$font->fontlist})
     {
