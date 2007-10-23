@@ -210,6 +210,7 @@ examples/020_textrise
 examples/020_textunderline
 examples/021_synfonts
 examples/022_truefonts
+examples/022_truefonts_diacrits_utf8
 examples/023_cjkfonts
 examples/024_bmpfonts
 examples/025_unifonts
