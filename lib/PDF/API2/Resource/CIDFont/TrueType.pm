@@ -199,12 +199,14 @@ sub outobjdeep
             $notdefbefore=0;
             $ml=PDFArray();
             $wx->add_elements(PDFNum($w),$ml);
-            $ml->add_elements(PDFNum($self->data->{wx}->[$w]));
+        #    $ml->add_elements(PDFNum($self->data->{wx}->[$w]));
+            $ml->add_elements(PDFNum($self->wxByCId($w)));
         } 
         elsif($self->subvec($w) && $notdefbefore==0) 
         {
             $notdefbefore=0;
-            $ml->add_elements(PDFNum($self->data->{wx}->[$w]));
+        #    $ml->add_elements(PDFNum($self->data->{wx}->[$w]));
+            $ml->add_elements(PDFNum($self->wxByCId($w)));
         } 
         else 
         {
@@ -239,6 +241,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2007/10/23 07:45:49  areibens
+    fixed width encoding for wrong advance codes
+
     Revision 2.1  2007/03/17 20:38:51  areibens
     replaced IOString dep. with scalar IO.
 
