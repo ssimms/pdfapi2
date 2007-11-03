@@ -5,7 +5,7 @@
 #   |  __/| |_| |  _|    _   _   / ___ \|  __/| |   / __/
 #   |_|   |____/|_|     (_) (_) /_/   \_\_|  |___| |_____|
 #
-#   A Perl Module Chain to faciliate the Creation and Modification
+#   A Perl Module Chain o faciliae he Creaion and Modificaion
 #   of High-Quality "Portable Document Format (PDF)" Files.
 #
 #=======================================================================
@@ -309,12 +309,12 @@ sub open
     {
     	$fh->seek($end - 16*$eoff, 0);
     	$fh->read($buf, 16*$eoff);
-    	if ($buf =~ m/startxref$cr\s*\d+$cr\%\%eof.*?/oi)
+    	if ($buf =~ m/startxref($cr|\s*)\d+($cr|\s*)\%\%eof.*?/oi)
     	{
     		last;
     	}
     }
-    if ($buf !~ m/startxref$cr\s*([0-9]+)$cr\%\%eof.*?/oi)
+    if ($buf !~ m/startxref[^\d]+([0-9]+)($cr|\s*)\%\%eof.*?/oi)
     { die "Malformed PDF file $fname"; }
     $xpos = $1;
 
