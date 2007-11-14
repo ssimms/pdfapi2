@@ -66,6 +66,7 @@ BEGIN {
     use PDF::API2::Resource::Font::Postscript;
     use PDF::API2::Resource::Font::BdFont;
     use PDF::API2::Resource::Font::SynFont;
+    use PDF::API2::Resource::Font::neTrueType;
     use PDF::API2::Resource::CIDFont::TrueType;
     use PDF::API2::Resource::CIDFont::CJKFont;
     use PDF::API2::Resource::UniFont;
@@ -1741,6 +1742,19 @@ sub ttfont {
     return($obj);
 }
 
+sub nettfont {
+    my ($self,$file,%opts)=@_;
+
+    $file=_findFont($file);
+    my $obj=PDF::API2::Resource::Font::neTrueType->new_api($self,$file,%opts);
+
+    $self->resource('Font',$obj->name,$obj,$self->{reopened});
+
+    $self->{pdf}->out_obj($self->{pages});
+    $obj->tounicodemap if($opts{-unicodemap}==1);
+    return($obj);
+}
+
 =item $font = $pdf->cjkfont $cjkname  [, %options]
 
 Returns a new cjk font object.
@@ -2540,6 +2554,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.12  2007/11/14 22:49:49  areibens
+    added non-embedded truetype font (8-bit only) support
+
     Revision 2.11  2007/09/18 22:29:31  areibens
     added -printscalingnone option
 
