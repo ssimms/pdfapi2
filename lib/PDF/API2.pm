@@ -998,7 +998,7 @@ sub page {
     if($index==0) {
         $page=PDF::API2::Page->new($self->{pdf},$self->{pages});
     } else {
-        $page=PDF::API2::Page->new($self->{pdf},$self->{pages},$index);
+        $page=PDF::API2::Page->new($self->{pdf},$self->{pages},$index-1);
     }
     $page->{' apipdf'}=$self->{pdf};
     $page->{' api'}=$self;
@@ -2554,6 +2554,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.13  2007/11/14 23:01:32  areibens
+    fixed relative page insert
+
     Revision 2.12  2007/11/14 22:49:49  areibens
     added non-embedded truetype font (8-bit only) support
 
