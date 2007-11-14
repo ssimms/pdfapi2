@@ -472,6 +472,7 @@ sub new {
     $self->{' font'}=$font;
     $self->{' data'}=$data;
 
+	$data->{noembed} = $opts{-noembed}==1 ? 1 : 0;
     $data->{iscff} = (defined $font->{'CFF '}) ? 1 : 0;
 
     $self->{Subtype}=PDFName('Type1C') if($data->{iscff});
@@ -702,13 +703,16 @@ sub outobjdeep {
             }
         }
 
-        $self->{' stream'} = "";
-        my $ffh;
-        CORE::open($ffh, '+>', \$self->{' stream'});
-        binmode($ffh,':raw');
-        $f->out($ffh, 'cmap', 'cvt ', 'fpgm', 'glyf', 'head', 'hhea', 'hmtx', 'loca', 'maxp', 'prep');
-        $self->{'Length1'}=PDFNum(length($self->{' stream'}));
-        CORE::close($ffh);
+		if($self->data->{noembed} != 1)
+		{
+        	$self->{' stream'} = "";
+        	my $ffh;
+        	CORE::open($ffh, '+>', \$self->{' stream'});
+        	binmode($ffh,':raw');
+        	$f->out($ffh, 'cmap', 'cvt ', 'fpgm', 'glyf', 'head', 'hhea', 'hmtx', 'loca', 'maxp', 'prep');
+        	$self->{'Length1'}=PDFNum(length($self->{' stream'}));
+        	CORE::close($ffh);
+		}
     }
 
     $self->SUPER::outobjdeep($fh, $pdf, %opts);
@@ -726,6 +730,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.4  2007/11/14 20:46:37  areibens
+    added noembed option
+
     Revision 2.3  2007/05/07 20:31:21  areibens
     fix subsetting
 
