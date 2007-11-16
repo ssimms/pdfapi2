@@ -52,6 +52,7 @@ lib/PDF/API2/Resource/XObject/Form/BarCode/ean13.pm
 lib/PDF/API2/Resource/XObject/Form/BarCode/int2of5.pm
 lib/PDF/API2/Resource/Font/BdFont.pm
 lib/PDF/API2/Resource/Font/CoreFont.pm
+lib/PDF/API2/Resource/Font/neTrueType.pm
 lib/PDF/API2/Resource/Font/Postscript.pm
 lib/PDF/API2/Resource/Font/SynFont.pm
 lib/PDF/API2/Resource/Font/CoreFont/bankgothic.pm
