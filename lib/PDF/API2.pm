@@ -1727,6 +1727,8 @@ Valid %options are:
 
   '-dokern' ... enables kerning if data is available.
 
+  '-noembed' ... disables embedding the fontfile.
+
 =cut
 
 sub ttfont {
@@ -2554,6 +2556,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.14  2007/11/16 19:30:31  areibens
+    added -noembed option
+
     Revision 2.13  2007/11/14 23:01:32  areibens
     fixed relative page insert
 
