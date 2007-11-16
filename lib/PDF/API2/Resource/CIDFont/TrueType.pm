@@ -88,10 +88,13 @@ sub new {
 
     $de->{'FontDescriptor'} = $des;
     $de->{'Subtype'} = PDFName($self->iscff ? 'CIDFontType0' : 'CIDFontType2');
-    $de->{'BaseFont'} = PDFName(pdfkey().'+'.($self->fontname).'~'.time());
+    ## $de->{'BaseFont'} = PDFName(pdfkey().'+'.($self->fontname).'~'.time());
+    $de->{'BaseFont'} = PDFName($self->fontname);
     $de->{'DW'} = PDFNum($self->missingwidth);
-    $des->{$self->data->{iscff} ? 'FontFile3' : 'FontFile2'}=$ff;
-
+    if($opts{-noembed} != 1)
+    {
+    	$des->{$self->data->{iscff} ? 'FontFile3' : 'FontFile2'}=$ff;
+    }
     unless($self->issymbol) {
         $self->encodeByName($opts{-encode});
         $self->data->{encode}=$opts{-encode};
@@ -241,6 +244,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.3  2007/11/16 19:27:32  areibens
+    fixed -noembed option
+
     Revision 2.2  2007/10/23 07:45:49  areibens
     fixed width encoding for wrong advance codes
 
