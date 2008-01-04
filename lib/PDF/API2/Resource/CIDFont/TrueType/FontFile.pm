@@ -505,14 +505,7 @@ sub new {
     }
     
     $data->{apiname}=$data->{fontname};
-if(0)
-{
 	$data->{apiname}=~s/[^A-Za-z0-9]+/ /og;
-}
-else
-{
-	$data->{apiname}=~s/\s+//og;
-}
     $data->{apiname}=join('',map { $_=~s/[^A-Za-z0-9]+//og; $_=ucfirst(lc(substr($_,0,2))); $_; } split(/\s+/,$data->{apiname}));
     $data->{fontname}=~s/[\x00-\x1f\s]//og;
 
@@ -644,22 +637,12 @@ else
     $data->{kern}=read_kern_table($font,$data->{upem},$self);
     delete $data->{kern} unless(defined $data->{kern});
 
-if(0)
-{
-    $data->{fontname}=~s/[^a-zA-Z0-9]//og;
-    $data->{fontfamily}=~s/[^a-zA-Z0-9]//og;
-    $data->{apiname}=~s/[^a-zA-Z0-9]//og;
-    $data->{altname}=~s/[^a-zA-Z0-9]//og;
-    $data->{subname}=~s/[^a-zA-Z0-9]//og;
-}
-else
-{
     $data->{fontname}=~s/\s+//og;
     $data->{fontfamily}=~s/\s+//og;
     $data->{apiname}=~s/\s+//og;
     $data->{altname}=~s/\s+//og;
     $data->{subname}=~s/\s+//og;
-}    
+
     $self->subsetByCId(0);
     
     return($self,$data);
@@ -747,6 +730,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.6  2008/01/04 08:08:39  areibens
+    apiname fix
+
     Revision 2.5  2007/11/16 19:27:32  areibens
     fixed -noembed option
 
