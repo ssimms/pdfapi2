@@ -199,7 +199,17 @@ sub read_os2_table
     read($fh,$buf, 12);
     $data->{V}->{panoseHex}=unpack('H*',$buf);
     $data->{V}->{panose}=$buf;
-
+	($data->{V}->{sFamilyClass}, $data->{V}->{bFamilyType}, $data->{V}->{bSerifStyle}, $data->{V}->{bWeight},
+		$data->{V}->{bProportion}, $data->{V}->{bContrast}, $data->{V}->{bStrokeVariation}, $data->{V}->{bArmStyle},
+		$data->{V}->{bLetterform}, $data->{V}->{bMidline}, $data->{V}->{bXheight}) = unpack('nC*',$buf);
+		
+	$data->{V}->{flags} = 0;
+    $data->{V}->{flags} |= 1 if ($data->{V}->{'bProportion'} == 9);
+    $data->{V}->{flags} |= 2 unless ($data->{V}->{'bSerifStyle'} > 10 && $data->{V}->{'bSerifStyle'} < 14);
+    $data->{V}->{flags} |= 8 if ($data->{V}->{'bFamilyType'} == 2);
+    $data->{V}->{flags} |= 32; # if ($data->{V}->{'bFamilyType'} > 3);
+    $data->{V}->{flags} |= 64 if ($data->{V}->{'bLetterform'} > 8);
+    
     seek($fh,$data->{'OS/2'}->{OFF}+42,0);
     read($fh,$buf, 16);
     $data->{V}->{ulUnicodeRange}=[ unpack('NNNN',$buf) ]; 
@@ -209,6 +219,8 @@ sub read_os2_table
         seek($fh,$data->{'OS/2'}->{OFF}+78,0);
         read($fh,$buf, 8);
         $data->{V}->{ulCodePageRange}=[ unpack('NN',$buf) ]; 
+        read($fh,$buf, 4);
+        ($data->{V}->{xHeight},$data->{V}->{CapHeight})=unpack('nn',$buf); 
     }
 }
 
@@ -220,6 +232,23 @@ sub read_head_table
     read($fh,$buf, 2);
     $data->{V}->{upem}=unpack_ushort($buf);
     $data->{V}->{upemf}=1000/$data->{V}->{upem};
+
+    seek($fh,$data->{'head'}->{OFF}+36,0);
+    read($fh,$buf, 2);
+    $data->{V}->{xMin}=unpack_short($buf);
+    read($fh,$buf, 2);
+    $data->{V}->{yMin}=unpack_short($buf);
+    read($fh,$buf, 2);
+    $data->{V}->{xMax}=unpack_short($buf);
+    read($fh,$buf, 2);
+    $data->{V}->{yMax}=unpack_short($buf);
+
+    $data->{V}->{fontbbox}=[
+        int($data->{V}->{'xMin'} * $data->{V}->{upemf}),
+        int($data->{V}->{'yMin'} * $data->{V}->{upemf}),
+        int($data->{V}->{'xMax'} * $data->{V}->{upemf}),
+        int($data->{V}->{'yMax'} * $data->{V}->{upemf})
+    ];
     seek($fh,$data->{'head'}->{OFF}+50,0);
     read($fh,$data->{'head'}->{indexToLocFormat}, 2);
     $data->{'head'}->{indexToLocFormat}=unpack_ushort($data->{'head'}->{indexToLocFormat});
@@ -470,13 +499,13 @@ sub read_post_table
     read($fh,$buf, 4);
     $post->{Format}=unpack('N',$buf);
     read($fh,$buf,4);
-    $post->{italicangle}=unpack_fixed($buf);
+    $data->{V}->{italicangle}=unpack_fixed($buf);
     read($fh,$buf,2);
-    $post->{underlineposition}=unpack_f2dot14($buf)*1000;
+    $data->{V}->{underlineposition}=unpack_f2dot14($buf)*1000;
     read($fh,$buf,2);
-    $post->{underlinethickness}=unpack_f2dot14($buf)*1000;
+    $data->{V}->{underlinethickness}=unpack_f2dot14($buf)*1000;
     read($fh,$buf,4);
-    $post->{isfixedpitch}=unpack_ulong($buf);
+    $data->{V}->{isfixedpitch}=unpack_ulong($buf);
     read($fh,$buf,16);
     
     if($post->{Format} == 0x00010000)
@@ -950,6 +979,7 @@ sub get_otf_data {
     $data->{V}->{fontfamily}=find_name($data->{name},1);
     $data->{V}->{fontname}=find_name($data->{name},4);
     $data->{V}->{stylename}=find_name($data->{name},2);
+
     my $name = lc find_name($data->{name},1);
     my $subname = lc find_name($data->{name},2);
     my $slant='';
@@ -1125,8 +1155,11 @@ sub get_otf_data {
     $data=$data->{V};
     $data->{firstchar}=0;
     $data->{lastchar}=255;
-    $data->{fontbbox}=[-200,-200,1000,1000];
-    $data->{flags}='262176';
+
+    $data->{flags} |= 1 if($data->{isfixedpitch} > 0);
+    $data->{flags} |= 64 if($data->{italicangle} != 0);
+    $data->{flags} |= (1<<18) if($data->{usWeightClass} >= 600);
+    
     return($data);
 }
 
