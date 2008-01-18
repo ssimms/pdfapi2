@@ -615,15 +615,9 @@ sub info {
       foreach my $k (@{$self->{infoMeta}}) {
         next unless(defined $self->{pdf}->{'Info'}->{$k});
         $opt{$k}=$self->{pdf}->{'Info'}->{$k}->val;
-        if(unpack('n',$opt{$k})==0xfffe) 
+        if ((unpack('n',$opt{$k})==0xfffe) or (unpack('n',$opt{$k})==0xfeff)) 
         {
-            my ($mark,@c)=unpack('v*',$opt{$k});
-            $opt{$k}=pack('U*',@c);
-        } 
-        elsif(unpack('n',$opt{$k})==0xfeff) 
-        {
-            my ($mark,@c)=unpack('n*',$opt{$k});
-            $opt{$k}=pack('U*',@c);
+            $opt{$k} = decode('UTF-16', $self->{pdf}->{'Info'}->{$k}->val);
         }
       }
   }
@@ -705,6 +699,7 @@ sub xmpMetadata {
         delete $md->{Filter};
         delete $md->{' nofilt'};
         $self->{pdf}->out_obj($md);
+        $self->{pdf}->out_obj($self->{catalog});
     }
     return($md->{' stream'});
 }
@@ -2556,6 +2551,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.15  2008/01/18 00:11:38  areibens
+    fixed catalog update and infohash utf16 from http://bugs.debian.org/461167
+
     Revision 2.14  2007/11/16 19:30:31  areibens
     added -noembed option
 
