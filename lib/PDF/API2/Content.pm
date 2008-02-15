@@ -1897,7 +1897,8 @@ sub _text_fill_line
 sub text_fill_left 
 {
     my ($self,$text,$width,%opts)=@_;
-    my ($line,$ret)=$self->_text_fill_line($text,$width,1);
+    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
+    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
     $width=$self->text($line,%opts);
     return($width,$ret);
 }
@@ -1911,7 +1912,8 @@ sub text_fill_left
 sub text_fill_center 
 {
     my ($self,$text,$width,%opts)=@_;
-    my ($line,$ret)=$self->_text_fill_line($text,$width,1);
+    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
+    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
     $width=$self->text_center($line,%opts);
     return($width,$ret);
 }
@@ -1925,7 +1927,8 @@ sub text_fill_center
 sub text_fill_right 
 {
     my ($self,$text,$width,%opts)=@_;
-    my ($line,$ret)=$self->_text_fill_line($text,$width,1);
+    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
+    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
     $width=$self->text_right($line,%opts);
     return($width,$ret);
 }
@@ -1939,7 +1942,8 @@ sub text_fill_right
 sub text_fill_justified 
 {
     my ($self,$text,$width,%opts)=@_;
-    my ($line,$ret)=$self->_text_fill_line($text,$width,1);
+    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
+    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
     my $hs=$self->hspace;
     my $w=$self->advancewidth($line);
     if($ret||$w>=$width)
@@ -1972,6 +1976,13 @@ Default is 'left'
 
 If a scalar, distance below baseline,
 else array reference with pairs of distance and line thickness.
+
+=item -spillover => $over
+
+Controls if words in a line which exceed the given width should be "spilled over" the bounds or if a new line should be used for this word.
+
+Over is 1 or 0
+Default is 1
 
 =back
 
