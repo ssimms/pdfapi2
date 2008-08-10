@@ -171,8 +171,6 @@ sub new
     $self->{'FontMatrix'} = PDFArray(map { PDFNum($_) } ( 0.001, 0, 0, 0.001, 0, 0 ) );
     $self->{'FontBBox'} = PDFArray(map { PDFNum($_) } ( $self->fontbbox ) );
 
-    $self->{'Encoding'}=$font->{Encoding};
-
     my $procs=PDFDict();
     $pdf->new_obj($procs);
     $self->{'CharProcs'} = $procs;
@@ -188,6 +186,25 @@ sub new
         $self->data->{uni}->[$w]=uniByName($self->data->{char}->[$w]);
         $self->data->{u2e}->{$self->data->{uni}->[$w]}=$w;
     }
+
+    if($font->isa('PDF::API2::Resource::CIDFont'))
+    {
+      $self->{'Encoding'}=PDFDict();
+      $self->{'Encoding'}->{Type}=PDFName('Encoding');
+      $self->{'Encoding'}->{Differences}=PDFArray();
+      foreach my $w ($first..$last) 
+      {
+          if(defined $self->data->{char}->[$w] && $self->data->{char}->[$w] ne '.notdef')
+          {
+            $self->{'Encoding'}->{Differences}->add_elements(PDFNum($w),PDFName($self->data->{char}->[$w]));
+          }
+      }
+    }
+    else
+    {
+      $self->{'Encoding'}=$font->{Encoding};
+    }
+
     #use Data::Dumper;
     #print Dumper($self->data);
     my @widths=();
@@ -201,7 +218,7 @@ sub new
         my $char=PDFDict();
         my $wth=int($font->width(chr($w))*1000*$slant+2*$space);
         $procs->{$font->glyphByEnc($w)}=$char;
-        $char->{Filter}=PDFArray(PDFName('FlateDecode'));
+        #$char->{Filter}=PDFArray(PDFName('FlateDecode'));
         $char->{' stream'}=$wth." 0 ".join(' ',map { int($_) } $self->fontbbox)." d1\n";
         $char->{' stream'}.="BT\n";
         $char->{' stream'}.=join(' ',1,0,tan(deg2rad($oblique)),1,0,0)." Tm\n" if($oblique);
@@ -219,14 +236,14 @@ sub new
             $char->{' stream'}.=" [ -$space ] TJ\n" if($space);
             my $ch=$self->encByUni(hex($ci->{upper}));
             $wth=int($font->width(chr($ch))*800*$slant*1.1+2*$space);
-            $char->{' stream'}.=$self->text(chr($ch));
+            $char->{' stream'}.=$font->text(chr($ch));
         } 
         else 
         {
             $char->{' stream'}.="/FSN 1000 Tf\n";
             $char->{' stream'}.=($slant*100)." Tz\n" if($slant!=1);
             $char->{' stream'}.=" [ -$space ] TJ\n" if($space);
-            $char->{' stream'}.=$self->text(chr($w));
+            $char->{' stream'}.=$font->text(chr($w));
         }
         $char->{' stream'}.=" Tj\nET\n";
         push @widths,$wth;
@@ -297,6 +314,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2008/08/10 14:43:08  areibens
+    update dejavu to 2.25
+
     Revision 2.1  2007/04/18 05:26:48  areibens
     fixed unicode caos handling for some broken fonts having no unicode for a glyph
 
