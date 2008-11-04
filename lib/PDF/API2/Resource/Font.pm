@@ -73,6 +73,7 @@ sub encodeByData {
         my $blk=$1;
         $data->{e2u}=[ map { $blk*256+$_ } (0..255) ];
         $data->{e2n}=[ map { nameByUni($_) || '.notdef' } @{$data->{e2u}} ];
+        $data->{firstchar} = 0;
     }
     elsif(defined $encoding) 
     {
@@ -267,6 +268,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.2  2008/11/04 23:54:51  areibens
+    fixed [rt.cpan.org #40648] Unicode text prints text on top of text before it
+
     Revision 2.1  2007/03/10 12:05:41  areibens
     applied improvements to encodeByData proposed by alankila@bel.fi
 

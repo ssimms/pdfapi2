@@ -307,10 +307,11 @@ sub outxmldeep
         $opts{-xmlfh}->print("</Stream>\n");
     } elsif (defined $self->{' streamfile'})
     {
-        open(DICTFH, $self->{' streamfile'}) || die "Unable to open $self->{' streamfile'}";
-        binmode(DICTFH.':raw');
+    	my $DICTFH;
+        open($DICTFH, $self->{' streamfile'}) || die "Unable to open $self->{' streamfile'}";
+        binmode($DICTFH,':raw');
         $opts{-xmlfh}->print("<Stream>\n");
-        while (read(DICTFH, $str, 4096))
+        while (read($DICTFH, $str, 4096))
         {
             if ($self->{' nofilt'})
             {
@@ -319,7 +320,7 @@ sub outxmldeep
             }
         $opts{-xmlfh}->print($str);
         }
-        close(DICTFH);
+        close($DICTFH);
         if ($self->{' nofilt'})
         {
             $str = '';
