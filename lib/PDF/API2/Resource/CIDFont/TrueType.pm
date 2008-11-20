@@ -140,11 +140,12 @@ sub wxByCId
 {
     my $self=shift @_;
     my $g=shift @_;
+    my $tmp = $self->fontobj->{'hmtx'}->read->{'advance'}[$g];
     my $w;
 
-    if(defined $self->fontobj->{'hmtx'}->read->{'advance'}[$g]) 
+    if(defined $t) 
     {
-        $w = int($self->fontobj->{'hmtx'}->read->{'advance'}[$g]*1000/$self->data->{upem});
+        $w = int($t*1000/$self->data->{upem});
     } 
     else 
     {
@@ -244,6 +245,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.4  2008/11/20 19:51:01  areibens
+    perf henning.just@datagraf.dk
+
     Revision 2.3  2007/11/16 19:27:32  areibens
     fixed -noembed option
 
