@@ -140,7 +140,7 @@ sub wxByCId
 {
     my $self=shift @_;
     my $g=shift @_;
-    my $tmp = $self->fontobj->{'hmtx'}->read->{'advance'}[$g];
+    my $t = $self->fontobj->{'hmtx'}->read->{'advance'}[$g];
     my $w;
 
     if(defined $t) 
@@ -245,6 +245,9 @@ alfred reibenschuh
 =head1 HISTORY
 
     $Log$
+    Revision 2.5  2009/03/20 09:54:46  areibens
+    rt.cpan.org #42524: strange space size after update on 0.72.003 from 0.71
+
     Revision 2.4  2008/11/20 19:51:01  areibens
     perf henning.just@datagraf.dk
 
