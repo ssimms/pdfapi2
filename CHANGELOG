@@ -1,3 +1,571 @@
+2009-03-20 09:54  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType.pm: rt.cpan.org
+          #42524: strange space size after update on 0.72.003 from
+          0.71
+
+2008-11-20 19:51  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType.pm: perf
+          henning.just@datagraf.dk
+
+2008-11-05 00:05  fredo
+
+        * lib/PDF/API2/Version.pm: *** empty log message ***
+
+2008-11-04 23:54  fredo
+
+        * lib/PDF/API2/Basic/PDF/Dict.pm
+          lib/PDF/API2/Resource/Font.pm: fixed [rt.cpan.org #40648]
+          Unicode text prints text on top of text before it
+
+2008-08-10 15:06  fredo
+
+        * examples/021_synfonts: added relative use lib
+
+2008-08-10 14:57  fredo
+
+        * lib/PDF/API2/Version.pm: *** empty log message ***
+
+2008-08-10 14:43  fredo
+
+        * examples/021_syntruefonts
+          lib/PDF/API2/Resource/Font/SynFont.pm
+          lib/PDF/API2/fonts/AUTHORS.txt
+          lib/PDF/API2/fonts/DejaVuSans-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSans-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSans-ExtraLight.ttf
+          lib/PDF/API2/fonts/DejaVuSans-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSans.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-BoldItalic.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Italic.ttf
+          lib/PDF/API2/fonts/DejaVuSerif.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-BoldItalic.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Italic.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed.ttf
+          lib/PDF/API2/fonts/LICENSE.txt lib/PDF/API2/fonts/NEWS.txt
+          lib/PDF/API2/fonts/README.txt
+          lib/PDF/API2/fonts/langcover.txt
+          lib/PDF/API2/fonts/status.txt
+          lib/PDF/API2/fonts/unicover.txt: to 2.25
+
+2008-03-10 21:38  fredo
+
+        * examples/060_transparency: genesis
+
+2008-03-10 21:23  fredo
+
+        * examples/012_pages: genesis
+
+2008-02-15 15:22  fredo
+
+        * lib/PDF/API2/Content.pm: added -spillover param to paragraph
+          and sub-methods
+
+2008-01-18 00:11  fredo
+
+        * lib/PDF/API2.pm: fixed catalog update and infohash utf16
+          from http://bugs.debian.org/461167
+
+2008-01-04 08:10  fredo
+
+        * lib/PDF/API2/Resource/Font/neTrueType.pm: flag fixes
+
+2008-01-04 08:08  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: apiname
+          fix
+
+2007-11-16 19:30  fredo
+
+        * lib/PDF/API2.pm: added -noembed option
+
+2007-11-16 19:27  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType.pm
+          lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: fixed
+          -noembed option
+
+2007-11-16 19:03  fredo
+
+        * MANIFEST: added non-embedded truetype
+
+2007-11-14 23:01  fredo
+
+        * lib/PDF/API2.pm: fixed relative page insert
+
+2007-11-14 22:49  fredo
+
+        * lib/PDF/API2.pm: added non-embedded truetype font (8-bit
+          only) support
+
+2007-11-14 22:47  fredo
+
+        * lib/PDF/API2/Resource/Font/neTrueType.pm: genesis
+
+2007-11-14 20:46  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added
+          noembed option
+
+2007-11-03 20:31  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: make startxref detection
+          more tolerant
+
+2007-10-23 07:49  fredo
+
+        * MANIFEST: added 022_truefonts_diacrits_utf8
+
+2007-10-23 07:48  fredo
+
+        * examples/022_truefonts_diacrits_utf8: genesis
+
+2007-10-23 07:46  fredo
+
+        * examples/020_textunderline: new
+
+2007-10-23 07:45  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType.pm: fixed width
+          encoding for wrong advance codes
+
+2007-10-16 20:08  fredo
+
+        * lib/PDF/API2/Resource/BaseFont.pm: changed undef safeguards
+          for wx* methods
+
+2007-10-10 06:18  fredo
+
+        * lib/PDF/API2/Content.pm lib/PDF/API2/Resource/BaseFont.pm
+          lib/PDF/API2/Version.pm: fixed noisy undef handling of
+          isvirtual
+
+2007-10-02 19:59  fredo
+
+        * lib/PDF/API2/Annotation.pm: added movie annotation
+
+2007-09-26 19:50  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: make trailer detection more
+          tolerant for reported ghostscript and swets formats
+
+2007-09-18 22:29  fredo
+
+        * lib/PDF/API2.pm: added -printscalingnone option
+
+2007-09-17 16:03  fredo
+
+        * lib/PDF/API2/Resource/XObject/Image/TIFF.pm: update docs for
+          tiffTag
+
+2007-09-14 15:36  fredo
+
+        * lib/PDF/API2/Resource/XObject/Image/TIFF.pm: also read Tiff
+          Tag 296 and make it available as resUnit
+
+2007-08-27 20:06  fredo
+
+        * lib/PDF/API2/Basic/TTF/Cmap.pm: updated ms_table election
+          algo to support newer apple and m$ unicode 3.1+ glyph cmaps
+
+2007-08-07 20:40  fredo
+
+        * examples/020_corefonts: added use lib
+
+2007-08-07 20:23  fredo
+
+        * lib/PDF/API2/Content.pm: added wantarray choice for
+          paragraph,
+
+2007-08-01 23:12  fredo
+
+        * lib/PDF/API2.pm: fix BOM in info strings
+
+2007-07-01 20:32  fredo
+
+        * lib/PDF/API2/fonts/DejaVuSerif-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Oblique.ttf: sync
+          with dejavu 2.18
+
+2007-07-01 20:30  fredo
+
+        * lib/PDF/API2/fonts/AUTHORS.txt
+          lib/PDF/API2/fonts/DejaVuSans-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSans-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSans-ExtraLight.ttf
+          lib/PDF/API2/fonts/DejaVuSans-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSans.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-BoldItalic.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Italic.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerif.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-BoldItalic.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Italic.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed.ttf
+          lib/PDF/API2/fonts/NEWS.txt lib/PDF/API2/fonts/README.txt
+          lib/PDF/API2/fonts/langcover.txt
+          lib/PDF/API2/fonts/status.txt
+          lib/PDF/API2/fonts/unicover.txt: avu 2.18
+
+2007-06-27 20:54  fredo
+
+        * lib/PDF/API2/Resource/Font/Postscript.pm: fix exporter
+          warnings of IO::File
+
+2007-06-23 09:48  fredo
+
+        * contrib/text2pdf.pl: added contributor email
+
+2007-06-23 09:43  fredo
+
+        * MANIFEST: added text2pdf.pl
+
+2007-06-23 09:42  fredo
+
+        * contrib/text2pdf.pl: genesis from contribution
+
+2007-06-07 10:43  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: fixed %%EOF/startxref
+          detection to be done in chunks
+
+2007-05-27 09:46  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: preparations for abbyy
+          finereader fix
+
+2007-05-24 19:29  fredo
+
+        * lib/PDF/API2/Resource/XObject/Image/PNM.pm: fixed pnm bitmap
+          decoding
+
+2007-05-16 21:45  fredo
+
+        * lib/PDF/API2.pm: fixed importpage doku bug
+          http://rt.cpan.org/Ticket/Display.html?id=27152
+
+2007-05-10 23:38  fredo
+
+        * lib/PDF/API2.pm: added note on importintoform and importpage
+          for existing pdf-file
+
+2007-05-10 06:44  fredo
+
+        * lib/PDF/API2/Basic/PDF/Pages.pm: fixed page insert with
+          upstream text-pdf 0.29a version
+
+2007-05-08 18:32  fredo
+
+        * lib/PDF/API2.pm lib/PDF/API2/Content.pm lib/PDF/API2/Lite.pm
+          lib/PDF/API2/Page.pm
+          lib/PDF/API2/Resource/XObject/Form/Hybrid.pm: renamed
+          compress to compressFlate
+
+2007-05-08 18:11  fredo
+
+        * lib/PDF/API2/Content.pm: fixed bogen
+
+2007-05-08 17:58  fredo
+
+        * MANIFEST: removed changelog
+
+2007-05-07 20:33  fredo
+
+        * lib/PDF/API2.pm: fix tounicode option
+
+2007-05-07 20:31  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: fix
+          subsetting
+
+2007-04-25 18:04  fredo
+
+        * lib/PDF/API2/Version.pm: tag release 0.60
+
+2007-04-25 17:58  fredo
+
+        * lib/PDF/API2/Basic/TTF/Name.pm: added upstream fix for 5.8.7
+          bugs
+
+2007-04-18 05:26  fredo
+
+        * lib/PDF/API2/Resource/Font/SynFont.pm: fixed unicode caos
+          handling for some broken fonts having no unicode for a glyph
+
+2007-04-07 10:28  fredo
+
+        * examples/023_cjkfonts: added lorem ipsum page
+
+2007-04-07 10:26  fredo
+
+        * examples/022_truefonts: added lorem ipsum page
+
+2007-04-07 10:25  fredo
+
+        * lib/PDF/API2/Resource/BaseFont.pm: fixed fix for wxByGlyph
+          not honoring cidfont width arrays
+
+2007-04-07 09:51  fredo
+
+        * lib/PDF/API2/Resource/BaseFont.pm: fix for wxByGlyph not
+          honoring cidfont width arrays
+
+2007-03-17 22:41  fredo
+
+        * Makefile.PL: fixed version print
+
+2007-03-17 20:38  fredo
+
+        * lib/PDF/API2/IOString.pm lib/PDF/API2/Resource/CIDFont.pm
+          lib/PDF/API2/Resource/CIDFont/CJKFont.pm
+          lib/PDF/API2/Resource/CIDFont/TrueType.pm
+          lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm
+          lib/PDF/API2/Resource/XObject/Image/JPEG.pm
+          lib/PDF/API2/Resource/XObject/Image/TIFF.pm: replaced
+          IOString dep. with scalar IO.
+
+2007-03-17 20:15  fredo
+
+        * lib/PDF/API2/Version.pm: release sync
+
+2007-03-17 20:07  fredo
+
+        * lib/PDF/API2.pm: fixed open to CORE::open
+
+2007-03-16 15:48  fredo
+
+        * lib/PDF/API2/Version.pm: release sync
+
+2007-03-16 15:39  fredo
+
+        * make_release.pl: fixed build/release versioning
+
+2007-03-16 15:35  fredo
+
+        * lib/PDF/API2/fonts/AUTHORS.txt lib/PDF/API2/fonts/BUGS.txt
+          lib/PDF/API2/fonts/DejaVuSans-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSans-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSans-ExtraLight.ttf
+          lib/PDF/API2/fonts/DejaVuSans-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSans.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansCondensed.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSansMono.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerif-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerif.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Bold.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-BoldOblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed-Oblique.ttf
+          lib/PDF/API2/fonts/DejaVuSerifCondensed.ttf
+          lib/PDF/API2/fonts/LICENSE.txt lib/PDF/API2/fonts/NEWS.txt
+          lib/PDF/API2/fonts/README.txt
+          lib/PDF/API2/fonts/langcover.txt
+          lib/PDF/API2/fonts/status.txt
+          lib/PDF/API2/fonts/unicover.txt:
+
+2007-03-16 15:28  fredo
+
+        * lib/PDF/API2.pm: replaced IOString dep. with scalar IO.
+
+2007-03-16 15:27  fredo
+
+        * lib/PDF/API2/Version.pm: release update
+
+2007-03-16 15:26  fredo
+
+        * lib/PDF/API2/Content.pm: removed silly grey-level handling
+
+2007-03-16 15:25  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: removed open_swallowed since
+          it is not nedded anymore
+
+2007-03-16 15:20  fredo
+
+        * examples/011_open_update: genesis
+
+2007-03-15 16:41  fredo
+
+        * make_release.pl: genesis
+
+2007-03-15 16:02  fredo
+
+        * examples/040_annotation examples/050_pagelabels: update
+          copyright
+
+2007-03-15 15:58  fredo
+
+        * examples/040_annotation: genesis
+
+2007-03-15 14:15  fredo
+
+        * lib/PDF/API2.pm: added pageLabel method
+
+2007-03-14 19:30  fredo
+
+        * lib/PDF/API2.pm: fixed -twocolumnright option typo
+
+2007-03-12 16:24  fredo
+
+        * lib/PDF/API2/Content.pm: removed eval from state calls
+
+2007-03-10 12:18  fredo
+
+        * lib/PDF/API2/Basic/PDF/Objind.pm: applied improvements to
+          release proposed by alankila@bel.fi
+
+2007-03-10 12:05  fredo
+
+        * lib/PDF/API2/Resource/Font.pm: applied improvements to
+          encodeByData proposed by alankila@bel.fi
+
+2007-03-10 11:10  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: fixed trailer detection to
+          be more tolerant (towards pdf-spec 1.7)
+
+2007-02-22 08:00  fredo
+
+        * lib/PDF/API2.pm: changed import* methods to check its first
+          arg -- thanks alankila2@yahoo.ca
+
+2007-02-14 20:29  fredo
+
+        * lib/PDF/API2/Resource/Font/CoreFont/courier.pm: fixed
+          default encoding with bold
+
+2007-02-14 11:44  fredo
+
+        * lib/PDF/API2/Resource/Font/CoreFont/timesroman.pm: updated
+          default encoding to that used by bold
+
+2007-02-14 11:26  fredo
+
+        * lib/PDF/API2/Content.pm: fixed advancewidth for space
+          calculation
+
+2007-02-14 11:22  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: updated versioning to
+          PDF::API2
+
+2007-02-14 11:19  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: fixed version update for
+          interoperability
+
+2007-01-04 17:39  fredo
+
+        * lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: fixed
+          [rt.cpan.org #24203] Incompatibility in Wide character
+          handling
+
+2007-01-04 16:33  fredo
+
+        * lib/PDF/API2/Resource/BaseFont.pm: fix acro 8 fix
+
+2007-01-04 16:02  fredo
+
+        * .project lib/PDF/API2/Content.pm
+          lib/PDF/API2/Resource/BaseFont.pm
+          lib/PDF/API2/Resource/CIDFont.pm
+          lib/PDF/API2/Resource/UniFont.pm: applied untested fix for
+          acrobat 8 "<ident> TJ" bug
+
+2006-08-14 18:11  fredo
+
+        * lib/PDF/API2/Resource/BaseFont.pm: fixed wxByGlyph
+
+2006-08-14 18:08  fredo
+
+        * lib/PDF/API2/Resource/Font/Postscript.pm: moved "use
+          io-file" to begin section
+
+2006-08-01 19:45  fredo
+
+        * MANIFEST: added dejavu fonts
+
+2006-06-25 20:31  fredo
+
+        * lib/PDF/API2/Version.pm: prepairing dejavu font inclusion
+
+2006-06-19 19:25  fredo
+
+        * lib/PDF/API2/Content.pm: fixed compress vs. Compress::ZLib
+          subs
+
+2006-06-19 19:22  fredo
+
+        * lib/PDF/API2/Resource/CIDFont.pm: removed dup sub
+
+2006-06-19 19:20  fredo
+
+        * examples/022_truefonts: added details
+
+2006-06-16 01:56  fredo
+
+        * lib/PDF/API2/Version.pm: version 0.52
+
+2006-06-15 21:12  fredo
+
+        * examples/027_winfont: added cid map
+
+2006-06-15 20:27  fredo
+
+        * lib/PDF/API2/Basic/PDF/String.pm: modified escaped string
+          conversion
+
+2006-06-15 20:15  fredo
+
+        * lib/PDF/API2/Basic/PDF/File.pm: beautification
+
+2006-06-14 16:57  fredo
+
+        * lib/PDF/API2/Resource/BaseFont.pm: fixed ToUnicode cmap
+          greneration to use actual encoden rather than the default
+
+2006-06-14 16:53  fredo
+
+        * lib/PDF/API2/Resource/BaseFont.pm: fixed unicode lookup to
+          use actual encoding rather than default
+
+2005-11-16 02:52  fredo
+
+        * META.yml Makefile.PL lib/PDF/API2/Version.pm: fix for 0.51
+
 2005-11-02 19:21  fredo
 
 	* lib/PDF/API2/Resource/CIDFont/TrueType/FontFile.pm: added kerning
