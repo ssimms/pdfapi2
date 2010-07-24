@@ -799,44 +799,4 @@ __END__
 
 alfred reibenschuh
 
-=head1 HISTORY
-
-    $Log$
-    Revision 2.0  2005/11/16 02:18:15  areibens
-    revision workaround for SF cvs import not to screw up CPAN
-
-    Revision 1.2  2005/11/16 01:27:50  areibens
-    genesis2
-
-    Revision 1.1  2005/11/16 01:19:27  areibens
-    genesis
-
-    Revision 1.8  2005/09/12 16:56:22  fredo
-    applied mod_perl patch by Paul Schilling <pfschill@sbcglobal.net>
-
-    Revision 1.7  2005/03/14 22:01:30  fredo
-    upd 2005
-
-    Revision 1.6  2004/11/26 01:24:54  fredo
-    fixed unicode mapping
-
-    Revision 1.5  2004/06/15 09:14:54  fredo
-    removed cr+lf
-
-    Revision 1.4  2004/06/07 19:44:44  fredo
-    cleaned out cr+lf for lf
-
-    Revision 1.3  2003/12/08 13:06:06  Administrator
-    corrected to proper licencing statement
-
-    Revision 1.2  2003/11/30 17:32:51  Administrator
-    merged into default
-
-    Revision 1.1.1.1.2.2  2003/11/30 16:57:08  Administrator
-    merged into default
-
-    Revision 1.1.1.1.2.1  2003/11/30 15:52:24  Administrator
-    added CVS id/log
-
-
 =cut
