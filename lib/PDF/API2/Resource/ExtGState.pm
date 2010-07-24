@@ -407,47 +407,4 @@ __END__
 
 alfred reibenschuh
 
-=head1 HISTORY
-
-    $Log$
-    Revision 2.0  2005/11/16 02:16:04  areibens
-    revision workaround for SF cvs import not to screw up CPAN
-
-    Revision 1.2  2005/11/16 01:27:48  areibens
-    genesis2
-
-    Revision 1.1  2005/11/16 01:19:25  areibens
-    genesis
-
-    Revision 1.10  2005/06/17 19:44:03  fredo
-    fixed CPAN modulefile versioning (again)
-
-    Revision 1.9  2005/06/17 18:53:34  fredo
-    fixed CPAN modulefile versioning (dislikes cvs)
-
-    Revision 1.8  2005/03/14 22:01:06  fredo
-    upd 2005
-
-    Revision 1.7  2004/12/16 00:30:53  fredo
-    added no warn for recursion
-
-    Revision 1.6  2004/06/15 09:14:41  fredo
-    removed cr+lf
-
-    Revision 1.5  2004/06/07 19:44:36  fredo
-    cleaned out cr+lf for lf
-
-    Revision 1.4  2003/12/08 13:05:33  Administrator
-    corrected to proper licencing statement
-
-    Revision 1.3  2003/11/30 17:28:55  Administrator
-    merged into default
-
-    Revision 1.2.2.1  2003/11/30 16:56:35  Administrator
-    merged into default
-
-    Revision 1.2  2003/11/30 11:44:49  Administrator
-    added CVS id/log
-
-
 =cut

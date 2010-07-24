@@ -143,35 +143,3 @@ sub param {
 
 
 1;
-
-__END__
-
-=head1 HISTORY
-
-    $Log$
-    Revision 2.0  2005/11/16 02:18:14  areibens
-    revision workaround for SF cvs import not to screw up CPAN
-
-    Revision 1.2  2005/11/16 01:27:50  areibens
-    genesis2
-
-    Revision 1.1  2005/11/16 01:19:27  areibens
-    genesis
-
-    Revision 1.5  2005/06/17 19:44:03  fredo
-    fixed CPAN modulefile versioning (again)
-
-    Revision 1.4  2005/06/17 18:53:34  fredo
-    fixed CPAN modulefile versioning (dislikes cvs)
-
-    Revision 1.3  2005/03/14 22:01:27  fredo
-    upd 2005
-
-    Revision 1.2  2004/12/16 00:30:53  fredo
-    added no warn for recursion
-
-    Revision 1.1  2004/07/20 20:27:43  fredo
-    genesis
-
-
-=cut
