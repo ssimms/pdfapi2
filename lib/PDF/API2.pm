@@ -114,11 +114,21 @@ PDF::API2 - A Perl Module Chain to faciliate the Creation and Modification of Hi
 =head1 SYNOPSIS
 
     use PDF::API2;
-    #
-    $pdf = PDF::API2->new;
+
+    # Create a blank PDF file
+    $pdf = PDF::API2->new();
+
+    # Open an existing PDF file
     $pdf = PDF::API2->open('some.pdf');
-    $page = $pdf->page;
+
+    # Add a blank page
+    $page = $pdf->page();
+
+    # Retrieve an existing page
     $page = $pdf->openpage($pagenum);
+
+    # Make an image, built-in font, and TrueType font available for
+    # use in the PDF
     $img = $pdf->image('some.jpg');
     $font = $pdf->corefont('Times-Roman');
     $font = $pdf->ttfont('TimesNewRoman.ttf');
@@ -127,25 +137,25 @@ PDF::API2 - A Perl Module Chain to faciliate the Creation and Modification of Hi
 
 =over 4
 
-=item $pdf = PDF::API->new %opts
+=item $pdf = PDF::API->new(%options)
 
-Creates a new pdf-file object. If you know beforehand
-to save the pdf to file you can give the '-file' option,
-to minimize possible memory requirements later-on.
+Creates a new PDF object.  If you will be saving it as a file and
+already know the filename, you can give the '-file' option to minimize
+possible memory requirements later on.
 
 B<Example:>
 
     $pdf = PDF::API2->new();
     ...
-    print $pdf->stringify;
+    print $pdf->stringify();
 
     $pdf = PDF::API2->new();
     ...
-    $pdf->saveas("our/new.pdf");
+    $pdf->saveas('our/new.pdf');
 
     $pdf = PDF::API2->new(-file => 'our/new.pdf');
     ...
-    $pdf->save;
+    $pdf->save();
 
 =cut
 
@@ -176,19 +186,19 @@ sub new {
     return $self;
 }
 
-=item $pdf = PDF::API->open $pdffile
+=item $pdf = PDF::API->open($pdffile)
 
-Opens an existing PDF for modification.
+Opens an existing PDF file.
 
 B<Example:>
 
-    $pdf = PDF::API2->open('my/old.pdf');
+    $pdf = PDF::API2->open('our/old.pdf');
     ...
-    $pdf->saveas("our/new.pdf");
+    $pdf->saveas('our/new.pdf');
 
     $pdf = PDF::API2->open('our/to/be/updated.pdf');
     ...
-    $pdf->update;
+    $pdf->update();
 
 =cut
 
@@ -240,15 +250,18 @@ sub open {
     return $self;
 }
 
-=item $pdf = PDF::API->openScalar $pdfstream
+=item $pdf = PDF::API->openScalar($pdf_string)
 
-Opens an existing PDF-stream for modification.
+Opens a PDF contained in a string.
 
 B<Example:>
 
-    open($fh,'our/stream.pdf') or die "$@";
-    @pdf = <$fh>;
-    $pdf = PDF::API->openScalar(join('',@pdf));
+    # Read a PDF into a string, for the purpose of demonstration
+    open $fh, 'our/old.pdf' or die $@;
+    undef $/;  # Read the whole file at once
+    $pdf_string = <$fh>;
+
+    $pdf = PDF::API->openScalar($pdf_string);
     ...
     $pdf->saveas('our/new.pdf');
 
@@ -285,9 +298,9 @@ sub openScalar {
     return $self;
 }
 
-=item $pdf->preferences %opts
+=item $pdf->preferences(%options)
 
-Controls viewing-preferences for the pdf.
+Controls viewing preferences for the PDF.
 
 =cut
 
