@@ -135,7 +135,7 @@ PDF::API2 - A Perl Module Chain to faciliate the Creation and Modification of Hi
 
 =head1 GENERIC METHODS
 
-=over 4
+=over
 
 =item $pdf = PDF::API->new(%options)
 
@@ -302,139 +302,164 @@ sub openScalar {
 
 Controls viewing preferences for the PDF.
 
-=cut
-
-=pod
-
 B<Page Mode Options:>
 
-I<-fullscreen>
-... Full-screen mode, with no menu bar, window controls, or any other window visible.
+=over
 
-I<-thumbs>
-... Thumbnail images visible.
+=item -fullscreen
 
-I<-outlines>
-... Document outline visible.
+Full-screen mode, with no menu bar, window controls, or any other window visible.
 
-=cut
+=item -thumbs
 
-=pod
+Thumbnail images visible.
+
+=item -outlines
+
+Document outline visible.
+
+=back
 
 B<Page Layout Options:>
 
-I<-singlepage>
-... Display one page at a time.
+=over
 
-I<-onecolumn>
-... Display the pages in one column.
+=item -singlepage
 
-I<-twocolumnleft>
-... Display the pages in two columns, with oddnumbered pages on the left.
+Display one page at a time.
 
-I<-twocolumnright>
-... Display the pages in two columns, with oddnumbered pages on the right.
+=item -onecolumn
 
-=cut
+Display the pages in one column.
 
-=pod
+=item -twocolumnleft
+
+Display the pages in two columns, with oddnumbered pages on the left.
+
+=item -twocolumnright
+
+Display the pages in two columns, with oddnumbered pages on the right.
+
+=back
 
 B<Viewer Options:>
 
-I<-hidetoolbar>
-        ... Specifying whether to hide tool bars.
+=over
 
-I<-hidemenubar>
-        ... Specifying whether to hide menu bars.
+=item -hidetoolbar
 
-I<-hidewindowui>
-        ... Specifying whether to hide user interface elements.
+Specifying whether to hide tool bars.
 
-I<-fitwindow>
-        ... Specifying whether to resize the document’s window to the size of the displayed page.
+=item -hidemenubar
 
-I<-centerwindow>
-        ... Specifying whether to position the document’s window in the center of the screen.
+Specifying whether to hide menu bars.
 
-I<-displaytitle>
-        ... Specifying whether the window’s title bar should display the document title
-        taken from the Title entry of the document information dictionary.
+=item -hidewindowui
 
-I<-afterfullscreenthumbs>
-        ... Thumbnail images visible after Full-screen mode.
+Specifying whether to hide user interface elements.
 
-I<-afterfullscreenoutlines>
-        ... Document outline visible after Full-screen mode.
+=item -fitwindow
 
-I<-printscalingnone>
-		... Set the default print setting for page scaling to none.
+Specifying whether to resize the document's window to the size of the displayed page.
 
-=cut
+=item -centerwindow
 
-=pod
+Specifying whether to position the document's window in the center of the screen.
 
-B<Initial Page Option:>
+=item -displaytitle
 
-I<-firstpage> => [ $pageobj, %opts]
-        ... Specifying the page to be displayed, plus one of the following options:
+Specifying whether the window's title bar should display the
+document title taken from the Title entry of the document information
+dictionary.
 
-=cut
+=item -afterfullscreenthumbs
 
-=pod
+Thumbnail images visible after Full-screen mode.
 
-B<Initial Page Options:>
+=item -afterfullscreenoutlines
 
-I<-fit> => 1
-            ... Display the page designated by page, with its contents magnified just enough to
-            fit the entire page within the window both horizontally and vertically. If the
-            required horizontal and vertical magnification factors are different, use the
-            smaller of the two, centering the page within the window in the other dimension.
+Document outline visible after Full-screen mode.
 
-I<-fith> => $top
-            ... Display the page designated by page, with the vertical coordinate top positioned
-            at the top edge of the window and the contents of the page magnified just enough
-            to fit the entire width of the page within the window.
+=item -printscalingnone
 
-I<-fitv> => $left
-            ... Display the page designated by page, with the horizontal coordinate left positioned
-            at the left edge of the window and the contents of the page magnified just enough
-            to fit the entire height of the page within the window.
+Set the default print setting for page scaling to none.
 
-I<-fitr> => [ $left, $bottom, $right, $top ]
-            ... Display the page designated by page, with its contents magnified just enough to
-            fit the rectangle specified by the coordinates left, bottom, right, and top
-            entirely within the window both horizontally and vertically. If the required
-            horizontal and vertical magnification factors are different, use the smaller of
-            the two, centering the rectangle within the window in the other dimension.
+=back
 
-I<-fitb> => 1
-            ... Display the page designated by page, with its contents magnified just enough
-            to fit its bounding box entirely within the window both horizontally and
-            vertically. If the required horizontal and vertical magnification factors are
-            different, use the smaller of the two, centering the bounding box within the
-            window in the other dimension.
+B<Initial Page Options>:
 
-I<-fitbh> => $top
-            ... Display the page designated by page, with the vertical coordinate top
-            positioned at the top edge of the window and the contents of the page
-            magnified just enough to fit the entire width of its bounding box
-            within the window.
+=over
 
-I<-fitbv> => $left
-            ... Display the page designated by page, with the horizontal coordinate
-            left positioned at the left edge of the window and the contents of the page
-            magnified just enough to fit the entire height of its bounding box within the
-            window.
+=item -firstpage => [ $pageobj, %options ]
 
-I<-xyz> => [ $left, $top, $zoom ]
-            ... Display the page designated by page, with the coordinates (left, top) positioned
-            at the top-left corner of the window and the contents of the page magnified by
-            the factor zoom. A zero (0) value for any of the parameters left, top, or zoom
-            specifies that the current value of that parameter is to be retained unchanged.
+Specifying the page to be displayed, plus one of the following options:
 
-=cut
+=over
 
-=pod
+=item -fit => 1
+
+Display the page designated by page, with its contents magnified just
+enough to fit the entire page within the window both horizontally and
+vertically. If the required horizontal and vertical magnification
+factors are different, use the smaller of the two, centering the page
+within the window in the other dimension.
+
+=item -fith => $top
+
+Display the page designated by page, with the vertical coordinate top
+positioned at the top edge of the window and the contents of the page
+magnified just enough to fit the entire width of the page within the
+window.
+
+=item -fitv => $left
+
+Display the page designated by page, with the horizontal coordinate
+left positioned at the left edge of the window and the contents of the
+page magnified just enough to fit the entire height of the page within
+the window.
+
+=item -fitr => [ $left, $bottom, $right, $top ]
+
+Display the page designated by page, with its contents magnified just
+enough to fit the rectangle specified by the coordinates left, bottom,
+right, and top entirely within the window both horizontally and
+vertically. If the required horizontal and vertical magnification
+factors are different, use the smaller of the two, centering the
+rectangle within the window in the other dimension.
+
+=item -fitb => 1
+
+Display the page designated by page, with its contents magnified just
+enough to fit its bounding box entirely within the window both
+horizontally and vertically. If the required horizontal and vertical
+magnification factors are different, use the smaller of the two,
+centering the bounding box within the window in the other dimension.
+
+=item -fitbh => $top
+
+Display the page designated by page, with the vertical coordinate top
+positioned at the top edge of the window and the contents of the page
+magnified just enough to fit the entire width of its bounding box
+within the window.
+
+=item -fitbv => $left
+
+Display the page designated by page, with the horizontal coordinate
+left positioned at the left edge of the window and the contents of the
+page magnified just enough to fit the entire height of its bounding
+box within the window.
+
+=item -xyz => [ $left, $top, $zoom ]
+
+Display the page designated by page, with the coordinates (left, top)
+positioned at the top-left corner of the window and the contents of
+the page magnified by the factor zoom. A zero (0) value for any of the
+parameters left, top, or zoom specifies that the current value of that
+parameter is to be retained unchanged.
+
+=back
+
+=back
 
 B<Example:>
 
@@ -538,19 +563,31 @@ sub preferences {
     return $self;
 }
 
-=item $val = $pdf->default $parameter
+=item $val = $pdf->default($parameter)
 
-=item $pdf->default $parameter, $val
+=item $pdf->default($parameter, $value)
 
-Gets/Sets default values for the behaviour of ::API2.
+Gets/sets the default value for a behaviour of PDF::API2.
 
 B<Supported Parameters:>
 
-I<nounrotate> ... prohibits API2 from rotating imported/opened page to re-create a default pdf-context.
+=over
 
-I<pageencaps> ... enables than API2 will add save/restore commands upon imported/opened pages to preserve graphics-state for modification.
+=item nounrotate
 
-I<copyannots> ... enables importing of annotations (B<*EXPERIMENTAL*>).
+prohibits API2 from rotating imported/opened page to re-create a
+default pdf-context.
+
+=item pageencaps
+
+enables than API2 will add save/restore commands upon imported/opened
+pages to preserve graphics-state for modification.
+
+=item copyannots
+
+enables importing of annotations (B<*EXPERIMENTAL*>).
+
+=back
 
 =cut
 
@@ -565,9 +602,9 @@ sub default {
     return($temp);
 }
 
-=item $bool = $pdf->isEncrypted
+=item $bool = $pdf->isEncrypted()
 
-Checks if the previously opened pdf is encrypted.
+Checks if the previously opened PDF is encrypted.
 
 =cut
 
@@ -576,14 +613,14 @@ sub isEncrypted {
     return(defined($self->{pdf}->{'Encrypt'}) ? 1 : 0);
 }
     
-=item %infohash = $pdf->info %infohash
+=item %infohash = $pdf->info(%infohash)
 
-Sets/Gets the info structure of the document.
+Gets/sets the info structure of the document.
 
 B<Example:>
 
     %h = $pdf->info(
-        'Author'       => " Alfred Reibenschuh ",
+        'Author'       => "Alfred Reibenschuh",
         'CreationDate' => "D:20020911000000+01'00'",
         'ModDate'      => "D:YYYYMMDDhhmmssOHH'mm'",
         'Creator'      => "fredos-script.pl",
@@ -593,7 +630,6 @@ B<Example:>
         'Keywords'     => "all good things are pdf"
     );
     print "Author: $h{Author}\n";
-    
 
 =cut
 
@@ -637,16 +673,16 @@ sub info {
   return(%opt);
 }
 
-=item @meta_data_attribs = $pdf->infoMetaAttributes @meta_data_attribs
+=item @meta_data_attributes = $pdf->infoMetaAttributes(@meta_data_attributes)
 
-Sets/Gets the supported info-structure tags.
+Gets/sets the supported info-structure tags.
 
 B<Example:>
 
-    @attrs = $pdf->infoMetaAttributes;
+    @attributes = $pdf->infoMetaAttributes;
     print "Supported Attributes: @attr\n";
-    @attrs = $pdf->infoMetaAttributes('CustomField1');
-    print "Supported Attributes: @attr\n";
+    @attributes = $pdf->infoMetaAttributes('CustomField1');
+    print "Supported Attributes: @attributes\n";
 
 =cut
 
@@ -660,9 +696,9 @@ sub infoMetaAttributes
     return(@{$self->{infoMeta}});
 }
 
-=item $xml = $pdf->xmpMetadata $xml
+=item $xml = $pdf->xmpMetadata($xml)
 
-Sets/Gets the XMP XML data-stream.
+Gets/sets the XMP XML data stream.
 
 B<Example:>
 
@@ -682,7 +718,7 @@ B<Example:>
     <?xpacket end='w'?>
     EOT
     $xml = $pdf->xmpMetadata($xml);
-    print "PDFs Metadata now reads: $xml\n";
+    print "PDF metadata now reads: $xml\n";
     
 =cut
 
@@ -717,43 +753,58 @@ sub xmpMetadata {
     return($md->{' stream'});
 }
 
-=item $pdf->pageLabel $index $options
+=item $pdf->pageLabel($index, $options)
 
-Sets PageLabel options.
+Sets page label options.
 
 B<Supported Options:>
 
-I<-style> ... 'Roman', 'roman', 'decimal', 'Alpha' or 'alpha'.
+=over
 
-I<-start> ... restart numbering at given number.
+=item -style
 
-I<-prefix> ... text prefix for numbering.
+Roman, roman, decimal, Alpha or alpha.
+
+=item -start
+
+Restart numbering at given number.
+
+=item -prefix
+
+Text prefix for numbering.
+
+=back
 
 B<Example:>
 
-	$pdf->pageLabel( 0, {
-		-style => 'roman',
-	} ); # start with roman numbering
+    # Start with Roman Numerals
+    $pdf->pageLabel(0, {
+        -style => 'roman',
+    });
 
-	$pdf->pageLabel( 4, {
-		-style => 'decimal',
-	} ); # switch to arabic
+    # Switch to Arabic
+    $pdf->pageLabel(4, {
+        -style => 'decimal',
+    });
 
-	$pdf->pageLabel( 32, {
-		-start => 1,
-		-prefix => 'A-'
-	} ); # numbering for appendix A
+    # Numbering for Appendix A
+    $pdf->pageLabel(32, {
+        -start => 1,
+        -prefix => 'A-'
+    });
     
-	$pdf->pageLabel( 36, {
-		-start => 1,
-		-prefix => 'B-'
-	} ); # numbering for appendix B
+    # Numbering for Appendix B
+    $pdf->pageLabel( 36, {
+        -start => 1,
+        -prefix => 'B-'
+    });
     
-	$pdf->pageLabel( 40, {
-		-style => 'Roman'
-		-start => 1,
-		-prefix => 'Index '
-	} ); # numbering for index
+    # Numbering for the Index
+    $pdf->pageLabel(40, {
+        -style => 'Roman'
+        -start => 1,
+        -prefix => 'Index '
+    });
     
 =cut
 
@@ -807,9 +858,9 @@ sub pageLabel {
 	}
 }
 
-=item $pdf->finishobjects @objects
+=item $pdf->finishobjects(@objects)
 
-Force objects to be written to file if available.
+Force objects to be written to file if possible.
 
 B<Example:>
 
@@ -817,7 +868,7 @@ B<Example:>
     ...
     $pdf->finishobjects($page, $gfx, $txt);
     ...
-    $pdf->save;
+    $pdf->save();
 
 =cut
 
@@ -863,15 +914,15 @@ sub proc_pages {
     return(@pglist);
 }
 
-=item $pdf->update
+=item $pdf->update()
 
-Updates a previously "opened" document after all changes have been applied.
+Saves a previously opened document.
 
 B<Example:>
 
     $pdf = PDF::API2->open('our/to/be/updated.pdf');
     ...
-    $pdf->update;
+    $pdf->update();
 
 =cut
 
@@ -880,7 +931,7 @@ sub update {
     $self->saveas($self->{pdf}->{' fname'});
 }
 
-=item $pdf->saveas $file
+=item $pdf->saveas($file)
 
 Saves the document to file.
 
@@ -888,7 +939,7 @@ B<Example:>
 
     $pdf = PDF::API2->new();
     ...
-    $pdf->saveas("our/new.pdf");
+    $pdf->saveas('our/new.pdf');
 
 =cut
 
@@ -930,15 +981,15 @@ sub save_xml {
 }
 
 
-=item $string = $pdf->stringify
+=item $string = $pdf->stringify()
 
-Returns the document in a string.
+Returns the document as a string.
 
 B<Example:>
 
     $pdf = PDF::API2->new();
     ...
-    print $pdf->stringify;
+    print $pdf->stringify();
 
 =cut
 
@@ -960,7 +1011,7 @@ sub stringify {
 
 sub release { $_[0]->end; return(undef);}
 
-=item $pdf->end
+=item $pdf->end()
 
 Destroys the document.
 
@@ -983,7 +1034,7 @@ sub end {
 
 =head1 PAGE METHODS
 
-=over 4
+=over
 
 =item $page = $pdf->page
 
@@ -1607,7 +1658,7 @@ sub artbox {
 
 =head1 FONT METHODS
 
-=over 4
+=over
 
 =item @allFontDirs = PDF::API2::addFontDirs $dir1, ..., $dirN
 
@@ -1897,7 +1948,7 @@ sub unifont {
 
 =head1 IMAGE METHODS
 
-=over 4
+=over
 
 =item $jpeg = $pdf->image_jpeg $file
 
@@ -2132,7 +2183,7 @@ B<Examples:>
 
 =head1 COLORSPACE METHODS
 
-=over 4
+=over
 
 =item $cs = $pdf->colorspace_act $file
 
@@ -2269,7 +2320,7 @@ sub colorspace_devicen {
 
 =head1 BARCODE METHODS
 
-=over 4
+=over
 
 =item $bc = $pdf->xo_codabar %opts
 
@@ -2344,7 +2395,7 @@ sub xo_ean13 {
 
 =head1 OTHER METHODS
 
-=over 4
+=over
 
 =item $xo = $pdf->xo_form
 
@@ -2486,7 +2537,7 @@ sub named_destination
 
 =head1 RESOURCE METHODS
 
-=over 4
+=over
 
 =item $pdf->resource $type, $key, $obj, $force
 
