@@ -43,7 +43,7 @@ BEGIN {
     use Math::Trig;
 
     @ISA = qw( PDF::API2::Resource::ColorSpace );
-    ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
+    ( $VERSION ) = '2.000';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];

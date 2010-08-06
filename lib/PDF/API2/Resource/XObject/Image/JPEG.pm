@@ -44,7 +44,7 @@ BEGIN {
 
     @ISA = qw( PDF::API2::Resource::XObject::Image );
 
-    ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
+    ( $VERSION ) = '2.001';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];

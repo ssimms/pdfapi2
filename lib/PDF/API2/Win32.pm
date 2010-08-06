@@ -34,7 +34,7 @@
 package PDF::API2::Win32;
 
     use vars qw($VERSION);
-    ( $VERSION ) = '$Revision$' =~ /Revision: (\S+)\s/; # $Date$
+    ( $VERSION ) = '2.0';
 
     no warnings qw[ deprecated recursion uninitialized ];
 

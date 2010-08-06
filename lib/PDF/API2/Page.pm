@@ -52,7 +52,7 @@ BEGIN {
     use POSIX qw(floor ceil);
     use Math::Trig;
 
-    ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
+    ( $VERSION ) = '2.001';
 
 }
 

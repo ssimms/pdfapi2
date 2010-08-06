@@ -48,7 +48,7 @@ BEGIN
 
     @ISA = qw( PDF::API2::Resource::BaseFont );
 
-    ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
+    ( $VERSION ) = '2.003';
 }
 
 no warnings qw[ deprecated recursion uninitialized ];
