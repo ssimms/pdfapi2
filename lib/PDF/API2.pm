@@ -186,7 +186,7 @@ sub new {
     return $self;
 }
 
-=item $pdf = PDF::API->open($pdffile)
+=item $pdf = PDF::API->open($pdf_file)
 
 Opens an existing PDF file.
 
@@ -673,7 +673,7 @@ sub info {
   return(%opt);
 }
 
-=item @meta_data_attributes = $pdf->infoMetaAttributes(@meta_data_attributes)
+=item @metadata_attributes = $pdf->infoMetaAttributes(@metadata_attributes)
 
 Gets/sets the supported info-structure tags.
 
@@ -681,6 +681,7 @@ B<Example:>
 
     @attributes = $pdf->infoMetaAttributes;
     print "Supported Attributes: @attr\n";
+
     @attributes = $pdf->infoMetaAttributes('CustomField1');
     print "Supported Attributes: @attributes\n";
 
@@ -702,21 +703,57 @@ Gets/sets the XMP XML data stream.
 
 B<Example:>
 
-    $xml = $pdf->xmpMetadata;
+    $xml = $pdf->xmpMetadata();
     print "PDFs Metadata reads: $xml\n";
     $xml=<<EOT;
     <?xpacket begin='' id='W5M0MpCehiHzreSzNTczkc9d'?>
     <?adobe-xap-filters esc="CRLF"?>
-    <x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='XMP toolkit 2.9.1-14, framework 1.6'>
-    <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/'>
-    <rdf:Description rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8' xmlns:pdf='http://ns.adobe.com/pdf/1.3/' pdf:Producer='Acrobat Distiller 6.0.1 for Macintosh'></rdf:Description>
-    <rdf:Description rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8' xmlns:xap='http://ns.adobe.com/xap/1.0/' xap:CreateDate='2004-11-14T08:41:16Z' xap:ModifyDate='2004-11-14T16:38:50-08:00' xap:CreatorTool='FrameMaker 7.0' xap:MetadataDate='2004-11-14T16:38:50-08:00'></rdf:Description>
-    <rdf:Description rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8' xmlns:xapMM='http://ns.adobe.com/xap/1.0/mm/' xapMM:DocumentID='uuid:919b9378-369c-11d9-a2b5-000393c97fd8'/>
-    <rdf:Description rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8' xmlns:dc='http://purl.org/dc/elements/1.1/' dc:format='application/pdf'><dc:description><rdf:Alt><rdf:li xml:lang='x-default'>Adobe Portable Document Format (PDF)</rdf:li></rdf:Alt></dc:description><dc:creator><rdf:Seq><rdf:li>Adobe Systems Incorporated</rdf:li></rdf:Seq></dc:creator><dc:title><rdf:Alt><rdf:li xml:lang='x-default'>PDF Reference, version 1.6</rdf:li></rdf:Alt></dc:title></rdf:Description>
-    </rdf:RDF>
+    <x:xmpmeta
+      xmlns:x='adobe:ns:meta/'
+      x:xmptk='XMP toolkit 2.9.1-14, framework 1.6'>
+        <rdf:RDF
+          xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+          xmlns:iX='http://ns.adobe.com/iX/1.0/'>
+            <rdf:Description
+              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
+              xmlns:pdf='http://ns.adobe.com/pdf/1.3/'
+              pdf:Producer='Acrobat Distiller 6.0.1 for Macintosh'></rdf:Description>
+            <rdf:Description
+              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
+              xmlns:xap='http://ns.adobe.com/xap/1.0/'
+              xap:CreateDate='2004-11-14T08:41:16Z'
+              xap:ModifyDate='2004-11-14T16:38:50-08:00'
+              xap:CreatorTool='FrameMaker 7.0'
+              xap:MetadataDate='2004-11-14T16:38:50-08:00'></rdf:Description>
+            <rdf:Description
+              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
+              xmlns:xapMM='http://ns.adobe.com/xap/1.0/mm/'
+              xapMM:DocumentID='uuid:919b9378-369c-11d9-a2b5-000393c97fd8'/></rdf:Description>
+            <rdf:Description
+              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
+              xmlns:dc='http://purl.org/dc/elements/1.1/'
+              dc:format='application/pdf'>
+                <dc:description>
+                  <rdf:Alt>
+                    <rdf:li xml:lang='x-default'>Adobe Portable Document Format (PDF)</rdf:li>
+                  </rdf:Alt>
+                </dc:description>
+                <dc:creator>
+                  <rdf:Seq>
+                    <rdf:li>Adobe Systems Incorporated</rdf:li>
+                  </rdf:Seq>
+                </dc:creator>
+                <dc:title>
+                  <rdf:Alt>
+                    <rdf:li xml:lang='x-default'>PDF Reference, version 1.6</rdf:li>
+                  </rdf:Alt>
+                </dc:title>
+            </rdf:Description>
+        </rdf:RDF>
     </x:xmpmeta>
     <?xpacket end='w'?>
     EOT
+
     $xml = $pdf->xmpMetadata($xml);
     print "PDF metadata now reads: $xml\n";
     
@@ -1610,9 +1647,11 @@ sub artbox {
 
 =over
 
-=item @allFontDirs = PDF::API2::addFontDirs $dir1, ..., $dirN
+=item @directories = PDF::API2::addFontDirs($dir1, $dir2, ...)
 
-Adds one or more directories to the search-path for finding font files.
+Adds one or more directories to the search path for finding font
+files.
+
 Returns the list of searched directories.
 
 =cut
@@ -1629,16 +1668,9 @@ sub _findFont {
     return($fonts[0]);
 }
 
-=item $font = $pdf->corefont $fontname [, %options]
+=item $font = $pdf->corefont($fontname, [%options])
 
-Returns a new adobe core font object.
-
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::Font::CoreFont> for an explanation.
-
+Returns a new Adobe core font object.
 
 B<Examples:>
 
@@ -1647,12 +1679,21 @@ B<Examples:>
     $font = $pdf->corefont('Helvetica');
     $font = $pdf->corefont('ZapfDingbats');
 
-
 Valid %options are:
 
-  '-encode' ... changes the encoding of the font from its default.
+=over
 
-  '-dokern' ... enables kerning if data is available.
+=item -encode
+
+Changes the encoding of the font from its default.
+
+=item -dokern
+
+Enables kerning if data is available.
+
+=back
+
+See Also: L<PDF::API2::Resource::Font::CoreFont>.
 
 =cut
 
@@ -1665,33 +1706,37 @@ sub corefont {
     return($obj);
 }
 
-=item $font = $pdf->psfont $psfile  [, %options]
+=item $font = $pdf->psfont($ps_file, [%options])
 
-Returns a new adobe type1 font object.
-
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::Font::Postscript> for an explanation.
+Returns a new Adobe Type1 font object.
 
 B<Examples:>
 
-    $font = $pdf->psfont( 'Times-Book.pfa', -afmfile => 'Times-Book.afm' );
-    $font = $pdf->psfont( '/fonts/Synest-FB.pfb', -pfmfile => '/fonts/Synest-FB.pfm' );
+    $font = $pdf->psfont('Times-Book.pfa', -afmfile => 'Times-Book.afm');
+    $font = $pdf->psfont('/fonts/Synest-FB.pfb', -pfmfile => '/fonts/Synest-FB.pfm');
 
 Valid %options are:
 
-  '-encode' ... changes the encoding of the font from its default.
+=over
 
-  '-afmfile' ... specifies that font metrics to be read from the
-                adobe font metrics file (AFM).
+=item -encode
 
-  '-pfmfile' ... specifies that font metrics to be read from the
-                windows printer font metrics file (PFM).
-                (this option overrides the -encode option)
+Changes the encoding of the font from its default.
 
-  '-dokern' ... enables kerning if data is available.
+=item -afmfile
+
+Specifies the location of the font metrics file.
+
+=item -pfmfile
+
+Specifies the location of the printer font metrics file.  This option
+overrides the -encode option.
+
+=item -dokern
+
+Enables kerning if data is available.
+
+=back
 
 =cut
 
@@ -1712,15 +1757,9 @@ sub psfont {
     return($obj);
 }
 
-=item $font = $pdf->ttfont $ttfile  [, %options]
+=item $font = $pdf->ttfont($ttf_file, [%options])
 
-Returns a new truetype or opentype font object.
-
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::CIDFont::TrueType> for an explanation.
+Returns a new TrueType or OpenType font object.
 
 B<Examples:>
 
@@ -1729,14 +1768,25 @@ B<Examples:>
 
 Valid %options are:
 
-  '-encode' ... changes the encoding of the font from its default.
+=over
 
-  '-isocmap' ... per default the MS Unicode Map is used, if this 
-                 option is given the ISO Unicode Map will be used.
+=item -encode
 
-  '-dokern' ... enables kerning if data is available.
+Changes the encoding of the font from its default.
 
-  '-noembed' ... disables embedding the fontfile.
+=item -isocmap
+
+Use the ISO Unicode Map instead of the default MS Unicode Map.
+
+=item -dokern
+
+Enables kerning if data is available.
+
+=item -noembed
+
+Disables embedding of the font file.
+
+=back
 
 =cut
 
@@ -1766,15 +1816,9 @@ sub nettfont {
     return($obj);
 }
 
-=item $font = $pdf->cjkfont $cjkname  [, %options]
+=item $font = $pdf->cjkfont($cjkname, [%options])
 
-Returns a new cjk font object.
-
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::CIDFont::CJKFont> for an explanation.
+Returns a new CJK font object.
 
 B<Examples:>
 
@@ -1783,7 +1827,15 @@ B<Examples:>
 
 Valid %options are:
 
-  '-encode' ... changes the encoding of the font from its default.
+=over
+
+=item -encode
+
+Changes the encoding of the font from its default.
+
+=back
+
+See Also: L<PDF::API2::Resource::CIDFont::CJKFont>
 
 =cut
 
@@ -1799,36 +1851,40 @@ sub cjkfont {
     return($obj);
 }
 
-=item $font = $pdf->synfont $basefont  [, %options]
+=item $font = $pdf->synfont($basefont, [%options])
 
 Returns a new synthetic font object.
 
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::Font::SynFont> for an explanation.
-
 B<Examples:>
 
-    $cf = $pdf->corefont('Times-Roman',-encode=>'latin1');
-    $sf = $pdf->synfont($cf,-slant=>0.85);  # compressed 85%
-    $sfb= $pdf->synfont($cf,-bold=>1);      # embolden by 10em
-    $sfi= $pdf->synfont($cf,-oblique=>-12); # italic at -12 degrees
+    $cf  = $pdf->corefont('Times-Roman', -encode => 'latin1');
+    $sf  = $pdf->synfont($cf, -slant => 0.85);  # compressed 85%
+    $sfb = $pdf->synfont($cf, -bold => 1);      # embolden by 10em
+    $sfi = $pdf->synfont($cf, -oblique => -12); # italic at -12 degrees
 
 Valid %options are:
 
-I<-slant>
-... slant/expansion factor (0.1-0.9 = slant, 1.1+ = expansion).
+=over
 
-I<-oblique>
-... italic angle (+/-)
+=item -slant
 
-I<-bold>
-... embolding factor (0.1+, bold=1, heavy=2, ...)
+Slant/expansion factor (0.1-0.9 = slant, 1.1+ = expansion).
 
-I<-space>
-... additional charspacing in em (0-1000)
+=item -oblique
+
+Italic angle (+/-)
+
+=item -bold
+
+Emboldening factor (0.1+, bold = 1, heavy = 2, ...)
+
+=item -space
+
+Additional character spacing in ems (0-1000)
+
+=back
+
+See Also: L<PDF::API2::Resource::Font::SynFont>
 
 =cut
 
@@ -1844,15 +1900,11 @@ sub synfont {
     return($obj);
 }
 
-=item $font = $pdf->bdfont $bdffile
+=item $font = $pdf->bdfont($bdf_file)
 
-Returns a new BDF font object, based on the specified adobe-bdf file.
+Returns a new BDF font object, based on the specified Adobe BDF file.
 
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::Font::BdFont> for an explanation.
+See Also: L<PDF::API2::Resource::Font::BdFont>
 
 =cut
 
@@ -1868,21 +1920,23 @@ sub bdfont {
     return($obj);
 }
 
-=item $font = $pdf->unifont @fontspecs, %options
+=item $font = $pdf->unifont(@fontspecs, %options)
 
 Returns a new uni-font object, based on the specified fonts and options.
 
-=cut
+B<BEWARE:> This is not a true pdf-object, but a virtual/abstract font definition!
 
-=pod
-
-B<BEWARE:> This is not a true pdf-object, but a virtual/abstract font-definition !
-
-See L<PDF::API2::Resource::UniFont> for an explanation.
+See Also: L<PDF::API2::Resource::UniFont>.
 
 Valid %options are:
 
-  '-encode' ... changes the encoding of the font from its default.
+=over
+
+=item -encode
+
+Changes the encoding of the font from its default.
+
+=back
 
 =cut
 
@@ -1900,9 +1954,9 @@ sub unifont {
 
 =over
 
-=item $jpeg = $pdf->image_jpeg $file
+=item $jpeg = $pdf->image_jpeg($file)
 
-Returns a new jpeg image object.
+Imports and returns a new JPEG image object.
 
 =cut
 
@@ -1917,9 +1971,9 @@ sub image_jpeg {
     return($obj);
 }
 
-=item $tiff = $pdf->image_tiff $file
+=item $tiff = $pdf->image_tiff($file)
 
-Returns a new tiff image object.
+Imports and returns a new TIFF image object.
 
 =cut
 
@@ -1934,9 +1988,9 @@ sub image_tiff {
     return($obj);
 }
 
-=item $pnm = $pdf->image_pnm $file
+=item $pnm = $pdf->image_pnm($file)
 
-Returns a new pnm image object.
+Imports and returns a new PNM image object.
 
 =cut
 
@@ -1951,9 +2005,9 @@ sub image_pnm {
     return($obj);
 }
 
-=item $png = $pdf->image_png $file
+=item $png = $pdf->image_png($file)
 
-Returns a new png image object.
+Imports and returns a new PNG image object.
 
 =cut
 
@@ -1968,9 +2022,9 @@ sub image_png {
     return($obj);
 }
 
-=item $gif = $pdf->image_gif $file
+=item $gif = $pdf->image_gif($file)
 
-Returns a new gif image object.
+Imports and returns a new GIF image object.
 
 =cut
 
@@ -1985,11 +2039,11 @@ sub image_gif {
     return($obj);
 }
 
-=item $gdf = $pdf->image_gd $gdobj, %options
+=item $gdf = $pdf->image_gd($gd_object, %options)
 
-Returns a new image object from GD::Image.
+Imports and returns a new image object from GD::Image.
 
-B<Options:> The only option currently supported is C<-lossless =E<gt> 1>.
+B<Options:> The only option currently supported is C<< -lossless => 1 >>.
 
 =cut
 
@@ -2118,32 +2172,18 @@ sub image_gd {
 #    return($obj);
 #}
 
-=pod
-
-B<Examples:>
-
-    $jpeg = $pdf->image_jpeg('../some/nice/picture.jpeg');
-    $tiff = $pdf->image_tiff('../some/nice/picture.tiff');
-    $pnm = $pdf->image_pnm('../some/nice/picture.pnm');
-    $png = $pdf->image_png('../some/nice/picture.png');
-    $gif = $pdf->image_gif('../some/nice/picture.gif');
-    $gdf = $pdf->image_gd($gdobj);
-
 =back
 
 =head1 COLORSPACE METHODS
 
 =over
 
-=item $cs = $pdf->colorspace_act $file
+=item $cs = $pdf->colorspace_act($file)
 
-Returns a new colorspace-object based on a adobe-color-table file.
+Returns a new colorspace object based on an Adobe Color Table file.
 
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::ColorSpace::Indexed::ACTFile> for an explanation of the file format.
+See L<PDF::API2::Resource::ColorSpace::Indexed::ACTFile> for a
+reference to the file format's specification.
 
 =cut
 
@@ -2158,15 +2198,9 @@ sub colorspace_act {
     return($obj);
 }
 
-=item $cs = $pdf->colorspace_web
+=item $cs = $pdf->colorspace_web()
 
 Returns a new colorspace-object based on the web color palette.
-
-=cut
-
-=pod
-
-See L<PDF::API2::Resource::ColorSpace::Indexed::WebColor> for an explanation.
 
 =cut
 
@@ -2181,13 +2215,9 @@ sub colorspace_web {
     return($obj);
 }
 
-=item $cs = $pdf->colorspace_hue
+=item $cs = $pdf->colorspace_hue()
 
 Returns a new colorspace-object based on the hue color palette.
-
-=cut
-
-=pod
 
 See L<PDF::API2::Resource::ColorSpace::Indexed::Hue> for an explanation.
 
@@ -2204,21 +2234,19 @@ sub colorspace_hue {
     return($obj);
 }
 
-=item $cs = $pdf->colorspace_separation $tint, $color
+=item $cs = $pdf->colorspace_separation($tint, $color)
 
-Returns a new separation colorspace-object based on the parameters.
+Returns a new separation colorspace object based on the parameters.
 
-=cut
+I<$tint> can be any valid ink identifier, including but not limited
+to: 'Cyan', 'Magenta', 'Yellow', 'Black', 'Red', 'Green', 'Blue' or
+'Orange'.
 
-=pod
+I<$color> must be a valid color specification limited to: '#rrggbb',
+'!hhssvv', '%ccmmyykk' or a "named color" (rgb).
 
-I<$tint> can be any valid ink-identifier, including but not limited to:
-'Cyan', 'Magenta', 'Yellow', 'Black', 'Red', 'Green', 'Blue' or 'Orange'.
-
-I<$color> must be a valid color-specification limited to:
-'#rrggbb', '!hhssvv', '%ccmmyykk' or a "named color" (rgb).
-
-The colorspace model for will be automatically chosen based on the specified color.
+The colorspace model will automatically be chosen based on the
+specified color.
 
 =cut
 
@@ -2232,9 +2260,9 @@ sub colorspace_separation {
     return($obj);
 }
 
-=item $cs = $pdf->colorspace_devicen \@tintCSx [, $samples]
+=item $cs = $pdf->colorspace_devicen(\@tintCSx, [$samples])
 
-Returns a new DeviceN colorspace-object based on the parameters.
+Returns a new DeviceN colorspace object based on the parameters.
 
 B<Example:> 
 
@@ -2242,15 +2270,13 @@ B<Example:>
     $ma = $pdf->colorspace_separation('Magenta', '%0f00');
     $ye = $pdf->colorspace_separation('Yellow',  '%00f0');
     $bk = $pdf->colorspace_separation('Black',   '%000f');
+
     $pms023 = $pdf->colorspace_separation('PANTONE 032CV', '%0ff0');
 
     $dncs = $pdf->colorspace_devicen( [ $cy,$ma,$ye,$bk,$pms023 ] );
-    
-=cut
 
-=pod
-
-The colorspace model for will be automatically chosen based on the first colorspace specified.
+The colorspace model will automatically be chosen based on the first
+colorspace specified.
 
 =cut
 
@@ -2272,17 +2298,17 @@ sub colorspace_devicen {
 
 =over
 
-=item $bc = $pdf->xo_codabar %opts
+=item $bc = $pdf->xo_codabar(%options)
 
-=item $bc = $pdf->xo_code128 %opts
+=item $bc = $pdf->xo_code128(%options)
 
-=item $bc = $pdf->xo_2of5int %opts
+=item $bc = $pdf->xo_2of5int(%options)
 
-=item $bc = $pdf->xo_3of9 %opts
+=item $bc = $pdf->xo_3of9(%options)
 
-=item $bc = $pdf->xo_ean13 %opts
+=item $bc = $pdf->xo_ean13(%options)
 
-creates the specified barcode object as a form-xo.
+Creates the specified barcode object as a form XObject.
 
 =cut
 
@@ -2347,13 +2373,9 @@ sub xo_ean13 {
 
 =over
 
-=item $xo = $pdf->xo_form
+=item $xo = $pdf->xo_form()
 
-Returns a new form-xobject.
-
-B<Examples:>
-
-    $xo = $pdf->xo_form;
+Returns a new form XObject.
 
 =cut
 
@@ -2368,13 +2390,9 @@ sub xo_form {
     return($obj);
 }
 
-=item $egs = $pdf->egstate
+=item $egs = $pdf->egstate()
 
 Returns a new extended graphics state object.
-
-B<Examples:>
-
-    $egs = $pdf->egstate;
 
 =cut
 
@@ -2389,9 +2407,9 @@ sub egstate {
     return($obj);
 }
 
-=item $obj = $pdf->pattern
+=item $obj = $pdf->pattern()
 
-Returns a new pattern-object.
+Returns a new pattern object.
 
 =cut
 
@@ -2406,9 +2424,9 @@ sub pattern {
     return($obj);
 }
 
-=item $obj = $pdf->shading
+=item $obj = $pdf->shading()
 
-Returns a new shading-object.
+Returns a new shading object.
 
 =cut
 
@@ -2423,7 +2441,7 @@ sub shading {
     return($obj);
 }
 
-=item $otls = $pdf->outlines
+=item $otls = $pdf->outlines()
 
 Returns a new or existing outlines object.
 
@@ -2443,12 +2461,6 @@ sub outlines {
     return($obj);
 
 }
-
-#=item $dst $pdf->named_destination $category, $name
-#
-#Returns a new or existing outlines object.
-#
-#=cut
 
 sub named_destination
 {
@@ -2489,20 +2501,19 @@ sub named_destination
 
 =over
 
-=item $pdf->resource $type, $key, $obj, $force
+=item $pdf->resource($type, $key, $obj, $force)
 
-Adds a resource to the global pdf tree.
+Adds a resource to the global PDF tree.
 
 B<Example:>
 
-    $pdf->resource('Font',$fontkey,$fontobj);
-    $pdf->resource('XObject',$imagekey,$imageobj);
-    $pdf->resource('Shading',$shadekey,$shadeobj);
-    $pdf->resource('ColorSpace',$spacekey,$speceobj);
+    $pdf->resource('Font', $fontkey, $fontobj);
+    $pdf->resource('XObject', $imagekey, $imageobj);
+    $pdf->resource('Shading', $shadekey, $shadeobj);
+    $pdf->resource('ColorSpace', $spacekey, $speceobj);
 
-B<Note:> You only have to add the required resources, if
-they are NOT handled by the *font*, *image*, *shade* or *space*
-methods.
+B<Note:> You only have to add the required resources if they are NOT
+handled by the font, image, shade or space methods.
 
 =cut
 
@@ -2556,11 +2567,13 @@ __END__
 
 =head1 BUGS
 
-This module does not work with perl's -l commandline switch.
+This module does not work with perl's -l command-line switch.
 
 =head1 AUTHOR
 
-alfred reibenschuh
+PDF::API2 was originally written (as far as I know) by Alfred
+Reibenschuh.
+
+It is currently being maintained by Steve Simms.
 
 =cut
-
