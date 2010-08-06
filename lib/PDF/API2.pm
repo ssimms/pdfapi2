@@ -1036,17 +1036,33 @@ sub end {
 
 =over
 
-=item $page = $pdf->page
+=item $page = $pdf->page()
 
-=item $page = $pdf->page $index
+=item $page = $pdf->page($page_number)
 
-Returns a new page object or inserts-and-returns a new page at $index.
+Returns a new page object.  By default, the page is added to the end
+of the document.  If you include an existing page number, the new page
+will be inserted in that position, pushing existing pages back.
 
-B<Note:> on $index
+$page_number can also have one of the following values:
 
-    -1 ... is inserted before the last page
-    1 ... is inserted before page number 1 (the first page)
-    0 ... is simply appended
+=over
+
+=item -1 inserts the new page as the second-last page
+
+=item 0 inserts the page as the last page
+
+=back
+
+B<Example:>
+
+    $pdf = PDF::API2->new();
+
+    # Add a page.  This becomes page 1.
+    $page = $pdf->page();
+
+    # Add a new first page.  $page becomes page 2.
+    $another_page = $pdf->page(1);
 
 =cut
 
@@ -1074,17 +1090,16 @@ sub page {
     return $page;
 }
 
-=item $pageobj = $pdf->openpage $index
+=item $page = $pdf->openpage($page_number)
 
-Returns the pageobject of page $index.
+Returns the L<PDF::API2::Page> object of page $page_number.
 
-B<Note:> on $index
+If $page_number is 0 or -1, it will return the last page in the
+document.
 
-    -1,0 ... returns the last page
-    1 ... returns page number 1
+B<Example:>
 
-B<Example:> (A Document with 99 Pages)
-
+    $pdf = PDF::API2->open('our/99page.pdf');
     $page = $pdf->openpage(1);   # returns the first page
     $page = $pdf->openpage(99);  # returns the last page
     $page = $pdf->openpage(-1);  # returns the last page
@@ -1243,28 +1258,32 @@ sub walk_obj {
     return($tobj);
 }
 
-=item $xoform = $pdf->importPageIntoForm $sourcepdf, $sourceindex
+=item $xoform = $pdf->importPageIntoForm($source_pdf, $source_page_number)
 
-Returns a form-xobject created from $sourcepdf,$sourceindex.
-This is useful if you want to transpose the imported page-description
-somewhat differently onto a page (ie. two-up, four-up, duplex, etc.).
+Returns a Form XObject created by extracting the specified page from $source_pdf.
 
-B<Note:> on $index
+This is useful if you want to transpose the imported page somewhat
+differently onto a page (e.g. two-up, four-up, etc.).
 
-    -1,0 ... returns the last page
-    1 ... returns page number 1
+If $source_page_number is 0 or -1, it will return the last page in the
+document.
 
 B<Example:>
 
-    $pdf = PDF::API2->new;
-    $old = PDF::API2->open('my/old.pdf');
-    $xo = $pdf->importPageIntoForm($old,2); # get page 2
-    $page = $pdf->page;
-    $gfx = $page->gfx;
-    $gfx->formimage($xo,0,0,1); # put it on page 1 with scale x1
-    $pdf->saveas("our/new.pdf");
+    $pdf = PDF::API2->new();
+    $old = PDF::API2->open('our/old.pdf');
+    $page = $pdf->page();
+    $gfx = $page->gfx();
 
-B<Note:> you can only import a page from an existing pdf-file!
+    # Import Page 2 from the old PDF
+    $xo = $pdf->importPageIntoForm($old, 2);
+
+    # Add it to the new PDF's first page at 1/2 scale
+    $gfx->formimage($xo, 0, 0, 0.5); 
+
+    $pdf->saveas('our/new.pdf');
+
+B<Note:> You can only import a page from an existing PDF file.
 
 =cut
 
@@ -1344,31 +1363,31 @@ sub importPageIntoForm {
     return($xo);
 }
 
-=item $pageobj = $pdf->importpage $sourcepdf, $sourceindex, $targetindex
+=item $page = $pdf->importpage($source_pdf, $source_page_number, $target_page_number)
 
-Returns the pageobject of page $targetindex, imported from $sourcepdf,$sourceindex.
+Imports a page from $source_pdf and adds it to the specified position
+in $pdf.
 
-B<Note:> on $index
+If $source_page_number or $target_page_number is 0 or -1, the last
+page in the document is used.
 
-    -1,0 ... returns the last page
-    1 ... returns page number 1
-
-B<Note:> you can specify a page object instead as $targetindex
-so that the contents of the sourcepage will be 'merged into'.
+B<Note:> If you pass a page object instead of a page number for
+$target_page_number, the contents of the page will be merged into the
+existing page.
 
 B<Example:>
 
-    $pdf = PDF::API2->new;
-    $old = PDF::API2->open('my/old.pdf');
-    $page = $pdf->importpage($old,2); # get page 2 into page 1
-    $pdf->saveas("our/new.pdf");
+    $pdf = PDF::API2->new();
+    $old = PDF::API2->open('our/old.pdf');
 
-B<Note:> you can only import a page from an existing pdf-file!
+    # Add page 2 from the old PDF as page 1 of the new PDF
+    $page = $pdf->importpage($old, 2);
+
+    $pdf->saveas('our/new.pdf');
+
+B<Note:> You can only import a page from an existing PDF file.
 
 =cut
-
-# B<Note:> the interactive forms of a page will also be imported, but may
-# cause problems if forms of another document have already been imported.
 
 sub importpage {
     my $self=shift @_;
@@ -1477,7 +1496,7 @@ sub importpage {
     return($t_page);
 }
 
-=item $pagenumber = $pdf->pages
+=item $count = $pdf->pages()
 
 Returns the number of pages in the document.
 
@@ -1488,31 +1507,30 @@ sub pages {
     return scalar @{$self->{pagestack}};
 }
 
-=item $pdf->mediabox $name
+=item $pdf->mediabox($name)
 
-=item $pdf->mediabox $w, $h
+=item $pdf->mediabox($w, $h)
 
-=item $pdf->mediabox $llx, $lly, $urx, $ury
+=item $pdf->mediabox($llx, $lly, $urx, $ury)
 
-Sets the global mediabox. Other methods: cropbox, bleedbox, trimbox and artbox.
+Sets the global mediabox.
 
 B<Example:>
 
-    $pdf = PDF::API2->new;
+    $pdf = PDF::API2->new();
     $pdf->mediabox('A4');
     ...
-    $pdf->saveas("our/new.pdf");
+    $pdf->saveas('our/new.pdf');
+
+    $pdf = PDF::API2->new();
+    $pdf->mediabox(595, 842);
+    ...
+    $pdf->saveas('our/new.pdf');
 
     $pdf = PDF::API2->new;
-    $pdf->mediabox(595,842);
+    $pdf->mediabox(0, 0, 595, 842);
     ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->mediabox(0,0,595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
-
+    $pdf->saveas('our/new.pdf');
 
 =cut
 
@@ -1522,30 +1540,13 @@ sub mediabox {
     $self;
 }
 
-=item $pdf->cropbox $name
+=item $pdf->cropbox($name)
 
-=item $pdf->cropbox $w, $h
+=item $pdf->cropbox($w, $h)
 
-=item $pdf->cropbox $llx, $lly, $urx, $ury
+=item $pdf->cropbox($llx, $lly, $urx, $ury)
 
 Sets the global cropbox.
-
-B<Example:>
-
-    $pdf = PDF::API2->new;
-    $pdf->cropbox('A4');
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->cropbox(595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->cropbox(0,0,595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
 
 =cut
 
@@ -1555,30 +1556,13 @@ sub cropbox {
     $self;
 }
 
-=item $pdf->bleedbox $name
+=item $pdf->bleedbox($name)
 
-=item $pdf->bleedbox $w, $h
+=item $pdf->bleedbox($w, $h)
 
-=item $pdf->bleedbox $llx, $lly, $urx, $ury
+=item $pdf->bleedbox($llx, $lly, $urx, $ury)
 
 Sets the global bleedbox.
-
-B<Example:>
-
-    $pdf = PDF::API2->new;
-    $pdf->bleedbox('A4');
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->bleedbox(595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->bleedbox(0,0,595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
 
 =cut
 
@@ -1588,30 +1572,13 @@ sub bleedbox {
     $self;
 }
 
-=item $pdf->trimbox $name
+=item $pdf->trimbox($name)
 
-=item $pdf->trimbox $w, $h
+=item $pdf->trimbox($w, $h)
 
-=item $pdf->trimbox $llx, $lly, $urx, $ury
+=item $pdf->trimbox($llx, $lly, $urx, $ury)
 
 Sets the global trimbox.
-
-B<Example:>
-
-    $pdf = PDF::API2->new;
-    $pdf->trimbox('A4');
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->trimbox(595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->trimbox(0,0,595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
 
 =cut
 
@@ -1621,30 +1588,13 @@ sub trimbox {
     $self;
 }
 
-=item $pdf->artbox $name
+=item $pdf->artbox($name)
 
-=item $pdf->artbox $w, $h
+=item $pdf->artbox($w, $h)
 
-=item $pdf->artbox $llx, $lly, $urx, $ury
+=item $pdf->artbox($llx, $lly, $urx, $ury)
 
 Sets the global artbox.
-
-B<Example:>
-
-    $pdf = PDF::API2->new;
-    $pdf->artbox('A4');
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->artbox(595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
-
-    $pdf = PDF::API2->new;
-    $pdf->artbox(0,0,595,842);
-    ...
-    $pdf->saveas("our/new.pdf");
 
 =cut
 
