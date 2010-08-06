@@ -705,7 +705,7 @@ B<Example:>
     $xml = $pdf->xmpMetadata;
     print "PDFs Metadata reads: $xml\n";
     $xml=<<EOT;
-    <?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>
+    <?xpacket begin='' id='W5M0MpCehiHzreSzNTczkc9d'?>
     <?adobe-xap-filters esc="CRLF"?>
     <x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='XMP toolkit 2.9.1-14, framework 1.6'>
     <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/'>
