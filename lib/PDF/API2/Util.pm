@@ -111,7 +111,7 @@ BEGIN {
 
     no warnings qw[ recursion uninitialized ];
 
-    ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
+    ( $VERSION ) = '2.000';
 
     $key_var='CBA';
     $key_var2=0;

@@ -43,7 +43,7 @@ BEGIN {
 
     use vars qw( $VERSION $hasWeakRef );
 
-    ( $VERSION ) = sprintf '%i.%03i', split(/\./,('$Revision$' =~ /Revision: (\S+)\s/)[0]); # $Date$
+    ( $VERSION ) = '2.001';
 
 }
 
