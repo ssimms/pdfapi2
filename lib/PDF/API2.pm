@@ -4,7 +4,7 @@ BEGIN {
 
     use vars qw( $VERSION $seq @FontDirs );
 
-    ($VERSION) = '2.015';
+    ($VERSION) = '2.016';
 
     @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC), 
         qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
@@ -22,8 +22,6 @@ BEGIN {
 
     use PDF::API2::Outlines;
     use PDF::API2::NamedDestination;
-
-    use PDF::API2::Version;
 
     use PDF::API2::Resource::ExtGState;
     use PDF::API2::Resource::Pattern;
@@ -161,7 +159,7 @@ sub new {
         $self->{pdf}->create_file($opt{-file});
     }
     $self->{infoMeta}=[qw(  Author CreationDate ModDate Creator Producer Title Subject Keywords  )];
-    $self->info( 'Producer' => $PDF::API2::Version::CVersion{vFredo}." [$^O]" );
+    $self->info( 'Producer' => "PDF::API2 $VERSION [$^O]" );
     return $self;
 }
 
