@@ -9,7 +9,6 @@ BEGIN {
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Resource::CIDFont;
 
-    use PDF::API2::Basic::TTF::Font;
     use PDF::API2::Resource::CIDFont::TrueType::FontFile;
 
     use POSIX;
