@@ -50,12 +50,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Form::BarCode::codabar->new $pdf
-
-Returns a codabar object.
-
-=cut
-
 sub new {
     my ($class,$pdf,%opts) = @_;
     my $self;
@@ -87,15 +81,4 @@ sub encode_char {
         return($barcodabar[index($codabar,$char)]);
 }
 
-
-
-
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

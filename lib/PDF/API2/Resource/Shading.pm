@@ -49,12 +49,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $cs = PDF::API2::Resource::Shading->new $pdf, $key, %parameters
-
-Returns a new shading object. base class for all shadings.
-
-=cut
-
 sub new {
     my ($class,$pdf,$key,%opts)=@_;
 
@@ -77,13 +71,6 @@ sub new {
     return($self);
 }
 
-=item $cs = PDF::API2::Resource::Shading->new_api $api, $name
-
-Returns a shading object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
 sub new_api {
     my ($class,$api,@opts)=@_;
 
@@ -103,11 +90,3 @@ sub outobjdeep {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

@@ -515,12 +515,3 @@ $FONTDATA = {
         'a99'                => 668,
     }, # HORIZ. WIDTH TABLE
 };
-
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

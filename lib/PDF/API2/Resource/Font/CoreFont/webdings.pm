@@ -791,12 +791,3 @@ $FONTDATA = {
         0xF0FF,
     ],
 };
-
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

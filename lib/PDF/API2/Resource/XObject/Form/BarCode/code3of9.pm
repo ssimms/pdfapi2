@@ -50,12 +50,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Form::BarCode::code3of9->new $pdf
-
-Returns a code3of9 object.
-
-=cut
-
 sub new {
     my ($class,$pdf,%opts) = @_;
     my $self;
@@ -314,11 +308,3 @@ sub encode_3of9_ext_w_chk {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

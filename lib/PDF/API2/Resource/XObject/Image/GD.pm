@@ -49,12 +49,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Image::GD->new $pdf, $obj [, $name]
-
-Returns a image object from a GD::Image.
-
-=cut
-
 sub new {
     my ($class,$pdf,$obj,$name,@opts) = @_;
     my $self;
@@ -70,13 +64,6 @@ sub new {
 
     return($self);
 }
-
-=item $res = PDF::API2::Resource::XObject::Image::GD->new_api $api, $obj [, $name]
-
-Returns a image object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
 
 sub new_api {
     my ($class,$api,@opts)=@_;
@@ -131,11 +118,3 @@ sub read_gd {
 
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

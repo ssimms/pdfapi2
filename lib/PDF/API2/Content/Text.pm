@@ -48,12 +48,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 $txt = PDF::API2::Content::Text->new @parameters
-
-Returns a new text content object (called from $page->text).
-
-=cut
-
 sub new {
   my ($class)=@_;
   my $self = $class->SUPER::new(@_);
@@ -62,11 +56,3 @@ sub new {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut
