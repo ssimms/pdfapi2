@@ -72,7 +72,7 @@ sub _look_for_font {
         return({%{$data}})
     }
 
-    eval "require PDF::API2::Resource::CIDFont::CJKFont::$fname; ";
+    eval "require 'PDF/API2/Resource/CIDFont/CJKFont/$fname.data'";
     unless($@){
         return({%{$fonts->{$fname}}});
     } else {
