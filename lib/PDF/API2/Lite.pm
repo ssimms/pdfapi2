@@ -16,7 +16,6 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-
 =head1 NAME 
 
 PDF::API2::Lite - lite pdf creation
@@ -31,7 +30,7 @@ PDF::API2::Lite - lite pdf creation
 
 =head1 METHODS
 
-=head2 PDF::API2::Lite
+=over
 
 =item $pdf = PDF::API::Lite->new
 
@@ -629,6 +628,8 @@ sub print {
 1;
 
 __END__
+
+=back
 
 =head1 AUTHOR
 

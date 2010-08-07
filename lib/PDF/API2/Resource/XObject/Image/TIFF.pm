@@ -18,6 +18,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::XObject::Image::TIFF
+
+=head1 METHODS
+
+=over
+
 =item  $res = PDF::API2::Resource::XObject::Image::TIFF->new $pdf, $file [, $name]
 
 Returns a tiff-image object.
@@ -606,8 +614,10 @@ sub readTags {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

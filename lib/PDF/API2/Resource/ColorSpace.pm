@@ -16,6 +16,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::ColorSpace
+
+=head1 METHODS
+
+=over
+
 =item $cs = PDF::API2::Resource::ColorSpace->new $pdf, $key, %parameters
 
 Returns a new colorspace object. base class for all colorspaces.
@@ -95,9 +103,11 @@ sub outobjdeep {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut
 

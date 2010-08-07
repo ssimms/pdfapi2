@@ -22,6 +22,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::CIDFont::CJKFont
+
+=head1 METHODS
+
+=over
+
 =item $font = PDF::API2::Resource::CIDFont::CJKFont->new $pdf, $cjkname, %options
 
 Returns a cjk-font object.
@@ -340,9 +348,11 @@ BEGIN {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut
 

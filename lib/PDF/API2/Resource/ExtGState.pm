@@ -16,6 +16,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::ExtGState
+
+=head1 METHODS
+
+=over
+
 =item $egs = PDF::API2::Resource::ExtGState->new @parameters
 
 Returns a new extgstate object (called from $pdf->extgstate).
@@ -369,6 +377,8 @@ sub outobjdeep {
 1;
 
 __END__
+
+=back
 
 =head1 AUTHOR
 

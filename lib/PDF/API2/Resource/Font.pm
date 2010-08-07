@@ -20,6 +20,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::Font
+
+=head1 METHODS
+
+=over
+
 =item $font->encodeByData $encoding
 
 Encodes the font in the specified byte-encoding.
@@ -229,8 +237,10 @@ sub remap {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

@@ -21,6 +21,14 @@ BEGIN
 
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::CIDFont
+
+=head1 METHODS
+
+=over
+
 =item $font = PDF::API2::Resource::CIDFont->new $pdf, $name
 
 Returns a cid-font object. base class form all CID based fonts.
@@ -366,6 +374,8 @@ sub outobjdeep
 1;
 
 __END__
+
+=back
 
 =head1 AUTHOR
 

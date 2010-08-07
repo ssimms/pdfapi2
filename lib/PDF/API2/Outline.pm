@@ -15,7 +15,15 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 $otl = PDF::API2::Outline->new $api,$parent,$prev
+=head1 NAME
+
+PDF::API2::Outline
+
+=head1 METHODS
+
+=over
+
+=item $otl = PDF::API2::Outline->new $api,$parent,$prev
 
 Returns a new outline object (called from $otls->outline).
 
@@ -338,6 +346,8 @@ sub outobjdeep {
 1;
 
 __END__
+
+=back
 
 =head1 AUTHOR
 

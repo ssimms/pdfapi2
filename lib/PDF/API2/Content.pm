@@ -20,7 +20,15 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 $co = PDF::API2::Content->new @parameters
+=head1 NAME
+
+PDF::API2::Content
+
+=head1 METHODS
+
+=over
+
+=item $co = PDF::API2::Content->new @parameters
 
 Returns a new content object (called from $page->text/gfx).
 
@@ -626,9 +634,11 @@ sub strokecolor
     return(@{$self->{' strokecolor'}});
 }
 
+=back
+
 =head1 GRAPHICS METHODS
 
-=over 4
+=over
 
 =item $gfx->move $x, $y
 
@@ -1675,7 +1685,7 @@ Applys text to the content and optionally returns the width of the given text.
 
 Options
 
-=ovar 4
+=over
 
 =item -indent
 
@@ -2159,6 +2169,8 @@ sub resource
 1;
 
 __END__
+
+=back
 
 =head1 AUTHOR
 

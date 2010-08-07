@@ -17,6 +17,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::XObject::Form::BarCode
+
+=head1 METHODS
+
+=over
+
 =item $res = PDF::API2::Resource::XObject::Form::BarCode->new $pdf, %opts
 
 Returns a barcode-form object.
@@ -223,8 +231,10 @@ sub height {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

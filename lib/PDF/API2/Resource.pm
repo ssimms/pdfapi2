@@ -17,7 +17,15 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 $res = PDF::API2::Resource->new $pdf, $name
+=head1 NAME
+
+PDF::API2::Resource
+
+=head1 METHODS
+
+=over
+
+=item $res = PDF::API2::Resource->new $pdf, $name
 
 Returns a resource object.
 
@@ -84,8 +92,10 @@ sub outobjdeep {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

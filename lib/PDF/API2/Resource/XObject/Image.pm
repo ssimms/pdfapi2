@@ -18,6 +18,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::XObject::Image
+
+=head1 METHODS
+
+=over
+
 =item $res = PDF::API2::Resource::XObject::Image->new $pdf, $name
 
 Returns a image-resource object. base class for all types of bitmap-images.
@@ -154,8 +162,10 @@ sub outobjdeep {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

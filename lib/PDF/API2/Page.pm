@@ -26,7 +26,15 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 $page = PDF::API2::Page->new $pdf, $parent, $index
+=head1 NAME
+
+PDF::API2::Page
+
+=head1 METHODS
+
+=over
+
+=item $page = PDF::API2::Page->new $pdf, $parent, $index
 
 Returns a page object (called from $pdf->page).
 
@@ -522,8 +530,10 @@ sub outobjdeep {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

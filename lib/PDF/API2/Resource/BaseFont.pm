@@ -19,6 +19,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::BaseFont
+
+=head1 METHODS
+
+=over
+
 =item $font = PDF::API2::Resource::BaseFont->new $pdf, $name
 
 Returns a font resource object.
@@ -164,7 +172,7 @@ sub tounicodemap {
 
 =head1 FONT-MANAGEMENT RELATED METHODS
 
-=over 4
+=over
 
 =item $name = $font->fontname()
 
@@ -218,7 +226,7 @@ sub iscff { return( $_[0]->data->{iscff} ); }
 
 =head1 TYPOGRAPHY RELATED METHODS
 
-=over 4
+=over
 
 =item ($llx, $lly, $urx, $ury) = $font->fontbbox()
 
@@ -661,7 +669,7 @@ sub width_array {
 
 =head1 STRING METHODS
 
-=over 4
+=over
 
 =item $utf8string = $font->utfByStr $string
 
@@ -794,6 +802,6 @@ __END__
 
 =head1 AUTHOR
 
-alfred reibenschuh.
+Alfred Reibenschuh.
 
 =cut

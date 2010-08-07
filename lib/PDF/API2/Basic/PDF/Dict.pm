@@ -40,6 +40,8 @@ PDF::API2::Basic::PDF::Dict - PDF Dictionaries and Streams. Inherits from L<PDF:
 There are various special instance variables which are used to look after,
 particularly, streams. Each begins with a space:
 
+=over
+
 =item stream
 
 Holds the stream contents for output
@@ -53,6 +55,8 @@ not the same as a PDF file stream. The data is stored in its unfiltered form.
 
 If both ' stream' and ' streamfile' are empty, this indicates where in the
 source PDF the stream starts.
+
+=back
 
 =head1 METHODS
 
