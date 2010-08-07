@@ -152,9 +152,6 @@ sub encodeByData {
         $self->{Widths}->add_elements( PDFNum($self->wxByEnc($n)) );
     }
 
-#use Data::Dumper;
-#    print Dumper($data);
-
     return($self);
 }
 

@@ -172,8 +172,6 @@ sub new
       $self->{'Encoding'}=$font->{Encoding};
     }
 
-    #use Data::Dumper;
-    #print Dumper($self->data);
     my @widths=();
     foreach my $w ($first..$last) 
     {
