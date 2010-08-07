@@ -24,7 +24,7 @@ sub _look_for_cmap ($) {
     my $fname=lc(shift);
     $fname=~s/[^a-z0-9]+//gi;
     return({%{$cmap->{$fname}}}) if(defined $cmap->{$fname});
-    eval "require PDF::API2::Resource::CIDFont::CMap::$fname; ";
+    eval "require 'PDF/API2/Resource/CIDFont/CMap/$fname.cmap'";
     unless($@){
         return({%{$cmap->{$fname}}});
     } else {
