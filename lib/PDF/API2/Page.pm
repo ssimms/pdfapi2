@@ -1,26 +1,15 @@
 package PDF::API2::Page;
 
-BEGIN {
+use base 'PDF::API2::Basic::PDF::Pages';
 
-    use strict;
-    use vars qw(@ISA %pgsz);
+use POSIX qw(floor);
 
-    @ISA = qw(PDF::API2::Basic::PDF::Pages);
-    use PDF::API2::Basic::PDF::Pages;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Util;
+use PDF::API2::Annotation;
+use PDF::API2::Content;
+use PDF::API2::Content::Text;
 
-    use PDF::API2::Annotation;
-
-    use PDF::API2::Content;
-    use PDF::API2::Content::Text;
-
-    use PDF::API2::Util;
-
-    use POSIX qw(floor ceil);
-    use Math::Trig;
-
-}
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
 no warnings qw[ deprecated recursion uninitialized ];
 

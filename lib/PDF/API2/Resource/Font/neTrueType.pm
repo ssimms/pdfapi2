@@ -1,5 +1,15 @@
 package PDF::API2::Resource::Font::neTrueType;
 
+use base 'PDF::API2::Resource::Font';
+
+use File::Basename;
+use IO::File;
+
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
+
+no warnings qw[ deprecated recursion uninitialized ];
+
 =head1 NAME
 
 PDF::API2::Resource::Font::neTrueType - Module for using 8bit nonembedded truetype Fonts.
@@ -16,24 +26,6 @@ PDF::API2::Resource::Font::neTrueType - Module for using 8bit nonembedded truety
 =head1 METHODS
 
 =over 4
-
-=cut
-
-BEGIN {
-
-    use Encode qw(:all);
-
-    use File::Basename;
-
-    use vars qw( @ISA $fonts $alias $subs $encodings );
-    use PDF::API2::Resource::Font;
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-
-    @ISA=qw(PDF::API2::Resource::Font);
-
-}
-no warnings qw[ deprecated recursion uninitialized ];
 
 =item $font = PDF::API2::Resource::Font::neTrueType->new $pdf, $fontfile, %options
 

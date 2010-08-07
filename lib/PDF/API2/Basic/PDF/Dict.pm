@@ -12,14 +12,14 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Dict;
 
+use base 'PDF::API2::Basic::PDF::Objind';
+
 use strict;
-use vars qw(@ISA $mincache $tempbase $cr);
 no warnings qw[ deprecated recursion uninitialized ];
 
-use PDF::API2::Basic::PDF::Objind;
-@ISA = qw(PDF::API2::Basic::PDF::Objind);
-
-$cr = '(?:\015|\012|(?:\015\012))';
+our $mincache;
+our $tempbase;
+our $cr = '(?:\015|\012|(?:\015\012))';
 
 use PDF::API2::Basic::PDF::Filter;
 use PDF::API2::Basic::PDF::Name;

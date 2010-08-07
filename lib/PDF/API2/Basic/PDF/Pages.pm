@@ -12,15 +12,16 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Pages;
 
+use base 'PDF::API2::Basic::PDF::Dict';
+
 use strict;
-use vars qw(@ISA %inst);
-@ISA = qw(PDF::API2::Basic::PDF::Dict);
 no warnings qw[ deprecated recursion uninitialized ];
 
+use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;
 
-%inst = map {$_ => 1} qw(Parent Type);
+our %inst = map {$_ => 1} qw(Parent Type);
 
 =head1 NAME
 

@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Number;
 
+use base 'PDF::API2::Basic::PDF::String';
+
 =head1 NAME
 
 PDF::API2::Basic::PDF::Number - Numbers in PDF. Inherits from L<PDF::API2::Basic::PDF::String>
@@ -21,12 +23,7 @@ PDF::API2::Basic::PDF::Number - Numbers in PDF. Inherits from L<PDF::API2::Basic
 =cut
 
 use strict;
-use vars qw(@ISA);
 no warnings qw[ deprecated recursion uninitialized ];
-
-use PDF::API2::Basic::PDF::String;
-@ISA = qw(PDF::API2::Basic::PDF::String);
-
 
 =head2 $n->convert($str)
 

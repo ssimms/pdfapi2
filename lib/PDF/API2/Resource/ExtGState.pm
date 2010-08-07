@@ -1,17 +1,10 @@
 package PDF::API2::Resource::ExtGState;
 
-BEGIN {
+use base 'PDF::API2::Resource';
 
-    use strict;
-    use PDF::API2::Resource;
-    use PDF::API2::Basic::PDF::Utils;
-    use Math::Trig;
-    use PDF::API2::Util;
-    use vars qw(@ISA);
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
-    @ISA = qw(PDF::API2::Resource);
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME

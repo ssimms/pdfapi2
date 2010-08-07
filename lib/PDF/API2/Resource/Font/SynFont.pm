@@ -1,19 +1,13 @@
 package PDF::API2::Resource::Font::SynFont;
 
-BEGIN {
+use base 'PDF::API2::Resource::Font';
 
-    use Encode qw(:all);
+use Math::Trig;
+use Unicode::UCD 'charinfo';
 
-    use vars qw( @ISA );
-    use PDF::API2::Resource::Font;
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use Math::Trig;
-    use Unicode::UCD 'charinfo';
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
-    @ISA=qw(PDF::API2::Resource::Font);
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME

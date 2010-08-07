@@ -1,22 +1,13 @@
 package PDF::API2::Resource::Font::BdFont;
 
-BEGIN {
+use base 'PDF::API2::Resource::Font';
 
-    use Encode qw(:all);
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
-    use vars qw( @ISA $BmpNum);
-    use PDF::API2::Resource::Font;
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use Math::Trig;
-    use Unicode::UCD 'charinfo';
-
-    @ISA=qw(PDF::API2::Resource::Font);
-
-    $BmpNum=0;
-    
-}
 no warnings qw[ deprecated recursion uninitialized ];
+
+our $BmpNum = 0;
 
 =head1 NAME
 

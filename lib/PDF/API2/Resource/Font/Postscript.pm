@@ -1,21 +1,13 @@
 package PDF::API2::Resource::Font::Postscript;
 
-BEGIN {
+use base 'PDF::API2::Resource::Font';
 
-    use Encode qw(:all);
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Resource::Font;
+use Encode qw(:all);
+use IO::File qw();
 
-    use POSIX;
-    use Compress::Zlib;
-    use File::Find;
-    use IO::File qw();
-    use vars qw(@ISA);
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
-    @ISA = qw( PDF::API2::Resource::Font );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {

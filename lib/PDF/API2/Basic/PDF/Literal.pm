@@ -1,12 +1,9 @@
 # Literal PDF Object for Dirty Hacks ...
 package PDF::API2::Basic::PDF::Literal;
 
+use base 'PDF::API2::Basic::PDF::Objind';
+
 use strict;
-use vars qw( @ISA );
-
-use PDF::API2::Basic::PDF::Objind;
-
-@ISA = qw(PDF::API2::Basic::PDF::Objind);
 
 use PDF::API2::Basic::PDF::Filter;
 use PDF::API2::Basic::PDF::Name;

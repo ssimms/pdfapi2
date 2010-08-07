@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Null;
 
+use base 'PDF::API2::Basic::PDF::Objind';
+
 =head1 NAME
 
 PDF::API2::Basic::PDF::Null - PDF Null type object.  This is a subclass of
@@ -22,9 +24,6 @@ PDF::API2::Basic::PDF::Objind and cannot be subclassed.
 =cut
 
 use strict;
-
-use vars qw(@ISA);
-@ISA = qw(PDF::API2::Basic::PDF::Objind);
 
 no warnings qw[ deprecated recursion uninitialized ];
 

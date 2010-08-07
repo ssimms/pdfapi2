@@ -1,18 +1,10 @@
 package PDF::API2::Resource::ColorSpace::Indexed::Hue;
 
-BEGIN {
+use base 'PDF::API2::Resource::ColorSpace::Indexed';
 
-    use strict;
-    use PDF::API2::Resource::ColorSpace::Indexed;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Util;
-    use POSIX;
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
-    use vars qw(@ISA);
-
-    @ISA = qw( PDF::API2::Resource::ColorSpace::Indexed );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {

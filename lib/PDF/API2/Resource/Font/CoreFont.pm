@@ -1,5 +1,18 @@
 package PDF::API2::Resource::Font::CoreFont;
 
+use base 'PDF::API2::Resource::Font';
+
+use File::Basename;
+
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
+
+no warnings qw[ deprecated recursion uninitialized ];
+
+our $fonts;
+our $alias;
+our $subs;
+
 =head1 NAME
 
 PDF::API2::Resource::Font::CoreFont - Module for using the 14 PDF built-in Fonts.
@@ -16,24 +29,6 @@ PDF::API2::Resource::Font::CoreFont - Module for using the 14 PDF built-in Fonts
 =head1 METHODS
 
 =over
-
-=cut
-
-BEGIN {
-
-    use Encode qw(:all);
-
-    use File::Basename;
-
-    use vars qw( @ISA $fonts $alias $subs $encodings );
-    use PDF::API2::Resource::Font;
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-
-    @ISA=qw(PDF::API2::Resource::Font);
-
-}
-no warnings qw[ deprecated recursion uninitialized ];
 
 =item $font = PDF::API2::Resource::Font::CoreFont->new $pdf, $fontname, %options
 

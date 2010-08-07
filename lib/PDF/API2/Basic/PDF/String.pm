@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::String;
 
+use base 'PDF::API2::Basic::PDF::Objind';
+
 =head1 NAME
 
 PDF::API2::Basic::PDF::String - PDF String type objects and superclass for simple objects
@@ -22,13 +24,9 @@ that are basically stringlike (Number, Name, etc.)
 =cut
 
 use strict;
-use vars qw(@ISA %trans %out_trans);
 no warnings qw[ deprecated recursion uninitialized ];
 
-use PDF::API2::Basic::PDF::Objind;
-@ISA = qw(PDF::API2::Basic::PDF::Objind);
-
-%trans = (
+our %trans = (
     "n" => "\n",
     "r" => "\r",
     "t" => "\t",
@@ -39,7 +37,7 @@ use PDF::API2::Basic::PDF::Objind;
     ")" => ")"
         );
 
-%out_trans = (
+our %out_trans = (
     "\n" => "n",
     "\r" => "r",
     "\t" => "t",

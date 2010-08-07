@@ -1,23 +1,16 @@
 package PDF::API2::Resource::CIDFont::CJKFont;
 
-BEGIN {
+use base 'PDF::API2::Resource::CIDFont';
 
-    use Encode qw(:all);
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Resource::CIDFont;
-
-    use POSIX;
-
-    use vars qw( @ISA $fonts $cmap $alias $subs );
-
-    @ISA = qw( PDF::API2::Resource::CIDFont );
-
-    $fonts = { };
-    $cmap = { };
-}
 no warnings qw[ deprecated recursion uninitialized ];
+
+our $fonts = {};
+our $cmap  = {};
+our $alias;
+our $subs;
 
 =head1 NAME
 
