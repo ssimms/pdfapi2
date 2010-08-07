@@ -9,8 +9,6 @@ BEGIN {
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Resource::CIDFont;
 
-    use PDF::API2::Basic::TTF::Font;
-
     use POSIX;
 
     use vars qw( @ISA $fonts $cmap $alias $subs $VERSION );
