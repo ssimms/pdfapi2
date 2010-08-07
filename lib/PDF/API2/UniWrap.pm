@@ -5,7 +5,6 @@ package PDF::API2::UniWrap;
 
 BEGIN {
 
-    use utf8;
     use Encode qw(:all);
 
     use 5.008;

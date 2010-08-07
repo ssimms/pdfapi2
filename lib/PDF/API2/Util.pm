@@ -4,7 +4,6 @@ no warnings qw[ recursion uninitialized ];
 
 BEGIN {
 
-    use utf8;
     use Encode qw(:all);
 
     use vars qw(

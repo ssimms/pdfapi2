@@ -2,7 +2,6 @@ package PDF::API2::Resource::Font::SynFont;
 
 BEGIN {
 
-    use utf8;
     use Encode qw(:all);
 
     use vars qw( @ISA $VERSION );

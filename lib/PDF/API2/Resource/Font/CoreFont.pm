@@ -21,7 +21,6 @@ PDF::API2::Resource::Font::CoreFont - Module for using the 14 PDF built-in Fonts
 
 BEGIN {
 
-    use utf8;
     use Encode qw(:all);
 
     use File::Basename;

@@ -14,7 +14,6 @@ BEGIN
 
     ( $VERSION ) = '2.001';
 
-    use utf8;
     use Encode qw(:all);
 }
 
