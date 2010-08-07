@@ -92,13 +92,25 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     $page = $pdf->page();
 
     # Retrieve an existing page
-    $page = $pdf->openpage($pagenum);
+    $page = $pdf->openpage($page_number);
 
-    # Make an image, built-in font, and TrueType font available for
-    # use in the PDF
-    $img = $pdf->image('some.jpg');
-    $font = $pdf->corefont('Times-Roman');
-    $font = $pdf->ttfont('TimesNewRoman.ttf');
+    # Set the page size
+    $page->mediabox('Letter');
+
+    # Add a built-in font to the PDF
+    $font = $pdf->corefont('Helvetica-Bold');
+
+    # Add an external TTF font to the PDF
+    $font = $pdf->ttfont('/path/to/font.ttf');
+
+    # Add some text to the page
+    $text = $pdf->text();
+    $text->font($font, 20);
+    $text->translate(200, 700);
+    $text->text('Hello World!');
+
+    # Save the PDF
+    $pdf->saveas('/path/to/new.pdf');
 
 =head1 GENERIC METHODS
 
