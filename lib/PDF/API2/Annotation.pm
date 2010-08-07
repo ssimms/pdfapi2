@@ -20,7 +20,15 @@ BEGIN
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 $ant = PDF::API2::Annotation->new
+=head1 NAME
+
+PDF::API2::Annotation
+
+=head1 METHODS
+
+=over
+
+=item $ant = PDF::API2::Annotation->new
 
 Returns a annotation object (called from $page->annotation).
 
@@ -392,8 +400,10 @@ sub dest
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

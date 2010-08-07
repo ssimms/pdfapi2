@@ -30,9 +30,13 @@ This object is not an array but an associative array containing the array of
 elements. Thus, there are special instance variables for an array object, beginning
 with a space
 
+=over
+
 =item var
 
 Contains the actual array of elements
+
+=back
 
 =head1 METHODS
 

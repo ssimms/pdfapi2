@@ -17,6 +17,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::XObject::Form
+
+=head1 METHODS
+
+=over
+
 =item $res = PDF::API2::Resource::XObject::Form->new $pdf
 
 Returns a form-resource object. base class for all types of form-xobjects.
@@ -123,6 +131,8 @@ sub outobjdeep {
 1;
 
 __END__
+
+=back
 
 =head1 AUTHOR
 

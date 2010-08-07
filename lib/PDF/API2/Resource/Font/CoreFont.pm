@@ -15,7 +15,7 @@ PDF::API2::Resource::Font::CoreFont - Module for using the 14 PDF built-in Fonts
 
 =head1 METHODS
 
-=over 4
+=over
 
 =cut
 
@@ -384,6 +384,8 @@ __END__
 
 =head1 SUPPORTED FONTS
 
+=over
+
 =item PDF::API::CoreFont supports the following 'Adobe Core Fonts':
 
   Courier
@@ -414,9 +416,11 @@ __END__
   Webdings
   Wingdings
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut
 

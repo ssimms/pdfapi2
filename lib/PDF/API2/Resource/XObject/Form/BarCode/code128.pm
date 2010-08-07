@@ -17,6 +17,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::XObject::Form::BarCode::code128
+
+=head1 METHODS
+
+=over
+
 =item $res = PDF::API2::Resource::XObject::Form::BarCode::code128->new $pdf, %opts
 
 Returns a code128 object. Use '-ean' to encode using EAN128 mode.
@@ -197,8 +205,10 @@ sub encode_ean128 {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

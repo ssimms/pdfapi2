@@ -16,6 +16,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::UniFont
+
+=head1 METHODS
+
+=over
+
 =item $font = PDF::API2::Resource::UniFont->new $pdf, @fontspecs, %options
 
 Returns a uni-font object.
@@ -287,3 +295,5 @@ sub text
 1;
 
 __END__
+
+=back

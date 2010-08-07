@@ -4,11 +4,9 @@ package PDF::API2::NamedDestination;
 
 PDF::API2::NamedDestination
 
-=head1 SYNOPSIS
-
 =head1 METHODS
 
-=over 4
+=over
 
 =cut
 
@@ -281,8 +279,10 @@ sub dest
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

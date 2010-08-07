@@ -17,6 +17,14 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::ColorSpace::Index::ACTFile
+
+=head1 METHODS
+
+=over
+
 =item $cs = PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new $pdf, $actfile
 
 Returns a new colorspace object created from an adobe color table file (ACT/8BCT).
@@ -78,8 +86,10 @@ sub new_api {
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh
 
 =cut

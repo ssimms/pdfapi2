@@ -15,6 +15,14 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
+=head1 NAME
+
+PDF::API2::Resource::ColorSpace::Separation
+
+=head1 METHODS
+
+=over
+
 =item $cs = PDF::API2::Resource::ColorSpace::Separation->new $pdf, $key, %parameters
 
 Returns a new colorspace object.
@@ -153,5 +161,8 @@ sub param {
     return($_[0]);
 }
 
-
 1;
+
+__END__
+
+=back
