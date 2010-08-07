@@ -40,7 +40,7 @@ BEGIN {
 
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Basic::PDF::Dict;
-    use PDF::API2::Basic::TTF::Font;
+    use Font::TTF::Font;
     use Data::Dumper;
     use POSIX;
 
@@ -462,7 +462,7 @@ sub new {
     my $data={};
 
     die "cannot find font '$file' ..." unless(-f $file);
-    my $font=PDF::API2::Basic::TTF::Font->open($file);
+    my $font=Font::TTF::Font->open($file);
     $data->{obj}=$font;
 
     $class = ref $class if ref $class;

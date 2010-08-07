@@ -51,7 +51,10 @@ my %makehash=(
     }, 
     MAN1PODS        => {}, 
     MAN3PODS        => {}, 
-    PREREQ_PM       => { 'Compress::Zlib' => 1.0, }, 
+    PREREQ_PM       => {
+        'Compress::Zlib' => 1.0,
+        'Font::TTF' => 0,
+    }, 
     VERSION_FROM    => $versionfile,
     BINARY_LOCATION => q|PDF-API2-|.$PDF::API2::Version::CVersion{vPerl}.q|.ppm.tar.gz|,
 );
