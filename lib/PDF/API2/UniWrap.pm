@@ -14,10 +14,6 @@ BEGIN {
     use Unicode::UCD;
     use Carp;
 
-    use vars qw($VERSION);
-
-    ( $VERSION ) = '2.000';
-
 }
 
 no warnings qw[ deprecated recursion uninitialized ];

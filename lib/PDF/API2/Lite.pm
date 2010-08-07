@@ -8,9 +8,7 @@ BEGIN {
 
     use POSIX qw( ceil floor );
 
-    use vars qw( $VERSION $hasWeakRef );
-
-    ( $VERSION ) = '2.001';
+    use vars qw( $hasWeakRef );
 
 }
 

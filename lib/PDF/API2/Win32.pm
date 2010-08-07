@@ -1,8 +1,5 @@
 package PDF::API2::Win32;
 
-    use vars qw($VERSION);
-    ( $VERSION ) = '2.0';
-
     no warnings qw[ deprecated recursion uninitialized ];
 
 package PDF::API2;

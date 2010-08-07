@@ -10,11 +10,9 @@ BEGIN {
 
     use POSIX;
 
-    use vars qw( @ISA $fonts $cmap $alias $subs $VERSION );
+    use vars qw( @ISA $fonts $cmap $alias $subs );
 
     @ISA = qw( PDF::API2::Resource::CIDFont );
-
-    ( $VERSION ) = '2.001';
 
     $fonts = { };
     $cmap = { };

@@ -4,15 +4,13 @@ BEGIN
 {
 
     use strict;
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
 
     use PDF::API2::Basic::PDF::Dict;
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Util;
 
     @ISA = qw(PDF::API2::Basic::PDF::Dict);
-
-    ( $VERSION ) = '2.001';
 
     use Encode qw(:all);
 }

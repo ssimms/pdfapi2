@@ -10,11 +10,10 @@ BEGIN {
     use Font::TTF::Font;
     use POSIX;
 
-    use vars qw( @ISA $VERSION $cmap );
+    use vars qw( @ISA $cmap );
 
     @ISA = qw( PDF::API2::Basic::PDF::Dict );
 
-    ( $VERSION ) = '2.006';
     $cmap={};
 }
 no warnings qw[ recursion uninitialized ];

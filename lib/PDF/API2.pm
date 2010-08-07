@@ -2,9 +2,7 @@ package PDF::API2;
 
 BEGIN {
 
-    use vars qw( $VERSION $seq @FontDirs );
-
-    ($VERSION) = '2.016';
+    use vars qw( $seq @FontDirs );
 
     @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC), 
         qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );

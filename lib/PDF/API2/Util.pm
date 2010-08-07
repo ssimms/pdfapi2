@@ -7,7 +7,6 @@ BEGIN {
     use Encode qw(:all);
 
     use vars qw(
-        $VERSION 
         @ISA 
         @EXPORT 
         @EXPORT_OK 
@@ -77,8 +76,6 @@ BEGIN {
     }
 
     no warnings qw[ recursion uninitialized ];
-
-    ( $VERSION ) = '2.000';
 
     $key_var='CBA';
     $key_var2=0;

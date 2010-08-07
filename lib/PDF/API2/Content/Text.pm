@@ -5,8 +5,6 @@ use strict;
 
 use base 'PDF::API2::Content';
 
-our $VERSION = '2.000';
-
 sub new {
     my ($class) = @_;
     my $self = $class->SUPER::new(@_);

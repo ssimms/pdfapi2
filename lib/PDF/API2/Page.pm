@@ -3,7 +3,7 @@ package PDF::API2::Page;
 BEGIN {
 
     use strict;
-    use vars qw(@ISA %pgsz $VERSION);
+    use vars qw(@ISA %pgsz);
 
     @ISA = qw(PDF::API2::Basic::PDF::Pages);
     use PDF::API2::Basic::PDF::Pages;
@@ -19,8 +19,6 @@ BEGIN {
 
     use POSIX qw(floor ceil);
     use Math::Trig;
-
-    ( $VERSION ) = '2.001';
 
 }
 

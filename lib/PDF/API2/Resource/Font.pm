@@ -10,11 +10,9 @@ BEGIN {
 
     use POSIX;
 
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
 
     @ISA = qw( PDF::API2::Resource::BaseFont );
-
-    ( $VERSION ) = '2.002';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];

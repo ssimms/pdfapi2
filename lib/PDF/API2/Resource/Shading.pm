@@ -3,15 +3,13 @@ package PDF::API2::Resource::Shading;
 BEGIN {
 
     use strict;
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
     use PDF::API2::Resource;
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Util;
     use Math::Trig;
 
     @ISA = qw(PDF::API2::Resource);
-
-    ( $VERSION ) = '2.000';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];

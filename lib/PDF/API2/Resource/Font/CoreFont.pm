@@ -25,14 +25,12 @@ BEGIN {
 
     use File::Basename;
 
-    use vars qw( @ISA $fonts $alias $subs $encodings $VERSION );
+    use vars qw( @ISA $fonts $alias $subs $encodings );
     use PDF::API2::Resource::Font;
     use PDF::API2::Util;
     use PDF::API2::Basic::PDF::Utils;
 
     @ISA=qw(PDF::API2::Resource::Font);
-
-    ( $VERSION ) = '2.000';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];
