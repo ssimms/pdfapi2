@@ -21,7 +21,6 @@ PDF::API2::Resource::Font::neTrueType - Module for using 8bit nonembedded truety
 
 BEGIN {
 
-    use utf8;
     use Encode qw(:all);
 
     use File::Basename;

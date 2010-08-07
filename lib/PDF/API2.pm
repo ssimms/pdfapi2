@@ -64,7 +64,6 @@ BEGIN {
 
     use POSIX qw( ceil floor );
 
-    use utf8;
     use Encode qw(:all);
 
 	use FileHandle;

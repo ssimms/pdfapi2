@@ -12,7 +12,6 @@ PDF::API2::NamedDestination
 
 BEGIN 
 {
-    use utf8;
     use Encode qw(:all);
 
     use vars qw( @ISA $VERSION );

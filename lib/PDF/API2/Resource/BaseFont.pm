@@ -2,7 +2,6 @@ package PDF::API2::Resource::BaseFont;
 
 BEGIN {
 
-    use utf8;
     use Encode qw(:all);
 
     use PDF::API2::Util;
