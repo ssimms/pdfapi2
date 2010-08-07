@@ -109,7 +109,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2 - A Perl Module Chain to faciliate the Creation and Modification of High-Quality "Portable Document Format (aka. PDF)" Files.
+PDF::API2 - Facilitates the creation and modification of PDF files
 
 =head1 SYNOPSIS
 
@@ -390,7 +390,7 @@ B<Initial Page Options>:
 
 =over
 
-=item -firstpage => [ $pageobj, %options ]
+=item -firstpage => [ $page, %options ]
 
 Specifying the page to be displayed, plus one of the following options:
 
@@ -467,7 +467,7 @@ B<Example:>
         -fullscreen => 1,
         -onecolumn => 1,
         -afterfullscreenoutlines => 1,
-        -firstpage => [ $pageobj , -fit => 1],
+        -firstpage => [$page, -fit => 1],
     );
 
 =cut
@@ -756,7 +756,7 @@ B<Example:>
 
     $xml = $pdf->xmpMetadata($xml);
     print "PDF metadata now reads: $xml\n";
-    
+
 =cut
 
 sub xmpMetadata {
@@ -842,7 +842,7 @@ B<Example:>
         -start => 1,
         -prefix => 'Index '
     });
-    
+
 =cut
 
 sub pageLabel {
