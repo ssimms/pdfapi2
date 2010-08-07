@@ -1,22 +1,11 @@
 #=======================================================================
-#    ____  ____  _____              _    ____ ___   ____
-#   |  _ \|  _ \|  ___|  _   _     / \  |  _ \_ _| |___ \
-#   | |_) | | | | |_    (_) (_)   / _ \ | |_) | |    __) |
-#   |  __/| |_| |  _|    _   _   / ___ \|  __/| |   / __/
-#   |_|   |____/|_|     (_) (_) /_/   \_\_|  |___| |_____|
-#
-#   Copyright 1999-2001 Alfred Reibenschuh <areibens@cpan.org>.
-#
-#   This library is free software; you can redistribute it
-#   and/or modify it under the same terms as Perl itself.
-#
-#=======================================================================
 #
 #   PDF::API2::Matrix
 #   Original Copyright 1995-96 Ulrich Pfeifer.
 #   modified by Alfred Reibenschuh <areibens@cpan.org> for PDF::API2
 #
-#   $Id$
+#   This library is free software; you can redistribute it
+#   and/or modify it under the same terms as Perl itself.
 #
 #=======================================================================
 package PDF::API2::Matrix;
@@ -148,6 +137,3 @@ sub print {
 }
 
 1;
-
-__END__
-
