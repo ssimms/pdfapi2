@@ -12,11 +12,9 @@ BEGIN {
 
     use POSIX;
 
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
 
     @ISA = qw( PDF::API2::Resource::CIDFont );
-
-    ( $VERSION ) = '2.005';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];

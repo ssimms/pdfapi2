@@ -8,10 +8,6 @@ BEGIN {
 
     use POSIX;
 
-    use vars qw($VERSION);
-
-    ( $VERSION ) = '2.001';
-
 }
 no warnings qw[ deprecated recursion uninitialized ];
 

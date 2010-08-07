@@ -3,7 +3,7 @@ package PDF::API2::Content;
 BEGIN {
 
     use strict;
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
     use PDF::API2::Basic::PDF::Dict;
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Util;
@@ -14,8 +14,6 @@ BEGIN {
 
     @ISA = qw(PDF::API2::Basic::PDF::Dict);
     
-    ( $VERSION ) = '2.010';
-
 }
 
 no warnings qw[ deprecated recursion uninitialized ];

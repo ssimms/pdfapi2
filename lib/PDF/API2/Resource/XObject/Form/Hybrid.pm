@@ -11,14 +11,13 @@ BEGIN {
 
     use POSIX;
 
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
 
     @ISA = (
         'PDF::API2::Content',
         'PDF::API2::Resource::XObject::Form'
     );
 
-    ( $VERSION ) = '2.001';
 }
 no warnings qw[ deprecated recursion uninitialized ];
 

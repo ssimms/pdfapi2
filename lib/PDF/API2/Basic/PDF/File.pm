@@ -141,7 +141,7 @@ BEGIN
 {
     use strict;
     no strict "refs";
-    use vars qw($cr $irreg_char $reg_char $ws_char $delim_char %types $VERSION);
+    use vars qw($cr $irreg_char $reg_char $ws_char $delim_char %types);
     # no warnings qw(uninitialized);
     use strict;
 
@@ -186,8 +186,6 @@ use PDF::API2::Basic::PDF::Pages;
 use PDF::API2::Basic::PDF::Null;
 
 no warnings qw[ deprecated recursion uninitialized ];
-
-    ( $VERSION ) = '2.009';
 
 #IMPORTED INTO PDF::API2
 

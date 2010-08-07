@@ -10,10 +10,6 @@
 #=======================================================================
 package PDF::API2::Matrix;
 
-    use vars qw( $VERSION );
-
-    ( $VERSION ) = '2.000';
-
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {

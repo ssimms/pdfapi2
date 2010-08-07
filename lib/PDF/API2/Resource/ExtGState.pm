@@ -7,11 +7,9 @@ BEGIN {
     use PDF::API2::Basic::PDF::Utils;
     use Math::Trig;
     use PDF::API2::Util;
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
 
     @ISA = qw(PDF::API2::Resource);
-
-    ( $VERSION ) = '2.000';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];

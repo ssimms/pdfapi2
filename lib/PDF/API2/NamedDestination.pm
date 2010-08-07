@@ -14,7 +14,7 @@ BEGIN
 {
     use Encode qw(:all);
 
-    use vars qw( @ISA $VERSION );
+    use vars qw( @ISA );
 
     use PDF::API2::Util;
     use PDF::API2::Basic::PDF::Utils;
@@ -22,7 +22,6 @@ BEGIN
     
     @ISA=qw(PDF::API2::Basic::PDF::Dict);
 
-    ( $VERSION ) = '2.000';
 }
 
 no warnings qw[ recursion uninitialized ];

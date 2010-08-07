@@ -11,11 +11,9 @@ BEGIN {
     use Compress::Zlib;
     use File::Find;
     use IO::File qw();
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
 
     @ISA = qw( PDF::API2::Resource::Font );
-
-    ( $VERSION ) = '2.002';
 
 }
 no warnings qw[ deprecated recursion uninitialized ];

@@ -9,9 +9,8 @@ BEGIN {
     use POSIX;
     use Compress::Zlib;
 
-    use vars qw(@ISA $VERSION);
+    use vars qw(@ISA);
     @ISA = qw( PDF::API2::Resource::XObject::Image );
-    ( $VERSION ) = '2.000';
 }
 no warnings qw[ deprecated recursion uninitialized ];
 

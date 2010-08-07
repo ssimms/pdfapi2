@@ -4,7 +4,7 @@ BEGIN {
 
     use Encode qw(:all);
 
-    use vars qw( @ISA $VERSION $BmpNum);
+    use vars qw( @ISA $BmpNum);
     use PDF::API2::Resource::Font;
     use PDF::API2::Util;
     use PDF::API2::Basic::PDF::Utils;
@@ -12,8 +12,6 @@ BEGIN {
     use Unicode::UCD 'charinfo';
 
     @ISA=qw(PDF::API2::Resource::Font);
-
-    ( $VERSION ) = '2.000';
 
     $BmpNum=0;
     
