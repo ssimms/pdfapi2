@@ -1,18 +1,7 @@
 package PDF::API2::Resource::XObject::Form::BarCode::ean13;
 
-BEGIN {
+use base 'PDF::API2::Resource::XObject::Form::BarCode';
 
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Resource::XObject::Form::BarCode;
-
-    use POSIX;
-
-    use vars qw(@ISA);
-
-    @ISA = qw( PDF::API2::Resource::XObject::Form::BarCode );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {

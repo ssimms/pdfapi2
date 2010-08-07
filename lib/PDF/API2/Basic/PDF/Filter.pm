@@ -103,9 +103,9 @@ sub release
 
 package PDF::API2::Basic::PDF::ASCII85Decode;
 
+use base 'PDF::API2::Basic::PDF::Filter';
+
 use strict;
-use vars qw(@ISA);
-@ISA = qw(PDF::API2::Basic::PDF::Filter);
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
@@ -193,9 +193,9 @@ sub infilt
 
 package PDF::API2::Basic::PDF::RunLengthDecode;
 
+use base 'PDF::API2::Basic::PDF::Filter';
+
 use strict;
-use vars qw(@ISA);
-@ISA = qw(PDF::API2::Basic::PDF::Filter);
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
@@ -283,9 +283,9 @@ sub infilt
 
 package PDF::API2::Basic::PDF::ASCIIHexDecode;
 
+use base 'PDF::API2::Basic::PDF::Filter';
+
 use strict;
-use vars qw(@ISA);
-@ISA = qw(PDF::API2::Basic::PDF::Filter);
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
@@ -317,10 +317,13 @@ sub infilt
 
 package PDF::API2::Basic::PDF::FlateDecode;
 
+use base 'PDF::API2::Basic::PDF::Filter';
+
 use strict;
-use vars qw(@ISA $havezlib);
 no warnings qw[ deprecated recursion uninitialized ];
-@ISA = qw(PDF::API2::Basic::PDF::Filter);
+
+our $havezlib;
+
 BEGIN
 {
     eval {require "Compress/Zlib.pm";};
@@ -360,10 +363,11 @@ sub infilt
 
 package PDF::API2::Basic::PDF::LZWDecode;
 
-use vars qw(@ISA @basedict);
-@ISA = qw(PDF::API2::Basic::PDF::FlateDecode);
-@basedict = map {pack("C", $_)} (0 .. 255, 0, 0);
+use base 'PDF::API2::Basic::PDF::FlateDecode';
+
 no warnings qw[ deprecated recursion uninitialized ];
+
+our @basedict = map {pack("C", $_)} (0 .. 255, 0, 0);
 
 sub new
 {

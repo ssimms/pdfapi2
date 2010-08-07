@@ -1,5 +1,14 @@
 package PDF::API2::NamedDestination;
 
+use base 'PDF::API2::Basic::PDF::Dict';
+
+use Encode qw(:all);
+
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
+
+no warnings qw[ recursion uninitialized ];
+
 =head1 NAME
 
 PDF::API2::NamedDestination
@@ -7,24 +16,6 @@ PDF::API2::NamedDestination
 =head1 METHODS
 
 =over
-
-=cut
-
-BEGIN 
-{
-    use Encode qw(:all);
-
-    use vars qw( @ISA );
-
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Basic::PDF::Dict;
-    
-    @ISA=qw(PDF::API2::Basic::PDF::Dict);
-
-}
-
-no warnings qw[ recursion uninitialized ];
 
 =item $dest = PDF::API2::NamedDestination->new $pdf
 

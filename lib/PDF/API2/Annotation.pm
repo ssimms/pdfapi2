@@ -1,19 +1,11 @@
 package PDF::API2::Annotation;
 
-BEGIN 
-{
+use base 'PDF::API2::Basic::PDF::Dict';
 
-    use strict;
-    use vars qw(@ISA);
+use Encode qw(:all);
 
-    use PDF::API2::Basic::PDF::Dict;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Util;
-
-    @ISA = qw(PDF::API2::Basic::PDF::Dict);
-
-    use Encode qw(:all);
-}
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
 no warnings qw[ deprecated recursion uninitialized ];
 

@@ -1,24 +1,12 @@
 package PDF::API2::Resource::XObject::Form::Hybrid;
 
-BEGIN {
+use base qw(PDF::API2::Content PDF::API2::Resource::XObject::Form);
 
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Basic::PDF::Dict;
-    use PDF::API2::Resource::XObject::Form;
+use PDF::API2::Basic::PDF::Dict;
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Resource::XObject::Form;
+use PDF::API2::Util;
 
-    use PDF::API2::Content;
-
-    use POSIX;
-
-    use vars qw(@ISA);
-
-    @ISA = (
-        'PDF::API2::Content',
-        'PDF::API2::Resource::XObject::Form'
-    );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {

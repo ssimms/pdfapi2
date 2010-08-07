@@ -1,20 +1,14 @@
 package PDF::API2::Content;
 
-BEGIN {
+use base 'PDF::API2::Basic::PDF::Dict';
 
-    use strict;
-    use vars qw(@ISA);
-    use PDF::API2::Basic::PDF::Dict;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Util;
-    use PDF::API2::Matrix;
-    use Math::Trig;
-    use Encode;
-    use Compress::Zlib qw[];
+use Compress::Zlib qw[];
+use Encode;
+use Math::Trig;
+use PDF::API2::Matrix;
 
-    @ISA = qw(PDF::API2::Basic::PDF::Dict);
-    
-}
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
 no warnings qw[ deprecated recursion uninitialized ];
 

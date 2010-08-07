@@ -1,22 +1,11 @@
 package PDF::API2::Resource::CIDFont::TrueType;
 
-BEGIN {
+use base 'PDF::API2::Resource::CIDFont';
 
-    use Encode qw(:all);
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Resource::CIDFont::TrueType::FontFile;
+use PDF::API2::Util;
 
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Resource::CIDFont;
-
-    use PDF::API2::Resource::CIDFont::TrueType::FontFile;
-
-    use POSIX;
-
-    use vars qw(@ISA);
-
-    @ISA = qw( PDF::API2::Resource::CIDFont );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME

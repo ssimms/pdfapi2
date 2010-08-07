@@ -12,11 +12,9 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Array;
 
-use strict;
-use vars qw(@ISA);
+use base 'PDF::API2::Basic::PDF::Objind';
 
-use PDF::API2::Basic::PDF::Objind;
-@ISA = qw(PDF::API2::Basic::PDF::Objind);
+use strict;
 
 no warnings qw[ deprecated recursion uninitialized ];
 

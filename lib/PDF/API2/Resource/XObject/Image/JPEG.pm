@@ -1,18 +1,10 @@
 package PDF::API2::Resource::XObject::Image::JPEG;
 
-BEGIN {
+use base 'PDF::API2::Resource::XObject::Image';
 
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Resource::XObject::Image;
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
-    use POSIX;
-
-    use vars qw(@ISA);
-
-    @ISA = qw( PDF::API2::Resource::XObject::Image );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new 

@@ -1,15 +1,15 @@
 package PDF::API2::Win32;
 
-    no warnings qw[ deprecated recursion uninitialized ];
+no warnings qw[ deprecated recursion uninitialized ];
+
 
 package PDF::API2;
 
-use vars qw( $wf );
 use Win32::TieRegistry;
 
 no warnings qw[ recursion uninitialized ];
 
-$wf={};
+our $wf = {};
 
 $Registry->Delimiter("/");
 

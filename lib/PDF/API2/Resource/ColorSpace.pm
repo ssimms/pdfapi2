@@ -1,17 +1,10 @@
 package PDF::API2::Resource::ColorSpace;
 
-BEGIN {
+use base 'PDF::API2::Basic::PDF::Array';
 
-    use strict;
-    use vars qw(@ISA);
-    use PDF::API2::Basic::PDF::Array;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Util;
-    use Math::Trig;
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
-    @ISA = qw(PDF::API2::Basic::PDF::Array);
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME

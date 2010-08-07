@@ -12,12 +12,12 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Page;
 
-use strict;
-use vars qw(@ISA);
-@ISA = qw(PDF::API2::Basic::PDF::Pages);
-no warnings qw[ deprecated recursion uninitialized ];
-use PDF::API2::Basic::PDF::Pages;
+use base 'PDF::API2::Basic::PDF::Pages';
 
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME

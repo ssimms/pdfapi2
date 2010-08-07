@@ -1,19 +1,10 @@
 package PDF::API2::Resource::XObject::Image;
 
-BEGIN {
+use base 'PDF::API2::Resource::XObject';
 
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Resource::XObject;
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
-    use POSIX;
-    use Compress::Zlib;
-
-    use vars qw(@ISA);
-
-    @ISA = qw( PDF::API2::Resource::XObject );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
@@ -154,7 +145,6 @@ sub outobjdeep {
     }
     $self->SUPER::outobjdeep(@opts);
 }
-
 
 1;
 

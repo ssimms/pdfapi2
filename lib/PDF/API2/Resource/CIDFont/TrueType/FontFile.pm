@@ -1,23 +1,17 @@
 package PDF::API2::Resource::CIDFont::TrueType::FontFile;
 
-BEGIN {
+use base 'PDF::API2::Basic::PDF::Dict';
 
-    use Encode qw(:all);
-    use PDF::API2::Util;
+use Encode qw(:all);
+use Font::TTF::Font;
+use POSIX qw(ceil floor);
 
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Basic::PDF::Dict;
-    use Font::TTF::Font;
-    use POSIX;
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
-    use vars qw( @ISA $cmap );
-
-    @ISA = qw( PDF::API2::Basic::PDF::Dict );
-
-    $cmap={};
-}
 no warnings qw[ recursion uninitialized ];
 
+our $cmap = {};
 
 sub _look_for_cmap ($) {
     my $fname=lc(shift);

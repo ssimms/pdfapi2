@@ -1,73 +1,58 @@
 package PDF::API2;
 
-BEGIN {
+use Encode qw(:all);
+use FileHandle;
+use IO::File;
 
-    use vars qw( $seq @FontDirs );
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
-    @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC), 
-        qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
+use PDF::API2::Basic::PDF::File;
+use PDF::API2::Basic::PDF::Pages;
+use PDF::API2::Page;
 
-    $seq="AA";
+use PDF::API2::Resource::Font::CoreFont;
+use PDF::API2::Resource::Font::Postscript;
+use PDF::API2::Resource::Font::BdFont;
+use PDF::API2::Resource::Font::SynFont;
+use PDF::API2::Resource::Font::neTrueType;
+use PDF::API2::Resource::CIDFont::TrueType;
+use PDF::API2::Resource::CIDFont::CJKFont;
+use PDF::API2::Resource::UniFont;
 
-    require 5.008; # we need this for unicode support
+use PDF::API2::Resource::XObject::Image::JPEG;
+use PDF::API2::Resource::XObject::Image::TIFF;
+use PDF::API2::Resource::XObject::Image::PNM;
+use PDF::API2::Resource::XObject::Image::PNG;
+use PDF::API2::Resource::XObject::Image::GIF;
+use PDF::API2::Resource::XObject::Image::GD;
 
-    use PDF::API2::Basic::PDF::File;
-    use PDF::API2::Basic::PDF::Page;
-    use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
+use PDF::API2::Resource::ColorSpace::Indexed::Hue;
+use PDF::API2::Resource::ColorSpace::Indexed::WebColor;
 
-    use PDF::API2::Util;
-    use PDF::API2::Page;
+use PDF::API2::Resource::ColorSpace::Separation;
+use PDF::API2::Resource::ColorSpace::DeviceN;
 
-    use PDF::API2::Outlines;
-    use PDF::API2::NamedDestination;
+use PDF::API2::Resource::XObject::Form::BarCode::int2of5;
+use PDF::API2::Resource::XObject::Form::BarCode::codabar;
+use PDF::API2::Resource::XObject::Form::BarCode::code128;
+use PDF::API2::Resource::XObject::Form::BarCode::code3of9;
+use PDF::API2::Resource::XObject::Form::BarCode::ean13;
 
-    use PDF::API2::Resource::ExtGState;
-    use PDF::API2::Resource::Pattern;
-    use PDF::API2::Resource::Shading;
+use PDF::API2::Resource::XObject::Form::Hybrid;
 
-    use PDF::API2::Resource::Font::CoreFont;
-    use PDF::API2::Resource::Font::Postscript;
-    use PDF::API2::Resource::Font::BdFont;
-    use PDF::API2::Resource::Font::SynFont;
-    use PDF::API2::Resource::Font::neTrueType;
-    use PDF::API2::Resource::CIDFont::TrueType;
-    use PDF::API2::Resource::CIDFont::CJKFont;
-    use PDF::API2::Resource::UniFont;
+use PDF::API2::Resource::ExtGState;
+use PDF::API2::Resource::Pattern;
+use PDF::API2::Resource::Shading;
 
-    use PDF::API2::Resource::XObject::Image::JPEG;
-    use PDF::API2::Resource::XObject::Image::TIFF;
-    use PDF::API2::Resource::XObject::Image::PNM;
-    use PDF::API2::Resource::XObject::Image::PNG;
-    use PDF::API2::Resource::XObject::Image::GIF;
-    use PDF::API2::Resource::XObject::Image::GD;
-
-    use PDF::API2::Resource::XObject::Form::Hybrid;
-
-    use PDF::API2::Resource::XObject::Form::BarCode::int2of5;
-    use PDF::API2::Resource::XObject::Form::BarCode::codabar;
-    use PDF::API2::Resource::XObject::Form::BarCode::code128;
-    use PDF::API2::Resource::XObject::Form::BarCode::code3of9;
-    use PDF::API2::Resource::XObject::Form::BarCode::ean13;
-
-    use PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
-    use PDF::API2::Resource::ColorSpace::Indexed::Hue;
-    use PDF::API2::Resource::ColorSpace::Indexed::WebColor;
-
-    use PDF::API2::Resource::ColorSpace::Separation;
-    use PDF::API2::Resource::ColorSpace::DeviceN;
-    
-    use Compress::Zlib;
-
-    use Math::Trig;
-
-    use POSIX qw( ceil floor );
-
-    use Encode qw(:all);
-
-	use FileHandle;
-}
+use PDF::API2::Outlines;
+use PDF::API2::NamedDestination;
 
 no warnings qw[ deprecated recursion uninitialized ];
+
+our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC), 
+                  qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
 
 =head1 NAME
 

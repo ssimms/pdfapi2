@@ -1,19 +1,12 @@
 package PDF::API2::Resource::BaseFont;
 
-BEGIN {
+use base 'PDF::API2::Resource';
 
-    use Encode qw(:all);
+use Compress::Zlib;
+use Encode qw(:all);
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
-    use PDF::API2::Resource;
-    use Compress::Zlib;
-    
-    use vars qw(@ISA);
-
-    @ISA = qw( PDF::API2::Resource );
-
-}
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
