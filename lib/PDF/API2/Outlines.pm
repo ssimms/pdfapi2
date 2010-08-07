@@ -1,28 +1,20 @@
 package PDF::API2::Outlines;
 
-BEGIN {
+use warnings;
+use strict;
 
-    use strict;
-    use vars qw(@ISA $VERSION);
+use base 'PDF::API2::Outline';
 
-    use PDF::API2::Outline;
-    use PDF::API2::Util;
-    use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Basic::PDF::Utils;
 
-    @ISA = qw(PDF::API2::Outline);
-
-    ( $VERSION ) = '2.000';
-
-}
-
-no warnings qw[ deprecated recursion uninitialized ];
+our $VERSION = '2.000';
 
 sub new {
-    my ($class,$api)=@_;
+    my ($class, $api) = @_;
     my $self = $class->SUPER::new($api);
-    $self->{Type}=PDFName('Outlines');
+    $self->{'Type'} = PDFName('Outlines');
 
-    return($self);
+    return $self;
 }
 
 1;
