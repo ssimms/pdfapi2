@@ -8,7 +8,6 @@ BEGIN {
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Basic::PDF::Dict;
     use Font::TTF::Font;
-    use Data::Dumper;
     use POSIX;
 
     use vars qw( @ISA $VERSION $cmap );
@@ -352,7 +351,6 @@ sub read_kern_table
             read($fh, $buf, $len);
         }
     }
-    ##print Dumper($data);
     return($data);
 }
 

@@ -442,8 +442,6 @@ sub readPFM {
         $df{KernPairs},
         $df{KernTracks} ) = unpack('v*',$buf);
 
-#use Data::Dumper;
-#    print STDERR Dumper(\%df);
     $data->{fontname}=$df{psName};
     $data->{fontname}=~s/[^A-Za-z0-9]+//og;
     $data->{apiname}=$df{windowsName};
