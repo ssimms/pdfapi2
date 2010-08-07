@@ -49,12 +49,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Image::GIF->new $pdf, $file [, $name]
-
-Returns a gif-image object.
-
-=cut
-
 # added from PDF::Create:
 # PDF::Image::GIFImage - GIF image support
 # Author: Michael Gross <mdgrosse@sbox.tugraz.at>
@@ -260,13 +254,6 @@ sub new {
     return($self);
 }
 
-=item $res = PDF::API2::Resource::XObject::Image::GIF->new_api $api, $file [, $name]
-
-Returns a gif-image object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
 sub new_api {
     my ($class,$api,@opts)=@_;
 
@@ -277,11 +264,3 @@ sub new_api {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

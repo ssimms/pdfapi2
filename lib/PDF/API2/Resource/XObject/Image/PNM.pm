@@ -46,12 +46,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Image::PNM->new $pdf, $file [, $name]
-
-Returns a pnm-image object.
-
-=cut
-
 sub new {
     my ($class,$pdf,$file,$name) = @_;
     my $self;
@@ -68,13 +62,6 @@ sub new {
 
     return($self);
 }
-
-=item $res = PDF::API2::Resource::XObject::Image::PNM->new_api $api, $file [, $name]
-
-Returns a pnm-image object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
 
 sub new_api {
     my ($class,$api,@opts)=@_;
@@ -230,12 +217,6 @@ sub read_pnm {
 1;
 
 __END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut
 
 pam(5) pam(5)
 NAME

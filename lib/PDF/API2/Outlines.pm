@@ -50,12 +50,6 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 $otls = PDF::API2::Outlines->new $api
-
-Returns a new outlines object (called from $pdf->outlines).
-
-=cut
-
 sub new {
     my ($class,$api)=@_;
     my $self = $class->SUPER::new($api);
@@ -65,11 +59,3 @@ sub new {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

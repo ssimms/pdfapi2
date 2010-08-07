@@ -53,12 +53,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $font = PDF::API2::Resource::Font::Postscript->new @parameters
-
-Returns a adobe type1 font object (called from $pdf->psfont).
-
-=cut
-
 sub new {
     my ($class, $pdf, $psfile, %opts) = @_;
     my ($self,$encoding);
@@ -554,6 +548,5 @@ sub readXFM {
 
     return($data);
 }
-
 
 1;

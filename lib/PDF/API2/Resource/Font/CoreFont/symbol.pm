@@ -502,12 +502,3 @@ $FONTDATA = {
         'apple' => '790',                        # C+0xFF # U+0xF0FF
     }, # HORIZ. WIDTH TABLE
 };
-
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

@@ -47,12 +47,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Image::PNG->new $pdf, $file [, $name]
-
-Returns a png-image object.
-
-=cut
-
 sub new {
     my ($class,$pdf,$file,$name,%opts) = @_;
     my $self;
@@ -285,13 +279,6 @@ sub new {
     return($self);
 }
 
-=item $res = PDF::API2::Resource::XObject::Image::PNG->new_api $api, $file [, $name]
-
-Returns a png-image object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
 sub new_api {
     my ($class,$api,@opts)=@_;
 
@@ -361,12 +348,6 @@ sub unprocess {
 1;
 
 __END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut
 
 RFC 2083
 PNG: Portable Network Graphics

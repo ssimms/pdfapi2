@@ -51,12 +51,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Form::BarCode::ea13->new $pdf
-
-Returns a ean13 object.
-
-=cut
-
 sub new {
     my ($class,$pdf,%opts) = @_;
     my $self;
@@ -172,11 +166,3 @@ sub encode {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

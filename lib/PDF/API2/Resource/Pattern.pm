@@ -49,12 +49,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $cs = PDF::API2::Resource::Pattern->new $pdf, $key, %parameters
-
-Returns a new pattern object. base class for all patterns.
-
-=cut
-
 sub new {
     my ($class,$pdf,$key,%opts)=@_;
 
@@ -66,13 +60,6 @@ sub new {
 
     return($self);
 }
-
-=item $cs = PDF::API2::Resource::Pattern->new_api $api, $name
-
-Returns a pattern object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
 
 sub new_api {
     my ($class,$api,@opts)=@_;
@@ -93,11 +80,3 @@ sub outobjdeep {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

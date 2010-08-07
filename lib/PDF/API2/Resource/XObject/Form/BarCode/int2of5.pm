@@ -49,12 +49,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Form::BarCode::int2of5->new $pdf
-
-Returns a 2of5int object.
-
-=cut
-
 sub new {
     my ($class,$pdf,%opts) = @_;
     my $self;
@@ -112,11 +106,3 @@ sub encode {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

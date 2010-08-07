@@ -54,12 +54,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $res = PDF::API2::Resource::XObject::Form::Hybrid->new $pdf
-
-Returns a hybrid-form object.
-
-=cut
-
 sub new {
     my ($class,$pdf) = @_;
     my $self;
@@ -98,13 +92,6 @@ sub new {
     return($self);
 }
 
-=item $res = PDF::API2::Resource::XObject::Form::Hybrid->new_api $api, $name
-
-Returns a hybrid-form object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
 sub new_api {
     my ($class,$api,@opts)=@_;
 
@@ -125,11 +112,3 @@ sub outobjdeep {
 }
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

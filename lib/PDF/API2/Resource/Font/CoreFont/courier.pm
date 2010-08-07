@@ -811,12 +811,3 @@ $FONTDATA = {
         'zdotaccent' => [ 'Z', '0', '0', 'dotaccent', '0', '0' ],   # U=017C
     },
 };
-
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

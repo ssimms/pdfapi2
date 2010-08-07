@@ -627,12 +627,3 @@ $FONTDATA = {
         'zero'               => 500,
     },
 };
-
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut

@@ -48,12 +48,6 @@ BEGIN {
 }
 no warnings qw[ deprecated recursion uninitialized ];
 
-=item $cs = PDF::API2::Resource::ColorSpace::Indexed->new $pdf, $key, %parameters
-
-Returns a new colorspace object.
-
-=cut
-
 sub new {
     my ($class,$pdf,$key,%opts)=@_;
 
@@ -67,13 +61,6 @@ sub new {
     
     return($self);
 }
-
-=item $cs = PDF::API2::Resource::ColorSpace::Indexed->new_api $api, $name
-
-Returns a indexed color-space object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
 
 sub new_api {
     my ($class,$api,@opts)=@_;

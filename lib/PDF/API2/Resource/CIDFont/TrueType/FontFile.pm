@@ -720,11 +720,3 @@ sub outobjdeep {
 
 
 1;
-
-__END__
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut
