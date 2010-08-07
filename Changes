@@ -1,3 +1,24 @@
+{{$NEXT}}
+
+- New Maintainer: Steve Simms (http://deefs.net)
+
+- This release jumps from version 0.73 to 2.016 in order to provide a
+  consistent version number across all modules in the distribution
+  without breaking any existing code or going backwards.
+
+- Font::TTF has been added as a dependency instead of being embedded
+  in the distribution.
+
+- Lots of updates to the documentation.
+
+
+======================================================================
+
+Changes below this point are from PDF::API2 0.73 and earlier,
+generated from the CVS logs.
+
+======================================================================
+
 2009-03-20 09:54  fredo
 
         * lib/PDF/API2/Resource/CIDFont/TrueType.pm: rt.cpan.org
