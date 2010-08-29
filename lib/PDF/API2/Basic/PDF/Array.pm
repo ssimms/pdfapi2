@@ -16,8 +16,6 @@ use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
 
-no warnings qw[ deprecated recursion uninitialized ];
-
 =head1 NAME
 
 PDF::API2::Basic::PDF::Array - Corresponds to a PDF array. Inherits from L<PDF::Objind>
@@ -141,11 +139,11 @@ with respect to a particular $pdf output context
 
 sub copy {
     my ($self, $pdf) = @_;
-    my ($res) = $self->SUPER::copy($pdf);
+    my $res = $self->SUPER::copy($pdf);
 
     $res->{' val'} = [];
     foreach my $e (@{$self->{' val'}}) {
-        if (UNIVERSAL::can($e, 'is_obj') && !$e->is_obj($pdf)) {
+        if (ref($e) and $e->can('is_obj') and not $e->is_obj($pdf)) {
             push(@{$res->{' val'}}, $e->copy($pdf));
         }
         else {
@@ -156,5 +154,3 @@ sub copy {
 }
 
 1;
-
-
