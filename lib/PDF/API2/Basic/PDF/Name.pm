@@ -42,7 +42,7 @@ sub from_pdf {
 =head2 $n->convert ($str, $pdf)
 
 Converts a name into a string by removing the / and converting any hex
-munging unless $pdf is supplied and its version is less than 1.2.
+munging.
 
 =cut
 
@@ -76,17 +76,22 @@ sub as_pdf {
 =head2 PDF::API2::Basic::PDF::Name->string_to_name ($str, $pdf)
 
 Suitably encode the string $str for output in the File object $pdf
-(the exact format may depend on the version of $pdf).  Prinicipally,
-encode certain characters in hex if the version is greater than 1.1.
+(the exact format may depend on the version of $pdf).
+
+Note: This function only encodes names properly for PDF version 1.2
+and higher.
 
 =cut
 
+# Technical Note: The code checking whether this is for version 1.1
+# was commented out before it was entered into version control.  I'm
+# not sure why.  (Steve Simms, 2010-08-28)
+
 sub string_to_name ($;$) {
     my ($str, $pdf) = @_;
- #   if (!(defined ($pdf) && $pdf->{' version'} < 2))
- #     { 
-      $str =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|'#' . sprintf('%02X', ord($1))|oge; 
- #     }
+#   unless (defined($pdf) and $pdf->{' version'} < 2) { 
+        $str =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|'#' . sprintf('%02X', ord($1))|oge; 
+#   }
     return $str;
 }
 
