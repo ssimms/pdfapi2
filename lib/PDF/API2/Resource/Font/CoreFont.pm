@@ -378,7 +378,7 @@ __END__
 
 =over
 
-=item PDF::API::CoreFont supports the following 'Adobe Core Fonts':
+=item PDF::API2::CoreFont supports the following 'Adobe Core Fonts':
 
   Courier
   Courier-Bold
@@ -395,7 +395,7 @@ __END__
   Times-Roman
   ZapfDingbats
 
-=item PDF::API::CoreFont supports the following 'Windows Fonts':
+=item PDF::API2::CoreFont supports the following 'Windows Fonts':
 
   Georgia
   Georgia,Bold

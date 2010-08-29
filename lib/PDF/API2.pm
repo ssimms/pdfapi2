@@ -96,7 +96,7 @@ PDF::API2 - Facilitates the creation and modification of PDF files
 
 =over
 
-=item $pdf = PDF::API->new(%options)
+=item $pdf = PDF::API2->new(%options)
 
 Creates a new PDF object.  If you will be saving it as a file and
 already know the filename, you can give the '-file' option to minimize
@@ -145,7 +145,7 @@ sub new {
     return $self;
 }
 
-=item $pdf = PDF::API->open($pdf_file)
+=item $pdf = PDF::API2->open($pdf_file)
 
 Opens an existing PDF file.
 
@@ -209,7 +209,7 @@ sub open {
     return $self;
 }
 
-=item $pdf = PDF::API->openScalar($pdf_string)
+=item $pdf = PDF::API2->openScalar($pdf_string)
 
 Opens a PDF contained in a string.
 
@@ -220,7 +220,7 @@ B<Example:>
     undef $/;  # Read the whole file at once
     $pdf_string = <$fh>;
 
-    $pdf = PDF::API->openScalar($pdf_string);
+    $pdf = PDF::API2->openScalar($pdf_string);
     ...
     $pdf->saveas('our/new.pdf');
 
