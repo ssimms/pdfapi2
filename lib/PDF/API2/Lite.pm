@@ -30,7 +30,7 @@ PDF::API2::Lite - lite pdf creation
 
 =over
 
-=item $pdf = PDF::API::Lite->new
+=item $pdf = PDF::API2::Lite->new
 
 =cut
 
