@@ -15,31 +15,28 @@ package PDF::API2::Basic::PDF::Name;
 use base 'PDF::API2::Basic::PDF::String';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Name - Inherits from L<PDF::API2::Basic::PDF::String> and stores PDF names (things
-beginning with /)
+PDF::API2::Basic::PDF::Name - Inherits from L<PDF::API2::Basic::PDF::String>
+and stores PDF names (things beginning with /)
 
 =head1 METHODS
 
 =head2 PDF::API2::Basic::PDF::Name->from_pdf($string)
 
-Creates a new string object (not a full object yet) from a given string.
-The string is parsed according to input criteria with escaping working, particular
-to Names.
+Creates a new string object (not a full object yet) from a given
+string.  The string is parsed according to input criteria with
+escaping working, particular to Names.
 
 =cut
 
-
-sub from_pdf
-{
+sub from_pdf {
     my ($class, $str, $pdf) = @_;
     my ($self) = $class->SUPER::from_pdf($str);
 
-    $self->{'val'} = name_to_string ($self->{'val'}, $pdf);
-    $self;
+    $self->{'val'} = name_to_string($self->{'val'}, $pdf);
+    return $self;
 }
 
 =head2 $n->convert ($str, $pdf)
@@ -49,14 +46,12 @@ munging unless $pdf is supplied and its version is less than 1.2.
 
 =cut
 
-sub convert
-{
+sub convert {
     my ($self, $str, $pdf) = @_;
 
-    $str = name_to_string ($str, $pdf);
+    $str = name_to_string($str, $pdf);
     return $str;
 }
-
 
 =head2 $s->as_pdf ($pdf)
 
@@ -65,13 +60,12 @@ PDF File object for which the name is intended if supplied.
 
 =cut
 
-sub as_pdf
-{
+sub as_pdf {
     my ($self, $pdf) = @_;
-    my ($str) = $self->{'val'};
+    my $str = $self->{'val'};
 
-    $str = string_to_name ($str, $pdf);
-    return ("/" . $str);
+    $str = string_to_name($str, $pdf);
+    return '/' . $str;
 }
 
 
@@ -87,12 +81,11 @@ encode certain characters in hex if the version is greater than 1.1.
 
 =cut
 
-sub string_to_name ($;$)
-{
+sub string_to_name ($;$) {
     my ($str, $pdf) = @_;
  #   if (!(defined ($pdf) && $pdf->{' version'} < 2))
  #     { 
-      $str =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|"#".sprintf("%02X", ord($1))|oge; 
+      $str =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|'#' . sprintf('%02X', ord($1))|oge; 
  #     }
     return $str;
 }
@@ -105,19 +98,19 @@ the hex encoding for PDF versions > 1.1.
 
 =cut
 
-sub name_to_string ($;$)
-{
+sub name_to_string ($;$) {
     my ($str, $pdf) = @_;
     $str =~ s|^/||o;
 
-    if (!(defined ($pdf) && $pdf->{' version'} && $pdf->{' version'} < 2))
-      { $str =~ s/#([0-9a-f]{2})/chr(hex($1))/oige; }
+    unless (defined($pdf) and $pdf->{' version'} and $pdf->{' version'} < 2) {
+        $str =~ s/#([0-9a-f]{2})/chr(hex($1))/oige;
+    }
+
     return $str;
 }
 
-sub outxmldeep
-{
+sub outxmldeep {
     my ($self, $fh, $pdf, %opts) = @_;
 
-    $opts{-xmlfh}->print("<Name>".$self->val."</Name>\n");
+    $opts{'-xmlfh'}->print('<Name>' . $self->val() . "</Name>\n");
 }
