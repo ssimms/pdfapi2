@@ -187,18 +187,4 @@ sub asPDFNum {
     return $_[0];
 }
 
-=head2 unpacku($str)
-
-Returns a list of unicode values for the given UTF8 string
-
-=cut
-
-sub unpacku {
-    my ($str) = @_;
-    my (@res);
-
-    return (unpack('U*', $str));
-}
-
 1;
-
