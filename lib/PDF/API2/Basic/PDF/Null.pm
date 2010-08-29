@@ -14,6 +14,8 @@ package PDF::API2::Basic::PDF::Null;
 
 use base 'PDF::API2::Basic::PDF::Objind';
 
+use strict;
+
 =head1 NAME
 
 PDF::API2::Basic::PDF::Null - PDF Null type object.  This is a subclass of
@@ -23,14 +25,8 @@ PDF::API2::Basic::PDF::Objind and cannot be subclassed.
 
 =cut
 
-use strict;
-
-no warnings qw[ deprecated recursion uninitialized ];
-
 # There is only one null object  (section 3.2.8).
-my ($null_obj) = {};
-bless $null_obj, "PDF::API2::Basic::PDF::Null";
-
+my $null_obj = bless {}, 'PDF::API2::Basic::PDF::Null';
 
 =head2 PDF::API2::Basic::PDF::Null->new
 
@@ -58,17 +54,15 @@ Output the object in PDF format.
 
 =cut
 
-sub outobjdeep
-{
+sub outobjdeep {
     my ($self, $fh, $pdf) = @_;
-    $fh->print ("null");
+    $fh->print('null');
 }
 
-sub outxmldeep
-{
+sub outxmldeep {
     my ($self, $fh, $pdf, %opts) = @_;
 
-    $opts{-xmlfh}->print("<Null/>\n");
+    $opts{'-xmlfh'}->print("<Null/>\n");
 }
 
 =head2 $s->is_obj
@@ -97,8 +91,7 @@ Return undef.
 
 =cut
 
-sub val
-{
+sub val {
     return undef;
 }
 
