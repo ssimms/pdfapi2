@@ -119,3 +119,5 @@ sub outxmldeep {
 
     $opts{'-xmlfh'}->print('<Name>' . $self->val() . "</Name>\n");
 }
+
+1;
