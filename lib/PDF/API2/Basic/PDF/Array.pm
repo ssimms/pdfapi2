@@ -45,16 +45,15 @@ initialise the array with.
 
 =cut
 
-sub new
-{
+sub new {
     my ($class, @vals) = @_;
-    my ($self);
+    my $self = {};
 
     $self->{' val'} = [@vals];
     $self->{' realised'} = 1;
     bless $self, $class;
+    return $self;
 }
-
 
 =head2 $a->outobjdeep($fh, $pdf)
 
@@ -62,32 +61,25 @@ Outputs an array as a PDF array to the given filehandle.
 
 =cut
 
-sub outobjdeep
-{
+sub outobjdeep {
     my ($self, $fh, $pdf, %opts) = @_;
-    my ($obj);
 
-    $fh->print("[ ");
-    foreach $obj (@{$self->{' val'}})
-    {
+    $fh->print('[ ');
+    foreach my $obj (@{$self->{' val'}}) {
         $obj->outobj($fh, $pdf);
-        $fh->print(" ");
+        $fh->print(' ');
     }
-    $fh->print("]");
+    $fh->print(']');
 }
 
-sub outxmldeep
-{
+sub outxmldeep {
     my ($self, $fh, $pdf, %opts) = @_;
-    my ($obj);
 
-    $opts{-xmlfh}->print("<Array>\n");
-    foreach $obj (@{$self->{' val'}})
-    {
+    $opts{'-xmlfh'}->print("<Array>\n");
+    foreach my $obj (@{$self->{' val'}}) {
         $obj->outxml($fh, $pdf, %opts);
     }
-    $opts{-xmlfh}->print("</Array>\n");
-
+    $opts{'-xmlfh'}->print("</Array>\n");
 }
 
 =head2 $a->removeobj($elem)
@@ -96,13 +88,11 @@ Removes all occurrences of an element from an array.
 
 =cut
 
-sub removeobj
-{
+sub removeobj {
     my ($self, $elem) = @_;
 
     $self->{' val'} = [grep($_ ne $elem, @{$self->{' val'}})];
 }
-
 
 =head2 $a->elementsof
 
@@ -111,9 +101,9 @@ not the array itself but the elements in the array.
 
 =cut
 
-sub elementsof
-{ wantarray ? @{$_[0]->{' val'}} : scalar @{$_[0]->{' val'}}; }
-
+sub elementsof {
+    return wantarray ? @{$_[0]->{' val'}} : scalar @{$_[0]->{' val'}};
+}
 
 =head2 $a->add_elements
 
@@ -122,16 +112,14 @@ is defined.
 
 =cut
 
-sub add_elements
-{
-    my ($self) = shift;
-    my ($e);
+sub add_elements {
+    my $self = shift();
 
-    foreach $e (@_)
-    { push (@{$self->{' val'}}, $e) if defined $e; }
-    $self;
+    foreach my $e (@_) {
+        push @{$self->{' val'}}, $e if defined $e;
+    }
+    return $self;
 }
-
 
 =head2 $a->val
 
@@ -140,9 +128,9 @@ containing the elements.
 
 =cut
 
-sub val
-{ $_[0]->{' val'}; }
-
+sub val {
+    return $_[0]->{' val'};
+}
 
 =head2 $a->copy($pdf)
 
@@ -151,21 +139,20 @@ with respect to a particular $pdf output context
 
 =cut
 
-sub copy
-{
+sub copy {
     my ($self, $pdf) = @_;
     my ($res) = $self->SUPER::copy($pdf);
-    my ($e);
 
     $res->{' val'} = [];
-    foreach $e (@{$self->{' val'}})
-    {
-        if (UNIVERSAL::can($e, "is_obj") && !$e->is_obj($pdf))
-        { push(@{$res->{' val'}}, $e->copy($pdf)); }
-        else
-        { push(@{$res->{' val'}}, $e); }
+    foreach my $e (@{$self->{' val'}}) {
+        if (UNIVERSAL::can($e, 'is_obj') && !$e->is_obj($pdf)) {
+            push(@{$res->{' val'}}, $e->copy($pdf));
+        }
+        else {
+            push(@{$res->{' val'}}, $e);
+        }
     }
-    $res;
+    return $res;
 }
 
 1;
