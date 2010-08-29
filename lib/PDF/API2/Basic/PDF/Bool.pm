@@ -15,7 +15,6 @@ package PDF::API2::Basic::PDF::Bool;
 use base 'PDF::API2::Basic::PDF::String';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
@@ -30,9 +29,9 @@ Converts a string into the string which will be stored.
 
 =cut
 
-sub convert
-{ return $_[1] eq "true"; }
-
+sub convert {
+    return $_[1] eq 'true';
+}
 
 =head2 as_pdf
 
@@ -40,15 +39,14 @@ Converts the value to a PDF output form
 
 =cut
 
-sub as_pdf
-{ $_[0]->{'val'} ? "true" : "false"; }
+sub as_pdf {
+    return $_[0]->{'val'} ? 'true' : 'false';
+}
 
-sub outxmldeep
-{
+sub outxmldeep {
     my ($self, $fh, $pdf, %opts) = @_;
 
-    $opts{-xmlfh}->print("<Bool>".$self->as_pdf."</Bool>\n");
+    $opts{'-xmlfh'}->print('<Bool>' . $self->as_pdf() . "</Bool>\n");
 }
 
 1;
-
