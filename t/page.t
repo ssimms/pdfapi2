@@ -1,4 +1,4 @@
-use Test::More tests => 24;
+use Test::More tests => 32;
 
 use warnings;
 use strict;
@@ -17,10 +17,24 @@ is($mediabox[3], 1440, 'Mediabox URY');
 
 $page->mediabox('LEDGER');
 @mediabox = $page->get_mediabox();
-is($mediabox[0], 0, 'Mediabox LLX');
-is($mediabox[1], 0, 'Mediabox LLY');
-is($mediabox[2], 1224, 'Mediabox URX');
-is($mediabox[3], 792, 'Mediabox URY');
+is($mediabox[0], 0, 'Mediabox LLX (ledger)');
+is($mediabox[1], 0, 'Mediabox LLY (ledger)');
+is($mediabox[2], 1224, 'Mediabox URX (ledger)');
+is($mediabox[3], 792, 'Mediabox URY (ledger)');
+
+$page->mediabox('non-existent');
+@mediabox = $page->get_mediabox();
+is($mediabox[0], 0, 'Mediabox LLX (unknown named type)');
+is($mediabox[1], 0, 'Mediabox LLY (unknown named type)');
+is($mediabox[2], 612, 'Mediabox URX (unknown named type)');
+is($mediabox[3], 792, 'Mediabox URY (unknown named type)');
+
+$page->mediabox(1, 2, 3, 4);
+@mediabox = $page->get_mediabox();
+is($mediabox[0], 1, 'Mediabox LLX (offset)');
+is($mediabox[1], 2, 'Mediabox LLY (offset)');
+is($mediabox[2], 3, 'Mediabox URX (offset)');
+is($mediabox[3], 4, 'Mediabox URY (offset)');
 
 $page->cropbox(10, 20);
 my @cropbox = $page->get_cropbox();
