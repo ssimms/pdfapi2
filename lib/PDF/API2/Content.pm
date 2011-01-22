@@ -22,7 +22,7 @@ PDF::API2::Content
 
 =item $co = PDF::API2::Content->new @parameters
 
-Returns a new content object (called from $page->text/gfx).
+Returns a new content object (called from $page->text and $page->gfx).
 
 =cut
 
@@ -359,7 +359,7 @@ sub translate
 
 =item $co->scale $sx,$sy
 
-Sets scaleing transformation.
+Sets scaling transformation.
 
 =cut
 
