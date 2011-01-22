@@ -25,6 +25,7 @@ BEGIN {
     use List::Util qw(min max);
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Basic::PDF::Filter;
+    use PDF::API2::Resource::PaperSizes;
 
     use POSIX qw( HUGE_VAL floor );
 
@@ -57,23 +58,7 @@ BEGIN {
     );
 
 
-    %PaperSizes=();
-    foreach my $dir (@INC) {
-        if(-f "$dir/PDF/API2/Resource/unipaper.txt")
-        {
-            my ($fh,$line);
-            open($fh,"$dir/PDF/API2/Resource/unipaper.txt");
-            while($line=<$fh>)
-            {
-                next if($line=~m|^#|);
-                chomp($line);
-                my ($name,$x,$y)=split(/\s+;\s+/,$line);
-                $PaperSizes{lc $name}=[$x,$y];
-            }
-            close($fh);
-            last;
-        }
-    }
+    %PaperSizes = PDF::API2::Resource::PaperSizes->get_paper_sizes();
 
     no warnings qw[ recursion uninitialized ];
 
@@ -688,33 +673,40 @@ sub defineName {
 }
 
 sub page_size {
-    my ($x1,$y1,$x2,$y2) = @_;
-    if(defined $x2) {
-        # full bbox
-        return($x1,$y1,$x2,$y2);
-    } elsif(defined $y1) {
-        # half bbox
-        return(0,0,$x1,$y1);
-    } elsif(defined $PaperSizes{lc($x1)}) {
-        # textual spec.
-        return(0,0,@{$PaperSizes{lc($x1)}});
-    } elsif($x1=~/^[\d\.]+$/) {
-        # single quadratic
-        return(0,0,$x1,$x1);
-    } else {
-        # pdf default.
-        return(0,0,612,792);
+    my ($x1, $y1, $x2, $y2) = @_;
+
+    # full bbox
+    if (defined $x2) {
+        return ($x1, $y1, $x2, $y2);
+    }
+
+    # half bbox
+    elsif (defined $y1) {
+        return (0, 0, $x1, $y1);
+    }
+
+    # textual spec.
+    elsif (defined $PaperSizes{lc $x1}) {
+        return (0, 0, @{$PaperSizes{lc $x1}});
+    }
+
+    # single quadratic
+    elsif ($x1 =~ /^[\d\.]+$/) {
+        return(0, 0, $x1, $x1);
+    }
+
+    # pdf default.
+    else {
+        return (0, 0, 612, 792);
     }
 }
 
-sub getPaperSizes 
-{
-    my %h=();
-    foreach my $k (keys %PaperSizes)
-    {
-    $h{$k}=[@{$PaperSizes{$k}}];
+sub getPaperSizes {
+    my %sizes = ();
+    foreach my $type (keys %PaperSizes) {
+        $sizes{$type} = [@{$PaperSizes{$type}}];
     }
-    return(%h);
+    return %sizes;
 }
 
 sub xmlMarkupDecl
