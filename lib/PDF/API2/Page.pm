@@ -81,22 +81,14 @@ Sets the mediabox.  This method supports the following aliases:
 
 =cut
 
+sub _set_bbox {
+    my ($box, $self, @values) = @_;
+    $self->{$box} = PDFArray( map { PDFNum(float($_)) } page_size(@values) );
+    return $self;
+}
+
 sub mediabox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    if(defined $x2) {
-        $self->{'MediaBox'}=PDFArray(
-            map { PDFNum(float($_)) } ($x1,$y1,$x2,$y2)
-        );
-    } elsif(defined $y1) {
-        $self->{'MediaBox'}=PDFArray(
-            map { PDFNum(float($_)) } (0,0,$x1,$y1)
-        );
-    } else {
-        $self->{'MediaBox'}=PDFArray(
-            (map { PDFNum(float($_)) } page_size($x1))
-        );
-    }
-    return($self);
+    return _set_bbox('MediaBox', @_);
 }
 
 =item ($llx, $lly, $urx, $ury) = $page->get_mediabox
@@ -132,21 +124,7 @@ Sets the cropbox.  This method supports the same aliases as mediabox.
 =cut
 
 sub cropbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    if(defined $x2) {
-        $self->{'CropBox'}=PDFArray(
-            map { PDFNum(float($_)) } ($x1,$y1,$x2,$y2)
-        );
-    } elsif(defined $y1) {
-        $self->{'CropBox'}=PDFArray(
-            map { PDFNum(float($_)) } (0,0,$x1,$y1)
-        );
-    } else {
-        $self->{'CropBox'}=PDFArray(
-            (map { PDFNum(float($_)) } page_size($x1))
-        );
-    }
-    $self;
+    return _set_bbox('CropBox', @_);
 }
 
 =item ($llx, $lly, $urx, $ury) = $page->get_cropbox
@@ -183,21 +161,7 @@ Sets the bleedbox.  This method supports the same aliases as mediabox.
 =cut
 
 sub bleedbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    if(defined $x2) {
-        $self->{'BleedBox'}=PDFArray(
-            map { PDFNum(float($_)) } ($x1,$y1,$x2,$y2)
-        );
-    } elsif(defined $y1) {
-        $self->{'BleedBox'}=PDFArray(
-            map { PDFNum(float($_)) } (0,0,$x1,$y1)
-        );
-    } else {
-        $self->{'BleedBox'}=PDFArray(
-            (map { PDFNum(float($_)) } page_size($x1))
-        );
-    }
-    $self;
+    return _set_bbox('BleedBox', @_);
 }
 
 =item ($llx, $lly, $urx, $ury) = $page->get_bleedbox
@@ -232,21 +196,7 @@ Sets the trimbox.  This method supports the same aliases as mediabox.
 =cut
 
 sub trimbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    if(defined $x2) {
-        $self->{'TrimBox'}=PDFArray(
-            map { PDFNum(float($_)) } ($x1,$y1,$x2,$y2)
-        );
-    } elsif(defined $y1) {
-        $self->{'TrimBox'}=PDFArray(
-            map { PDFNum(float($_)) } (0,0,$x1,$y1)
-        );
-    } else {
-        $self->{'TrimBox'}=PDFArray(
-            (map { PDFNum(float($_)) } page_size($x1))
-        );
-    }
-    $self;
+    return _set_bbox('TrimBox', @_);
 }
 
 =item ($llx, $lly, $urx, $ury) = $page->get_trimbox
@@ -283,21 +233,7 @@ Sets the artbox.  This method supports the same aliases as mediabox.
 =cut
 
 sub artbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    if(defined $x2) {
-        $self->{'ArtBox'}=PDFArray(
-            map { PDFNum(float($_)) } ($x1,$y1,$x2,$y2)
-        );
-    } elsif(defined $y1) {
-        $self->{'ArtBox'}=PDFArray(
-            map { PDFNum(float($_)) } (0,0,$x1,$y1)
-        );
-    } else {
-        $self->{'ArtBox'}=PDFArray(
-            (map { PDFNum(float($_)) } page_size($x1))
-        );
-    }
-    $self;
+    return _set_bbox('ArtBox', @_);
 }
 
 =item ($llx, $lly, $urx, $ury) = $page->get_artbox
