@@ -1409,7 +1409,6 @@ sub transform_rel {
 }
 
 sub matrix_update {
-  use PDF::API2::Matrix;
   my ($self,$tx,$ty)=@_;
   $self->{' textlinematrix'}->[0]+=$tx;
   $self->{' textlinematrix'}->[1]+=$ty;
