@@ -15,10 +15,7 @@ BEGIN {
         $key_var2 
         %u2n 
         %n2u 
-        %u2n_o 
-        %n2u_o 
         $pua
-        $uuu
         %PaperSizes
     );
     use Math::Trig;
@@ -26,6 +23,7 @@ BEGIN {
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Basic::PDF::Filter;
     use PDF::API2::Resource::Colors;
+    use PDF::API2::Resource::Glyphs;
     use PDF::API2::Resource::PaperSizes;
 
     use POSIX qw( HUGE_VAL floor );
@@ -68,44 +66,8 @@ BEGIN {
 
     $pua=0xE000;
 
-    %u2n_o=();
-    %n2u_o=();
-
-    $uuu={g=>{},u=>{}};
-    foreach my $dir (@INC) {
-        if(-f "$dir/PDF/API2/Resource/uniglyph.txt")
-        {
-            my ($fh,$line);
-            open($fh,"$dir/PDF/API2/Resource/uniglyph.txt");
-            while($line=<$fh>)
-            {
-                next if($line=~m|^#|);
-                chomp($line);
-                $line=~s|\s+\#.+$||go;
-                my ($uni,$name,$prio)=split(/\s+;\s+/,$line);
-                $uni=hex($uni);
-                $uuu->{u}->{$uni}||=[];
-                $uuu->{g}->{$name}||=[];
-                push @{$uuu->{u}->{$uni}},{uni=>$uni,name=>$name,prio=>$prio};    
-                push @{$uuu->{g}->{$name}},{uni=>$uni,name=>$name,prio=>$prio};    
-            }
-            close($fh);
-            last;
-        }
-    }
-    foreach my $k (sort {$a<=>$b} keys %{$uuu->{u}})
-    {
-        $u2n_o{$k}=$uuu->{u}->{$k}->[0]->{name};
-    }
-    foreach my $k (keys %{$uuu->{g}})
-    {
-        my($r)=sort {$a->{prio}<=>$b->{prio}} @{$uuu->{g}->{$k}};
-        $n2u_o{$k}=$r->{uni};
-    }
-    $uuu=undef;
-
-    %u2n=%u2n_o;
-    %n2u=%n2u_o;
+    %u2n = %{$PDF::API2::Resource::Glyphs::u2n};
+    %n2u = %{$PDF::API2::Resource::Glyphs::n2u};
 }
 
 sub pdfkey {
@@ -638,9 +600,9 @@ sub uniByName {
 }
 
 sub initNameTable {
-    %u2n=(); %u2n=%u2n_o;
-    %n2u=(); %n2u=%n2u_o;
-    $pua=0xE000;
+    %u2n = %{$PDF::API2::Resource::Glyphs::u2n};
+    %n2u = %{$PDF::API2::Resource::Glyphs::n2u};
+    $pua = 0xE000;
     1;
 }
 sub defineName {
