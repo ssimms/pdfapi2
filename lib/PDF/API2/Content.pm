@@ -2,7 +2,7 @@ package PDF::API2::Content;
 
 use base 'PDF::API2::Basic::PDF::Dict';
 
-use Compress::Zlib qw[];
+use Compress::Zlib qw();
 use Encode;
 use Math::Trig;
 use PDF::API2::Matrix;
@@ -10,7 +10,7 @@ use PDF::API2::Matrix;
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
 
-no warnings qw[ deprecated recursion uninitialized ];
+no warnings qw( deprecated recursion uninitialized );
 
 =head1 NAME
 
@@ -78,18 +78,25 @@ Adds @content to the object.
 =cut
 
 sub add_post {
-    my $self=shift @_;
-    if (scalar @_ > 0) {
-        $self->{' poststream'}.=($self->{' poststream'}=~m|\s$|o?'':' ').join(' ',@_).' ';
+    my $self = shift;
+    if (scalar @_) {
+        $self->{' poststream'} .= ($self->{' poststream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ';
     }
-    $self;
+    return $self;
 }
 sub add {
-    my $self=shift @_;
-    if (scalar @_ > 0) {
-        $self->{' stream'}.=encode("iso-8859-1",($self->{' stream'}=~m|\s$|o?'':' ').join(' ',@_).' ');
+    my $self = shift;
+    if (scalar @_) {
+        $self->{' stream'} .= encode('iso-8859-1', ($self->{' stream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ');
     }
-    $self;
+    return $self;
+}
+
+# Shortcut method for determining if we're inside a text object
+# (i.e. between BT and ET).  See textstart and textend.
+sub _in_text_object {
+    my $self = shift();
+    return defined($self->{' apiistext'}) && $self->{' apiistext'} == 1;
 }
 
 =item $co->save
@@ -103,8 +110,8 @@ sub _save {
 }
 
 sub save {
-    my $self=shift @_;
-    unless (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+    my $self = shift;
+    unless ($self->_in_text_object()) {
         $self->add(_save());
     }
 }
@@ -120,8 +127,8 @@ sub _restore {
 }
 
 sub restore {
-    my $self=shift @_;
-    unless (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+    my $self = shift;
+    unless ($self->_in_text_object()) {
         $self->add(_restore());
     }
 }
@@ -286,7 +293,7 @@ sub matrix {
     my $self=shift @_;
     my ($a,$b,$c,$d,$e,$f)=@_;
     if (defined $a) {
-        if (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+        if ($self->_in_text_object()) {
             $self->add(_matrix_text($a,$b,$c,$d,$e,$f));
             @{$self->{' textmatrix'}}=($a,$b,$c,$d,$e,$f);
             @{$self->{' textlinematrix'}}=(0,0);
@@ -295,7 +302,7 @@ sub matrix {
             $self->add(_matrix_gfx($a,$b,$c,$d,$e,$f));
         }
     }
-    if(defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+    if ($self->_in_text_object()) {
         return @{$self->{' textmatrix'}};
     } 
     else {
@@ -617,7 +624,7 @@ sub move {
         $self->{' y'}=$y;
         $self->{' mx'}=$x;
         $self->{' my'}=$y;
-        if (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+        if ($self->_in_text_object()) {
             $self->add_post(floats($x,$y), 'm');
         } 
         else {
@@ -643,7 +650,7 @@ sub line {
         $y = shift;
         $self->{' x'}=$x;
         $self->{' y'}=$y;
-        if (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+        if ($self->_in_text_object()) {
             $self->add_post(floats($x,$y), 'l');
         } 
         else {
@@ -659,7 +666,7 @@ sub line {
 
 sub hline {
     my ($self, $x) = @_;
-    if (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+    if ($self->_in_text_object()) {
         $self->add_post(floats($x,$self->{' y'}),'l');
     } 
     else {
@@ -675,7 +682,7 @@ sub hline {
 
 sub vline {
     my ($self, $y) = @_;
-    if (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+    if ($self->_in_text_object()) {
         $self->add_post(floats($self->{' x'},$y),'l');
     } 
     else {
@@ -698,7 +705,7 @@ sub curve {
         $y2 = shift;
         $x3 = shift;
         $y3 = shift;
-        if (defined($self->{' apiistext'}) && $self->{' apiistext'} == 1) {
+        if ($self->_in_text_object()) {
             $self->add_post(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
         } 
         else {
@@ -1121,7 +1128,7 @@ sub egstate {
 
 sub textstart {
     my ($self) = @_;
-    if (!defined($self->{' apiistext'}) || $self->{' apiistext'} != 1) {
+    unless ($self->_in_text_object()) {
         $self->add(' BT ');
         $self->{' apiistext'}=1;
         $self->{' font'}=undef;
@@ -1859,17 +1866,17 @@ sub section {
 
 sub textend {
     my ($self) = @_;
-    if ($self->{' apiistext'} == 1) {
-        $self->add(' ET ',$self->{' poststream'});
-        $self->{' apiistext'}=0;
-        $self->{' poststream'}='';
+    if ($self->_in_text_object()) {
+        $self->add(' ET ', $self->{' poststream'});
+        $self->{' apiistext'} = 0;
+        $self->{' poststream'} = '';
     }
     return $self;
 }
 
 =item $width = $txt->textlabel $x, $y, $font, $size, $text, %options
 
-Applys text with options, but without teststart/end 
+Applies text with options, but without teststart/end 
 and optionally returns the width of the given text.
 
 B<Example:> 
@@ -1896,7 +1903,7 @@ sub textlabel {
     my %text_state=();
     $trans_opts{-rotate} = $opts{-rotate} if($opts{-rotate});
 
-    my $wastext = $self->{' apiistext'};
+    my $wastext = $self->_in_text_object;
     if ($wastext) {
         %text_state=$self->textstate;
         $self->textend;
