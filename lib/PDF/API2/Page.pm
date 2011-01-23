@@ -87,6 +87,24 @@ sub _set_bbox {
     return $self;
 }
 
+sub _get_bbox {
+    my ($self, $box_order) = @_;
+
+    # Default to letter
+    my @media = (0, 0, 612, 792);
+
+    foreach my $mediatype (@{$box_order}) {
+        my $mediaobj = $self->find_prop($mediatype);
+        if ($mediaobj) {
+            @media = map { $_->val } $mediaobj->elementsof;
+            last;
+        }
+    }
+
+    return @media;
+}
+
+
 sub mediabox {
     return _set_bbox('MediaBox', @_);
 }
@@ -98,19 +116,8 @@ Gets the mediabox based one best estimates or the default.
 =cut
 
 sub get_mediabox {
-    my ($self) = @_;
-    my $media = [ 0, 0, 612, 792 ];
-    foreach my $mediatype (
-        qw( MediaBox CropBox BleedBox TrimBox ArtBox )
-    ) {
-        my $mediaobj = undef;
-        if($mediaobj = $self->find_prop($mediatype)) {
-            $media = [ map{ $_->val } $mediaobj->elementsof ];
-            last;
-        }
-    }
-
-    return(@{$media});
+    my $self = shift();
+    return _get_bbox($self, [qw(MediaBox CropBox BleedBox TrimBox ArtBox)]);
 }
 
 =item $page->cropbox $w, $h
@@ -133,21 +140,9 @@ Gets the cropbox based one best estimates or the default.
 
 =cut
 
-sub get_cropbox 
-{
-    my ($self) = @_;
-    my $media = [ 0, 0, 612, 792 ];
-    foreach my $mediatype (qw[CropBox BleedBox TrimBox ArtBox MediaBox])
-    {
-        my $mediaobj = undef;
-        if($mediaobj = $self->find_prop($mediatype)) 
-        {
-            $media = [ map{ $_->val } $mediaobj->elementsof ];
-            last;
-        }
-    }
-
-    return(@{$media});
+sub get_cropbox {
+    my $self = shift();
+    return _get_bbox($self, [qw(CropBox BleedBox TrimBox ArtBox MediaBox)]);
 }
 
 =item $page->bleedbox $w, $h
@@ -170,21 +165,9 @@ Gets the bleedbox based one best estimates or the default.
 
 =cut
 
-sub get_bleedbox 
-{
-    my ($self) = @_;
-    my $media = [ 0, 0, 612, 792 ];
-    foreach my $mediatype (qw[BleedBox TrimBox ArtBox MediaBox CropBox])
-    {
-        my $mediaobj = undef;
-        if($mediaobj = $self->find_prop($mediatype)) 
-        {
-            $media = [ map{ $_->val } $mediaobj->elementsof ];
-            last;
-        }
-    }
-
-    return(@{$media});
+sub get_bleedbox {
+    my $self = shift();
+    return _get_bbox($self, [qw(BleedBox TrimBox ArtBox MediaBox CropBox)]);
 }
 
 =item $page->trimbox $w, $h
@@ -205,21 +188,9 @@ Gets the trimbox based one best estimates or the default.
 
 =cut
 
-sub get_trimbox 
-{
-    my ($self) = @_;
-    my $media = [ 0, 0, 612, 792 ];
-    foreach my $mediatype (qw[TrimBox ArtBox MediaBox CropBox BleedBox])
-    {
-        my $mediaobj = undef;
-        if($mediaobj = $self->find_prop($mediatype)) 
-        {
-            $media = [ map{ $_->val } $mediaobj->elementsof ];
-            last;
-        }
-    }
-
-    return(@{$media});
+sub get_trimbox {
+    my $self = shift();
+    return _get_bbox($self, [qw(TrimBox ArtBox MediaBox CropBox BleedBox)]);
 }
 
 =item $page->artbox $w, $h
@@ -242,21 +213,9 @@ Gets the artbox based one best estimates or the default.
 
 =cut
 
-sub get_artbox 
-{
-    my ($self) = @_;
-    my $media = [ 0, 0, 612, 792 ];
-    foreach my $mediatype (qw[ArtBox TrimBox BleedBox CropBox MediaBox])
-    {
-        my $mediaobj = undef;
-        if($mediaobj = $self->find_prop($mediatype)) 
-        {
-            $media = [ map{ $_->val } $mediaobj->elementsof ];
-            last;
-        }
-    }
-
-    return(@{$media});
+sub get_artbox {
+    my $self = shift();
+    return _get_bbox($self, [qw(ArtBox TrimBox BleedBox CropBox MediaBox)]);
 }
 
 =item $page->rotate $deg
