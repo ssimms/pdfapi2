@@ -25,6 +25,7 @@ BEGIN {
     use List::Util qw(min max);
     use PDF::API2::Basic::PDF::Utils;
     use PDF::API2::Basic::PDF::Filter;
+    use PDF::API2::Resource::Colors;
     use PDF::API2::Resource::PaperSizes;
 
     use POSIX qw( HUGE_VAL floor );
@@ -57,7 +58,7 @@ BEGIN {
         page_size
     );
 
-
+    %colors = PDF::API2::Resource::Colors->get_colors();
     %PaperSizes = PDF::API2::Resource::PaperSizes->get_paper_sizes();
 
     no warnings qw[ recursion uninitialized ];
@@ -105,24 +106,6 @@ BEGIN {
 
     %u2n=%u2n_o;
     %n2u=%n2u_o;
-
-    %colors=();
-    foreach my $dir (@INC) {
-        if(-f "$dir/PDF/API2/Resource/unicolor.txt")
-        {
-            my ($fh,$line);
-            open($fh,"$dir/PDF/API2/Resource/unicolor.txt");
-            while($line=<$fh>)
-            {
-                next if($line=~m|^#|);
-                chomp($line);
-                my ($name,$val)=split(/\s+;\s+/,$line);
-                $colors{lc $name}=$val;
-            }
-            close($fh);
-            last;
-        }
-    }
 }
 
 sub pdfkey {
