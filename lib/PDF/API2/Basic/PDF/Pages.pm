@@ -419,5 +419,3 @@ sub get_top
 }
 
 1;
-__END__
-

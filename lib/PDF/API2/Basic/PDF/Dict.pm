@@ -401,5 +401,4 @@ Returns the dictionary, which is itself.
 sub val
 { $_[0]; }
 
-
-
+1;
