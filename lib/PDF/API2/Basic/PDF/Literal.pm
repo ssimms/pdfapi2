@@ -87,5 +87,4 @@ sub outxmldeep
 sub val
 { $_[0]; }
 
-
-
+1;
