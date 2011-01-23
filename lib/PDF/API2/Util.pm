@@ -690,195 +690,52 @@ PDF::API2::Util - utility package for often use methods across the package.
 
 =item %sizes = getPaperSizes();
 
-Will retrive the registered papersizes of PDF::API2.
+Will retrieve the registered paper sizes of PDF::API2.
 
     print Dumper(\%sizes);
     $VAR1={
-        '4a'        =>  [ 4760  , 6716  ],
-        '2a'        =>  [ 3368  , 4760  ],
-        'a0'        =>  [ 2380  , 3368  ],
-        'a1'        =>  [ 1684  , 2380  ],
-        'a2'        =>  [ 1190  , 1684  ],
-        'a3'        =>  [ 842   , 1190  ],
-        'a4'        =>  [ 595   , 842   ],
-        'a5'        =>  [ 421   , 595   ],
-        'a6'        =>  [ 297   , 421   ],
-        '4b'        =>  [ 5656  , 8000  ],
-        '2b'        =>  [ 4000  , 5656  ],
-        'b0'        =>  [ 2828  , 4000  ],
-        'b1'        =>  [ 2000  , 2828  ],
-        'b2'        =>  [ 1414  , 2000  ],
-        'b3'        =>  [ 1000  , 1414  ],
-        'b4'        =>  [ 707   , 1000  ],
-        'b5'        =>  [ 500   , 707   ],
-        'b6'        =>  [ 353   , 500   ],
-        'letter'    =>  [ 612   , 792   ],
-        'broadsheet'    =>  [ 1296  , 1584  ],
-        'ledger'    =>  [ 1224  , 792   ],
-        'tabloid'   =>  [ 792   , 1224  ],
-        'legal'     =>  [ 612   , 1008  ],
-        'executive' =>  [ 522   , 756   ],
-        '36x36'     =>  [ 2592  , 2592  ],
+        '4a'         =>  [ 4760  , 6716  ],
+        '2a'         =>  [ 3368  , 4760  ],
+        'a0'         =>  [ 2380  , 3368  ],
+        'a1'         =>  [ 1684  , 2380  ],
+        'a2'         =>  [ 1190  , 1684  ],
+        'a3'         =>  [ 842   , 1190  ],
+        'a4'         =>  [ 595   , 842   ],
+        'a5'         =>  [ 421   , 595   ],
+        'a6'         =>  [ 297   , 421   ],
+        '4b'         =>  [ 5656  , 8000  ],
+        '2b'         =>  [ 4000  , 5656  ],
+        'b0'         =>  [ 2828  , 4000  ],
+        'b1'         =>  [ 2000  , 2828  ],
+        'b2'         =>  [ 1414  , 2000  ],
+        'b3'         =>  [ 1000  , 1414  ],
+        'b4'         =>  [ 707   , 1000  ],
+        'b5'         =>  [ 500   , 707   ],
+        'b6'         =>  [ 353   , 500   ],
+        'letter'     =>  [ 612   , 792   ],
+        'broadsheet' =>  [ 1296  , 1584  ],
+        'ledger'     =>  [ 1224  , 792   ],
+        'tabloid'    =>  [ 792   , 1224  ],
+        'legal'      =>  [ 612   , 1008  ],
+        'executive'  =>  [ 522   , 756   ],
+        '36x36'      =>  [ 2592  , 2592  ],
     };
 
 =back
 
 =head1 PREDEFINED COLORS
 
-See the file C<unicolor.txt> for a complete list.
+See the source of L<PDF::API2::Resource::Colors> for a complete list.
 
-B<Please Note:> This is an amalgamation of the X11, SGML and (X)HTML specification sets.
+B<Please Note:> This is an amalgamation of the X11, SGML and (X)HTML
+specification sets.
 
 =head1 PREDEFINED GLYPH-NAMES
 
 See the file C<uniglyph.txt> for a complete list.
 
-a a1 a10 a100 a101 a102 a103 a104 a105 a106 a107 a108 a11 a117 a118 a119 a12 a120 a121 a122 a123 a124
-a125 a126 a127 a128 a129 a13 a130 a131 a132 a133 a134 a135 a136 a137 a138 a139 a14 a140 a141 a142 a143
-a144 a145 a146 a147 a148 a149 a15 a150 a151 a152 a153 a154 a155 a156 a157 a158 a159 a16 a160 a162 a165
-a166 a167 a168 a169 a17 a170 a171 a172 a173 a174 a175 a176 a177 a178 a179 a18 a180 a181 a182 a183 a184
-a185 a186 a187 a188 a189 a19 a190 a191 a192 a193 a194 a195 a196 a197 a198 a199 a2 a20 a200 a201 a202 a203
-a204 a205 a206 a21 a22 a23 a24 a25 a26 a27 a28 a29 a3 a30 a31 a32 a33 a34 a35 a36 a37 a38 a39 a4 a40 a41
-a42 a43 a44 a45 a46 a47 a48 a49 a5 a50 a51 a52 a53 a54 a55 a56 a57 a58 a59 a6 a60 a61 a62 a63 a64 a65 a66
-a67 a68 a69 a7 a70 a72 a74 a75 a78 a79 a8 a81 a82 a83 a84 a85 a86 a87 a88 a89 a9 a90 a91 a92 a93 a94 a95
-a96 a97 a98 a99 aacgr aacute Aacutesmall abreve acirc acircumflex Acircumflexsmall acute acutecomb
-Acutesmall acy adieresis Adieresissmall ae aeacute aelig AEsmall afii00208 afii10017 afii10018 afii10019
-afii10020 afii10021 afii10022 afii10023 afii10024 afii10025 afii10026 afii10027 afii10028 afii10029
-afii10030 afii10031 afii10032 afii10033 afii10034 afii10035 afii10036 afii10037 afii10038 afii10039
-afii10040 afii10041 afii10042 afii10043 afii10044 afii10045 afii10046 afii10047 afii10048 afii10049
-afii10050 afii10051 afii10052 afii10053 afii10054 afii10055 afii10056 afii10057 afii10058 afii10059
-afii10060 afii10061 afii10062 afii10063 afii10064 afii10065 afii10066 afii10067 afii10068 afii10069
-afii10070 afii10071 afii10072 afii10073 afii10074 afii10075 afii10076 afii10077 afii10078 afii10079
-afii10080 afii10081 afii10082 afii10083 afii10084 afii10085 afii10086 afii10087 afii10088 afii10089
-afii10090 afii10091 afii10092 afii10093 afii10094 afii10095 afii10096 afii10097 afii10098 afii10099
-afii10100 afii10101 afii10102 afii10103 afii10104 afii10105 afii10106 afii10107 afii10108 afii10109
-afii10110 afii10145 afii10146 afii10147 afii10148 afii10192 afii10193 afii10194 afii10195 afii10196
-afii10831 afii10832 afii10846 afii299 afii300 afii301 afii57381 afii57388 afii57392 afii57393 afii57394
-afii57395 afii57396 afii57397 afii57398 afii57399 afii57400 afii57401 afii57403 afii57407 afii57409
-afii57410 afii57411 afii57412 afii57413 afii57414 afii57415 afii57416 afii57417 afii57418 afii57419
-afii57420 afii57421 afii57422 afii57423 afii57424 afii57425 afii57426 afii57427 afii57428 afii57429
-afii57430 afii57431 afii57432 afii57433 afii57434 afii57440 afii57441 afii57442 afii57443 afii57444
-afii57445 afii57446 afii57448 afii57449 afii57450 afii57451 afii57452 afii57453 afii57454 afii57455
-afii57456 afii57457 afii57458 afii57470 afii57505 afii57506 afii57507 afii57508 afii57509 afii57511
-afii57512 afii57513 afii57514 afii57519 afii57534 afii57636 afii57645 afii57658 afii57664 afii57665
-afii57666 afii57667 afii57668 afii57669 afii57670 afii57671 afii57672 afii57673 afii57674 afii57675
-afii57676 afii57677 afii57678 afii57679 afii57680 afii57681 afii57682 afii57683 afii57684 afii57685
-afii57686 afii57687 afii57688 afii57689 afii57690 afii57694 afii57695 afii57700 afii57705 afii57716
-afii57717 afii57718 afii57723 afii57793 afii57794 afii57795 afii57796 afii57797 afii57798 afii57799
-afii57800 afii57801 afii57802 afii57803 afii57804 afii57806 afii57807 afii57839 afii57841 afii57842
-afii57929 afii61248 afii61289 afii61352 afii61573 afii61574 afii61575 afii61664 afii63167 afii64937 agr
-agrave Agravesmall airplane alefsym aleph alpha alphatonos amacr amacron amalg amp ampersand ampersandit
-ampersanditlc ampersandsmall and ang ang90 angle angleleft angleright angmsd angsph angst anoteleia aogon
-aogonek ap ape apos approxequal aquarius aries aring aringacute Aringsmall arrowboth arrowdblboth
-arrowdbldown arrowdblleft arrowdblright arrowdblup arrowdown arrowdwnleft1 arrowdwnrt1 arrowhorizex
-arrowleft arrowleftdwn1 arrowleftup1 arrowright arrowrtdwn1 arrowrtup1 arrowup arrowupdn arrowupdnbse
-arrowupleft1 arrowuprt1 arrowvertex asciicircum asciitilde Asmall ast asterisk asteriskmath asuperior
-asymp at atilde Atildesmall auml b backslash ballpoint bar barb2down barb2left barb2ne barb2nw barb2right
-barb2se barb2sw barb2up barb4down barb4left barb4ne barb4nw barb4right barb4se barb4sw barb4up barwed
-bcong bcy bdash1 bdash2 bdown bdquo becaus bell bepsi bernou beta beth bgr blank bleft bleftright blk12
-blk14 blk34 block bne bnw bomb book bottom bowtie box2 box3 box4 boxcheckbld boxdl boxdr boxh boxhd boxhu
-boxshadowdwn boxshadowup boxul boxur boxv boxvh boxvl boxvr boxxmarkbld bprime braceex braceleft
-braceleftbt braceleftmid bracelefttp braceright bracerightbt bracerightmid bracerighttp bracketleft
-bracketleftbt bracketleftex bracketlefttp bracketright bracketrightbt bracketrightex bracketrighttp breve
-Brevesmall bright brokenbar brvbar bse bsim bsime Bsmall bsol bsuperior bsw budleafne budleafnw budleafse
-budleafsw bull bullet bump bumpe bup bupdown c cacute cancer candle cap capricorn caret caron Caronsmall
-carriagereturn ccaron ccedil ccedilla Ccedillasmall ccirc ccircumflex cdot cdotaccent cedil cedilla
-Cedillasmall cent centinferior centoldstyle centsuperior chcy check checkbld chi cir circ circle circle2
-circle4 circle6 circledown circleleft circlemultiply circleplus circleright circleshadowdwn
-circleshadowup circlestar circleup circumflex Circumflexsmall cire clear club clubs colon colone
-colonmonetary comma commaaccent commainferior command commasuperior commat comp compfn cong congruent
-conint coprod copy copyright copyrightsans copyrightserif copysr crarr crescentstar cross crossceltic
-crossmaltese crossoutline crossshadow crosstar2 Csmall cuepr cuesc cularr cup cupre curarr curren
-currency cuspopen cuspopen1 cuvee cuwed cyrbreve cyrflex d dagger daggerdbl daleth darr darr2 dash dashv
-dblac dblgrave dcaron dcroat dcy deg degree deleteleft deleteright delta dgr dharl dharr diam diamond
-diams die dieresis dieresisacute dieresisgrave Dieresissmall dieresistonos divide divonx djcy dkshade
-dlarr dlcorn dlcrop dnblock dodecastar3 dollar dollarinferior dollaroldstyle dollarsuperior dong dot
-dotaccent Dotaccentsmall dotbelowcomb DotDot dotlessi dotlessj dotmath drarr drcorn drcrop droplet dscy
-Dsmall dstrok dsuperior dtri dtrif dzcy e eacgr eacute Eacutesmall ebreve ecaron ecir ecirc ecircumflex
-Ecircumflexsmall ecolon ecy edieresis Edieresissmall edot edotaccent eeacgr eegr efDot egr egrave
-Egravesmall egs eight eightinferior eightoclock eightoldstyle eightsans eightsansinv eightsuperior
-element elevenoclock ell ellipsis els emacr emacron emdash empty emptyset emsp emsp13 emsp14 endash eng
-ensp envelopeback envelopefront eogon eogonek epsi epsilon epsilontonos epsis equal equals equiv
-equivalence erDot escape esdot Esmall estimated esuperior eta etatonos eth Ethsmall euml euro excl exclam
-exclamdbl exclamdown exclamdownsmall exclamsmall exist existential f fcy female ff ffi ffl fi figuredash
-filecabinet filetalltext filetalltext1 filetalltext3 filledbox filledrect five fiveeighths fiveinferior
-fiveoclock fiveoldstyle fivesans fivesansinv fivesuperior fl flag flat floppy3 floppy5 florin fnof folder
-folderopen forall fork four fourinferior fouroclock fouroldstyle foursans foursansinv foursuperior frac12
-frac13 frac14 frac15 frac16 frac18 frac23 frac25 frac34 frac35 frac38 frac45 frac56 frac58 frac78
-fraction franc frasl frown frownface Fsmall g gamma gammad gbreve gcaron gcedil gcirc gcircumflex
-gcommaaccent gcy gdot gdotaccent ge gel gemini germandbls ges Gg ggr gimel gjcy gl gnE gnsim gradient
-grave gravecomb Gravesmall greater greaterequal gsdot gsim Gsmall gt guillemotleft guillemotright
-guilsinglleft guilsinglright gvnE h H18533 H18543 H18551 H22073 hairsp hamilt handhalt handok handptdwn
-handptleft handptright handptup handv handwrite handwriteleft hardcy harddisk harr harrw hbar hcirc
-hcircumflex head2down head2left head2right head2up heart hearts hellip hexstar2 hookabovecomb horbar
-hourglass house Hsmall hstrok hungarumlaut Hungarumlautsmall hybull hyphen hypheninferior hyphensuperior
-i iacgr iacute Iacutesmall ibreve icirc icircumflex Icircumflexsmall icy idiagr idieresis Idieresissmall
-idigr Idot Idotaccent iecy iexcl iff Ifraktur igr igrave Igravesmall ij ijlig imacr imacron image incare
-infin infinity inodot int intcal integral integralbt integralex integraltp intersection invbullet
-invcircle invsmileface iocy iogon iogonek iota iotadieresis iotadieresistonos iotatonos iquest isin
-Ismall isuperior itilde iukcy iuml j jcirc jcircumflex jcy jsercy Jsmall jukcy k kappa kappav kcedil
-kcommaaccent kcy keyboard kgr kgreen kgreenlandic khcy khgr kjcy Ksmall l lAarr lacute lagran lambda lang
-laquo larr larr2 larrhk larrlp larrtl lcaron lcedil lceil lcommaaccent lcub lcy ldot ldquo ldquor le
-leafccwne leafccwnw leafccwse leafccwsw leafne leafnw leafse leafsw leg leo les less lessequal lfblock
-lfloor lg lgr lhard lharu lhblk libra lira ljcy ll lmidot lnE lnsim logicaland logicalnot logicalor longs
-lowast lowbar loz lozenge lozenge4 lozenge6 lozf lpar lrarr2 lrhar2 lsaquo lsh lsim lslash Lslashsmall
-Lsmall lsqb lsquo lsquor lstrok lsuperior lt lthree ltimes ltri ltrie ltrif ltshade lvnE m macr macron
-Macronsmall mailboxflagdwn mailboxflagup mailbxopnflgdwn mailbxopnflgup male malt map marker mcy mdash
-mgr micro mid middot minus minusb minute mldr mnplus models mouse2button Msmall msuperior mu multiply
-mumap musicalnote musicalnotedbl n nabla nacute nap napos napostrophe natur nbsp ncaron ncedil
-ncommaaccent ncong ncy ndash ne nearr nequiv neutralface nexist nge nges ngr ngt nharr ni nine
-nineinferior nineoclock nineoldstyle ninesans ninesansinv ninesuperior njcy nlarr nldr nle nles nlt nltri
-nltrie nmid not notelement notequal notin notsubset npar npr npre nrarr nrtri nrtrie nsc nsce nsim nsime
-Nsmall nsub nsube nsup nsupe nsuperior ntilde Ntildesmall nu num numbersign numero numsp nvdash nwarr o
-oacgr oacute Oacutesmall oast obreve ocir ocirc ocircumflex Ocircumflexsmall octastar2 octastar4 ocy
-odash odblac odieresis Odieresissmall odot oe oelig OEsmall ogon ogonek Ogoneksmall ogr ograve
-Ogravesmall ohacgr ohgr ohm ohorn ohungarumlaut olarr oline om omacr omacron omega omega1 omegatonos
-omicron omicrontonos ominus one onedotenleader oneeighth onefitted onehalf oneinferior oneoclock
-oneoldstyle onequarter onesans onesansinv onesuperior onethird openbullet oplus or orarr order ordf
-ordfeminine ordm ordmasculine orthogonal oS oslash oslashacute Oslashsmall Osmall osol osuperior otilde
-Otildesmall otimes ouml overline p par para paragraph parenleft parenleftbt parenleftex parenleftinferior
-parenleftsuperior parenlefttp parenright parenrightbt parenrightex parenrightinferior parenrightsuperior
-parenrighttp part partialdiff pc pcy pencil pennant pentastar2 percent percnt period periodcentered
-periodinferior periodsuperior permil perp perpendicular perthousand peseta pgr phgr phi phi1 phis phiv
-phmmat phone pi pisces piv planck plus plusb plusdo plusminus plusmn pound pr prescription prime prnsim
-prod product prop propersubset propersuperset proportional prsim psgr psi Psmall puncsp q Qsmall query
-quest question questiondown questiondownsmall questionsmall quiltsquare2 quiltsquare2inv quot quotedbl
-quotedblbase quotedblleft quotedbllftbld quotedblright quotedblrtbld quoteleft quotereversed quoteright
-quotesinglbase quotesingle r rAarr racute radic radical radicalex rang raquo rarr rarr2 rarrhk rarrlp
-rarrtl rarrw rcaron rcedil rceil rcommaaccent rcub rcy rdquo rdquor readingglasses real rect reflexsubset
-reflexsuperset reg registercircle registered registersans registerserif registersquare revlogicalnot
-rfloor Rfraktur rgr rhard rharu rho rhombus4 rhombus6 rhov ring ring2 ring4 ring6 ringbutton2 Ringsmall
-rlarr2 rlhar2 rosette rosettesolid rpar rsaquo rsh Rsmall rsqb rsquo rsquor rsuperior rtblock rthree
-rtimes rtri rtrie rtrif rupiah rx s sacute saggitarius samalg sbquo sc scaron Scaronsmall sccue scedil
-scedilla scirc scircumflex scissors scissorscutting scnsim scommaaccent scorpio scsim scy sdot sdotb
-second sect section semi semicolon setmn seven seveneighths seveninferior sevenoclock sevenoldstyle
-sevensans sevensansinv sevensuperior sextile SF010000 SF020000 SF030000 SF040000 SF050000 SF060000
-SF070000 SF080000 SF090000 SF100000 SF110000 SF190000 SF200000 SF210000 SF220000 SF230000 SF240000
-SF250000 SF260000 SF270000 SF280000 SF360000 SF370000 SF380000 SF390000 SF400000 SF410000 SF420000
-SF430000 SF440000 SF450000 SF460000 SF470000 SF480000 SF490000 SF500000 SF510000 SF520000 SF530000
-SF540000 sfgr sgr shade sharp shchcy shcy shy sigma sigma1 sigmav sim sime similar six sixinferior
-sixoclock sixoldstyle sixsans sixsansinv sixsuperior skullcrossbones slash smile smileface snowflake
-softcy sol space spade spades sqcap sqcup sqsub sqsube sqsup sqsupe squ square square2 square4 square6
-squf Ssmall sstarf ssuperior star starf starofdavid starshadow sterling sub sube subnE suchthat sum
-summation sun sung sunshine sup sup1 sup2 sup3 supe supnE szlig t tapereel target tau taurus tbar tcaron
-tcedil tcommaaccent tcy tdot telephonesolid telhandsetcirc telrec tenoclock tensans tensansinv tgr there4
-therefore theta theta1 thetas thetasym thetav thgr thinsp thkap thksim thorn Thornsmall three
-threeeighths threeinferior threeoclock threeoldstyle threequarters threequartersemdash threesans
-threesansinv threesuperior thumbdown thumbup tilde tildecomb Tildesmall times timesb tonos top tprime
-trade trademark trademarksans trademarkserif triagdn triaglf triagrt triagup trie tristar2 tscy tshcy
-Tsmall tstrok tsuperior twelveoclock twixt two twodotenleader twoinferior twooclock twooldstyle twosans
-twosansinv twosuperior twothirds u uacgr uacute Uacutesmall uarr uarr2 ubrcy ubreve ucirc ucircumflex
-Ucircumflexsmall ucy udblac udiagr udieresis Udieresissmall udigr ugr ugrave Ugravesmall uharl uharr
-uhblk uhorn uhungarumlaut ulcorn ulcrop umacr umacron uml underscore underscoredbl union universal uogon
-uogonek upblock uplus upsi upsih upsilon Upsilon1 upsilondieresis upsilondieresistonos upsilontonos
-urcorn urcrop uring Usmall utilde utri utrif uuml v varr vcy vdash veebar vellip verbar vineleafboldne
-vineleafboldnw vineleafboldse vineleafboldsw virgo vltri vprime vprop vrtri Vsmall Vvdash w wacute wcirc
-wcircumflex wdieresis wedgeq weierp weierstrass wgrave wheel windowslogo wreath Wsmall x xcirc xdtri xgr
-xi xmarkbld xrhombus Xsmall xutri y yacute Yacutesmall yacy ycirc ycircumflex ycy ydieresis
-Ydieresissmall yen ygrave yicy yinyang Ysmall yucy yuml z zacute zcaron Zcaronsmall zcy zdot zdotaccent
-zero zeroinferior zerooldstyle zerosans zerosansinv zerosuperior zeta zgr zhcy Zsmall zwnj
-
-B<Please Note:> You may notice that apart from the 'AGL/WGL4', names from the XML, (X)HTML and SGML
-specification sets have been included to enable interoperability towards PDF.
+B<Please Note:> You may notice that apart from the 'AGL/WGL4', names
+from the XML, (X)HTML and SGML specification sets have been included
+to enable interoperability towards PDF.
 
 =cut
