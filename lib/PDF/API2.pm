@@ -2530,8 +2530,7 @@ This module does not work with perl's -l command-line switch.
 
 =head1 AUTHOR
 
-PDF::API2 was originally written (as far as I know) by Alfred
-Reibenschuh.
+PDF::API2 was originally written by Alfred Reibenschuh.
 
 It is currently being maintained by Steve Simms.
 

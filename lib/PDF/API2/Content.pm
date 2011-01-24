@@ -1692,7 +1692,7 @@ sub textpos2 {
 
 Adds text to the page.
 
-Options
+Options:
 
 =over
 
