@@ -1030,7 +1030,7 @@ filling.
 
 sub fill {
     my $self = shift;
-    $self->add(shift ? 'f*' : 'f');
+    $self->add(shift() ? 'f*' : 'f');
     return $self;
 }
 
@@ -1042,7 +1042,7 @@ Fills and then strokes the current path.
 
 sub fillstroke {
     my $self = shift;
-    $self->add(shift ? 'B*' : 'B');
+    $self->add(shift() ? 'B*' : 'B');
     return $self;
 }
 
@@ -1055,7 +1055,7 @@ path.
 
 sub clip {
     my $self = shift;
-    $self->add(shift ? 'W*' : 'W');
+    $self->add(shift() ? 'W*' : 'W');
     return $self;
 }
 
@@ -1684,7 +1684,7 @@ sub textpos2 {
 
 =back
 
-=item Text-Showing
+=head2 Text-Showing
 
 =over
 
