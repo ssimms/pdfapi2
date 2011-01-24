@@ -1,0 +1,44 @@
+PDF::API2 is using Dist::Zilla to make development easier.
+Unfortunately, this can make it a little bit harder to contribute
+since the source isn't the same as the distribution.
+
+
+GET THE SOURCE CODE
+-------------------
+
+You can get the source from the following master repository:
+
+http://deefs.net/hg/pdfapi2
+
+It can also be found in an easily-forked location at:
+
+http://bitbucket.org/ssimms/pdfapi2
+
+
+INSTALL Dist::Zilla
+-------------------
+
+Once you have the source, you'll also need the Dist::Zilla
+distribution from CPAN.  It has a boatload of dependencies, but it
+should install cleanly.  If not, help is usually easy to find on
+irc.perl.org.
+
+
+RUN dzil build|test|etc
+-----------------------
+
+PERL5LIB=lib dzil build|test|etc
+
+or
+
+export PERL5LIB=lib
+dzil build|test|etc
+
+If you leave out the PERL5LIB=lib part, you'll almost definitely get
+an error saying that PDF::API2::Build::Version couldn't be located.
+That's because it's only found here.
+
+Basically, PDF::API2::Build::Version takes the version number from the
+dist.ini file and adds it to all the .pm files just under the package
+name.  As of this writing, I haven't found a plugin for Dist::Zilla
+that does this in a way that doesn't look machine-generated.
