@@ -1,15 +1,30 @@
 {{$NEXT}}
 
-- New Maintainer: Steve Simms (http://deefs.net)
-
-- This release jumps from version 0.73 to 2.016 in order to provide a
-  consistent version number across all modules in the distribution
-  without breaking any existing code or going backwards.
-
-- Font::TTF has been added as a dependency instead of being embedded
-  in the distribution.
-
-- Lots of updates to the documentation.
+    - New Maintainer: Steve Simms (http://deefs.net)
+    
+    - This release jumps from version 0.73 to 2.016 in order to
+      provide a consistent version number across all modules in the
+      distribution without breaking any existing code or going
+      backwards.
+    
+    - Lots of updates to the documentation, particularly in
+      PDF::API2::Content, which was almost completely rewritten and
+      reorganized.
+    
+    - Font::TTF has been added as a dependency instead of being
+      embedded in the distribution.
+    
+    - Everything that worked in 0.73 should work unmodified in 2.016,
+      at least if it used the published documentation, and most
+      everything should still work even if it didn't.
+    
+    - PDF::API2 used to read and parse three text files, one of which
+      was over 500kB, on every load.  These files have been turned
+      into modules, and while I haven't done any performance testing,
+      I'd have a hard time believing that it isn't faster now.
+    
+    - There are now a few tests forming the beginning of a test suite.
+      Contributions of tests would be most welcome!
 
 
 ======================================================================
