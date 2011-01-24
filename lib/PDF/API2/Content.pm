@@ -14,15 +14,21 @@ no warnings qw( deprecated recursion uninitialized );
 
 =head1 NAME
 
-PDF::API2::Content
+PDF::API2::Content - Methods for adding graphics and text to a PDF
+
+=head1 SYNOPSIS
+
+    # Start with a PDF page (new or opened)
+    my $pdf = PDF::API2->new();
+    my $page = $pdf->page();
+    
+    # Add a new content object
+    my $content = $page->gfx();
+    my $content = $page->text();
+    
+    # Then call the methods below add graphics and text to the page.
 
 =head1 METHODS
-
-=over
-
-=item $co = PDF::API2::Content->new @parameters
-
-Returns a new content object (called from $page->text and $page->gfx).
 
 =cut
 
@@ -71,248 +77,21 @@ sub outobjdeep {
     $self->SUPER::outobjdeep(@_);
 }
 
-=item $co->add @content
+=head2 Coordinate Transformations
 
-Adds @content to the object.
+The methods in this section change the coordinate system for the
+current content object relative to the rest of the document.
 
-=cut
+If you call more than one of these methods, the PDF specification
+recommends calling them in the following order: translate, rotate,
+scale, skew.  Each change builds on the last, and you can get
+unexpected results when calling them in a different order.
 
-sub add_post {
-    my $self = shift;
-    if (scalar @_) {
-        $self->{' poststream'} .= ($self->{' poststream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ';
-    }
-    return $self;
-}
-sub add {
-    my $self = shift;
-    if (scalar @_) {
-        $self->{' stream'} .= encode('iso-8859-1', ($self->{' stream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ');
-    }
-    return $self;
-}
+=over
 
-# Shortcut method for determining if we're inside a text object
-# (i.e. between BT and ET).  See textstart and textend.
-sub _in_text_object {
-    my $self = shift();
-    return defined($self->{' apiistext'}) && $self->{' apiistext'} == 1;
-}
+=item $content->translate($x, $y)
 
-=item $co->save
-
-Saves the state of the object.
-
-=cut
-
-sub _save {
-    return 'q';
-}
-
-sub save {
-    my $self = shift;
-    unless ($self->_in_text_object()) {
-        $self->add(_save());
-    }
-}
-
-=item $co->restore
-
-Restores the state of the object.
-
-=cut
-
-sub _restore {
-    return 'Q';
-}
-
-sub restore {
-    my $self = shift;
-    unless ($self->_in_text_object()) {
-        $self->add(_restore());
-    }
-}
-
-=item $co->compressFlate
-
-Marks content for compression on output.
-
-=cut
-
-sub compressFlate {
-    my $self=shift @_;
-    $self->{'Filter'}=PDFArray(PDFName('FlateDecode'));
-    $self->{-docompress}=1;
-    return $self;
-}
-
-sub metaStart {
-    my $self=shift @_;
-    my $tag=shift @_;
-    my $obj=shift @_;
-    $self->add("/$tag");
-    if (defined $obj) {
-        my $dict=PDFDict();
-        $dict->{Metadata}=$obj;
-        $self->resource('Properties',$obj->name,$dict);        
-        $self->add('/'.($obj->name));
-        $self->add('BDC');
-    }
-    else {
-        $self->add('BMC');
-    }
-    return $self;
-}
-
-sub metaEnd {
-    my $self=shift @_;
-    $self->add('EMC');
-    return $self;
-}
-
-=item $co->flatness $flat
-
-Sets flatness.
-
-=cut
-
-sub _flatness {
-    my ($flatness)=@_;
-    return ($flatness, 'i');
-}
-
-sub flatness {
-    my ($self,$flatness)=@_;
-    $self->add(_flatness($flatness));
-}
-
-=item $co->linecap $cap
-
-Sets linecap.
-
-=cut
-
-sub _linecap {
-    my ($linecap)=@_;
-    return ($linecap, 'J');
-}
-
-sub linecap {
-    my ($self,$linecap)=@_;
-    $self->add(_linecap($linecap));
-}
-
-=item $co->linedash @dash
-
-Sets linedash.
-
-=cut
-
-sub _linedash {
-    my (@a)=@_;
-    if (scalar @a < 1) {
-            return ('[',']','0','d');
-    } 
-    else {
-        if ($a[0]=~/^\-/) {
-            my %a=@a;
-            $a{-pattern}=[$a{-full}||0,$a{-clear}||0] unless(ref $a{-pattern});
-            return ('[',floats(@{$a{-pattern}}),']',($a{-shift}||0),'d');
-        } 
-        else {
-            return ('[',floats(@a),'] 0 d');
-        }
-    }
-}
-
-sub linedash {
-    my ($self,@a)=@_;
-    $self->add(_linedash(@a));
-}
-
-=item $co->linejoin $join
-
-Sets linejoin.
-
-=cut
-
-sub _linejoin {
-    my ($linejoin)=@_;
-    return ($linejoin, 'j');
-}
-sub linejoin {
-    my ($this,$linejoin)=@_;
-    $this->add(_linejoin($linejoin));
-}
-
-=item $co->linewidth $width
-
-Sets linewidth.
-
-=cut
-
-sub _linewidth {
-    my ($linewidth)=@_;
-    return ($linewidth, 'w');
-}
-sub linewidth {
-    my ($this,$linewidth)=@_;
-    $this->add(_linewidth($linewidth));
-}
-
-=item $co->meterlimit $limit
-
-Sets meterlimit.
-
-=cut
-
-sub _meterlimit {
-    my ($limit)=@_;
-    return ($limit, 'M');
-}
-sub meterlimit {
-    my ($this, $limit)=@_;
-    $this->add(_meterlimit($limit));
-}
-
-=item $co->matrix $a,$b,$c,$d,$e,$f
-
-Sets matrix transformation.
-
-=cut
-
-sub _matrix_text {
-    my ($a,$b,$c,$d,$e,$f)=@_;
-    return (floats($a,$b,$c,$d,$e,$f),'Tm');
-}
-sub _matrix_gfx {
-    my ($a,$b,$c,$d,$e,$f)=@_;
-    return (floats($a,$b,$c,$d,$e,$f),'cm');
-}
-sub matrix {
-    my $self=shift @_;
-    my ($a,$b,$c,$d,$e,$f)=@_;
-    if (defined $a) {
-        if ($self->_in_text_object()) {
-            $self->add(_matrix_text($a,$b,$c,$d,$e,$f));
-            @{$self->{' textmatrix'}}=($a,$b,$c,$d,$e,$f);
-            @{$self->{' textlinematrix'}}=(0,0);
-        } 
-        else {
-            $self->add(_matrix_gfx($a,$b,$c,$d,$e,$f));
-        }
-    }
-    if ($self->_in_text_object()) {
-        return @{$self->{' textmatrix'}};
-    } 
-    else {
-        return $self;
-    }
-}
-
-=item $co->translate $x,$y
-
-Sets translation transformation.
+Moves the origin along the x and y axes.
 
 =cut
 
@@ -326,41 +105,11 @@ sub translate {
     $self->transform(-translate=>[$x,$y]);
 }
 
-=item $co->scale $sx,$sy
+=item $content->rotate($degrees)
 
-Sets scaling transformation.
+Rotates the coordinate system counter-clockwise.
 
-=cut
-
-sub _scale {
-    my ($x,$y)=@_;
-    return ($x,0,0,$y,0,0);
-}
-
-sub scale {
-    my ($self,$sx,$sy)=@_;
-    $self->transform(-scale=>[$sx,$sy]);
-}
-
-=item $co->skew $sa,$sb
-
-Sets skew transformation.
-
-=cut
-
-sub _skew {
-    my ($a,$b)=@_;
-    return (1, tan(deg2rad($a)),tan(deg2rad($b)),1,0,0);
-}
-
-sub skew {
-    my ($self,$a,$b)=@_;
-    $self->transform(-skew=>[$a,$b]);
-}
-
-=item $co->rotate $rot
-
-Sets rotation transformation.
+Use a negative argument to rotate clockwise.
 
 =cut
 
@@ -374,18 +123,53 @@ sub rotate {
     $self->transform(-rotate=>$a);
 }
 
-=item $co->transform %opts
+=item $content->scale($sx, $sy)
 
-Sets transformations (eg. translate, rotate, scale, skew) in pdf-canonical order.
+Scales (stretches) the coordinate systems along the x and y axes.
 
-B<Example:>
+=cut
 
-    $co->transform(
-        -translate => [$x,$y],
-        -rotate    => $rot,
-        -scale     => [$sx,$sy],
-        -skew      => [$sa,$sb],
+sub _scale {
+    my ($x,$y)=@_;
+    return ($x,0,0,$y,0,0);
+}
+
+sub scale {
+    my ($self,$sx,$sy)=@_;
+    $self->transform(-scale=>[$sx,$sy]);
+}
+
+=item $content->skew($sa, $sb)
+
+Skews the coordinate system by C<$sa> degrees (counter-clockwise) from
+the x axis and C<$sb> degrees (clockwise) from the y axis.
+
+=cut
+
+sub _skew {
+    my ($a,$b)=@_;
+    return (1, tan(deg2rad($a)),tan(deg2rad($b)),1,0,0);
+}
+
+sub skew {
+    my ($self,$a,$b)=@_;
+    $self->transform(-skew=>[$a,$b]);
+}
+
+=item $content->transform(%options)
+
+    $content->transform(
+        -translate => [$x, $y],
+        -rotate    => $degrees,
+        -scale     => [$sx, $sy],
+        -skew      => [$sa, $sb],
     )
+
+Performs multiple coordinate transformations at once, in the order
+recommended by the PDF specification (translate, rotate, scale, then
+skew).
+
+This is equivalent to making each transformation separately.
 
 =cut
 
@@ -477,17 +261,828 @@ sub transform {
     return $self;
 }
 
-=item $co->fillcolor @colors
+=item $content->transform_rel(%options)
 
-=item $co->strokecolor @colors
+Makes transformations similarly to C<transform>, except that it adds
+to the previously set values.
 
-Sets fill-/strokecolor, see PDF::API2::Util for a list of possible color specifiers.
+=cut
 
-B<Examples:>
+sub transform_rel {
+    my ($self,%opt)=@_;
+    my ($sa1,$sb1)=@{$opt{-skew} ? $opt{-skew} : [0,0]};
+    my ($sa0,$sb0)=@{$self->{" skew"}};
 
-    $co->fillcolor('blue');       # blue
-    $co->strokecolor('#FF0000');  # red
-    $co->fillcolor('%FFF000000'); # cyan
+    my ($sx1,$sy1)=@{$opt{-scale} ? $opt{-scale} : [1,1]};
+    my ($sx0,$sy0)=@{$self->{" scale"}};
+
+    my $rot1=$opt{"-rotate"} || 0;
+    my $rot0=$self->{" rotate"};
+
+    my ($tx1,$ty1)=@{$opt{-translate} ? $opt{-translate} : [0,0]};
+    my ($tx0,$ty0)=@{$self->{" translate"}};
+
+    $self->transform(
+        -skew=>[$sa0+$sa1,$sb0+$sb1],
+        -scale=>[$sx0*$sx1,$sy0*$sy1],
+        -rotate=>$rot0+$rot1,
+        -translate=>[$tx0+$tx1,$ty0+$ty1],
+    );
+    return $self;
+}
+
+=item $content->matrix($a, $b, $c, $d, $e, $f)
+
+(Advanced) Sets the current transformation matrix manually.  Unless
+you have a particular need to enter transformations manually, you
+should use the C<transform> method instead.
+
+=cut
+
+sub _matrix_text {
+    my ($a,$b,$c,$d,$e,$f)=@_;
+    return (floats($a,$b,$c,$d,$e,$f),'Tm');
+}
+
+sub _matrix_gfx {
+    my ($a,$b,$c,$d,$e,$f)=@_;
+    return (floats($a,$b,$c,$d,$e,$f),'cm');
+}
+
+sub matrix {
+    my $self=shift @_;
+    my ($a,$b,$c,$d,$e,$f)=@_;
+    if (defined $a) {
+        if ($self->_in_text_object()) {
+            $self->add(_matrix_text($a,$b,$c,$d,$e,$f));
+            @{$self->{' textmatrix'}}=($a,$b,$c,$d,$e,$f);
+            @{$self->{' textlinematrix'}}=(0,0);
+        } 
+        else {
+            $self->add(_matrix_gfx($a,$b,$c,$d,$e,$f));
+        }
+    }
+    if ($self->_in_text_object()) {
+        return @{$self->{' textmatrix'}};
+    } 
+    else {
+        return $self;
+    }
+}
+
+sub matrix_update {
+    my ($self,$tx,$ty)=@_;
+    $self->{' textlinematrix'}->[0]+=$tx;
+    $self->{' textlinematrix'}->[1]+=$ty;
+    return $self;
+}
+
+=back
+
+=head2 Graphics State Parameters
+
+=over
+
+=item $content->save
+
+Saves the current graphics state and text state on a stack.
+
+=cut
+
+sub _save {
+    return 'q';
+}
+
+sub save {
+    my $self = shift;
+    unless ($self->_in_text_object()) {
+        $self->add(_save());
+    }
+}
+
+=item $content->restore
+
+Restores the most recently saved graphics state and text state,
+removing it from the stack.
+
+=cut
+
+sub _restore {
+    return 'Q';
+}
+
+sub restore {
+    my $self = shift;
+    unless ($self->_in_text_object()) {
+        $self->add(_restore());
+    }
+}
+
+=item $content->linewidth($width)
+
+Sets the width of the stroke.
+
+=cut
+
+sub _linewidth {
+    my ($linewidth)=@_;
+    return ($linewidth, 'w');
+}
+sub linewidth {
+    my ($this,$linewidth)=@_;
+    $this->add(_linewidth($linewidth));
+}
+
+=item $content->linecap($style)
+
+Sets the style to be used at the end of a stroke.
+
+=over
+
+=item 0 = Butt Cap
+
+The stroke ends at the end of the path, with no projection.
+
+=item 1 = Round Cap
+
+An arc is drawn around the end of the path with a diameter equal to
+the line width, and is filled in.
+
+=item 2 = Projecting Square Cap
+
+The stroke continues past the end of the path for half the line width.
+
+=back
+
+=cut
+
+sub _linecap {
+    my ($linecap)=@_;
+    return ($linecap, 'J');
+}
+
+sub linecap {
+    my ($self,$linecap)=@_;
+    $self->add(_linecap($linecap));
+}
+
+=item $content->linejoin($style)
+
+Sets the style of join to be used at corners of a path.
+
+=over
+
+=item 0 = Miter Join
+
+The outer edges of the stroke extend until they meet, up to the limit
+specified below.  If the limit would be surpassed, a bevel join is
+used instead.
+
+=item 1 = Round Join
+
+A circle with a diameter equal to the linewidth is drawn around the
+corner point, producing a rounded corner.
+
+=item 2 = Bevel Join
+
+A triangle is drawn to fill in the notch between the two strokes.
+
+=back
+
+=cut
+
+sub _linejoin {
+    my ($linejoin)=@_;
+    return ($linejoin, 'j');
+}
+sub linejoin {
+    my ($this,$linejoin)=@_;
+    $this->add(_linejoin($linejoin));
+}
+
+=item $content->meterlimit($ratio)
+
+Note: This method is named incorrectly, and will be renamed in a
+future release.
+
+Sets the miter (not meter) limit when the line join style is a miter
+join.
+
+The ratio is the maximum length of the miter divided by the line
+width.  Any miter above this ratio will be converted to a bevel join.
+
+=cut
+
+sub _meterlimit {
+    my ($limit)=@_;
+    return ($limit, 'M');
+}
+sub meterlimit {
+    my ($this, $limit)=@_;
+    $this->add(_meterlimit($limit));
+}
+
+=item $content->linedash($on_off)
+
+=item $content->linedash($on, $off)
+
+Sets the line dash pattern.
+
+If passed with one argument, the strokes and spaces will have equal
+lengths.
+
+If passed with two arguments, the strokes will have length C<$on>, and
+the spaces will have length C<$off>.
+
+=cut
+
+sub _linedash {
+    my (@a)=@_;
+    if (scalar @a < 1) {
+        return ('[',']','0','d');
+    } 
+    else {
+        if ($a[0]=~/^\-/) {
+            my %a=@a;
+            $a{-pattern}=[$a{-full}||0,$a{-clear}||0] unless(ref $a{-pattern});
+            return ('[',floats(@{$a{-pattern}}),']',($a{-shift}||0),'d');
+        } 
+        else {
+            return ('[',floats(@a),'] 0 d');
+        }
+    }
+}
+
+sub linedash {
+    my ($self,@a)=@_;
+    $self->add(_linedash(@a));
+}
+
+=item $content->flatness($tolerance)
+
+(Advanced) Sets the maximum variation in output pixels when drawing
+curves.
+
+=cut
+
+sub _flatness {
+    my ($flatness)=@_;
+    return ($flatness, 'i');
+}
+
+sub flatness {
+    my ($self,$flatness)=@_;
+    $self->add(_flatness($flatness));
+}
+
+=item $content->egstate($object)
+
+(Advanced) Adds an Extended Graphic State object containing additional
+state parameters.
+
+=cut
+
+sub egstate {
+    my $self = shift;
+    my $egs = shift;
+    $self->add('/'.$egs->name,'gs');
+    $self->resource('ExtGState',$egs->name,$egs);
+    return $self;
+}
+
+=back
+
+=head2 Path Construction (Drawing)
+
+=over
+
+=item $content->move($x, $y)
+
+Starts a new path at the specified coordinates.
+
+=cut
+
+sub _move {
+    my($x,$y)=@_;
+    return (floats($x,$y), 'm');
+}
+sub move {
+    my $self=shift @_;
+    my ($x,$y);
+    while(defined($x = shift)) {
+        $y = shift;
+        $self->{' x'}=$x;
+        $self->{' y'}=$y;
+        $self->{' mx'}=$x;
+        $self->{' my'}=$y;
+        if ($self->_in_text_object()) {
+            $self->add_post(floats($x,$y), 'm');
+        } 
+        else {
+            $self->add(floats($x,$y), 'm');
+        }
+    }
+    return $self;
+}
+
+=item $content->line($x, $y)
+
+Extends the path in a line from the current coordinates to the
+specified coordinates, and updates the current position to be the new
+coordinates.
+
+Note: The line will not appear until you call C<stroke>.
+
+=cut
+
+sub _line {
+    my ($x,$y) = @_;
+    return (floats($x,$y), 'l');
+}
+
+sub line {
+    my $self = shift;
+    my ($x,$y);
+    while(defined($x = shift)) {
+        $y = shift;
+        $self->{' x'}=$x;
+        $self->{' y'}=$y;
+        if ($self->_in_text_object()) {
+            $self->add_post(floats($x,$y), 'l');
+        } 
+        else {
+            $self->add(floats($x,$y), 'l');
+        }
+    }
+    return $self;
+}
+
+=item $content->hline($x)
+
+=item $content->vline($y)
+
+Shortcut for drawing horizontal and vertical lines from the current
+position.
+
+=cut
+
+sub hline {
+    my ($self, $x) = @_;
+    if ($self->_in_text_object()) {
+        $self->add_post(floats($x,$self->{' y'}),'l');
+    } 
+    else {
+        $self->add(floats($x,$self->{' y'}),'l');
+    }
+    $self->{' x'}=$x;
+    return $self;
+}
+
+sub vline {
+    my ($self, $y) = @_;
+    if ($self->_in_text_object()) {
+        $self->add_post(floats($self->{' x'},$y),'l');
+    } 
+    else {
+        $self->add(floats($self->{' x'},$y),'l');
+    }
+    $self->{' y'}=$y;
+    return $self;
+}
+
+=item $content->poly($x1, $y1, ..., $xn, $yn)
+
+Shortcut for creating a polyline path.  Moves to C<[$x1, $y1]>, and
+then extends the path in lines along the specified coordinates.
+
+=cut
+
+sub poly {
+    my $self = shift;
+    my $x = shift;
+    my $y = shift;
+    $self->move($x,$y);
+    $self->line(@_);
+    return $self;
+}
+
+=item $content->curve($cx1, $cy1, $cx2, $cy2, $x, $y)
+
+Extends the path in a curve from the current point to C<($x, $y)>,
+using the two specified points to create a cubic Bezier curve, and
+updates the current position to be the new point.
+
+Note: The curve will not appear until you call C<stroke>.
+
+=cut
+
+sub curve {
+    my $self = shift;
+    my($x1,$y1,$x2,$y2,$x3,$y3);
+    while (defined($x1 = shift)) {
+        $y1 = shift;
+        $x2 = shift;
+        $y2 = shift;
+        $x3 = shift;
+        $y3 = shift;
+        if ($self->_in_text_object()) {
+            $self->add_post(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
+        } 
+        else {
+            $self->add(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
+        }
+        $self->{' x'}=$x3;
+        $self->{' y'}=$y3;
+    }
+    return $self;
+}
+
+=item $content->spline($cx1, $cy1, $x, $y)
+
+Extends the path in a curve from the current point to C<($x, $y)>,
+using the two specified points to create a spline, and updates the
+current position to be the new point.
+
+Note: The curve will not appear until you call C<stroke>.
+
+=cut
+
+sub spline {
+    my $self = shift;
+    
+    while(scalar @_ >= 4) {
+        my $cx = shift;
+        my $cy = shift;
+        my $x = shift;
+        my $y = shift;
+        my $c1x = (2*$cx+$self->{' x'})/3;
+        my $c1y = (2*$cy+$self->{' y'})/3;
+        my $c2x = (2*$cx+$x)/3;
+        my $c2y = (2*$cy+$y)/3;
+        $self->curve($c1x,$c1y,$c2x,$c2y,$x,$y);
+    }
+}
+
+=item $content->arc($x, $y, $a, $b, $alpha, $beta, $move)
+
+Extends the path along an arc of an ellipse centered at C<[x, y]>.
+The major and minor axes of the ellipse are C<$a> and C<$b>,
+respectively, and the arc moves from C<$alpha> degrees to C<$beta>
+degrees.  The current position is then set to the endpoint of the arc.
+
+Set C<$move> to a true value if this arc is the beginning of a new
+path instead of the continuation of an existing path.
+
+=cut
+
+# Private
+sub arctocurve {
+    my ($a,$b,$alpha,$beta) = @_;
+    if (abs($beta-$alpha) > 30) {
+        return (
+            arctocurve($a,$b,$alpha,($beta+$alpha)/2),
+            arctocurve($a,$b,($beta+$alpha)/2,$beta)
+        );
+    } 
+    else {
+        $alpha = ($alpha * pi / 180);
+        $beta  = ($beta * pi / 180);
+
+        my $bcp = (4.0/3 * (1 - cos(($beta - $alpha)/2)) / sin(($beta - $alpha)/2));
+        my $sin_alpha = sin($alpha);
+        my $sin_beta =  sin($beta);
+        my $cos_alpha = cos($alpha);
+        my $cos_beta =  cos($beta);
+
+        my $p0_x = $a * $cos_alpha;
+        my $p0_y = $b * $sin_alpha;
+        my $p1_x = $a * ($cos_alpha - $bcp * $sin_alpha);
+        my $p1_y = $b * ($sin_alpha + $bcp * $cos_alpha);
+        my $p2_x = $a * ($cos_beta + $bcp * $sin_beta);
+        my $p2_y = $b * ($sin_beta - $bcp * $cos_beta);
+        my $p3_x = $a * $cos_beta;
+        my $p3_y = $b * $sin_beta;
+
+        return ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
+    }
+}
+
+sub arc {
+    my ($self,$x,$y,$a,$b,$alpha,$beta,$move) = @_;
+    my @points = arctocurve($a,$b,$alpha,$beta);
+    my ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
+
+    $p0_x= $x + shift @points;
+    $p0_y= $y + shift @points;
+
+    $self->move($p0_x,$p0_y) if($move);
+
+    while (scalar @points > 0) {
+        $p1_x = $x + shift @points;
+        $p1_y = $y + shift @points;
+        $p2_x = $x + shift @points;
+        $p2_y = $y + shift @points;
+        $p3_x = $x + shift @points;
+        $p3_y = $y + shift @points;
+        $self->curve($p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
+        shift @points;
+        shift @points;
+        $self->{' x'}=$p3_x;
+        $self->{' y'}=$p3_y;
+    }
+    return $self;
+}
+
+=item $content->bogen($x1, $y1, $x2, $y2, $radius, $move, $outer, $reverse)
+
+Extends the path along an arc of a circle of the specified radius
+between C<[x1, y1]> to C<[x2, y2]>.  The current position is then set
+to the endpoint of the arc.
+
+Set C<$move> to a true value if this arc is the beginning of a new
+path instead of the continuation of an existing path.
+
+Set C<$outer> to a true value to draw the larger arc between the two
+points instead of the smaller one.
+
+Set C<$reverse> to a true value to start from the end of the arc and
+extend to the beginning.
+
+Note: 2*r cannot be smaller than the distance from C<[x1, y1]> to
+C<[x2, y2]>.
+
+=cut
+
+sub bogen {
+    my ($self,$x1,$y1,$x2,$y2,$r,$move,$larc,$spf) = @_;
+    my ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
+    my $x = $x2-$x1;
+    my $y = $y2-$y1;
+    my $z = sqrt($x**2+$y**2);
+    my $alpha_rad = asin($y/$z);
+
+    $alpha_rad+=pi/2 if($x<0 and $y>0);
+    $alpha_rad-=pi/2 if($x<0 and $y<0);
+ 
+    my $alpha=rad2deg($alpha_rad);
+    # use the complement angle for span
+    $alpha -= 180 if($spf>0);
+
+    my $d=2*$r;
+    my ($beta,$beta_rad,@points);
+
+    $beta=rad2deg(2*asin($z/$d));
+    $beta=360-$beta if($larc>0);
+
+    $beta_rad=deg2rad($beta);
+
+    @points=arctocurve($r,$r,90+$alpha+$beta/2,90+$alpha-$beta/2);
+
+    if ($spf>0) {
+        my @pts=@points;
+        @points=();
+        while ($y=pop @pts) {
+            $x=pop @pts;
+            push(@points,$x,$y);
+        }
+    }
+
+    $p0_x=shift @points;
+    $p0_y=shift @points;
+    $x=$x1-$p0_x;
+    $y=$y1-$p0_y;
+
+    $self->move($x,$y) if($move);
+
+    while(scalar @points > 0) {
+        $p1_x= $x + shift @points;
+        $p1_y= $y + shift @points;
+        $p2_x= $x + shift @points;
+        $p2_y= $y + shift @points;
+        # if we run out of data points, use the end point instead
+        if (scalar @points == 0) {
+            $p3_x = $x2;
+            $p3_y = $y2;
+        }
+        else {
+            $p3_x= $x + shift @points;
+            $p3_y= $y + shift @points;
+        }
+        $self->curve($p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
+        shift @points;
+        shift @points;
+    }
+    return $self;
+}
+
+=item $content->close
+
+Closes and ends the current path by extending a line from the current
+position to the starting position.
+
+=cut
+
+sub close {
+    my $self = shift;
+    $self->add('h');
+    $self->{' x'}=$self->{' mx'};
+    $self->{' y'}=$self->{' my'};
+    return $self;
+}
+
+=item $content->endpath
+
+Ends the current path without explicitly enclosing it.
+
+=cut
+
+sub endpath {
+    my $self = shift;
+    $self->add('n');
+    return $self;
+}
+
+=item $content->ellipse($x, $y, $a, $b)
+
+Creates an elliptical path centered on C<[$x, $y]>, with major and
+minor axes specified by C<$a> and C<$b>, respectively.
+
+Note: The ellipse will not appear until you call C<stroke> or C<fill>.
+
+=cut
+
+sub ellipse {
+    my ($self,$x,$y,$a,$b) = @_;
+    $self->arc($x,$y,$a,$b,0,360,1);
+    $self->close;
+    return $self;
+}
+
+=item $content->circle($x, $y, $radius)
+
+Creates a circular path centered on C<[$x, $y]> with the specified
+radius.
+
+Note: The circle will not appear until you call C<stroke> or C<fill>.
+
+=cut
+
+sub circle {
+    my ($self,$x,$y,$r) = @_;
+    $self->arc($x,$y,$r,$r,0,360,1);
+    $self->close;
+    return $self;
+}
+
+=item $content->pie($x, $y, $a, $b, $alpha, $beta)
+
+Creates a pie-shaped path from an ellipse centered on C<[$x, $y]>.
+The major and minor axes of the ellipse are C<$a> and C<$b>,
+respectively, and the arc moves from C<$alpha> degrees to C<$beta>
+degrees.
+
+Note: The pie will not appear until you call C<stroke> or C<fill>.
+
+=cut
+
+sub pie {
+    my $self = shift;
+    my ($x,$y,$a,$b,$alpha,$beta)=@_;
+    my ($p0_x,$p0_y)=arctocurve($a,$b,$alpha,$beta);
+    $self->move($x,$y);
+    $self->line($p0_x+$x,$p0_y+$y);
+    $self->arc($x,$y,$a,$b,$alpha,$beta);
+    $self->close;
+}
+
+=item $content->rect($x1, $y1, $w1, $h1, ..., $xn, $yn, $wn, $hn)
+
+Creates paths for one or more rectangles, with their lower left points
+at C<[$x, $y]> and with the specified widths and heights.
+
+Note: The rectangle will not appear until you call C<stroke> or C<fill>.
+
+=cut
+
+sub rect {
+    my $self = shift;
+    my ($x,$y,$w,$h);
+    while (defined($x = shift)) {
+        $y = shift;
+        $w = shift;
+        $h = shift;
+        $self->add(floats($x,$y,$w,$h),'re');
+    }
+    $self->{' x'}=$x;
+    $self->{' y'}=$y;
+    return $self;
+}
+
+=item $content->rectxy($x1, $y1, $x2, $y2)
+
+Creates a rectangular path, with C<[$x1, $y1]> and and C<[$x2, $y2]>
+specifying opposite corners.
+
+Note: The rectangle will not appear until you call C<stroke> or C<fill>.
+
+=cut
+
+sub rectxy {
+    my ($self,$x,$y,$x2,$y2)=@_;
+    $self->rect($x,$y,($x2-$x),($y2-$y));
+    return $self;
+}
+
+=back
+
+=head2 Path Painting (Drawing)
+
+=over
+
+=item $content->stroke
+
+Strokes the current path.
+
+=cut
+
+sub _stroke {
+    return 'S';
+}
+
+sub stroke {
+    my $self = shift;
+    $self->add(_stroke);
+    return $self;
+}
+
+=item $content->fill($use_even_odd_fill)
+
+Fills the current path.
+
+If the path intersects with itself, the nonzero winding rule will be
+used to determine which part of the path is filled in.  If you would
+prefer to use the even-odd rule, pass a true argument.
+
+See the PDF Specification, section 8.5.3.3, for more details on
+filling.
+
+=cut
+
+sub fill {
+    my $self = shift;
+    $self->add(shift ? 'f*' : 'f');
+    return $self;
+}
+
+=item $content->fillstroke($use_even_odd_fill)
+
+Fills and then strokes the current path.
+
+=cut
+
+sub fillstroke {
+    my $self = shift;
+    $self->add(shift ? 'B*' : 'B');
+    return $self;
+}
+
+=item $content->clip($use_even_odd_fill)
+
+Modifies the current clipping path by intersecting it with the current
+path.
+
+=cut
+
+sub clip {
+    my $self = shift;
+    $self->add(shift ? 'W*' : 'W');
+    return $self;
+}
+
+=back
+
+=head2 Colors
+
+=over
+
+=item $content->fillcolor($color)
+
+=item $content->strokecolor($color)
+
+Sets the fill or stroke color.
+
+    # Use a named color
+    $content->fillcolor('blue');
+
+    # Use an RGB color (start with '#')
+    $content->fillcolor('#FF0000');
+
+    # Use a CMYK color (start with '%')
+    $content->fillcolor('%FF000000');
+
+RGB and CMYK colors can have one-byte, two-byte, three-byte, or
+four-byte values for each color.  For instance, cyan can be given as
+C<%F000> or C<%FFFF000000000000>.
 
 =cut
 
@@ -601,436 +1196,52 @@ sub strokecolor {
     return @{$self->{' strokecolor'}};
 }
 
+
+sub shade {
+    my $self = shift;
+    my $shade = shift;
+    my @cord = @_;
+    my @tm = (
+        $cord[2]-$cord[0] , 0,
+        0                 , $cord[3]-$cord[1],
+        $cord[0]          , $cord[1]
+    );
+    $self->save;
+    $self->matrix(@tm);
+    $self->add('/'.$shade->name,'sh');
+
+    $self->resource('Shading',$shade->name,$shade);
+
+    $self->restore;
+    return $self;
+}
+
 =back
 
-=head1 GRAPHICS METHODS
+=head2 External Objects
 
 =over
 
-=item $gfx->move $x, $y
+=item $content->image($image_object, $x, $y, $width, $height)
 
-=cut
+=item $content->image($image_object, $x, $y, $scale)
 
-sub _move {
-    my($x,$y)=@_;
-    return (floats($x,$y), 'm');
-}
-sub move {
-    my $self=shift @_;
-    my ($x,$y);
-    while(defined($x = shift)) {
-        $y = shift;
-        $self->{' x'}=$x;
-        $self->{' y'}=$y;
-        $self->{' mx'}=$x;
-        $self->{' my'}=$y;
-        if ($self->_in_text_object()) {
-            $self->add_post(floats($x,$y), 'm');
-        } 
-        else {
-            $self->add(floats($x,$y), 'm');
-        }
-    }
-    return $self;
-}
+=item $content->image($image_object, $x, $y)
 
-=item $gfx->line $x, $y
+    # Example
+    my $image_object = $pdf->image_jpeg($my_image_file);
+    $content->image($image_object, 100, 200);
 
-=cut
+Places an image on the page in the specified location.
 
-sub _line {
-    my ($x,$y) = @_;
-    return (floats($x,$y), 'l');
-}
+If coordinate transformations have been made (see Coordinate
+Transformations above), the position and scale will be relative to the
+updated coordinates.  Otherwise, [0,0] will represent the bottom left
+corner of the page, and C<$width> and C<$height> will be measured at
+72dpi.
 
-sub line {
-    my $self = shift;
-    my ($x,$y);
-    while(defined($x = shift)) {
-        $y = shift;
-        $self->{' x'}=$x;
-        $self->{' y'}=$y;
-        if ($self->_in_text_object()) {
-            $self->add_post(floats($x,$y), 'l');
-        } 
-        else {
-            $self->add(floats($x,$y), 'l');
-        }
-    }
-    return $self;
-}
-
-=item $gfx->hline $x
-
-=cut
-
-sub hline {
-    my ($self, $x) = @_;
-    if ($self->_in_text_object()) {
-        $self->add_post(floats($x,$self->{' y'}),'l');
-    } 
-    else {
-        $self->add(floats($x,$self->{' y'}),'l');
-    }
-    $self->{' x'}=$x;
-    return $self;
-}
-
-=item $gfx->vline $y
-
-=cut
-
-sub vline {
-    my ($self, $y) = @_;
-    if ($self->_in_text_object()) {
-        $self->add_post(floats($self->{' x'},$y),'l');
-    } 
-    else {
-        $self->add(floats($self->{' x'},$y),'l');
-    }
-    $self->{' y'}=$y;
-    return $self;
-}
-
-=item $gfx->curve $cx1, $cy1, $cx2, $cy2, $x, $y
-
-=cut
-
-sub curve {
-    my $self = shift;
-    my($x1,$y1,$x2,$y2,$x3,$y3);
-    while (defined($x1 = shift)) {
-        $y1 = shift;
-        $x2 = shift;
-        $y2 = shift;
-        $x3 = shift;
-        $y3 = shift;
-        if ($self->_in_text_object()) {
-            $self->add_post(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
-        } 
-        else {
-            $self->add(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
-        }
-        $self->{' x'}=$x3;
-        $self->{' y'}=$y3;
-    }
-    return $self;
-}
-
-=item $gfx->spline $cx1, $cy1, $x, $y
-
-=cut
-
-sub spline {
-    my $self = shift;
-    
-    while(scalar @_ >= 4) {
-        my $cx = shift;
-        my $cy = shift;
-        my $x = shift;
-        my $y = shift;
-        my $c1x = (2*$cx+$self->{' x'})/3;
-        my $c1y = (2*$cy+$self->{' y'})/3;
-        my $c2x = (2*$cx+$x)/3;
-        my $c2y = (2*$cy+$y)/3;
-        $self->curve($c1x,$c1y,$c2x,$c2y,$x,$y);
-    }
-}
-
-sub arctocurve {
-    my ($a,$b,$alpha,$beta) = @_;
-    if (abs($beta-$alpha) > 30) {
-        return (
-            arctocurve($a,$b,$alpha,($beta+$alpha)/2),
-            arctocurve($a,$b,($beta+$alpha)/2,$beta)
-        );
-    } 
-    else {
-        $alpha = ($alpha * pi / 180);
-        $beta  = ($beta * pi / 180);
-
-        my $bcp = (4.0/3 * (1 - cos(($beta - $alpha)/2)) / sin(($beta - $alpha)/2));
-        my $sin_alpha = sin($alpha);
-        my $sin_beta =  sin($beta);
-        my $cos_alpha = cos($alpha);
-        my $cos_beta =  cos($beta);
-
-        my $p0_x = $a * $cos_alpha;
-        my $p0_y = $b * $sin_alpha;
-        my $p1_x = $a * ($cos_alpha - $bcp * $sin_alpha);
-        my $p1_y = $b * ($sin_alpha + $bcp * $cos_alpha);
-        my $p2_x = $a * ($cos_beta + $bcp * $sin_beta);
-        my $p2_y = $b * ($sin_beta - $bcp * $cos_beta);
-        my $p3_x = $a * $cos_beta;
-        my $p3_y = $b * $sin_beta;
-
-        return ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-    }
-}
-
-=item $gfx->arc $x, $y, $a, $b, $alpha, $beta, $move
-
-will draw an arc centered at x,y with minor/major-axis
-given by a,b from alpha to beta (degrees). move must be
-set to 1, unless you want to continue an existing path.
-
-=cut
-
-sub arc {
-    my ($self,$x,$y,$a,$b,$alpha,$beta,$move) = @_;
-    my @points = arctocurve($a,$b,$alpha,$beta);
-    my ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-
-    $p0_x= $x + shift @points;
-    $p0_y= $y + shift @points;
-
-    $self->move($p0_x,$p0_y) if($move);
-
-    while (scalar @points > 0) {
-        $p1_x = $x + shift @points;
-        $p1_y = $y + shift @points;
-        $p2_x = $x + shift @points;
-        $p2_y = $y + shift @points;
-        $p3_x = $x + shift @points;
-        $p3_y = $y + shift @points;
-        $self->curve($p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-        shift @points;
-        shift @points;
-        $self->{' x'}=$p3_x;
-        $self->{' y'}=$p3_y;
-    }
-    return $self;
-}
-
-=item $gfx->ellipse $x, $y, $a, $b
-
-=cut
-
-sub ellipse {
-    my ($self,$x,$y,$a,$b) = @_;
-    $self->arc($x,$y,$a,$b,0,360,1);
-    $self->close;
-    return $self;
-}
-
-=item $gfx->circle $x, $y, $r
-
-=cut
-
-sub circle {
-    my ($self,$x,$y,$r) = @_;
-    $self->arc($x,$y,$r,$r,0,360,1);
-    $self->close;
-    return $self;
-}
-
-=item $gfx->bogen $x1, $y1, $x2, $y2, $r, $move, $larc, $span
-
-will draw an arc of a circle from x1,y1 to x2,y2 with radius r.
-move must be set to 1, unless you want to continue an existing path.
-larc can be set to 1, if you want to draw the larger instead of the
-shorter arc. span can be set to 1, if you want to draw the arc
-on the other side. NOTE: 2*r cannot be smaller than the distance
-from x1,y1 to x2,y2.
-
-=cut
-
-sub bogen {
-    my ($self,$x1,$y1,$x2,$y2,$r,$move,$larc,$spf) = @_;
-    my ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-    my $x = $x2-$x1;
-    my $y = $y2-$y1;
-    my $z = sqrt($x**2+$y**2);
-    my $alpha_rad = asin($y/$z);
-
-    $alpha_rad+=pi/2 if($x<0 and $y>0);
-    $alpha_rad-=pi/2 if($x<0 and $y<0);
- 
-    my $alpha=rad2deg($alpha_rad);
-    # use the complement angle for span
-    $alpha -= 180 if($spf>0);
-
-    my $d=2*$r;
-    my ($beta,$beta_rad,@points);
-
-    $beta=rad2deg(2*asin($z/$d));
-    $beta=360-$beta if($larc>0);
-
-    $beta_rad=deg2rad($beta);
-
-    @points=arctocurve($r,$r,90+$alpha+$beta/2,90+$alpha-$beta/2);
-
-    if ($spf>0) {
-        my @pts=@points;
-        @points=();
-        while ($y=pop @pts) {
-            $x=pop @pts;
-            push(@points,$x,$y);
-        }
-    }
-
-    $p0_x=shift @points;
-    $p0_y=shift @points;
-    $x=$x1-$p0_x;
-    $y=$y1-$p0_y;
-
-    $self->move($x,$y) if($move);
-
-    while(scalar @points > 0) {
-        $p1_x= $x + shift @points;
-        $p1_y= $y + shift @points;
-        $p2_x= $x + shift @points;
-        $p2_y= $y + shift @points;
-        # if we run out of data points, use the end point instead
-        if (scalar @points == 0) {
-            $p3_x = $x2;
-            $p3_y = $y2;
-        }
-        else {
-            $p3_x= $x + shift @points;
-            $p3_y= $y + shift @points;
-        }
-        $self->curve($p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-        shift @points;
-        shift @points;
-    }
-    return $self;
-}
-
-=item $gfx->pie $x, $y, $a, $b, $alpha, $beta
-
-=cut
-
-sub pie {
-    my $self = shift;
-    my ($x,$y,$a,$b,$alpha,$beta)=@_;
-    my ($p0_x,$p0_y)=arctocurve($a,$b,$alpha,$beta);
-    $self->move($x,$y);
-    $self->line($p0_x+$x,$p0_y+$y);
-    $self->arc($x,$y,$a,$b,$alpha,$beta);
-    $self->close;
-}
-
-=item $gfx->rect $x1,$y1, $w1,$h1, ..., $xn,$yn, $wn,$hn
-
-=cut
-
-sub rect {
-    my $self = shift;
-    my ($x,$y,$w,$h);
-    while (defined($x = shift)) {
-        $y = shift;
-        $w = shift;
-        $h = shift;
-        $self->add(floats($x,$y,$w,$h),'re');
-    }
-    $self->{' x'}=$x;
-    $self->{' y'}=$y;
-    return $self;
-}
-
-=item $gfx->rectxy $x1,$y1, $x2,$y2
-
-=cut
-
-sub rectxy {
-    my ($self,$x,$y,$x2,$y2)=@_;
-    $self->rect($x,$y,($x2-$x),($y2-$y));
-    return $self;
-}
-
-=item $gfx->poly $x1,$y1, ..., $xn,$yn
-
-=cut
-
-sub poly {
-    my $self = shift;
-    my $x = shift;
-    my $y = shift;
-    $self->move($x,$y);
-    $self->line(@_);
-    return $self;
-}
-
-=item $gfx->close
-
-=cut
-
-sub close {
-    my $self = shift;
-    $self->add('h');
-    $self->{' x'}=$self->{' mx'};
-    $self->{' y'}=$self->{' my'};
-    return $self;
-}
-
-=item $gfx->endpath
-
-=cut
-
-sub endpath {
-    my $self = shift;
-    $self->add('n');
-    return $self;
-}
-
-=item $gfx->clip $nonzero
-
-=cut
-
-sub clip {
-    my $self = shift;
-    $self->add(!(shift)?'W':'W*');
-    return $self;
-}
-
-=item $gfx->stroke
-
-=cut
-
-sub _stroke {
-    return 'S';
-}
-
-sub stroke {
-    my $self = shift;
-    $self->add(_stroke);
-    return $self;
-}
-
-=item $gfx->fill $nonzero
-
-=cut
-
-sub fill {
-    my $self = shift;
-    $self->add(!(shift)?'f':'f*');
-    return $self;
-}
-
-=item $gfx->fillstroke $nonzero
-
-=cut
-
-sub fillstroke {
-    my $self = shift;
-    $self->add(!(shift)?'B':'B*');
-    return $self;
-}
-
-=item $gfx->image $imgobj, $x,$y, $w,$h
-
-=item $gfx->image $imgobj, $x,$y, $scale
-
-=item $gfx->image $imgobj, $x,$y
-
-B<Please Note:> The width/height or scale given
-is in user-space coordinates which is subject to
-transformations which may have been specified beforehand.
-
-Per default this has a 72dpi resolution, so if you want an
-image to have a 150 or 300dpi resolution, you should specify
-a scale of 72/150 (or 72/300) or adjust width/height accordingly.
+For example, if you have a 600x600 image that you would like to be
+shown at 600dpi (i.e. one inch square), set the width and height to 72.
 
 =cut
 
@@ -1062,11 +1273,11 @@ sub image {
     return $self;
 }
 
-=item $gfx->formimage $imgobj, $x, $y, $scale
+=item $content->formimage($form_object, $x, $y, $scale)
 
-=item $gfx->formimage $imgobj, $x, $y
+=item $content->formimage($form_object, $x, $y)
 
-Places the X-Object (or XO-Form) at x/y with optional scale.
+Places an XObject on the page in the specified location.
 
 =cut
 
@@ -1087,75 +1298,172 @@ sub formimage {
     return $self;
 }
 
-=item $gfx->shade $shadeobj, $x1,$y1, $x2,$y2
+=back
+
+=head2 Text State Parameters
+
+All of the following parameters that take a size are applied before
+any scaling takes place, so you don't need to adjust values to
+counteract scaling.
+
+=over
+
+=item $spacing = $content->charspace($spacing)
+
+Sets the spacing between characters.  This is initially zero.
 
 =cut
 
-sub shade {
-    my $self = shift;
-    my $shade = shift;
-    my @cord = @_;
-    my @tm = (
-        $cord[2]-$cord[0] , 0,
-        0                 , $cord[3]-$cord[1],
-        $cord[0]          , $cord[1]
-    );
-    $self->save;
-    $self->matrix(@tm);
-    $self->add('/'.$shade->name,'sh');
-
-    $self->resource('Shading',$shade->name,$shade);
-
-    $self->restore;
-    return $self;
+sub _charspace {
+    my ($para) = @_;
+    return float($para, 6) . ' Tc';
 }
-
-=item $gfx->egstate $egsobj
-
-=cut
-
-sub egstate {
-    my $self = shift;
-    my $egs = shift;
-    $self->add('/'.$egs->name,'gs');
-    $self->resource('ExtGState',$egs->name,$egs);
-    return $self;
-}
-
-=item $hyb->textstart
-
-=cut
-
-sub textstart {
-    my ($self) = @_;
-    unless ($self->_in_text_object()) {
-        $self->add(' BT ');
-        $self->{' apiistext'}=1;
-        $self->{' font'}=undef;
-        $self->{' fontset'}=0;
-        $self->{' fontsize'}=0;
-        $self->{' charspace'}=0;
-        $self->{' hspace'}=100;
-        $self->{' wordspace'}=0;
-        $self->{' lead'}=0;
-        $self->{' rise'}=0;
-        $self->{' render'}=0;
-        @{$self->{' matrix'}}=(1,0,0,1,0,0);
-        @{$self->{' textmatrix'}}=(1,0,0,1,0,0);
-        @{$self->{' textlinematrix'}}=(0,0);
-        @{$self->{' fillcolor'}}=(0);
-        @{$self->{' strokecolor'}}=(0);
-        @{$self->{' translate'}}=(0,0);
-        @{$self->{' scale'}}=(1,1);
-        @{$self->{' skew'}}=(0,0);
-        $self->{' rotate'}=0;
+sub charspace {
+    my ($self, $para) = @_;
+    if (defined $para) {
+        $self->{' charspace'}=$para;
+        $self->add(_charspace($para));
     }
-    return $self;
+    return $self->{' charspace'};
 }
 
-=item %state = $txt->textstate %state
+=item $spacing = $content->wordspace($spacing)
 
-Sets or gets the current text-object state.
+Sets the spacing between words.  This is initially zero (or, in other
+words, just the width of the space).
+
+=cut
+
+sub _wordspace {
+    my ($para) = @_;
+    return float($para, 6) . ' Tw';
+}
+
+sub wordspace {
+    my ($self, $para) = @_;
+    if (defined $para) {
+        $self->{' wordspace'}=$para;
+        $self->add(_wordspace($para));
+    }
+    return $self->{' wordspace'};
+}
+
+=item $scale = $content->hspace($scale)
+
+Note: This method is named incorrectly, and will be renamed in a
+future release.
+
+Sets the percentage of horizontal text scaling (not spacing).  This is
+initially 100 (i.e. no scaling), and must be passed as an integer.
+
+=cut
+
+sub _hspace {
+    my ($para) = @_;
+    return float($para, 6) . ' Tz';
+}
+sub hspace {
+    my ($self,$para)=@_;
+    if (defined $para) {
+        $self->{' hspace'}=$para;
+        $self->add(_hspace($para));
+    }
+    return $self->{' hspace'};
+}
+
+=item $leading = $content->lead($leading)
+
+Sets the text leading, which is the distance between baselines.  This
+is initially zero (i.e. the lines will be printed on top of each
+other).
+
+=cut
+
+sub _lead {
+    my ($para) = @_;
+    return float($para) . ' TL';
+}
+sub lead {
+    my ($self,$para) = @_;
+    if (defined ($para)) {
+        $self->{' lead'} = $para;
+        $self->add(_lead($para));
+    }
+    return $self->{' lead'};
+}
+
+=item $mode = $content->render($mode)
+
+Sets the text rendering mode.
+
+=over
+
+=item 0 = Fill text
+
+=item 1 = Stroke text (outline)
+
+=item 2 = Fill, then stroke text
+
+=item 3 = Neither fill nor stroke text (invisible)
+
+=item 4 = Fill text and add to path for clipping
+
+=item 5 = Stroke text and add to path for clipping
+
+=item 6 = Fill, then stroke text and add to path for clipping
+
+=item 7 = Add text to path for clipping
+
+=back
+
+=cut
+
+sub _render {
+    my ($para) = @_;
+    return intg($para) . ' Tr';
+}
+
+sub render {
+    my ($self, $para) = @_;
+    if (defined ($para)) {
+        $self->{' render'} = $para;
+        $self->add(_render($para));
+    }
+    return $self->{' render'};
+}
+
+=item $distance = $content->rise($distance)
+
+Adjusts the baseline up or down from its current location.  This is
+initially zero.
+
+Use this for creating superscripts or subscripts (usually with an
+adjustment to the font size as well).
+
+=cut
+
+sub _rise {
+    my ($para) = @_;
+    return float($para) . ' Ts';
+}
+
+sub rise {
+    my ($self, $para) = @_;
+    if (defined ($para)) {
+        $self->{' rise'} = $para;
+        $self->add(_rise($para));
+    }
+    return $self->{' rise'};
+}
+
+=item %state = $content->textstate(charspace => $value, wordspace => $value, ...)
+
+Shortcut for setting multiple text state parameters at once.
+
+This can also be used without arguments to retrieve the current text
+state settings.
+
+Note: This does not currently work with the C<save> and C<restore> commands.
 
 =cut
 
@@ -1237,90 +1545,14 @@ sub textstate2 {
     return %state;
 }
 
-=item ($tx,$ty) = $txt->textpos
+=item $content->font($font_object, $size)
 
-Gets the current estimated text position.
+    # Example
+    my $pdf = PDF::API2->new();
+    my $font = $pdf->corefont('Helvetica');
+    $content->font($font, 12);
 
-B<Note:> This is relative to text-space.
-
-=cut
-
-sub _textpos {
-    my ($self,@xy)=@_;
-    my ($x,$y)=(0,0);
-    while (scalar @xy > 0) {
-        $x+=shift @xy;
-        $y+=shift @xy;
-    }
-    my (@m)=_transform(
-        -matrix=>$self->{" textmatrix"},
-        -point=>[$x,$y]
-    );
-    return($m[0],$m[1]);
-}
-sub textpos {
-    my $self=shift @_;
-    return($self->_textpos(@{$self->{" textlinematrix"}}));
-}
-sub textpos2 {
-    my $self=shift @_;
-    return(@{$self->{" textlinematrix"}});
-}
-
-=item $txt->transform_rel %opts
-
-Sets transformations (eg. translate, rotate, scale, skew) in pdf-canonical order,
-but relative to the previously set values.
-
-B<Example:>
-
-  $txt->transform_rel(
-    -translate => [$x,$y],
-    -rotate    => $rot,
-    -scale     => [$sx,$sy],
-    -skew      => [$sa,$sb],
-  )
-
-=cut
-
-sub transform_rel {
-    my ($self,%opt)=@_;
-    my ($sa1,$sb1)=@{$opt{-skew} ? $opt{-skew} : [0,0]};
-    my ($sa0,$sb0)=@{$self->{" skew"}};
-
-    my ($sx1,$sy1)=@{$opt{-scale} ? $opt{-scale} : [1,1]};
-    my ($sx0,$sy0)=@{$self->{" scale"}};
-
-    my $rot1=$opt{"-rotate"} || 0;
-    my $rot0=$self->{" rotate"};
-
-    my ($tx1,$ty1)=@{$opt{-translate} ? $opt{-translate} : [0,0]};
-    my ($tx0,$ty0)=@{$self->{" translate"}};
-
-    $self->transform(
-        -skew=>[$sa0+$sa1,$sb0+$sb1],
-        -scale=>[$sx0*$sx1,$sy0*$sy1],
-        -rotate=>$rot0+$rot1,
-        -translate=>[$tx0+$tx1,$ty0+$ty1],
-    );
-    return $self;
-}
-
-sub matrix_update {
-    my ($self,$tx,$ty)=@_;
-    $self->{' textlinematrix'}->[0]+=$tx;
-    $self->{' textlinematrix'}->[1]+=$ty;
-    return $self;
-}
-
-=item $txt->font $fontobj,$size
-
-=item $txt->fontset $fontobj,$size
-
-I<The fontset method WILL NOT APPLY the font+size to the pdf-stream, but
-which will later be done by the text-methods.>
-
-B<Only use fontset if you know what you are doing, there is no super-secret failsave!>
+Sets the font and font size.
 
 =cut
 
@@ -1359,111 +1591,38 @@ sub fontset {
     return $self;
 }
 
-=item $spacing = $txt->charspace $spacing
+=back
+
+=head2 Text-Positioning
+
+Note: There is a very good chance that these commands will be replaced
+in a future release.
+
+=over
+
+=item $content->distance($dx, $dy)
+
+Moves to the start of the next line, offset by the given amounts,
+which are both required.
 
 =cut
 
-sub _charspace {
-    my ($para) = @_;
-    return float($para, 6) . ' Tc';
-}
-sub charspace {
-    my ($self,$para) = @_;
-    if(defined $para) {
-        $self->{' charspace'}=$para;
-        $self->add(_charspace($para));
-    }
-    return $self->{' charspace'};
+sub distance {
+    my ($self,$dx,$dy)=@_;
+    $self->add(float($dx),float($dy),'Td');
+    $self->matrix_update($dx,$dy);
+    $self->{' textlinematrix'}->[0]=$dx;
 }
 
-=item $spacing = $txt->wordspace $spacing
+=item $content->cr($vertical_offset)
 
-=cut
+If passed with an argument, moves to the start of the next line,
+offset by the given value.
 
-sub _wordspace {
-    my ($para)=@_;
-    return float($para, 6) . ' Tw';
-}
-sub wordspace {
-    my ($self,$para)=@_;
-    if(defined $para) {
-        $self->{' wordspace'}=$para;
-        $self->add(_wordspace($para));
-    }
-    return $self->{' wordspace'};
-}
+If passed without an argument, moves to the start of the next line.
 
-=item $spacing = $txt->hspace $spacing
-
-=cut
-
-sub _hspace {
-    my ($para) = @_;
-    return float($para, 6) . ' Tz';
-}
-sub hspace {
-    my ($self,$para)=@_;
-    if (defined $para) {
-        $self->{' hspace'}=$para;
-        $self->add(_hspace($para));
-    }
-    return $self->{' hspace'};
-}
-
-=item $leading = $txt->lead $leading
-
-=cut
-
-sub _lead {
-    my ($para) = @_;
-    return float($para) . ' TL';
-}
-sub lead {
-    my ($self,$para) = @_;
-    if (defined ($para)) {
-        $self->{' lead'} = $para;
-        $self->add(_lead($para));
-    }
-    return $self->{' lead'};
-}
-
-=item $rise = $txt->rise $rise
-
-=cut
-
-sub _rise {
-    my ($para)=@_;
-    return float($para) . ' Ts';
-}
-sub rise {
-    my ($self,$para)=@_;
-    if (defined ($para)) {
-        $self->{' rise'} = $para;
-        $self->add(_rise($para));
-    }
-    return $self->{' rise'};
-}
-
-=item $rendering = $txt->render $rendering
-
-=cut
-
-sub _render {
-    my ($para) = @_;
-    return intg($para) . ' Tr';
-}
-sub render {
-    my ($self, $para) = @_;
-    if (defined ($para)) {
-        $self->{' render'} = $para;
-        $self->add(_render($para));
-    }
-    return $self->{' render'};
-}
-
-=item $txt->cr $linesize
-
-takes an optional argument giving a custom leading between lines.
+Note that this is equivalent to a carriage return plus line feed.  To
+get just a carriage return, pass zero as the argument.
 
 =cut
 
@@ -1480,7 +1639,9 @@ sub cr {
     $self->{' textlinematrix'}->[0]=0;
 }
 
-=item $txt->nl
+=item $content->nl
+
+Moves to the start of the next line.
 
 =cut
 
@@ -1491,53 +1652,45 @@ sub nl {
     $self->{' textlinematrix'}->[0]=0;
 }
 
-=item $txt->distance $dx,$dy
+=item ($tx, $ty) = $content->textpos()
+
+Gets the current estimated text position.
+
+Note: This does not affect the PDF in any way.
 
 =cut
 
-sub distance {
-    my ($self,$dx,$dy)=@_;
-    $self->add(float($dx),float($dy),'Td');
-    $self->matrix_update($dx,$dy);
-    $self->{' textlinematrix'}->[0]=$dx;
+sub _textpos {
+    my ($self,@xy)=@_;
+    my ($x,$y)=(0,0);
+    while (scalar @xy > 0) {
+        $x+=shift @xy;
+        $y+=shift @xy;
+    }
+    my (@m)=_transform(
+        -matrix=>$self->{" textmatrix"},
+        -point=>[$x,$y]
+    );
+    return($m[0],$m[1]);
+}
+sub textpos {
+    my $self=shift @_;
+    return($self->_textpos(@{$self->{" textlinematrix"}}));
+}
+sub textpos2 {
+    my $self=shift @_;
+    return(@{$self->{" textlinematrix"}});
 }
 
-=item $width = $txt->advancewidth $string [, %textstate]
+=back
 
-Returns the width of the string based on all currently set text-attributes
-or on those overridden by %textstate.
+=item Text-Showing
 
-=cut
+=over
 
-sub advancewidth {
-    my ($self,$text,@opts) = @_;
-    if(scalar @opts > 1) {
-        my %opts=@opts;
-        foreach my $k (qw[ font fontsize wordspace charspace hspace]) {
-            $opts{$k}=$self->{" $k"} unless(defined $opts{$k});
-        }
-        my $glyph_width = $opts{font}->width($text)*$opts{fontsize};
-        my $num_space = $text =~ y/\x20/\x20/;
-        my $num_char = length($text);
-        my $word_spaces = $opts{wordspace}*$num_space;
-        my $char_spaces = $opts{charspace}*$num_char;
-        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$opts{hspace}/100;
-        return $advance;
-    }
-    else {
-        my $glyph_width = $self->{' font'}->width($text)*$self->{' fontsize'};
-        my $num_space = $text =~ y/\x20/\x20/;
-        my $num_char = length($text);
-        my $word_spaces = $self->wordspace*$num_space;
-        my $char_spaces = $self->charspace*$num_char;
-        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$self->hspace/100;
-        return $advance;
-    }
-}
+=item $width = $content->text($text, %options)
 
-=item $width = $txt->text $text, %options
-
-Applys text to the content and optionally returns the width of the given text.
+Adds text to the page.
 
 Options
 
@@ -1545,23 +1698,19 @@ Options
 
 =item -indent
 
-Indent the text by the number of points.
+Indents the text by the number of points.
 
-=item -underline
+=item -underline => 'auto'
 
-If this is a scalar, it is the distance, in points, below the baseline where
-the line is drawn. The line thickness is one point. If it is a reference to an
-array, each pair is the distance below the baseline and the thickness of the
-line (ie., C<-underline=E<gt>[2,1,4,2]> will draw a double underline
-with the lower twice as thick as the upper).
+=item -underline => $distance
 
-If thickness is a reference to an array, the first value is the thickness
-and the second value is the color of the line (ie., 
-C<-underline=E<gt>[2,[1,'red'],4,[2,'#0000ff']]> will draw a "red" and a 
-"blue" line).
+=item -underline => [$distance, $thickness, ...]
 
-You can also use the string C<'auto'> for either or both distance and thickness 
-values to auto-magically calculate best values from the font-definition.
+Underlines the text.  C<$distance> is the number of units beneath the
+baseline, and C<$thickness> is the width of the line.
+
+Multiple underlines can be made by passing several distances and
+thicknesses.
 
 =back
 
@@ -1648,7 +1797,9 @@ sub text {
     return $wd;
 }
 
-=item $txt->text_center $text
+=item $content->text_center($text)
+
+As C<text>, but centered on the current point.
 
 =cut
 
@@ -1660,6 +1811,8 @@ sub text_center {
 
 =item $txt->text_right $text, %options
 
+As C<text>, but right-aligned to the current point.
+
 =cut
 
 sub text_right {
@@ -1668,9 +1821,40 @@ sub text_right {
     return $self->text($text,-indent=>-$width,@opts);
 }
 
-=item $width = $txt->text_justified $text, $width, %options
+=item $width = $txt->advancewidth($string, %text_state)
 
-** DEVELOPER METHOD **
+Returns the width of the string based on all currently set text-state
+attributes.  These can optionally be overridden.
+
+=cut
+
+sub advancewidth {
+    my ($self,$text,@opts) = @_;
+    if(scalar @opts > 1) {
+        my %opts=@opts;
+        foreach my $k (qw[ font fontsize wordspace charspace hspace]) {
+            $opts{$k}=$self->{" $k"} unless(defined $opts{$k});
+        }
+        my $glyph_width = $opts{font}->width($text)*$opts{fontsize};
+        my $num_space = $text =~ y/\x20/\x20/;
+        my $num_char = length($text);
+        my $word_spaces = $opts{wordspace}*$num_space;
+        my $char_spaces = $opts{charspace}*$num_char;
+        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$opts{hspace}/100;
+        return $advance;
+    }
+    else {
+        my $glyph_width = $self->{' font'}->width($text)*$self->{' fontsize'};
+        my $num_space = $text =~ y/\x20/\x20/;
+        my $num_char = length($text);
+        my $word_spaces = $self->wordspace*$num_space;
+        my $char_spaces = $self->charspace*$num_char;
+        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$self->hspace/100;
+        return $advance;
+    }
+}
+
+=back
 
 =cut
 
@@ -1701,12 +1885,6 @@ sub _text_fill_line {
     return ($line,$ret);
 }
 
-=item ($width,$chunktext) = $txt->text_fill_left $text, $width
-
-** DEVELOPER METHOD **
-
-=cut
-
 sub text_fill_left {
     my ($self,$text,$width,%opts) = @_;
     my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
@@ -1714,12 +1892,6 @@ sub text_fill_left {
     $width=$self->text($line,%opts);
     return ($width,$ret);
 }
-
-=item ($width,$chunktext) = $txt->text_fill_center $text, $width, %options
-
-** DEVELOPER METHOD **
-
-=cut
 
 sub text_fill_center {
     my ($self,$text,$width,%opts) = @_;
@@ -1729,12 +1901,6 @@ sub text_fill_center {
     return ($width,$ret);
 }
 
-=item ($width,$chunktext) = $txt->text_fill_right $text, $width
-
-** DEVELOPER METHOD **
-
-=cut
-
 sub text_fill_right {
     my ($self,$text,$width,%opts) = @_;
     my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
@@ -1742,12 +1908,6 @@ sub text_fill_right {
     $width=$self->text_right($line,%opts);
     return ($width,$ret);
 }
-
-=item ($width,$chunktext) = $txt->text_fill_justified $text, $width
-
-** DEVELOPER METHOD **
-
-=cut
 
 sub text_fill_justified {
     my ($self,$text,$width,%opts) = @_;
@@ -1763,47 +1923,47 @@ sub text_fill_justified {
     return($width,$ret);
 }
 
-=item $overflow_text = $txt->paragraph $text, $width, $height, %options
-
-** DEVELOPER METHOD **
-
-Apply the text within the rectangle and return any leftover text.
-
-B<Options>
-
-=over 4
-
-=item -align => $choice
-
-Choice is 'justified', 'right', 'center', 'left'
-Default is 'left'
-
-=item -underline => $distance
-
-=item -underline => [ $distance, $thickness, ... ]
-
-If a scalar, distance below baseline,
-else array reference with pairs of distance and line thickness.
-
-=item -spillover => $over
-
-Controls if words in a line which exceed the given width should be "spilled over" the bounds or if a new line should be used for this word.
-
-Over is 1 or 0
-Default is 1
-
-=back
-
-B<Example:>
-
-    $txt->font($font,$fontsize);
-    $txt->lead($lead);
-    $txt->translate($x,$y);
-    $overflow = $txt->paragraph( 'long paragraph here ...',
-                                 $width,
-                                 $y+$lead-$bottom_margin );
-
-=cut
+# =item $overflow_text = $txt->paragraph $text, $width, $height, %options
+# 
+# ** DEVELOPER METHOD **
+# 
+# Apply the text within the rectangle and return any leftover text.
+# 
+# B<Options>
+# 
+# =over 4
+# 
+# =item -align => $choice
+# 
+# Choice is 'justified', 'right', 'center', 'left'
+# Default is 'left'
+# 
+# =item -underline => $distance
+# 
+# =item -underline => [ $distance, $thickness, ... ]
+# 
+# If a scalar, distance below baseline,
+# else array reference with pairs of distance and line thickness.
+# 
+# =item -spillover => $over
+# 
+# Controls if words in a line which exceed the given width should be "spilled over" the bounds or if a new line should be used for this word.
+# 
+# Over is 1 or 0
+# Default is 1
+# 
+# =back
+# 
+# B<Example:>
+# 
+#     $txt->font($font,$fontsize);
+#     $txt->lead($lead);
+#     $txt->translate($x,$y);
+#     $overflow = $txt->paragraph( 'long paragraph here ...',
+#                                  $width,
+#                                  $y+$lead-$bottom_margin );
+# 
+# =cut
 
 sub paragraph {
     my ($self,$text,$width,$height,%opts) = @_;
@@ -1832,15 +1992,15 @@ sub paragraph {
     return $text;
 }
 
-=item $overflow_text = $txt->section $text, $width, $height, %options
-
-** DEVELOPER METHOD **
-
-Split paragraphs by newline and loop over them, reassemble leftovers 
-when box is full and apply the text within the rectangle and return 
-any leftover text.
-
-=cut
+# =item $overflow_text = $txt->section $text, $width, $height, %options
+# 
+# ** DEVELOPER METHOD **
+# 
+# Split paragraphs by newline and loop over them, reassemble leftovers 
+# when box is full and apply the text within the rectangle and return 
+# any leftover text.
+# 
+# =cut
 
 sub section {
     my ($self,$text,$width,$height,%opts)=@_;
@@ -1859,43 +2019,6 @@ sub section {
     }
     return $overflow;
 }
-
-=item $hyb->textend
-
-=cut
-
-sub textend {
-    my ($self) = @_;
-    if ($self->_in_text_object()) {
-        $self->add(' ET ', $self->{' poststream'});
-        $self->{' apiistext'} = 0;
-        $self->{' poststream'} = '';
-    }
-    return $self;
-}
-
-=item $width = $txt->textlabel $x, $y, $font, $size, $text, %options
-
-Applies text with options, but without teststart/end 
-and optionally returns the width of the given text.
-
-B<Example:> 
-
-    $t = $page->gfx;
-    $t->textlabel(300,700,$myfont,20,'Page Header',
-        -rotate => -30,
-        -color => '#FF0000',
-        -hspace => 120,
-        -align => 'center',
-    );
-    $t->textlabel(500,500,$myfont,20,'Page Header',
-        -rotate => 30,
-        -color => '#0000FF',
-        -hspace => 80,
-        -align => 'right',
-    );
-    
-=cut
 
 sub textlabel {
     my ($self,$x,$y,$font,$size,$text,%opts,$wht) = @_;
@@ -1942,6 +2065,131 @@ sub textlabel {
     }
     return $wht;
 }
+
+sub metaStart {
+    my $self=shift @_;
+    my $tag=shift @_;
+    my $obj=shift @_;
+    $self->add("/$tag");
+    if (defined $obj) {
+        my $dict=PDFDict();
+        $dict->{Metadata}=$obj;
+        $self->resource('Properties',$obj->name,$dict);        
+        $self->add('/'.($obj->name));
+        $self->add('BDC');
+    }
+    else {
+        $self->add('BMC');
+    }
+    return $self;
+}
+
+sub metaEnd {
+    my $self=shift @_;
+    $self->add('EMC');
+    return $self;
+}
+
+=head2 Advanced Methods
+
+=over
+
+=item $content->add @content
+
+Add raw content to the PDF stream.  You will generally want to use the
+other methods in this class instead.
+
+=cut
+
+sub add_post {
+    my $self = shift;
+    if (scalar @_) {
+        $self->{' poststream'} .= ($self->{' poststream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ';
+    }
+    return $self;
+}
+sub add {
+    my $self = shift;
+    if (scalar @_) {
+        $self->{' stream'} .= encode('iso-8859-1', ($self->{' stream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ');
+    }
+    return $self;
+}
+
+# Shortcut method for determining if we're inside a text object
+# (i.e. between BT and ET).  See textstart and textend.
+sub _in_text_object {
+    my $self = shift();
+    return defined($self->{' apiistext'}) && $self->{' apiistext'} == 1;
+}
+
+=item $content->compressFlate
+
+Marks content for compression on output.  This is done automatically
+in nearly all cases, so you shouldn't need to call this yourself.
+
+=cut
+
+sub compressFlate {
+    my $self=shift @_;
+    $self->{'Filter'}=PDFArray(PDFName('FlateDecode'));
+    $self->{-docompress}=1;
+    return $self;
+}
+
+=item $content->textstart
+
+Starts a text object.  You will likely want to use the C<text> method
+instead.
+
+=cut
+
+sub textstart {
+    my ($self) = @_;
+    unless ($self->_in_text_object()) {
+        $self->add(' BT ');
+        $self->{' apiistext'}=1;
+        $self->{' font'}=undef;
+        $self->{' fontset'}=0;
+        $self->{' fontsize'}=0;
+        $self->{' charspace'}=0;
+        $self->{' hspace'}=100;
+        $self->{' wordspace'}=0;
+        $self->{' lead'}=0;
+        $self->{' rise'}=0;
+        $self->{' render'}=0;
+        @{$self->{' matrix'}}=(1,0,0,1,0,0);
+        @{$self->{' textmatrix'}}=(1,0,0,1,0,0);
+        @{$self->{' textlinematrix'}}=(0,0);
+        @{$self->{' fillcolor'}}=(0);
+        @{$self->{' strokecolor'}}=(0);
+        @{$self->{' translate'}}=(0,0);
+        @{$self->{' scale'}}=(1,1);
+        @{$self->{' skew'}}=(0,0);
+        $self->{' rotate'}=0;
+    }
+    return $self;
+}
+
+=item $content->textend
+
+Ends a text object.
+
+=cut
+
+sub textend {
+    my ($self) = @_;
+    if ($self->_in_text_object()) {
+        $self->add(' ET ', $self->{' poststream'});
+        $self->{' apiistext'} = 0;
+        $self->{' poststream'} = '';
+    }
+    return $self;
+}
+
+=back
+
+=cut
 
 sub resource {
     my ($self, $type, $key, $obj, $force) = @_;
