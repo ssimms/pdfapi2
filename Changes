@@ -1,5 +1,12 @@
 {{$NEXT}}
 
+    - [RT #58386] Fix create_egs call in Lite.pm (J Greely)
+
+    - [RT #62922] Fix string interpolation in pdf-merge.pl
+      (Guillaume Rousse)
+
+2.016     2011-01-24
+
     - New Maintainer: Steve Simms (http://deefs.net)
     
     - This release jumps from version 0.73 to 2.016 in order to
