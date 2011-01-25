@@ -196,7 +196,7 @@ B<Examples:>
 
 sub create_egs {
     my ($self)=@_;
-    return $self->{api}->extgstate;
+    return $self->{api}->egstate;
 }
 
 =item $img = $pdf->image_jpeg $file
