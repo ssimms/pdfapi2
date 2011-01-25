@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+    - The DejaVu fonts have been removed from the distribution, since
+      they were only used by one example script.  If you need them for
+      your project, you can download them from http://dejavu-fonts.org
+
     - [RT #58386] Fix create_egs call in Lite.pm (J Greely)
 
     - [RT #62922] Fix string interpolation in pdf-merge.pl
