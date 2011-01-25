@@ -18,7 +18,7 @@ my $outfile=shift @ARGV;
 my $pdf=PDF::API2->new;
 
 foreach my $in (@ARGV) {
-    print STDERR 'loading file $in .';
+    print STDERR "loading file $in .";
     my $inpdf=PDF::API2->open($in);
     my $pages=scalar @{$inpdf->{pagestack}};
     foreach my $page (1..$pages) {
