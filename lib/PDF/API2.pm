@@ -967,16 +967,6 @@ sub save {
     $self->end;
 }
 
-sub save_xml {
-    my ($self,$file)=@_;
-    my $fh=IO::File->new;
-    $fh->open("> $file");
-    $self->{pdf}->save_xml($fh);
-    $fh->close;
-    $self->end;
-}
-
-
 =item $string = $pdf->stringify()
 
 Returns the document as a string.

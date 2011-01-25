@@ -78,12 +78,6 @@ sub outobjdeep
     }
 }
 
-sub outxmldeep
-{
-    my ($self, $fh, $pdf, %opts) = @_;
-    $opts{-xmlfh}->print("<Literal>NOT HANDLED HERE.</Literal>\n");
-}
-
 sub val
 { $_[0]; }
 
