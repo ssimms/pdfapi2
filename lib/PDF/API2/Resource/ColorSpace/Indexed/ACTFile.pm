@@ -9,7 +9,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::ColorSpace::Index::ACTFile
+PDF::API2::Resource::ColorSpace::Indexed::ACTFile
 
 =head1 METHODS
 
