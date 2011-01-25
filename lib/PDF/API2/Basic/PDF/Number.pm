@@ -42,10 +42,4 @@ sub as_pdf {
     return $_[0]->{'val'};
 }
 
-sub outxmldeep {
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    $opts{'-xmlfh'}->print('<Number>' . $self->val() . "</Number>\n");
-}
-
 1;

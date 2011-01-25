@@ -215,14 +215,6 @@ sub outobjdeep
     $self->{' parent'}->read_obj($self)->outobjdeep($fh, $pdf,%opts) unless ($self->{' realised'});
 }
 
-sub outxmldeep
-{
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    $self->{' parent'}->read_obj($self)->outxmldeep($fh, $pdf,%opts) unless ($self->{' realised'});
-}
-
-
 =head2 $r->outobj($fh)
 
 If this is a full object then outputs a reference to the object, otherwise calls
@@ -239,17 +231,6 @@ sub outobj
     else
     { $self->outobjdeep($fh, $pdf, %opts); }
 }
-
-sub outxml
-{
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    if (defined $pdf->{' objects'}{$self->uid})
-    { $opts{-xmlfh}->printf("<Ref id=\"%d %d\" />", @{$pdf->{' objects'}{$self->uid}}[0..1]); }
-    else
-    { $self->outxmldeep($fh, $pdf, %opts); }
-}
-
 
 =head2 $r->elementsof
 

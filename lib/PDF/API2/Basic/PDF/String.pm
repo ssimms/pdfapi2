@@ -171,10 +171,4 @@ sub outobjdeep {
     $fh->print($self->as_pdf($pdf));
 }
 
-sub outxmldeep {
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    $opts{'-xmlfh'}->print('<String>' . $self->val() . "</String>\n");
-}
-
 1;

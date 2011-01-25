@@ -70,16 +70,6 @@ sub outobjdeep {
     $fh->print(']');
 }
 
-sub outxmldeep {
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    $opts{'-xmlfh'}->print("<Array>\n");
-    foreach my $obj (@{$self->{' val'}}) {
-        $obj->outxml($fh, $pdf, %opts);
-    }
-    $opts{'-xmlfh'}->print("</Array>\n");
-}
-
 =head2 $a->removeobj($elem)
 
 Removes all occurrences of an element from an array.
