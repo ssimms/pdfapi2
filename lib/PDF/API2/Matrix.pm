@@ -10,8 +10,6 @@
 #=======================================================================
 package PDF::API2::Matrix;
 
-no warnings qw[ deprecated recursion uninitialized ];
-
 sub new {
     my $type = shift;
     my $self = [];
@@ -32,22 +30,22 @@ sub transpose {
         push @result, [];
     }
     for my $row (@{$self}) {
-        $m=0;
+        $m = 0;
         for my $col (@{$row}) {
             push(@{$result[$m++]}, $col);
         }
     }
-    new PDF::API2::Matrix (@result);
+    return PDF::API2::Matrix->new(@result);
 }
 
 sub vekpro {
-    my($a, $b) = @_;
-    my $result=0;
+    my ($a, $b) = @_;
+    my $result = 0;
 
     for my $i (0 .. $#{$a}) {
         $result += $a->[$i] * $b->[$i];
     }
-    $result;
+    return $result;
 }
 
 sub multiply {
@@ -64,7 +62,7 @@ sub multiply {
         }
         push(@result, $rescol);
     }
-    new PDF::API2::Matrix (@result);
+    return PDF::API2::Matrix->new(@result);
 }
 
 1;
