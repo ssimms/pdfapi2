@@ -2,7 +2,6 @@ package PDF::API2;
 
 use Encode qw(:all);
 use FileHandle;
-use IO::File;
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
