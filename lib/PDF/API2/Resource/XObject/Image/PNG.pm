@@ -5,6 +5,7 @@ use base 'PDF::API2::Resource::XObject::Image';
 use Compress::Zlib;
 use POSIX qw(ceil floor);
 
+use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
