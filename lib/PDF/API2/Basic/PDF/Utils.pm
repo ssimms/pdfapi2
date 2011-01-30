@@ -146,45 +146,4 @@ sub PDFLiteral {
     return PDF::API2::Basic::PDF::Literal->new(@_);
 }
 
-=head2 asPDFBool
-
-Returns a literal value in PDF output form
-
-=cut
-
-sub asPDFBool {
-    return PDF::API2::Basic::PDF::Bool->new(@_)->as_pdf();
-}
-
-=head2 asPDFStr
-
-Returns a string in PDF output form (including () or <>)
-
-=cut
-
-sub asPDFStr {
-    return PDF::API2::Basic::PDF::String->new(@_)->as_pdf();
-}
-
-=head2 asPDFName
-
-Returns a Name in PDF Output form (including /)
-
-=cut
-
-sub asPDFName {
-    return PDF::API2::Basic::PDF::Name->new(@_)->as_pdf();
-}
-
-=head2 asPDFNum
-
-Returns a number in PDF output form
-
-=cut
-
-sub asPDFNum {
-    # no translation needed
-    return $_[0];
-}
-
 1;
