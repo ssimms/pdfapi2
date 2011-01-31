@@ -14,7 +14,6 @@ use PDF::API2::Resource::Font::CoreFont;
 use PDF::API2::Resource::Font::Postscript;
 use PDF::API2::Resource::Font::BdFont;
 use PDF::API2::Resource::Font::SynFont;
-use PDF::API2::Resource::Font::neTrueType;
 use PDF::API2::Resource::CIDFont::TrueType;
 use PDF::API2::Resource::CIDFont::CJKFont;
 use PDF::API2::Resource::UniFont;
@@ -1718,19 +1717,6 @@ sub ttfont {
 
     $file=_findFont($file);
     my $obj=PDF::API2::Resource::CIDFont::TrueType->new_api($self,$file,%opts);
-
-    $self->resource('Font',$obj->name,$obj,$self->{reopened});
-
-    $self->{pdf}->out_obj($self->{pages});
-    $obj->tounicodemap if($opts{-unicodemap}==1);
-    return($obj);
-}
-
-sub nettfont {
-    my ($self,$file,%opts)=@_;
-
-    $file=_findFont($file);
-    my $obj=PDF::API2::Resource::Font::neTrueType->new_api($self,$file,%opts);
 
     $self->resource('Font',$obj->name,$obj,$self->{reopened});
 

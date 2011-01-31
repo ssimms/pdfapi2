@@ -4,6 +4,9 @@
       they were only used by one example script.  If you need them for
       your project, you can download them from http://dejavu-fonts.org
 
+    - The undocumented nettfont method has been removed, along with
+      the supporting PDF::API2::Resource::Font::neTrueType module.
+
     - The undocumented save_xml method has been removed, along with
       the supporting functions in PDF::API2::Basic::*.
 
