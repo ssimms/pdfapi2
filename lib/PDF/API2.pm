@@ -33,12 +33,6 @@ use PDF::API2::Resource::ColorSpace::Indexed::WebColor;
 use PDF::API2::Resource::ColorSpace::Separation;
 use PDF::API2::Resource::ColorSpace::DeviceN;
 
-use PDF::API2::Resource::XObject::Form::BarCode::int2of5;
-use PDF::API2::Resource::XObject::Form::BarCode::codabar;
-use PDF::API2::Resource::XObject::Form::BarCode::code128;
-use PDF::API2::Resource::XObject::Form::BarCode::code3of9;
-use PDF::API2::Resource::XObject::Form::BarCode::ean13;
-
 use PDF::API2::Resource::XObject::Form::Hybrid;
 
 use PDF::API2::Resource::ExtGState;
@@ -2149,6 +2143,7 @@ Creates the specified barcode object as a form XObject.
 sub xo_code128 {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::XObject::Form::BarCode::coda128;
     my $obj=PDF::API2::Resource::XObject::Form::BarCode::code128->new_api($self,@opts);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -2160,6 +2155,7 @@ sub xo_code128 {
 sub xo_codabar {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::XObject::Form::BarCode::codabar;
     my $obj=PDF::API2::Resource::XObject::Form::BarCode::codabar->new_api($self,@opts);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -2171,6 +2167,7 @@ sub xo_codabar {
 sub xo_2of5int {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::XObject::Form::BarCode::int2of5;
     my $obj=PDF::API2::Resource::XObject::Form::BarCode::int2of5->new_api($self,@opts);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -2182,6 +2179,7 @@ sub xo_2of5int {
 sub xo_3of9 {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::XObject::Form::BarCode::code3of9;
     my $obj=PDF::API2::Resource::XObject::Form::BarCode::code3of9->new_api($self,@opts);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -2193,6 +2191,7 @@ sub xo_3of9 {
 sub xo_ean13 {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::XObject::Form::BarCode::ean13;
     my $obj=PDF::API2::Resource::XObject::Form::BarCode::ean13->new_api($self,@opts);
 
     $self->resource('XObject',$obj->name,$obj);
