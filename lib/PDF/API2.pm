@@ -10,14 +10,6 @@ use PDF::API2::Basic::PDF::File;
 use PDF::API2::Basic::PDF::Pages;
 use PDF::API2::Page;
 
-use PDF::API2::Resource::Font::CoreFont;
-use PDF::API2::Resource::Font::Postscript;
-use PDF::API2::Resource::Font::BdFont;
-use PDF::API2::Resource::Font::SynFont;
-use PDF::API2::Resource::CIDFont::TrueType;
-use PDF::API2::Resource::CIDFont::CJKFont;
-use PDF::API2::Resource::UniFont;
-
 use PDF::API2::Resource::XObject::Image::JPEG;
 use PDF::API2::Resource::XObject::Image::TIFF;
 use PDF::API2::Resource::XObject::Image::PNM;
@@ -1621,6 +1613,7 @@ See Also: L<PDF::API2::Resource::Font::CoreFont>.
 
 sub corefont {
     my ($self,$name,@opts)=@_;
+    require PDF::API2::Resource::Font::CoreFont;
     my $obj=PDF::API2::Resource::Font::CoreFont->new_api($self,$name,@opts);
     $self->resource('Font',$obj->name,$obj);
     $self->{pdf}->out_obj($self->{pages});
@@ -1670,6 +1663,7 @@ sub psfont {
         $opts{$o}=_findFont($opts{$o});
     }
     $psf=_findFont($psf);
+    require PDF::API2::Resource::Font::Postscript;
     my $obj=PDF::API2::Resource::Font::Postscript->new_api($self,$psf,%opts);
 
     $self->resource('Font',$obj->name,$obj,$self->{reopened});
@@ -1716,6 +1710,7 @@ sub ttfont {
     my ($self,$file,%opts)=@_;
 
     $file=_findFont($file);
+    require PDF::API2::Resource::CIDFont::TrueType;
     my $obj=PDF::API2::Resource::CIDFont::TrueType->new_api($self,$file,%opts);
 
     $self->resource('Font',$obj->name,$obj,$self->{reopened});
@@ -1751,6 +1746,7 @@ See Also: L<PDF::API2::Resource::CIDFont::CJKFont>
 sub cjkfont {
     my ($self,$name,%opts)=@_;
 
+    require PDF::API2::Resource::CIDFont::CJKFont;
     my $obj=PDF::API2::Resource::CIDFont::CJKFont->new_api($self,$name,%opts);
 
     $self->resource('Font',$obj->name,$obj,$self->{reopened});
@@ -1800,6 +1796,7 @@ See Also: L<PDF::API2::Resource::Font::SynFont>
 sub synfont {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::Font::SynFont;
     my $obj=PDF::API2::Resource::Font::SynFont->new_api($self,@opts);
 
     $self->resource('Font',$obj->name,$obj,$self->{reopened});
@@ -1820,6 +1817,7 @@ See Also: L<PDF::API2::Resource::Font::BdFont>
 sub bdfont {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::Font::BdFont;
     my $obj=PDF::API2::Resource::Font::BdFont->new_api($self,@opts);
 
     $self->resource('Font',$obj->name,$obj,$self->{reopened});
@@ -1852,6 +1850,7 @@ Changes the encoding of the font from its default.
 sub unifont {
     my ($self,@opts)=@_;
 
+    require PDF::API2::Resource::UniFont;
     my $obj=PDF::API2::Resource::UniFont->new_api($self,@opts);
 
     return($obj);
