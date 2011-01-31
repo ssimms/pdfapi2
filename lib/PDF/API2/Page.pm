@@ -252,12 +252,12 @@ will be prepended to the page description.
 
 sub fixcontents {
     my ($self) = @_;
-        $self->{'Contents'} = $self->{'Contents'} || PDFArray();
-        if(ref($self->{'Contents'})=~/Objind$/) {
+    $self->{'Contents'} = $self->{'Contents'} || PDFArray();
+    if(ref($self->{'Contents'})=~/Objind$/) {
         $self->{'Contents'}->realise;
     }
-        if(ref($self->{'Contents'})!~/Array$/) {
-            $self->{'Contents'} = PDFArray($self->{'Contents'});
+    if(ref($self->{'Contents'})!~/Array$/) {
+        $self->{'Contents'} = PDFArray($self->{'Contents'});
     }
 }
 
@@ -277,8 +277,8 @@ sub content {
 
 sub addcontent {
     my ($self,@objs) = @_;
-        $self->fixcontents;
-        $self->{'Contents'}->add_elements(@objs);
+    $self->fixcontents;
+    $self->{'Contents'}->add_elements(@objs);
 }
 sub precontent {
     my ($self,@objs) = @_;
