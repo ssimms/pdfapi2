@@ -798,53 +798,34 @@ B<Example:>
 =cut
 
 sub pageLabel {
-    my $self=shift @_;
+    my $self = shift();
 
-	$self->{catalog}->{PageLabels}||=PDFDict();
-	$self->{catalog}->{PageLabels}->{Nums}||=PDFArray();
-	
-	my $arr=$self->{catalog}->{PageLabels}->{Nums};
-	while(scalar @_)
-	{
-		my $index=shift @_;
-		my $opts=shift @_;
-		
-		$arr->add_elements(PDFNum($index));
+    $self->{'catalog'}->{'PageLabels'} ||= PDFDict();
+    $self->{'catalog'}->{'PageLabels'}->{'Nums'} ||= PDFArray();
 
-		my $d=PDFDict();
-		if($opts->{-style} eq 'Roman')
-		{
-			$d->{S}=PDFName('R');
-		}
-		elsif($opts->{-style} eq 'roman')
-		{
-			$d->{S}=PDFName('r');
-		}
-		elsif($opts->{-style} eq 'Alpha')
-		{
-			$d->{S}=PDFName('A');
-		}
-		elsif($opts->{-style} eq 'alpha')
-		{
-			$d->{S}=PDFName('a');
-		}
-		else
-		{
-			$d->{S}=PDFName('D');
-		}
+    my $nums = $self->{'catalog'}->{'PageLabels'}->{'Nums'};
+    while (scalar @_) {
+        my $index = shift();
+        my $opts = shift();
 
-		if(defined $opts->{-prefix})
-		{
-			$d->{P}=PDFStr($opts->{-prefix});
-		}
+        $nums->add_elements(PDFNum($index));
 
-		if(defined $opts->{-start})
-		{
-			$d->{St}=PDFNum($opts->{-start});
-		}
-				
-		$arr->add_elements($d);
-	}
+        my $d = PDFDict();
+        $d->{'S'} = PDFName($opts->{'-style'} eq 'Roman' ? 'R' :
+                            $opts->{'-style'} eq 'roman' ? 'r' :
+                            $opts->{'-style'} eq 'Alpha' ? 'A' :
+                            $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
+                          
+        if (defined $opts->{'-prefix'}) {
+            $d->{'P'} = PDFStr($opts->{'-prefix'});
+        }
+
+        if (defined $opts->{'-start'}) {
+            $d->{'St'} = PDFNum($opts->{'-start'});
+        }
+
+        $nums->add_elements($d);
+    }
 }
 
 =item $pdf->finishobjects(@objects)
