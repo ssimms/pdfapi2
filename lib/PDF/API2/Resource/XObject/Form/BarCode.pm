@@ -31,13 +31,13 @@ sub new {
 
     $self->{' bfont'}=$opts{-font};
 
-    $self->{' umzn'}=$opts{-umzn};      # (u)pper (m)ending (z)o(n)e
-    $self->{' lmzn'}=$opts{-lmzn};      # (l)ower (m)ending (z)o(n)e
-    $self->{' zone'}=$opts{-zone};
-    $self->{' quzn'}=$opts{-quzn};      # (qu)iet (z)o(n)e
-    $self->{' ofwt'}=$opts{-ofwt}||0.01;        # (o)ver(f)low (w)id(t)h
-    $self->{' fnsz'}=$opts{-fnsz};      # (f)o(n)t(s)i(z)e
-    $self->{' spcr'}=$opts{-spcr}||'';
+    $self->{' umzn'}=$opts{-umzn} || 0;    # (u)pper (m)ending (z)o(n)e
+    $self->{' lmzn'}=$opts{-lmzn} || 0;    # (l)ower (m)ending (z)o(n)e
+    $self->{' zone'}=$opts{-zone} || 0;
+    $self->{' quzn'}=$opts{-quzn} || 0;    # (qu)iet (z)o(n)e
+    $self->{' ofwt'}=$opts{-ofwt} || 0.01; # (o)ver(f)low (w)id(t)h
+    $self->{' fnsz'}=$opts{-fnsz};         # (f)o(n)t(s)i(z)e
+    $self->{' spcr'}=$opts{-spcr} || '';
 
     return($self);
 }
