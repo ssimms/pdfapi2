@@ -68,7 +68,7 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     $font = $pdf->ttfont('/path/to/font.ttf');
 
     # Add some text to the page
-    $text = $pdf->text();
+    $text = $page->text();
     $text->font($font, 20);
     $text->translate(200, 700);
     $text->text('Hello World!');
