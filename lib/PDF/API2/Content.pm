@@ -482,7 +482,7 @@ sub meterlimit {
     $this->add(_meterlimit($limit));
 }
 
-=item $content->linedash($on_off)
+=item $content->linedash($length)
 
 =item $content->linedash($on, $off)
 
@@ -503,6 +503,8 @@ sub _linedash {
     } 
     else {
         if ($a[0]=~/^\-/) {
+            # Note: This is undocumented, and will probably go away in
+            # the future.
             my %a=@a;
             $a{-pattern}=[$a{-full}||0,$a{-clear}||0] unless(ref $a{-pattern});
             return ('[',floats(@{$a{-pattern}}),']',($a{-shift}||0),'d');
