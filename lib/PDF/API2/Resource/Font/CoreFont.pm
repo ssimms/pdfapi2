@@ -103,32 +103,6 @@ sub deep_copy
     }
 }
 
-sub _look_for_fontfile ($) 
-{
-    my $fname=shift;
-    my $fpath=undef;
-    foreach my $dir (@INC) 
-    {
-        $fpath="$dir/PDF/API2/Resource/Font/CoreFont/$fname";
-        last if(-f $fpath);
-        $fpath=undef;
-    }
-    return($fpath);
-}
-
-sub _look_for_fontmetricfile ($) 
-{
-    my $fname=shift;
-    my $fpath=undef;
-    foreach my $dir (@INC) 
-    {
-        $fpath="$dir/PDF/API2/Resource/Font/CoreFont/$fname.fm";
-        last if(-f $fpath);
-        $fpath=undef;
-    }
-    return($fpath);
-}
-
 sub new 
 {
     my ($class,$pdf,$name,@opts) = @_;
