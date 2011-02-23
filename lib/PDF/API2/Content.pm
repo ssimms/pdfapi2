@@ -860,7 +860,7 @@ sub bogen {
     $x=$x1-$p0_x;
     $y=$y1-$p0_y;
 
-    $self->move($x,$y) if($move);
+    $self->move($x1,$y1) if($move);
 
     while(scalar @points > 0) {
         $p1_x= $x + shift @points;

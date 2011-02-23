@@ -4,6 +4,10 @@
       they were only used by one example script.  If you need them for
       your project, you can download them from http://dejavu-fonts.org
 
+    - Fix: Content->bogen() didn't behave as documented if $move was
+      set (it started drawing from the center of the circle rather
+      than [x1, y1]).
+
     - The undocumented nettfont method has been removed, along with
       the supporting PDF::API2::Resource::Font::neTrueType module.
 
@@ -14,6 +18,7 @@
 
     - [RT #62922] Fix string interpolation in pdf-merge.pl
       (Guillaume Rousse)
+
 
 2.016     2011-01-24
 
