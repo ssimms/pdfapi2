@@ -811,11 +811,13 @@ path instead of the continuation of an existing path.
 Set C<$outer> to a true value to draw the larger arc between the two
 points instead of the smaller one.
 
-Set C<$reverse> to a true value to start from the end of the arc and
-extend to the beginning.
+Set C<$reverse> to a true value to draw the mirror image of the
+specified arc.
 
-Note: 2*r cannot be smaller than the distance from C<[x1, y1]> to
+C<$radius * 2> cannot be smaller than the distance from C<[x1, y1]> to
 C<[x2, y2]>.
+
+Note: The curve will not appear until you call C<stroke>.
 
 =cut
 
