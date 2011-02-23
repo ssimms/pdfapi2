@@ -482,11 +482,15 @@ sub meterlimit {
     $this->add(_meterlimit($limit));
 }
 
+=item $content->linedash()
+
 =item $content->linedash($length)
 
 =item $content->linedash($on, $off)
 
 Sets the line dash pattern.
+
+If passed without any arguments, a solid line will be drawn.
 
 If passed with one argument, the strokes and spaces will have equal
 lengths.
