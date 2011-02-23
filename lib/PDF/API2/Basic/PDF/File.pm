@@ -506,13 +506,11 @@ sub readval
     my ($res, $key, $value, $k);
 
     $str = update($fh, $str);
-    ## updateRef($fh, \$str);
 
     if ($str =~ m/^<</so)
     {
         $str = substr ($str, 2);
         $str = update($fh, $str);
-        ## updateRef($fh, \$str);
         $res = PDFDict();
 
         while ($str !~ m/^>>/o) {
@@ -535,11 +533,9 @@ sub readval
                 $res->{null} = $value;
             }
             $str = update($fh, $str); # thanks gareth.jones@stud.man.ac.uk
-            ## updateRef($fh, \$str); # thanks gareth.jones@stud.man.ac.uk
         }
         $str =~ s/^>>//o;
         $str = update($fh, $str);
-        ## updateRef($fh, \$str);
     # streams can't be followed by a lone carriage-return.
     # fredo: yes they can !!! -- use the MacOS Luke.
         if (($str =~ s/^stream(?:(?:\015\012)|\012|\015)//o)
@@ -561,7 +557,6 @@ sub readval
                 $res->{' stream'} = $value;
                 $res->{' nofilt'} = 1;
                 $str = update($fh, $str, 1);  # tell update we are in-stream and only need an endstream 
-                ## updateRef($fh, \$str, 1);  # tell update we are in-stream and only need an endstream 
                 #$str =~ s/^endstream//o; # we cannot regexpr here since we need the first endstream only
                 # so we do the following:
                 my $wh = index($str,'endstream');
@@ -607,7 +602,6 @@ sub readval
             $res->{' realised'} = 1;
         }
         $str = update($fh, $str);       # thanks to kundrat@kundrat.sk
-        ## updateRef($fh, \$str);       # thanks to kundrat@kundrat.sk
         $str =~ s/^endobj//o;
     } elsif ($str =~ m|^/($reg_char+)|so)        # name
     {
@@ -677,14 +671,12 @@ sub readval
     {
         $str =~ s/^\[//o;
         $str = update($fh, $str);
-        ## updateRef($fh, \$str);
         $res = PDFArray();
         while ($str !~ m/^\]/o)
         {
             ($value, $str) = $self->readval($str, %opts);
             $res->add_elements($value);
             $str = update($fh, $str);   # str might just be exhausted!
-            ## updateRef($fh, \$str);   # str might just be exhausted!
         }
         $str =~ s/^\]//o;
     } 
@@ -1077,42 +1069,6 @@ sub update
 
     return $str;
 }
-
-sub updateRef
-{
-    my ($fh, $str, $instream) = @_;
-    my $inlen=16; my $inoff=1;
-    print STDERR "fpos=".tell($fh)." strlen=".length($$str)."\n" if($readDebug);
-    if($instream) {
-        # we are inside a (possible binary) stream
-        # so we fetch data till we see an 'endstream'
-        # -- fredo/2004-09-03
-        while ($$str !~ m/endstream/o && !$fh->eof)
-        {
-            print STDERR "fpos=".tell($fh)." strlen=".length($$str)."\n" if($readDebug);
-            $fh->read($$str, 314, length($$str));
-        }
-    } else {
-        $$str =~ s/^$ws_char*//o;
-        while ($$str !~ m/$cr/o && !$fh->eof && length($$str) < 16000)
-        {
-            print STDERR "fpos=".tell($fh)." strlen=".length($$str)."\n" if($readDebug);
-            $fh->read($$str, $inlen, length($$str));
-            $$str =~ s/^$ws_char*//so;
-            $inlen+=$inoff;
-        }
-        while ($$str =~ m/^\%/o) # restructured by fredo/2003-03-23
-        {
-            print STDERR "fpos=".tell($fh)." strlen=".length($$str)."\n" if($readDebug);
-            $fh->read($$str, $inlen, length($$str)) while ($$str !~ m/$cr/o && !$fh->eof);
-            $$str =~ s/^\%[^\015\012]+$ws_char*//so; # fixed for reportlab -- fredo
-            $inlen+=$inoff;
-        }
-    }
-
-    return undef;
-}
-
 
 =head2 $objind = $p->test_obj($num, $gen)
 
