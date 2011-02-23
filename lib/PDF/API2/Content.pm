@@ -1519,40 +1519,6 @@ sub textstate {
     return %state;
 }
 
-sub textstate2 {
-    my $self = shift;
-    my %state;
-    if (scalar @_) {
-        %state = @_;
-        foreach my $k (qw[ charspace hspace wordspace lead rise render ]) {
-            next unless($state{$k});
-            if ($self->{" $k"} ne $state{$k}) {
-                $self->can($k)->($self, $state{$k});
-            }
-        }
-        if ($state{font} && $state{fontsize}) {
-            if ($self->{" font"} ne $state{font} || $self->{" fontsize"} ne $state{fontsize}) {
-                $self->font($state{font},$state{fontsize});
-            }
-        }
-        if($state{fillcolor}) {
-            $self->fillcolor(@{$state{fillcolor}});
-        }
-        if($state{strokecolor}) {
-            $self->strokecolor(@{$state{strokecolor}});
-        }
-        %state = ();
-    }
-    else {
-        foreach my $k (qw[ font fontsize charspace hspace wordspace lead rise render ]) {
-            $state{$k}=$self->{" $k"};
-        }
-        $state{fillcolor}=[@{$self->{" fillcolor"}}];
-        $state{strokecolor}=[@{$self->{" strokecolor"}}];
-    }
-    return %state;
-}
-
 =item $content->font($font_object, $size)
 
     # Example
