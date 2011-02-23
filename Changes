@@ -19,6 +19,9 @@
     - [RT #62922] Fix string interpolation in pdf-merge.pl
       (Guillaume Rousse)
 
+    - [RT #66054] Fix rename of .cmap files so that they actually work
+      now. (cnhacktnt)
+
 
 2.016     2011-01-24
 
