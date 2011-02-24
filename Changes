@@ -1,5 +1,15 @@
 {{$NEXT}}
 
+    - The tests in 2.017 exposed a floating point issue where some
+      computers give more trailing zeros than others.  It doesn't
+      affect the output, but it does break the tests on those
+      computers, since the PDFs are slightly different.  This version
+      modifies the float() method to remove trailing zeros, which
+      should fix the test breakage and give consistent PDFs.
+
+
+2.017     2011-02-22
+
     - The DejaVu fonts have been removed from the distribution, since
       they were only used by one example script.  If you need them for
       your project, you can download them from http://dejavu-fonts.org
