@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - [RT #66167] Fix a typo in the require statement for code128
+      barcodes (TC Kuan).
+
+
+2.018     2011-02-23
+
     - The tests in 2.017 exposed a floating point issue where some
       computers give more trailing zeros than others.  It doesn't
       affect the output, but it does break the tests on those
