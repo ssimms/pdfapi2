@@ -2109,7 +2109,7 @@ Creates the specified barcode object as a form XObject.
 sub xo_code128 {
     my ($self,@opts)=@_;
 
-    require PDF::API2::Resource::XObject::Form::BarCode::coda128;
+    require PDF::API2::Resource::XObject::Form::BarCode::code128;
     my $obj=PDF::API2::Resource::XObject::Form::BarCode::code128->new_api($self,@opts);
 
     $self->resource('XObject',$obj->name,$obj);
