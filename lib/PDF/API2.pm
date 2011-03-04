@@ -30,7 +30,6 @@ use PDF::API2::Resource::ExtGState;
 use PDF::API2::Resource::Pattern;
 use PDF::API2::Resource::Shading;
 
-use PDF::API2::Outlines;
 use PDF::API2::NamedDestination;
 
 no warnings qw[ deprecated recursion uninitialized ];
@@ -2247,17 +2246,18 @@ Returns a new or existing outlines object.
 =cut
 
 sub outlines {
-    my ($self)=@_;
+    my $self = shift();
 
-    $self->{pdf}->{Root}->{Outlines}||=PDF::API2::Outlines->new($self);
+    require PDF::API2::Outlines;
+    $self->{pdf}->{Root}->{Outlines} ||= PDF::API2::Outlines->new($self);
 
-    my $obj=$self->{pdf}->{Root}->{Outlines};
+    my $obj = $self->{pdf}->{Root}->{Outlines};
 
-    $self->{pdf}->new_obj($obj) if(!$obj->is_obj($self->{pdf}));
+    $self->{pdf}->new_obj($obj) unless $obj->is_obj($self->{pdf});
     $self->{pdf}->out_obj($obj);
     $self->{pdf}->out_obj($self->{pdf}->{Root});
 
-    return($obj);
+    return $obj;
 
 }
 
