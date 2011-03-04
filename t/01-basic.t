@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use warnings;
 use strict;
@@ -40,3 +40,11 @@ $page = $pdf->page();
 is($pdf->pages(),
    2,
    q{$pdf->pages() returns 2 after a second page is added});
+
+# Open a PDF
+
+$pdf = PDF::API2->open('t/resources/sample.pdf');
+
+isa_ok($pdf,
+       'PDF::API2',
+       q{PDF::API2->open() returns a PDF::API2 object});
