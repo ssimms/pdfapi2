@@ -10,13 +10,6 @@ use PDF::API2::Basic::PDF::File;
 use PDF::API2::Basic::PDF::Pages;
 use PDF::API2::Page;
 
-use PDF::API2::Resource::XObject::Image::JPEG;
-use PDF::API2::Resource::XObject::Image::TIFF;
-use PDF::API2::Resource::XObject::Image::PNM;
-use PDF::API2::Resource::XObject::Image::PNG;
-use PDF::API2::Resource::XObject::Image::GIF;
-use PDF::API2::Resource::XObject::Image::GD;
-
 use PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
 use PDF::API2::Resource::ColorSpace::Indexed::Hue;
 use PDF::API2::Resource::ColorSpace::Indexed::WebColor;
@@ -1870,6 +1863,7 @@ Imports and returns a new JPEG image object.
 sub image_jpeg {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::XObject::Image::JPEG;
     my $obj=PDF::API2::Resource::XObject::Image::JPEG->new_api($self,$file);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -1887,6 +1881,7 @@ Imports and returns a new TIFF image object.
 sub image_tiff {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::XObject::Image::TIFF;
     my $obj=PDF::API2::Resource::XObject::Image::TIFF->new_api($self,$file);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -1904,6 +1899,7 @@ Imports and returns a new PNM image object.
 sub image_pnm {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::XObject::Image::PNM;
     my $obj=PDF::API2::Resource::XObject::Image::PNM->new_api($self,$file);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -1921,6 +1917,7 @@ Imports and returns a new PNG image object.
 sub image_png {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::XObject::Image::PNG;
     my $obj=PDF::API2::Resource::XObject::Image::PNG->new_api($self,$file);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -1938,6 +1935,7 @@ Imports and returns a new GIF image object.
 sub image_gif {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::XObject::Image::GIF;
     my $obj=PDF::API2::Resource::XObject::Image::GIF->new_api($self,$file);
 
     $self->resource('XObject',$obj->name,$obj);
@@ -1957,6 +1955,7 @@ B<Options:> The only option currently supported is C<< -lossless => 1 >>.
 sub image_gd {
     my ($self,$gd,%opts)=@_;
 
+    require PDF::API2::Resource::XObject::Image::GD;
     my $obj=PDF::API2::Resource::XObject::Image::GD->new_api($self,$gd,undef,%opts);
 
     $self->resource('XObject',$obj->name,$obj);
