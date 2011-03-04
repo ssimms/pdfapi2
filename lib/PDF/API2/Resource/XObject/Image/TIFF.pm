@@ -28,7 +28,7 @@ sub new
     my ($class,$pdf,$file,$name) = @_;
     my $self;
 
-    my $tif=TiffFile->new($file);
+    my $tif=PDF::API2::Resource::XObject::Image::Tiff::File->new($file);
     
     # in case of problematic things 
     #  proxy to other modules
@@ -340,7 +340,7 @@ sub tiffTag {
     return($self->{' tiff'}->{$tag});
 }
 
-package TiffFile;
+package PDF::API2::Resource::XObject::Image::Tiff::File;
 
 use IO::File;
 
