@@ -3,6 +3,12 @@
     - [RT #66167] Fix a typo in the require statement for code128
       barcodes (TC Kuan).
 
+    - Numerous modules are now only loaded when they're needed, which
+      should help speed up the load time and reduce the memory
+      footprint.
+
+    - Test coverage is up to about 45% of the codebase.
+
 
 2.018     2011-02-23
 
