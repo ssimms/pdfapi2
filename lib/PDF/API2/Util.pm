@@ -32,7 +32,6 @@ BEGIN {
     @ISA = qw(Exporter);
     @EXPORT = qw(
         pdfkey
-        pdfkey2
         float floats floats5 intg intgs
         mMin mMax
         HSVtoRGB RGBtoHSV HSLtoRGB RGBtoHSL RGBtoLUM
@@ -44,7 +43,6 @@ BEGIN {
     );
     @EXPORT_OK = qw(
         pdfkey
-        pdfkey2
         digest digestx digest16 digest32
         float floats floats5 intg intgs
         mMin mMax
@@ -72,10 +70,6 @@ BEGIN {
 
 sub pdfkey {
     return($PDF::API2::Util::key_var++);
-}
-
-sub pdfkey2 {
-    return($PDF::API2::Util::key_var.($PDF::API2::Util::key_var2++));
 }
 
 sub digestx {
