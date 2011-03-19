@@ -1701,6 +1701,12 @@ Disables embedding of the font file.
 sub ttfont {
     my ($self, $file, %opts) = @_;
 
+    # PDF::API2 doesn't set BaseEncoding for TrueType fonts, so text
+    # isn't searchable unless a ToUnicode CMap is included.  Include
+    # the ToUnicode CMap by default, but allow it to be disabled (for
+    # performance and file size reasons) by setting -unicodemap to 0.
+    $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
+
     $file = _findFont($file);
     require PDF::API2::Resource::CIDFont::TrueType;
     my $obj = PDF::API2::Resource::CIDFont::TrueType->new_api($self, $file, %opts);
