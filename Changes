@@ -1,5 +1,20 @@
 {{$NEXT}}
 
+    - Text using TrueType fonts is now searchable again.  In version
+      0.61, an undocumented -unicodemap option was added to nearly all
+      of the font resource methods, which only included a ToUnicode
+      CMap if it was set (and it's required in order for PDF readers
+      to be able to identify individual characters if BaseEncoding
+      isn't present, which it isn't for TrueType fonts).
+
+      I've left the -unicodemap option in place, and it's still
+      undocumented (except here), but it's now on by default.  Call
+      $pdf->ttfont($fontfile, -unicodemap => 0) if you want to disable
+      it for performance or file size reasons.
+
+
+2.019     2011-03-10
+
     - [RT #66167] Fix a typo in the require statement for code128
       barcodes (TC Kuan).
 
