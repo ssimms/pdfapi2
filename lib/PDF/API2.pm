@@ -1699,17 +1699,17 @@ Disables embedding of the font file.
 =cut
 
 sub ttfont {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
-    $file=_findFont($file);
+    $file = _findFont($file);
     require PDF::API2::Resource::CIDFont::TrueType;
-    my $obj=PDF::API2::Resource::CIDFont::TrueType->new_api($self,$file,%opts);
+    my $obj = PDF::API2::Resource::CIDFont::TrueType->new_api($self, $file, %opts);
 
-    $self->resource('Font',$obj->name,$obj,$self->{reopened});
+    $self->resource('Font', $obj->name, $obj, $self->{reopened});
 
     $self->{pdf}->out_obj($self->{pages});
-    $obj->tounicodemap if($opts{-unicodemap}==1);
-    return($obj);
+    $obj->tounicodemap if $opts{-unicodemap};
+    return $obj;
 }
 
 =item $font = $pdf->cjkfont($cjkname, [%options])
