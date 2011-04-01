@@ -160,7 +160,7 @@ sub outobjdeep
                 $self->{'Filter'}{' val'}[$i]{'val'} = $temp;      # !!!
             } elsif ($temp eq 'FlateDecode')
             { $hasflate = -2; }
-            $temp1 = "PDF::API2::Basic::PDF::$temp";
+            $temp1 = "PDF::API2::Basic::PDF::Filter::$temp";
             push (@filts, $temp1->new);
         }
         splice(@{$self->{'Filter'}{' val'}}, $hasflate, 1) if ($hasflate > -1);
@@ -244,7 +244,7 @@ sub read_stream
     {
         foreach $f ($self->{'Filter'}->elementsof)
         {
-            my ($temp) = "PDF::API2::Basic::PDF::" . $f->val;
+            my ($temp) = "PDF::API2::Basic::PDF::Filter::" . $f->val;
             push(@filts, $temp->new());
         }
     }

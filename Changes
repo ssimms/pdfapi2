@@ -12,6 +12,10 @@
       $pdf->ttfont($fontfile, -unicodemap => 0) if you want to disable
       it for performance or file size reasons.
 
+    - The various filter types have their own classes in the
+      PDF::API2::Basic::PDF::Filter namespace now, rather than having
+      all of the packages in Filter.pm.
+
 
 2.019     2011-03-10
 
