@@ -10,13 +10,6 @@ use PDF::API2::Basic::PDF::File;
 use PDF::API2::Basic::PDF::Pages;
 use PDF::API2::Page;
 
-use PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
-use PDF::API2::Resource::ColorSpace::Indexed::Hue;
-use PDF::API2::Resource::ColorSpace::Indexed::WebColor;
-
-use PDF::API2::Resource::ColorSpace::Separation;
-use PDF::API2::Resource::ColorSpace::DeviceN;
-
 use PDF::API2::Resource::XObject::Form::Hybrid;
 
 use PDF::API2::Resource::ExtGState;
@@ -1988,6 +1981,7 @@ reference to the file format's specification.
 sub colorspace_act {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
     my $obj=PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new_api($self,$file);
 
     $self->resource('ColorSpace',$obj->name,$obj);
@@ -2005,6 +1999,7 @@ Returns a new colorspace-object based on the web color palette.
 sub colorspace_web {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::ColorSpace::Indexed::WebColor;
     my $obj=PDF::API2::Resource::ColorSpace::Indexed::WebColor->new_api($self);
 
     $self->resource('ColorSpace',$obj->name,$obj);
@@ -2024,6 +2019,7 @@ See L<PDF::API2::Resource::ColorSpace::Indexed::Hue> for an explanation.
 sub colorspace_hue {
     my ($self,$file,%opts)=@_;
 
+    require PDF::API2::Resource::ColorSpace::Indexed::Hue;
     my $obj=PDF::API2::Resource::ColorSpace::Indexed::Hue->new_api($self);
 
     $self->resource('ColorSpace',$obj->name,$obj);
@@ -2050,6 +2046,8 @@ specified color.
 
 sub colorspace_separation {
     my ($self,$name,@clr)=@_;
+
+    require PDF::API2::Resource::ColorSpace::Separation;
     my $obj=PDF::API2::Resource::ColorSpace::Separation->new_api($self,$name,@clr);
 
     $self->resource('ColorSpace',$obj->name,$obj);
@@ -2082,6 +2080,7 @@ sub colorspace_devicen {
     my ($self,$clrs,$samples)=@_;
     $samples||=2;
     
+    require PDF::API2::Resource::ColorSpace::DeviceN;
     my $obj=PDF::API2::Resource::ColorSpace::DeviceN->new_api($self,$clrs,$samples);
 
     $self->resource('ColorSpace',$obj->name,$obj);
