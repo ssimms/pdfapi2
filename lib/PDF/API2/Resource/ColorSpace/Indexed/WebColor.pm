@@ -24,13 +24,10 @@ sub new {
 
     $csd->{' stream'}='';
 
-    my %cc=();
-
     foreach my $r (0,0x33,0x66,0x99,0xCC,0xFF) {
         foreach my $g (0,0x33,0x66,0x99,0xCC,0xFF) {
             foreach my $b (0,0x33,0x66,0x99,0xCC,0xFF) {
                 $csd->{' stream'}.=pack('CCC',$r,$g,$b);
-                $cc{sprintf('%02X%02X%02X',$r,$g,$b)}=1;
             }
         }
     } # 0-215
