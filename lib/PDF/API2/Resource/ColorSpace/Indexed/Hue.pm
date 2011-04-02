@@ -43,13 +43,4 @@ sub new {
     return($self);
 }
 
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $self->{' api'}=$api;
-
-    return($obj);
-}
-
 1;
