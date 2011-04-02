@@ -27,7 +27,7 @@ sub infilt
 
     $isend = ($str =~ s/>$//og);
     $str =~ s/\s//oig;
-    $str =~ s/([0-9a-z])/pack("C", hex($1 . "0"))/oige if ($isend && length($str) & 1);
+    $str =~ s/([0-9a-z])$/$1 . '0'/oie if ($isend && length($str) % 2 == 1);
     $str =~ s/([0-9a-z]{2})/pack("C", hex($1))/oige;
     $str;
 }
