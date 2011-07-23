@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+use PDF::API2;
+use PDF::API2::Util;
+use POSIX;
+use Math::Trig;
+
+my $cx=300;
+my $cy=400;
+my $cr=15;
+my $cs=32;
+my $ang=30;
+
+$pdf=PDF::API2->new;
+$pdf->mediabox(595,842);
+
+$fnt=$pdf->corefont('Verdana-Bold');
+
+foreach my $z (0xf,0xE,0xd,0xC,0xb,0xA,0x8) {
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'HSV Colorspace',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+    foreach my $s (0 .. 0x7) {
+        my $ha=$s/2;
+        foreach my $h (0 .. (12*$ha)-1) {
+            my $t=sprintf('&%02X%02X%02X',floor(256*$h/(12*$ha)),(($s*2)<<4|($s*2)),($z<<4|$z));
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+cos(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cy+sin(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+cos(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cy-2+sin(deg2rad(360*$h/(12*$ha)))*$cs*$s,$fnt,6,$t,-color=>'#000',-hspace=>80,-center=>1);
+        }
+    }
+}
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__
+
+    

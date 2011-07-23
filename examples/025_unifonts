@@ -1,0 +1,1336 @@
+#!/usr/bin/perl
+
+use File::Basename;
+use PDF::API2;
+use PDF::API2::Util;
+use Unicode::UCD 'charinfo';
+use Encode qw[:all];
+use Getopt::Long;
+use PDF::API2::UniWrap;
+use utf8;
+
+#-----------------------------------------
+package PDF::API2::UniWrap;
+
+sub char_length {
+    my $self=shift if ref($_[0]);
+    my ($c) = @_;
+
+    #if ($c eq 'CM' || $c eq 'ZW') {
+    #    return 0;
+    #}
+    if(defined $self && defined $self->{widthobj}) 
+    {
+        return $self->{widthobj}->width($c);
+    } 
+
+    return 1;
+}
+
+#-----------------------------------------
+package main;
+
+$uw = PDF::API2::UniWrap->new(line_length=>50, emergency_break=>50);
+
+$api=PDF::API2->new();
+
+$api->mediabox(595,842);
+
+$helv=$api->corefont('Helvetica-Bold',-encode=>'latin1');
+
+$times=$api->corefont('Times-Roman',-encode=>'latin1');
+$time2=$api->synfont($times,-slant=>1.3);
+$treb=$api->corefont('Trebuchet-Italic',-encode=>'latin1');
+$tre2=$api->synfont($treb,-slant=>1.1,-space=>60);
+$georg=$api->corefont('Georgia-Italic',-encode=>'latin1');
+
+$jfs=$api->cjkfont( 'KozMin', -encode=>'shiftjis' );
+$jf1=$api->cjkfont( 'KozMin-Bold', -encode=>'shiftjis' );
+$jf2=$api->cjkfont( 'KozGo-Italic', -encode=>'shiftjis' );
+
+$uf=$api->unifont($jf1,[$time2,[0]], -encode=>'shiftjis');
+$u2=$api->unifont($jf2,[$tre2,[0]], -encode=>'shiftjis');
+$u3=$api->unifont($jf2,{ font=>$georg, blocks=>[0] }, -encode=>'shiftjis');
+
+$start=tell(DATA);
+
+q|    Ming Ming-Bold Ming-Italic Ming-BoldItalic
+    Song Song-Bold Song-Italic Song-BoldItalic
+    MyungJo MyungJo-Bold MyungJo-Italic MyungJo-BoldItalic
+    KozMin KozMin-Bold KozMin-Italic KozMin-BoldItalic
+    KozGo KozGo-Bold KozGo-Italic KozGo-BoldItalic|;
+
+%fonts=(
+'KozMin'=>$jfs,
+'KozMin-Bold + Times'=>$uf,
+'KozGo-Italic + Trebuchet-Italic'=>$u2,
+'KozGo-Italic + Georgia-Italic'=>$u3
+);
+
+
+foreach my $fontname ('KozMin','KozMin-Bold + Times','KozGo-Italic + Trebuchet-Italic','KozGo-Italic + Georgia-Italic')
+{
+    $y=800;
+
+    $page = $api->page;
+    $gfx = $page->gfx;
+    delete $gfx->{Filter};
+    my $font=$fonts{$fontname};
+    $uw->{widthobj}=$font;
+
+    seek(DATA,$start,0);
+    binmode(DATA,':raw');
+
+    $gfx->textlabel(50,$y,$helv,10,$fontname,-color=>'darkred');
+    foreach (1..45)
+    {
+	$y-=15;
+	$line=<DATA>;
+	$line=~s|[\012\015]+$||go;
+	$gfx->textlabel(50,$y,$font,10,$line,-hspace=>80);
+    }
+}
+
+$api->saveas("$0.pdf");
+$api->end;
+
+__END__
+PDFJ - 日本語PDF生成モジュール
+
+=head1 SYNOPSIS
+
+  use PDFJ qw(SJIS);
+  $doc = PDFJ::Doc->new($pdfversion, $paperwidth, $paperheight);
+  $font = $doc->new_font('Ryumin-Light', '90ms-RKSJ-H', 'Times-Roman');
+  $page = $doc->new_page;
+  $text = Text("テキスト", TStyle(font => $font, fontsize => 10));
+  $paragraph = Paragraph($text, PStyle(size => 100, align => 'w', linefeed => 20));
+  $image = $doc->new_image($jpgfile, $pixelwidth, $pixelheight, $width, $height);
+  $shape = Shape->ellipse($x, $y, $rx, $ry);
+  $block = Block('V', $paragraph, $image, $shape, BStyle(align => 'c'));
+  $block->show($page, $x, $y);
+  $doc->print('sample.pdf');
+
+=head1 DESCRIPTION
+
+=head2 概要
+
+このモジュールは日本語PDFを生成する。次のような特徴がある。
+
+=over 4
+
+=item *
+
+JIS X 4051「日本語文書の行組版方法」（1995）にほぼ準拠した行組版ルールを組み込んであり、禁則や行の詰め伸ばしはこのモジュールに任せることができる。
+
+=item *
+
+ルビ、添え字、縦書き中の欧文、縦中横、欧文のハイフネーション、下線・傍線、圏点、網掛けといった組版処理もこのモジュールに任せることができる。
+
+=item *
+
+Type1フォントでは、和文にRyumin-LightとGothicBBB-Medium、欧文にTimes、Helvetica、Courierの各ファミリが使える。これらはフォント自体は埋め込まれないので、コンパクトなPDFを作れる。ただし表示・印刷環境にそのフォントがないと代替フォントとなる。
+
+=item *
+
+任意のTrueTypeフォントを使うこともできる。TrueTypeフォントは埋め込まれる（和文についてはサブセットで）ので、若干PDFのサイズが大きくなるが、どんな環境でも同じように表示・印刷できる。
+
+=item *
+
+欧文に、固定ピッチの半角フォントを使うことも、プロポーショナルな欧文フォントを使うこともできる。
+
+=item *
+
+日本語文字コードとしては、シフトJIS、日本語EUC、UTF8、Unicodeに対応している。
+
+=item *
+
+JPEG画像（ファイルおよびURL指定）と線画図形が扱える。画像や図形をテキストの一部として行内に配置することも可能。逆に線画図形の中にテキストや画像を配置することもできる。
+
+=item *
+
+テキストを行長と行送りを指定して折り返し処理し、段落を作ることができる。段落には箇条書きのためのラベルを付けることができる
+
+=item *
+
+段落、画像、図形などを並べてブロックというまとまりを作ることができる。ブロックには、内容の配置、周囲の余白、枠線、塗りつぶし色などを指定できる。ブロック内の並びの方向として、上→下、左→右、右→左がある。ブロックを入れ子にすることで表を作ることができる。
+
+=item *
+
+段落やブロックを指定の大きさを超えないように分割して、複数のページに分けて表示することができる。
+
+=item *
+
+PDFの文書情報、アウトライン情報、ハイパーリンク（文書内およびURL）を付加できる。
+
+=item *
+
+暗号化ができる。
+
+=back
+
+=head2 表示可能なオブジェクト
+
+PDFJでは次の表示可能な構成要素に対応するオブジェクトを組み合わせてPDF文書を作成する。これらはみな、showというメソッドでページ上に位置を指定して表示することができる。showメソッドの具体的な使い方については後述する。
+
+=over 4
+
+=item テキスト（PDFJ::Text）
+
+指定の文字列を、指定のフォントやサイズなどの属性に従って表示するもの。フォントのエンコーディングがHであれば左から右へ横書きで、Vであれば上から下へ縦書きで表示される。
+
+ルビ、添え字、縦中横、下線・傍線、圏点、囲みといった属性の指定ができる。
+
+テキスト自体には行長や行送りといった属性はなく、折り返して表示されることはない。
+
+文字だけでなく、表示可能なオブジェクトを含むことができる。
+
+=item 段落（PDFJ::Paragraph）
+
+テキストに対して行長と行送りと配置を指定して行の折り返しをおこない、ひとつの段落として表示するもの。行の折り返しに伴う、禁則処理、ハイフネーション、行の詰め伸ばしは自動的に処理される。
+
+またテキストには、文字だけでなく画像や図形をひとつの文字のように扱って含むこともできる。
+
+行頭、行末のインデント、先頭行につけるラベルを指定することもできる。
+
+段落の前後の間隔を指定することができる。この間隔は段落を並べてブロックを作る際に適用される。
+
+=item 画像（PDFJ::Image）
+
+JPEG形式で、ファイルに保存されているものか、URLで参照できる画像のみが扱える。元のピクセルサイズとは関係なく指定の大きさで表示できる。
+
+周囲の余白を指定することもできる。
+
+=item 図形（PDFJ::Shape）
+
+直線、矩形、多角形、円、楕円、ベジエ曲線を組み合わせて図形を作成し、表示できる。線の有無、太さ、色、点線、塗りつぶしの有無、色といった属性が指定できる。
+
+図形内にテキストを配置することもできる。
+
+周囲の余白を指定することもできる。
+
+=item ブロック（PDFJ::Block）
+
+表示可能なオブジェクトを特定の方向に並べてひとまとめにしたもの。方向としては、H（左→右）、R（右→左）、V（上→下）の三種類がある。全体の幅や高さを指定して内容の配置を指定することもできる。内容の配置は、左右方向に、l（左）、c（中央）、r（右）、上下方向に、t（上）、m（中央）、b（下）を組み合わせて指定する。ただし、全体の幅や高さは内容によって決まる幅や高さより小さくはできない。
+
+オブジェクトに前後の間隔の指定があれば、それに従って間隔が空けられる。また、直接数値で間隔を指定することもできる。
+
+ブロックには、周囲の余白、枠線、塗りつぶし色を指定することができる。
+
+ブロックを入れ子にすることで、表を作ることができる。
+
+=back
+
+=head2 その他のオブジェクト
+
+その他に次のようなオブジェクトが、表示可能なオブジェクトとともに使用される。
+
+=over 4
+
+=item フォント（PDFJ::AFont、PDFJ::CIDFont）
+
+フォントはType1フォントでは、和文にRyumin-LightとGothicBBB-Medium、欧文にTimes、Helvetica、Courierの各ファミリが使える。TrueTypeフォントは任意のものが使える。ただしPDFに埋め込まれるので、埋め込みが許可されたTrueTypeフォントでなければならない。
+
+和文フォントだけを指定したテキストに欧文が現れたときには、和文フォントの半角文字（文字幅は半角固定）が使われるが、組み合わせる欧文フォントを指定しておくとその欧文フォントが使われる。プロポーショナルな和文フォントには対応していない。
+
+縦書き用エンコーディング（V）を指定した和文フォントを指定すると、そのテキストは縦書きとなる。
+
+=item テキストスタイル（PDFJ::TextStyle）
+
+フォント、フォントサイズ、文字描画モード、ベースライン調整、斜体、下線（縦書きでは傍線）、囲み箱、圏点、添え字（上・下）、ルビ、傍注、図形スタイル、が指定できる。
+
+文字描画モードは、文字の枠線と塗りつぶしの組み合わせの指定。図形スタイルは、文字描画、下線・傍線、囲み箱における図形スタイルの指定。
+
+=item 段落スタイル（PDFJ::ParagraphStyle）
+
+行長、揃え、行送り、ラベル、ラベル長、行頭インデント、行末インデント、前間隔、後間隔、が指定できる。
+
+揃えとしては、b（行頭揃え）、m（中央揃え）、e（行末揃え）、w（両端揃え）がある。
+
+=item ブロックスタイル（PDFJ::BlockStyle）
+
+幅、高さ、揃え、揃えフラグ、周囲余白、枠線、塗りつぶし色、前間隔、後間隔、が指定できる。
+
+=item 図形スタイル（PDFJ::ShapeStyle）
+
+線幅、点線、線色、塗りつぶし色、周囲余白、前間隔、後間隔、が指定できる。
+
+=item 色（PDFJ::Color）
+
+灰色指定と、ＲＧＢ指定ができる。図形属性の線色と塗りつぶし色の指定に使われる。
+
+=item ページ（PDFJ::Page）
+
+各ページの内容を保持する。テキストや画像や図形など、表示可能なオブジェクトはページに配置することで実際に表示される。
+
+=item PDF文書（PDFJ::Doc）
+
+一つのPDF文書。ページ群や、リソースとしてのフォントや画像をまとめ、最終的に一つのPDFファイルとして出力する。
+
+=back
+
+=head2 PDFJのインストール
+
+管理者であれば次の標準的な手順でインストールできる。
+
+  perl Makefile.PL
+  make
+  make install
+
+最後のmake installは管理者権限で実行する。Windowsではmakeでなくnmakeを使用する。
+
+管理者でない場合でも、PDFJを構成する次のモジュールファイル群をPerlから利用できる（すなわち@INCにセットされた）ディレクトリにおけば利用できる。
+
+  PDFJ.pm
+  PDFJ/Object.pm
+  PDFJ/Unicode.pm
+  PDFJ/E2U.pm
+  PDFJ/S2U.pm
+  PDFJ/U2C.pm
+  PDFJ/TTF.pm
+
+PDFJは、欧文のハイフネーションをおこなうために、TeX::Hyphenモジュールを使用している。欧文を含むテキストを扱う場合は必要となるので、CPANからダウンロードしてインストールしておく。管理者でない場合は、次のモジュールをPerlから利用できるディレクトリにおけばよい。
+
+  TeX/Hyphen.pm
+  TeX/Hyphen/czech.pm
+  TeX/Hyphen/german.pm
+
+PDFJは、フォントや画像などのデータを埋め込む際に、デフォルトではCompress::Zlibモジュールを使用する。Compress::Zlibがない環境や、Compress::Zlibを使いたくない場合のために、Compress::Zlibを使わずにデータの埋め込みをおこなうオプションも用意されている。（L<"文書オブジェクトの作成">を参照）
+
+暗号化をおこなう際には、Digest::MD5モジュールが必要である。
+
+=head2 PDFJの使用
+
+PDFJを使用するには、つぎのようにして use PDFJ の引数に日本語文字コードを指定する。省略すると'SJIS'とみなされる。
+
+  # Shift-JISの場合
+  use PDFJ 'SJIS';
+
+  # EUCの場合
+  use PDFJ 'EUC';
+
+  # UTF8の場合
+  use PDFJ 'UTF8';
+
+  # UNICODE（UCS2）の場合
+  use PDFJ 'UNICODE';
+
+テキストオブジェクトを作る時に与える文字列や、フォントのエンコーディングでの日本語文字コードは、use PDFJ で指定したものと合致するようにしなければならない。
+
+異なる文字コードを混在させたり切り替えて使用することはできない。
+
+use PDFJ によって次のサブルーチンがエクスポートされる。
+
+  Doc
+  Text
+  TStyle
+  NewLine
+  Outline
+  Dest
+  Paragraph
+  PStyle
+  Block
+  BStyle
+  NewBlock
+  BlockSkip
+  Shape
+  SStyle
+  Color
+
+=head2 文書オブジェクトの作成
+
+まず最初に文書オブジェクトを作成しなければならない。
+
+  $docobj = PDFJ::Doc->new($version, $width, $height);
+
+ここで、$versionはPDFのバージョン（※下記の注を参照）、$widthはページの幅、$heightはページの高さで、単位はポイント（1/72インチ）である。（ポイントの定義は定まったものがないが、PDFでは1/72インチとされている。1インチは25.4mm。）
+
+なお、ページの幅と高さは、各ページオブジェクトを作成する時に個別に指定することもできる。
+
+※PDFのバージョン
+
+PDFのバージョンは、次のようにAcrobatやAcrobat Readerのバージョンと対応している。
+
+  PDFバージョン1.2 … Acrobatバージョン3
+  PDFバージョン1.3 … Acrobatバージョン4
+  PDFバージョン1.4 … Acrobatバージョン5
+
+したがってAcrobat3でも使えるようにしたければ1.2にしておく。ただし、日本語TrueTypeフォントを使うときは1.3以上が必要。Acrobat4以上で使えればよいということなら常に1.3にしておけばよい。
+
+※データ埋め込み方法の指定
+
+Compress::Zlibを使わずにデータの埋め込みをおこなう場合は、文書オブジェクトのfilterメソッドを用いて次のようにデータ埋め込み方法の指定をおこなっておく。この指定をしない場合はCompress::Zlibを使った埋め込みがおこなわれる。
+
+  $docobj->filter('a');
+
+=head2 ページオブジェクトの作成
+
+ページは文書オブジェクトからnew_pageメソッドで追加される。幅と高さを省略すると文書オブジェクトの作成の際に指定したものが使われる。
+
+  $pageobj = $docobj->new_page;
+  $pageobj = $docobj->new_page($width, $height);
+
+今のところ、ページは末尾に追加できるだけで、途中に挿入する方法は用意されていない。
+
+ページ番号は、pagenumメソッドで得られる。
+
+  $pagenum = $pageobj->pagenum;
+
+=head2 フォントオブジェクトの作成
+
+フォントオブジェクトは、文書オブジェクトから、new_fontメソッドで作られる。
+
+  $fontobj = $docobj->new_font($basefont, $encoding);
+
+$basefontはベースフォント名で、Type1フォントの場合次のいずれかを指定する。
+
+  ※欧文フォント
+  Courier
+  Courier-Bold
+  Courier-BoldOblique
+  Courier-Oblique
+  Helvetica
+  Helvetica-Bold
+  Helvetica-BoldOblique
+  Helvetica-Oblique
+  Times-Bold
+  Times-BoldItalic
+  Times-Italic
+  Times-Roman
+
+  ※和文フォント
+  Ryumin-Light
+  GothicBBB-Medium
+
+$basefontにTrueTypeフォントのファイル名（拡張子が.ttf）を指定することで、TrueTypeフォントを指定することができる。また、TrueTypeCollectionフォント（拡張子が.ttc）の場合はその中の何番目（0から数えて）のフォントを使うかをファイル名の後ろに「:番号」として付加する。（例：「c:\windows\fonts\msgothic.ttc:0」）
+
+=over 4
+
+※TrueTypeCollectionフォントは固定ピッチのフォントとプロポーショナルなフォントがセットになっていることが多いが、上記のようにして指定するのは固定ピッチの方でなければならない。付属のスクリプトttcinfo.plでTrueTypeCollectionフォントに含まれるフォント名を調べることができる。プロポーショナルなフォントはフォント名に P が付加されていることが多い。
+
+※TrueTypeフォントはPDFに埋め込まれる（日本語フォントの場合はサブセットで）が、埋め込みを許可しないTrueTypeフォントも存在する。PDFJは、フォント自体の中にある埋め込みを許可するかどうかのフラグを見て、OKかどうかを判断する。ただし、別のライセンスファイルなどで使用許諾条件が示されている場合もありうるので、フォント作成者の権利を侵害しないように十分注意していただきたい。
+
+※TrueTypeフォントを埋め込む際には、フォントファイル内にユニコードに対応したcmapテーブル（platformIDが3、platformSpecificIDが1、formatが4のもの）が必要である。古いTrueTypeフォントではこのcmapテーブルを持たないものも存在する。現状ではそういうTrueTypeフォントは埋め込むことができない。
+
+=back
+
+$encodingはエンコーディングで、次のいずれかの定義済みエンコーディング名を指定する。省略すると、欧文フォントに対しては'WinAnsiEncoding'、日本語フォントに対しては'90ms-RKSJ-H'が使われる。MacExpertEncodingはエキスパートフォントと呼ばれる特殊なフォントのためのエンコーディング。
+
+  ※欧文フォントのエンコーディング
+  WinAnsiEncoding
+  MacRomanEncoding
+  MacExpertEncoding
+
+  ※日本語フォントのエンコーディング
+  83pv-RKSJ-H … Macintosh JIS X 0208 KanjiTalk6拡張
+  90pv-RKSJ-H … Macintosh JIS X 0208 KanjiTalk7拡張
+  90ms-RKSJ-H … Microsoft CP932 JIS X 0208 NEC,IBM拡張
+  90ms-RKSJ-V … 〃縦書き
+  Add-RKSJ-H  … JIS X 0208 富士通FMR拡張
+  Add-RKSJ-V  … 〃縦書き
+  Ext-RKSJ-H  … JIS C 6226(JIS78) NEC拡張
+  Ext-RKSJ-V  … 〃縦書き
+  EUC-H       … JIS X 0208
+  EUC-V       … 〃縦書き
+  EUC-NEC-H   … JIS X 0208 NEC拡張
+  EUC-NEC-V   … 〃縦書き
+  UniJIS-UCS2-HW-H … Unicode 横書き
+  UniJIS-UCS2-HW-V … Unicode 縦書き
+
+日本語フォントのエンコーディングの末尾の'H'は横書き、'V'は縦書き。'RKSJ'とつくものはShift-JIS用、'EUC'とつくものはEUC用、'Uni'とつくものはUnicode用。日本語プロポーショナルフォントは使えないことに注意。欧文部分も含めてすべての文字が全角か半角の固定ピッチとなる。
+
+※EUC-NEC-HとEUC-NEC-Vは、EUC-HとEUC-VをベースにNEC拡張文字（区点での13,89-92区）を加えたもので、PDFJで独自に定義したエンコーディングである（これを使ったPDFをAcrobatなどで開いてフォント情報を見るとエンコーディングは「カスタム」と表示される）。それ以外はAdobeによって定義済のエンコーディング。
+
+※UTF8の場合もフォントエンコーディングには上記のUnicode用を指定すればよい。
+
+new_fontメソッドにはもう一つの用法があり、つぎのようにして日本語フォントと欧文フォントの組を指定する。
+
+  $fontobj = $docobj->new_font($jbasefont, $jencoding, $abasefont, $aencoding);
+
+ここで、$jbasefontは日本語ベースフォント名、$jencodingはそのエンコーディング、$abasefontは欧文ベースフォント名、$aencodingはそのエンコーディング。$aencodingを省略するとWinAnsiEncoding。
+
+このように日本語フォントと欧文フォントを組み合わせたフォントオブジェクトをテキストに対して指定すると、テキスト中の日本語部分と欧文部分（正確に言うと0x7fまでのASCII文字の部分）に対してそれぞれのフォントが自動的に切り替えて適用される。これにより、欧文部分についてはプロポーショナルな表示となる。組フォントでは欧文フォントが適用されるのはASCII文字だけであり、ASCII文字についてはWinAnsiEncodingとMacRomanEncodingに違いはないので、組文字の欧文フォントのエンコーディングはどちらを指定しても同じ。
+
+単独の欧文フォントを適用した文字列は、use PDFJ '…'で指定した日本語文字コードによらず、1バイト＝1文字としてエンコーディングに従って表示される。
+
+日本語フォントの文字セットはAdobe-Japan1-4として扱われる。Adobe-Japan1-4には、大まかに言ってJIS X 0201と0208（第一水準、第二水準）、および各メーカーの拡張文字が含まれる。詳細は次を参照のこと。
+
+http://partners.adobe.com/asn/developer/pdfs/tn/5078.Adobe-Japan1-6.pdf 
+
+最新の文字セットはAdobe-Japan1-6であり、これにはJIS X 0212（補助漢字）と0213（第三水準、第四水準）が含まれているが、今のところPDFJではAdobe-Japan1-6ではなくAdobe-Japan1-4が使われる。
+
+=head2 テキストオブジェクトの作成
+
+テキストオブジェクトは、Textサブルーチンで作成する。
+
+  $textobj = Text(@list, $textstyle);
+
+ここで、@listは文字列、表示可能なオブジェクト、改行オブジェクトのリストで、@listの要素が順に並べられた内容のテキストが作成される。$textstyleはテキストスタイルオブジェクト。
+
+リストは配列参照の形で与えることもできる。
+
+  $textobj = Text([@list], $textstyle);
+
+改行オブジェクトはNewLineサブルーチンで作成する（引数無し）。改行オブジェクトはテキストオブジェクトをそのまま表示する場合には何の効果もないが、段落オブジェクトを作る際に強制改行する効果をもたらす。
+
+テキストスタイルオブジェクトはTStyleサブルーチンで作成する。
+
+  $textstyle = TStyle(%args);
+
+引数にはハッシュリストの形で次のものを与える。fontとfontsizeは必須。その他はオプション。
+
+  font => フォントオブジェクト
+  fontsize => フォントサイズ（ポイント）
+  italic => イタリックフラグ（真を指定するとイタリックに）
+  bold => ボールドフラグ（真を指定するとボールドに）
+  slant => 斜体フラグ（真を指定すると斜体に）
+  render => 文字描画モード（0:塗り潰し、1:枠線、2:塗り潰し＋枠線）
+  shapestyle => 文字描画の図形スタイルオブジェクト
+  rise => ベースラインの上調整値（ポイント）
+  vh => 縦中横フラグ（真を指定すると縦中横に）
+  withline => 下線または傍線フラグ（真を指定すると下線または傍線が付く）
+  withlinestyle => 下線または傍線の図形スタイルオブジェクト
+  withbox => 囲み枠指定（f:塗り潰し、s:枠線、sf:塗り潰し＋枠線）
+  withboxstyle => 囲み枠の図形スタイルオブジェクト
+  withdot => 圏点フラグ（真を指定すると圏点が付く）
+  withnote => 注釈テキストオブジェクト
+  suffix => 添え字指定（'u'を指定すると上添え字、'l'を指定すると下添え字）
+  ruby => ルビ文字列
+  objalign => 表示可能オブジェクトの配置
+  noglue => 文字種によって自動挿入される調整余白を入れない
+  code => 文字コード（'SJIS'、'EUC'、'UTF8'、'UNICODE'のいずれか）
+
+slantによる斜体は日本語文字列にのみ有効であり、欧文についてはItalic系のフォントを指定することでおこなうこと。italicとboldについては、L<"イタリックとボールド">を参照。
+
+renderやshapestyleの指定をしないと、文字は黒の塗り潰しで描画される。
+
+withlineを指定してwithlinestyleを省略すると黒の実線となる。withboxを指定してwithboxstyleを省略すると黒の実線となる。
+
+withnoteは文字の上や右に別のテキスト（そのテキストオブジェクトをwithnoteで指定する）を表示するものであり、suffixは指定した文字を小さくして位置を上下させる命令である。
+
+※withnoteに文字列を与え、withnotestyleにテキストスタイルオブジェクトを与えることもできる。
+
+objalignは、Textに画像や図形などの表示可能オブジェクトが与えられたときにどう配置するかをつぎのように指定する。objalignの指定を省略すると、横書きでは'b'、縦書きでは'c'とみなされる。
+
+  ※横書きの場合（上下方向の配置の指定となる）
+  t … 文字とオブジェクトの上端をあわせる
+  m … 文字とオブジェクトの上下中央をあわせる
+  b … 文字とオブジェクトの下端をあわせる
+
+  ※縦書きの場合（左右方向の配置の指定となる）
+  l … 文字とオブジェクトの左端をあわせる
+  c … 文字とオブジェクトの左右中央をあわせる
+  r … 文字とオブジェクトの右端をあわせる
+
+codeは、use PDFJで指定した文字コードとは違う文字コードによるテキストを与えたいときに指定する。
+
+=head2 テキストオブジェクトの入れ子による部分スタイル指定
+
+テキストの一部分だけに特定のスタイルを適用したい場合、テキストオブジェクトを入れ子にして部分スタイルを指定することでおこなう。入れ子になったテキストオブジェクトでは子のスタイルで指定されていないスタイルは親のものが引き継がれる。
+
+例えば、明朝のテキストの一部をゴシックにしたい場合、つぎのようにする。
+
+  $mincho = $docobj->new_font('Ryumin-Light', '90ms-RKSJ-H');
+  $gothic = $docobj->new_font('GothicBBB-Medium', '90ms-RKSJ-H');
+  $textobj = Text([
+      "明朝", 
+      Text("ゴシック", TStyle(font => $gothic)),
+      "ここも明朝"
+    ], TStyle(font => $mincho, fontsize => 10));
+
+この場合、"ゴシック"に対するスタイルではfontsizeが指定されていないので、親スタイルのfontsizeの10が引き継がれる。
+
+テキストの一部に下線を引く場合は、例えばつぎのようにする。
+
+  $mincho = $docobj->new_font('Ryumin-Light', '90ms-RKSJ-H');
+  $normal_style = TStyle(font => $mincho, fontsize => 10);
+  $uline_style = TStyle(withline => 1);
+  $textobj = Text([
+      "テキスト",
+      Text("下線付き", $uline_style),
+    ], $normal_style);
+
+テキストスタイルはこのように変数にセットしておいて使うこともできるし、先の例のように直接TStyleサブルーチンを使ってもよい。
+
+=head2 イタリックとボールド
+
+テキストスタイルのitalicとboldを使うためには、どのフォントがどのフォントのイタリック形やボールド形である、ということをドキュメントオブジェクトに教えておいてやる必要がある。そのために、italic()とbold()メソッドを使う。例えば次のようにする。
+
+  $ft = $docobj->new_font('Times-Roman');
+  $fti = $docobj->new_font('Times-Italic');
+  $ftb = $docobj->new_font('Times-Bold');
+  $ftbi = $docobj->new_font('Times-BoldItalic');
+  $docobj->italic($ft, $fti, $ftb, $ftbi);
+  $docobj->bold($ft, $ftb, $fti, $ftbi);
+
+このように、元フォント、その修飾フォント、の順で、二組以上をまとめて引数に与えることができる。組となるフォントは、欧文フォント同士、日本語フォント同士、欧文フォントと組になった日本語フォント同士、でなければならない。
+
+  Text('normal', Text('italic', TStyle(italic => 1)), TStyle(font => $ft))
+
+このようなテキストオブジェクトを作ると、'normal'には$ftが、'italic'には$ftiが使われることになる。
+
+italic()やbold()での登録がされていないフォントに対してitalicやboldのスタイルを与えた場合は、何の効果ももたらさない。
+
+なお、一般に日本語フォントにはイタリック形は存在しないので、日本語文字列に対してテキストスタイルでitalicが指定された場合は、slantに置き換えて傾けて表示する。
+
+=head2 段落オブジェクトの作成
+
+段落オブジェクトはParagraphサブルーチンで作成する。
+
+  $paragraphobj = Paragraph($textobj, $parastyle);
+
+ここで、$textobjはテキストオブジェクト、$parastyleは段落スタイルオブジェクト。複数のテキストを与えたいときはそれを一つのテキストオブジェクトにまとめた上で与える。
+
+段落スタイルオブジェクトはPStyleサブルーチンで作成する。
+
+  $parastyle = PStyle(%args);
+
+引数にはハッシュリストの形で次のものを与える。sizeとlinefeedとalignは必須。他はオプション。
+
+  size => 段落の行方向のサイズ（ポイント）
+  align => 揃え（b:行頭揃え m:中央揃え e:行末揃え w:両端揃え W:強制両端揃え）
+  linefeed => 行送り（ポイント）
+  preskip => 段落前の間隔（ポイント）
+  postskip => 段落後の間隔（ポイント）
+  beginindent => 行頭インデント
+  endindent => 行末インデント
+  beginpadding => 行頭側の余白（ポイント）
+  labeltext => ラベルのテキストオブジェクト
+  labelsize => ラベルの行方向のサイズ（ポイント）
+  labelskip => ラベルと本文の間隔（ポイント）
+  nobreak => 真だとbreakメソッドで分割されない
+  postnobreak => 真だとブロックのbreakでその後ろで分割されない
+  float => ブロックのbreakで位置を自動移動（「ブロックオブジェクトの分割」参照）
+
+linefeedで指定するのは行送りであって行間ではないことに注意。linefeed => '150%' のように 数値% と指定すると、テキストオブジェクトのフォントサイズに対する割合とみなされる。
+
+preskipとpostskipは、ブロック内に段落を並べる時の間隔として使われる。省略すると、それぞれ行間（行送りからフォントサイズを差し引いた長さ）の半分にセットされる。
+
+テキストは、(size - beginpadding - beginindent - endindent - labelsize)という行長を超えないように折り返し処理され、alignにしたがって揃えられる。wによる両端揃えの時、末尾行だけは行頭揃えとなる。Wによる強制両端揃えでは、末尾行も含めて両端揃えとなる。行の折り返しの際の禁則とハイフネーション、両端揃えの際の詰め伸ばしは、JIS X 4051にほぼ則っておこなわれる。
+
+beginindentとendindentを配列参照の形で与えると、先頭行から順に使われる。行数が要素数より大きいときは最後の要素が繰り返し使われる。
+
+beginpaddingは、ラベルも含めた段落全体の、行頭側に取る余白を指定する。（この余白はsizeの中に含まれる。）したがって、ラベルがないときは、beginpaddingの指定と単独要素のbeginindentの指定は同じ効果を持つ。
+
+labeltextでテキストオブジェクトが指定されると、ラベルとして先頭行の前に表示される。ラベルと本文の間にはlabelskipだけの間隔が取られる。labeltextに文字列を与えると本体のテキストオブジェクトと同じテキストスタイルでテキストオブジェクト化される。
+
+labeltextには、テキストオブジェクトを返すサブルーチン参照と、そのサブルーチンに与える引数のリストを、配列参照の形で与えることもできる。これによって番号付き箇条書きが実現できる。例えばつぎのようになる。
+
+  $LabelNum = 1;
+  sub numlabel {
+    my($fmt, $style) = @_;
+    Text(sprintf($fmt, $LabelNum++), $style);
+  }
+  $ol_style = PStyle(size => 500, align => 'w', labelsize => 30,
+    labeltext => [\&numlabel, "%d.", $normal_style]);
+  $para1 = Paragaph($text1, $ol_style);
+  $para2 = Paragaph($text2, $ol_style);
+
+postnobreakとfloatは、この段落を含むブロックがbreakされるときに意味を持つ。
+
+=head2 段落オブジェクトの分割
+
+段落の行方向の大きさは段落スタイルのsizeで指定したものになるが、それと垂直な方向の大きさは行数（と行送りとフォントサイズ）で決まる。これが一定の大きさになるように段落を分割するために、breakメソッドが用意されている。例えば横書きの段落オブジェクト$paraに対して、
+
+  @paras = $para->break(200);
+
+とすると、高さが200ポイント以下になるように分割した段落のリストが得られる。もし、最初の段落だけは高さを100以下にしたければ、つぎのようにすればよい。
+
+  @paras = $para->break(100, 200);
+
+breakの引数に指定したサイズのリストは順に分割する段落のサイズとして使われ、なくなると最後のサイズが繰り返し使われる。
+
+breakの引数に指定したサイズが小さすぎて、最後のサイズでも分割できない部分が残ったときは、分割に失敗したものとして未定義値が返される。
+
+もし、$para->break(5, 200) のように最初や途中にフォントサイズより小さなサイズを指定すると、それに対応して空の段落オブジェクトが得られる。この例では、最初に空の段落オブジェクト、続いて200ずつに分割された段落オブジェクトが返されることになる。
+
+段落スタイルのnobreakが真に設定されていると、分割されない。例えばnobreakな横書き段落オブジェクト$uparaがあり、その高さが150であるときに、$upara->break(100, 200) は (空段落オブジェクト, $uparaと同じオブジェクト) を返す。$upara->break(100) では分割に失敗して未定義値を返す。
+
+=head2 ブロックオブジェクトの作成
+
+ブロックオブジェクトはBlockサブルーチンで作成する。
+
+  $blockobj = Block($direction, @objlit, $blockstyle);
+
+ここで、$directionはブロックの内容を並べる方向、@objlitは表示可能なオブジェクトのリスト、$blockstyleはブロックスタイルオブジェクト。
+
+オブジェクトのリストはつぎのように配列参照の形で与えることもできる。
+
+  $blockobj = Block($direction, [@objlit], $blockstyle);
+
+ブロックの内容を並べる方向は、次のいずれかを指定する。
+
+  H … 左から右
+  R … 右から左
+  V … 上から下
+
+$directionで指定した方向に、@objlitの要素を順に並べたものがブロックの内容となる。その際、各要素の表示可能なオブジェクトに、preskipやpostskipのスタイルが指定されていれば、それにしたがって間隔が取られる。また特殊な指定として、@objlistの中にオブジェクトでなく生の数値を入れるとその間隔が取られる。
+
+ブロックスタイルオブジェクトはBStyleサブルーチンで作成する。
+
+  $blockstyle = BStyle(%args);
+
+引数にはハッシュリストの形で次のものを与える。
+
+  width => 幅（ポイント）
+  height => 高さ（ポイント）
+  align => 揃え
+  adjust => 揃えフラグ（真を指定すると要素のブロックのサイズを揃える）
+  padding => 周囲余白（ポイント）
+  beginpadding => 行頭側の余白（ポイント）
+  withbox => 囲み枠指定（f:塗り潰し、s:枠線、sf:塗り潰し＋枠線）
+  withboxstyle => 囲み枠の図形スタイルオブジェクト
+  preskip => 前の間隔（ポイント）
+  postskip => 後の間隔（ポイント）
+  nobreak => 真だとbreakで分割されない
+  postnobreak => 真だとブロックのbreakでその後ろで分割されない
+  repeatheader => breakで分割するとき先頭で繰り返す要素数
+  float => ブロックのbreakで位置を自動移動（「ブロックオブジェクトの分割」参照）
+  nofirstfloat => 真だとbreakで先頭にはfloat要素を置かない
+  bfloatsep => floatがbの要素とそれ以外の要素の間に挿入される表示可能オブジェクト
+  efloatsep => floatがeの要素とそれ以外の要素の間に挿入される表示可能オブジェクト
+
+width、heightで幅や高さを指定した場合、内容の幅や高さがそれより大きい場合は内容に合わせられる。内容よりも指定した幅や高さが大きい場合は、alignにしたがって位置が揃えられる。
+
+alignによる揃えは次のいずれかを組み合わせて指定。省略すると'tl'とみなされる。
+
+  ※左右方向
+  l … 左寄せ
+  c … 中央寄せ
+  r … 右寄せ
+  
+  ※上下方向
+  t … 上寄せ
+  m … 中央寄せ
+  b … 下寄せ
+
+adjustを真に指定すると、方向がHやRの場合は要素ブロックの高さ、Vの場合は要素ブロックの幅を、もっとも大きいものに揃える。ブロックを並べて表を作成するときに使用する。
+
+paddingは内容の周りに取られる余白の幅であり、withboxで囲み枠を指定した場合はその余白の外側に描画される。
+
+beginpaddingは囲み枠の外の行頭側に取られる余白の指定である。
+
+withboxでは、's','f','sf'の他に、'rX'（Xは数値）を付加すると角が半径Xで丸くなる。
+
+=head2 ブロックオブジェクトの分割
+
+段落オブジェクトと同様に、ブロックオブジェクトもbreakメソッドによって分割ができる。例えば方向が'V'のブロックオブジェクト$blockを高さが200ポイント以下になるように分割したければ、
+
+  @blocks = $block->break(200);
+
+とすればよい。最初のブロックだけ高さを100以下にしたければ、つぎのようにする。
+
+  @blocks = $block->break(100, 200);
+
+breakの引数に指定したサイズのリストは順に分割した段落のサイズとして使われ、なくなると最後のサイズが繰り返し使われる。
+
+ブロックの分割の際、ブロック内のオブジェクトとして、方向の同じブロックや、行方向の異なる段落（'V'なら'H'、'H'や'R'なら'V'）があると、そのオブジェクトも分割することでできるだけ指定のサイズに合うように分割される。
+
+指定したサイズで分割ができなかった場合、breakメソッドは未定義値を返す。複数のサイズを指定した場合に、最後以外のサイズが小さすぎた場合は、それに対応するものとして空のブロックが返される。
+
+ブロックスタイルで nobreak が真になっていると、そのブロックは分割されない。
+
+ブロックの中にNewBlockサブルーチンで作成される改ブロックオブジェクトがあると、ブロックの分割の際にそこで強制的に分割される。
+
+ブロックの分割の際、その要素となるブロックや段落や図形のスタイルで postnobreak が真に設定されていると、その後ろで分割されることはない。これによって、見出し段落と本文段落が別ページに分かれることを防ぐことができる。
+
+ブロックの分割の際、その要素となるブロックや段落や図形のスタイルで float が設定されていると、その要素は分割されたブロック内で指定の位置に移動される。float指定の意味は次のとおり。
+
+  bN:分割されたブロックの先頭（Nは1～9または省略）
+  eN:分割されたブロックの末尾（Nは1～9または省略）
+  h:分割せずに可能ならその位置に、無理なら次のブロックの先頭に
+
+bとeの後ろに1～9の番号を付けて数字別にグループ化できる。数字の大きなものほど先頭または末尾寄りに配置される。b0やe0とはせずにbやeとすることに注意。
+
+ブロックスタイルでnofirstfloatを真に指定すると、breakの際に全体の先頭にはfloat要素を置かない。
+
+ブロックスタイルのbfloatsepで表示可能オブジェクトを指定すると、floatがbで先頭に移動した要素群の後に挿入される。efloatsepで指定したオブジェクトはfloatがeで末尾に移動した要素群の前に挿入される。これにより、floatをeとしてページ末尾に移動した脚注段落と本文段落の間に区切り線を入れるようなことができる。floatにbNやeN（Nは1～9）を使う場合は、bfloatsepやefloatsepに配列参照の形でオブジェクトのリストを与えると、そのN番目のものが使われる（bやeには0番目のものが使われる）。なお、bfloatsepやefloatsepに使うオブジェクトはそれ専用に使用し、分割されるブロックの内容として使ってはならない。また、bfloatsepに使うオブジェクトとefloatsepに使うオブジェクトも異なるオブジェクトでなければならない。
+
+ブロックスタイルで repeatheader が指定されていると、その値の数だけの先頭要素が、分割された各ブロックの先頭で繰り返される。（ただし先頭要素の途中や後ろで分割された場合は除く。）これによって表の先頭の項目名の行を繰り返すことができる。先頭要素自体が分割されるとおかしな結果が得られるので、先頭要素が分割可能な段落やブロックの場合は nobreak を指定しておくこと（方向の違うブロックの場合は不要）。また先頭要素と次の要素が分割された場合も不適切な結果となるので、先頭要素には postnobreak の指定をしておくこと。
+
+=head2 画像オブジェクトの作成
+
+画像オブジェクトはJPEG画像についてのみ作成でき、文書オブジェクトからnew_imageメソッドで作成する。
+
+  $imgobj = $docobj->new_image($src, $pxwidth, $pxheight, 
+    $width, $height, $padding, $colorspace);
+
+ここで、$srcはURLまたはファイル名（拡張子は.jpgまたは.jpegであること）、$pxwidthと$pxheightは画像のピクセルサイズ、$widthと$heightは表示サイズ（ポイント）、$paddingは周囲の余白（ポイント）、$colorspaceはカラースペース（rgb,gray,cmykのいずれかで省略するとrgb）。$paddingと$colorspaceは省略できる。
+
+現在の仕様では、URL指定した場合は生成されるPDFにはURL情報だけが埋め込まれ、表示する際にAcrobatReaderがそのURLにアクセスして画像内容を読みとる。したがって表示に時間がかかったり、アクセスできないと画像が表示できないといったことが起こりうる。
+
+ファイル名指定した画像の場合は、生成されたPDFに画像内容そのものがデータとして埋め込まれるので、元の画像ファイルをPDFファイルと一緒に配布したりする必要はない。
+
+画像オブジェクトには他の表示可能なオブジェクトと違ってスタイルの指定はない。ブロックに含める際にpostnobreakを指定したいというようなときは、図形オブジェクトの中に画像オブジェクトを含めて、その図形オブジェクトにスタイルを指定する。
+
+=head2 図形オブジェクトの作成
+
+図形オブジェクトはShapeサブルーチンで作成する。
+
+  $shapeobj = Shape($shapestyle);
+
+ここで$shapestyleは図形スタイルオブジェクト。$shapestyleは省略できる。これだけでは何も中味のない図形オブジェクトが作られるだけである。その後、次のメソッドを使って図形を加えていく。
+
+=over 4
+
+=item 直線（lineメソッド）
+
+  $shapeobj->line($x, $y, $w, $h, $style);
+
+($x,$y)から($x+$w,$y+$h)へ直線が引かれる。$styleは図形スタイルオブジェクトで、省略可能。
+
+=item 矩形（boxメソッド）
+
+  $shapeobj->box($x, $y, $w, $h, $spec, $style);
+
+($x,$y)と($x+$w,$y+$h)を対角とする矩形が描かれる。$styleは図形スタイルオブジェクトで、省略可能。$specは次の描画指定。
+
+  f … 塗り潰しのみ
+  s … 枠線のみ
+  sf … 塗り潰し＋枠線
+  n … 描画しない
+  ※上記のsの代わりに、l（左辺）、r（右辺）、t（上辺）、b（下辺）、の組み合わせも可
+  ※次はオプション
+  rX … （Xは数値）角を半径Xで丸くする
+
+box()に対する$styleでは、通常の図形スタイルに加えて次のスタイルが使える。（L<"ハイパーリンク">を参照）
+
+  link => リンク先（文書内のリンク先名または、URI:を付けたURI名）
+
+=item 円（circleメソッド）
+
+  $shapeobj->circle($x, $y, $r, $spec, $arcarea, $style);
+
+($x,$y)が中心、$rが半径の円が描かれる。$arcareaは四半円指定（1:右上、2:左上、3:左下、4:右下）で省略すれば全円。$styleは図形スタイルオブジェクトで、省略可能。$specは次の描画指定。
+
+  f … 塗り潰しのみ
+  s … 枠線のみ
+  sf … 塗り潰し＋枠線
+
+=item 楕円（ellipseメソッド）
+
+  $shapeobj->ellipse($x, $y, $xr, $yr, $spec, $arcarea, $style);
+
+$xrが横半径、$yrが縦半径であることを除けば円と同じ。
+
+=item 多角形（polygonメソッド）
+
+  $shapeobj->polygon([@coords], $spec, $style);
+
+@coordsは頂点の座標のXとYの組を順に並べたリスト。$styleは図形スタイルオブジェクトで、省略可能。$specは次の描画指定。
+
+  f … 塗り潰しのみ
+  s … 枠線のみ
+  sf … 塗り潰し＋枠線
+
+=item 円弧（arcメソッド）
+
+  $shapeobj->arc($x, $y, $r, $start, $end, $spec, $style);
+
+($x,$y)が中心、$rが半径、開始角$start、終了角$endの円弧または円弧と半径で囲まれた領域が描かれる。開始角、終了角はラジアン。$styleは図形スタイルオブジェクトで、省略可能。$specは次の描画指定。$specがaの時は円弧のみ、その他の場合は円弧と半径で囲まれた領域が描画される。
+
+  a … 円弧のみ
+  f … 塗り潰しのみ
+  s … 枠線のみ
+  sf … 塗り潰し＋枠線
+
+=item オブジェクト（objメソッド）
+
+  $shapeobj->obj($obj, @showargs);
+
+図形中に表示可能なオブジェクト$objを、$obj->show($page, @showargs)によって配置する。
+
+=back
+
+以上のメソッドはみなオブジェクト自身を返すので、
+
+  $shapeobj = Shape->line(…)->box(…)->obj(…);
+
+のように記述することも可能。
+
+以上のメソッドで描画する場合は、結果としてその図形オブジェクトが上下左右にどれだけの範囲を占めるかという全体としての図形の大きさが内部的に管理され、幅と高さを持った表示可能オブジェクトとして扱うことができる。
+
+これら以外のプリミティブな描画メソッドもある（PDFJ::Shapeのメソッド一覧を参照）が、それらのメソッドを使った場合は図形オブジェクトの大きさの管理はおこなわれないことに注意が必要。
+
+図形スタイルオブジェクトは、SStyleサブルーチンで作成する。
+
+  $shapestyle = SStyle(%args);
+
+引数にはハッシュリストの形で次のものを与える。
+
+  fillcolor => 塗り潰し色（色オブジェクト）
+  strokecolor => 線色（色オブジェクト）
+  linewidth => 線幅（ポイント）
+  linedash => [$dash, $gap, $phase] または "$dash, $gap, $phase"
+  preskip => 前の間隔（ポイント）
+  postskip => 後の間隔（ポイント）
+  postnobreak => 真だとブロックのbreakでその後ろで分割されない
+  float => ブロックのbreakで位置を自動移動（「ブロックオブジェクトの分割」参照）
+
+linedashの指定で、$dashは破線長、$gapは隙間長、$phaseは開始位置。$phaseは省略可能。
+
+preskip、postskip、postnobreak、floatは、ブロックの中に図形オブジェクトを置くときに意味を持つ。
+
+box()に対する$styleでは、上記の図形スタイルに加えて次のスタイルが使える。
+
+  link => リンク先（文書内のリンク先名または、URI:を付けたURI名）
+
+=head2 追加の図形オブジェクトメソッド
+
+use PDFJ::Shape; すると、次の追加の図形描画メソッドがPDFJ::Shapeに追加される。これらのメソッドはいずれもオブジェクト自身を返す。また、描画範囲の管理がおこなわれる。
+
+=over 4
+
+=item 矢印（arrowメソッド）
+
+  $shapeobj->arrow($x, $y, $w, $h, $headsize, $headangle, $style);
+
+$headsizeと$headangle以外の引数はlineと同じ。直線の終端に、長さが$headsize、先端角度の半分が$headangle（ラジアン）の三角形の鏃が付けられる。
+
+=item 波括弧（braceメソッド）
+
+  $shapeobj->brace($x, $y, $w, $h, $style);
+
+引数の意味は矩形と同じ。その矩形の中に納まる波括弧を描画する。$wが正なら開き括弧、負なら閉じ括弧。文字の{}では間に合わない大きな波括弧が必要な場合に使用する。
+
+=item 角括弧（bracketメソッド）
+
+  $shapeobj->bracket($x, $y, $w, $h, $style);
+
+引数の意味は矩形と同じ。その矩形の中に納まる角括弧を描画する。$wが正なら開き括弧、負なら閉じ括弧。文字の[]では間に合わない大きな角括弧が必要な場合に使用する。
+
+=item 丸括弧（parenメソッド）
+
+  $shapeobj->paren($x, $y, $w, $h, $style);
+
+引数の意味は矩形と同じ。その矩形の中に納まる丸括弧を描画する。$wが正なら開き括弧、負なら閉じ括弧。文字の()では間に合わない大きな角括弧が必要な場合に使用する。
+
+=back
+
+=head2 色オブジェクトの作成
+
+色オブジェクトは、Colorサブルーチンで作成する。
+
+  $colorobj = Color($r, $g, $b);
+  $colorobj = Color('#RRGGBB');
+  $colorobj = Color($g);
+
+三引数の場合、$rは赤、$gは緑、$bは青のそれぞれの割合（0から1までの範囲の数値）。
+
+一引数で、#で始まる16進6桁の文字列の場合、二桁ずつ赤、緑、青の割合（00からffまで）とみなされる。
+
+一引数で、数値の場合は、グレーの割合（0から1までの範囲の数値）。0が黒、1が白。
+
+=head2 表示可能オブジェクトのページへの配置
+
+表示可能なオブジェクトをページ上に配置するには、showメソッドを用いる。
+
+  $obj->show($page, $x, $y, $align, $transtype, @transargs);
+
+ここで、$pageはページオブジェクト、$x、$yは表示位置、$alignは配置、$transtypeは変形の種類、@transargsは変形のパラメータである。$align以降の引数は省略できる。
+
+表示位置の座標は、ページの左下隅が原点(0,0)となり、X座標は右へ、Y座標は上へ向かって増加する。単位はポイントである。
+
+配置$alignは、($x,$y)で指定した表示位置に対して、オブジェクトをどのように配置するかを指定するもので、次の横位置と縦位置を組み合わせて指定する。
+
+  横位置
+    l … オブジェクトの左端を$xにあわせる
+    c … オブジェクトの中央を$xにあわせる
+    r … オブジェクトの右端を$xにあわせる
+  縦位置
+    t … オブジェクトの上端を$yにあわせる
+    m … オブジェクトの中央を$yにあわせる
+    b … オブジェクトの下端を$yにあわせる
+
+配置$alignの指定を省略すると、そのオブジェクト固有の原点を($x,$y)にあわせる。各オブジェクトの固有の原点は次のとおり。
+
+  横書きテキスト … 先頭文字の左端の、下端から高さの0.125倍だけ上の位置
+  縦書きテキスト … 先頭文字の上端の、左右中央の位置
+  段落 … 先頭行テキストの固有の原点
+  ブロック … 左上隅
+  画像 … 左下隅
+  図形 … 描画命令の原点がそのまま原点となる
+
+showメソッドに、$transtype以降の引数を与えると、表示の際に変形することができる。変形の種類$transtypeとそのパラメータ@transargsには次のいずれかを指定する。
+
+  'magnify', $mx, $my … 横方向に$mx倍、縦方向に$my倍、拡大・縮小する
+  'rotate', $rad … 反時計回りに$radラジアンだけ回転する
+  'distort', $xtan, $ytan … (1,0)を(1,$xtan)へ、(0,1)を($ytan,1)へ移すように、横軸、縦軸をそれぞれ傾ける
+
+各変形は、showメソッドの$xと$yの引数で決まる位置を原点としておこなわれる。
+
+=head2 ページのレイヤ
+
+showメソッドで表示可能オブジェクトをページに配置していくと、後から配置したものが手前に配置されて、前に配置されたものに重なっていく。
+
+この重なりの順序を制御したい場合のために、ページオブジェクトにlayerメソッドが用意されている。
+
+  $pageobj->layer($layernum);
+
+$layernumはレイヤ番号で、0以上の整数値。layerメソッドを実行すると、それ以降の描画は指定したレイヤ番号のレイヤに対しておこなわれる。
+
+ページの内容が表示されるときには、レイヤ番号の順番に配置される。
+
+=head2 スタイルのコピー
+
+直接入れ子になったテキストオブジェクトのテキストスタイルに関しては、親子関係による内容の継承がおこなわれるので、部分スタイルの指定ができる。それ以外の場合にスタイルの自動的な継承がおこなわれることはない。
+
+既存のスタイルを元にして属性を変更したり追加したりしたスタイルを作成したい場合、cloneメソッドを用いる。このメソッドはテキストスタイル、段落スタイル、ブロックスタイル、図形スタイルのすべてについて使える。
+
+  $newstyle = $originalstyle->clone(%newargs);
+
+%newargsを指定しなければ単にコピーが作られる。%newargsで指定した属性は元の属性を上書きする（元の属性がなければ追加される）。
+
+=head2 スタイル指定のさまざまな方法
+
+各種のスタイルオブジェクトを作成したり、clone()でコピーしたりするときに、その引数はハッシュリストで与えるが、ハッシュ参照やcssライクな文字列で与えることもできる。次は同等である。
+
+  PStyle(size => 200, align => 'w', linefeed => '150%')
+  PStyle({size => 200, align => 'w', linefeed => '150%'})
+  PStyle('size:200; align:w; linefeed:150%')
+
+文字列で与えるときは、「属性名:属性値」を「;」で区切って並べて指定する。ただし、ハッシュ参照や文字列で指定するときは引数はその一つだけでなければならない。
+
+属性値としてオブジェクトを与えるときは文字列による方法は取れないが、属性値もスタイルオブジェクトである時には、次のように {} で指定が可能である。
+
+  TStyle('withline:1; withlinestyle:{linewidth:0.5; linedash:2,2; strokecolor:#ff0000}')
+
+引数にハッシュリストを与えるときにも、属性値としてスタイルオブジェクトを取る属性（属性名がstyleで終わる）や、Colorオブジェクトを取る属性（属性名がcolorで終わる）については、属性値をオブジェクトでなくハッシュ参照や文字列で与えることができる。
+
+  TStyle(withline => 1, withlinestyle => 
+    {linewidth => 0.5, linedash => '2,2', strokecolor => '#ff0000'})
+
+=head2 PDF文書の出力
+
+作成したPDF文書をファイルに出力するには、文書オブジェクトのprintメソッドを用いる。
+
+  $docobj->print($filename);
+
+ファイル名$filenameの拡張子は、通常は.pdfとする。
+
+ファイル名として '-' を指定すると標準出力に出力される。
+
+=head2 文書情報の追加
+
+PDFには文書のタイトル、作成者、キーワードなどの文書情報を入れることができる。これをおこなうには、次のようにadd_info()メソッドを用いる。
+
+  $docobj->add_info(Title => 'タイトル', Author => '作成者');
+
+指定できるキーは次のものがある。
+
+  Title => 文書のタイトル
+  Author => 文書の作成者名
+  Subject => 文書の主題
+  Keywords => 文書に関連するキーワード
+  Creator => 文書を作成したアプリケーション名
+
+なお、Producerキーには「PDFJ バージョン」が、CreationDateキーには作成日時（標準時）が自動的にセットされる。
+
+=head2 アウトライン
+
+PDFにはアウトラインという目次機能がある（しおりとも言う）。アウトラインの項目をマウスでクリックするとその項目で指定された位置が表示される。アウトラインは階層的に構成され、章や節などの見出しをアウトラインに対応させることが多い。
+
+PDFJで文書にアウトラインを付加するには、テキストオブジェクトを作成する際に、対象の文字列やオブジェクトの前にアウトライン指示オブジェクトを置く。アウトライン指示オブジェクトは Outline() サブルーチンで作成する。例えば、「はじめに」という見出しをアウトラインのトップレベルに加えたい場合、つぎのようにする。
+
+  Text(Outline('はじめに'), 'はじめに', $midasi_style)
+
+このテキストオブジェクトがページに配置されると、文書のアウトラインに「はじめに」という項目が作られてこの「はじめに」というテキストの左上の位置が指定される。この例ではアウトライン項目とテキストの文字列を同じにしているが、異なる文字列を指定してもよい。
+
+１レベル下の「本書の内容」という見出しをアウトラインに加えたい場合、つぎのようにする。
+
+  Text(Outline('本書の内容', 1), '本書の内容', $midasi_style)
+
+Outline() の２番目の引数には、アウトラインの階層レベルを指定する。レベル 0 は上記の「はじめに」の例のように省略できる。
+
+アウトラインは、Outline()を含んだテキストオブジェクトがページに配置されるときに順に追加されて作られていく。いまのところ、既存のアウトラインの途中に挿入する手段は用意されていない。レベル0の項目の次にレベル2の項目を作るなど、階層のギャップが生じると、ギャップを埋めるための空文字列によるアウトライン項目が作られる。
+
+=head2 ハイパーリンク
+
+PDFにはハイパーリンク機能があり、ページ上のリンク元に指定された領域をクリックすると、そのリンク先が表示される。リンク先としては、同じ文書内の場所、別の文書の場所、URI（http:などで始まるインターネット上の場所と考えればよい）があるが、今のところPDFJでは同じ文書内の場所とURIに対応している。
+
+同じ文書内でのリンクを作るには、リンク先のテキストにDest()サブルーチンで名前を指定して作成したPDFJ::Destオブジェクトを配置する。例えば
+
+  Text(Dest('dest'),'リンク先',TStyle(…))
+
+とすると、'リンク先'というテキストの前に'dest'という名前のリンク先が作られる。Dest()で作られるPDFJ::Destオブジェクト自体は、表示には現れない。リンク先の名前は任意の文字列が使えるが、「URI:」で始まるものはURIへのリンクのために使われる。
+
+リンク元では矩形の図形オブジェクトの図形スタイルのlinkでリンク先名を指定するか、テキストスタイルのwithboxstyleで同様にlink指定をする。例えば
+
+  Shape->box(0,0,100,50,'s',SStyle(link => 'dest'))
+
+とすると、横100ポイント、縦50ポイントの矩形が作られて、その内部をクリックすると名前が'dest'のリンク先に飛ぶ。テキストの場合は、
+
+  Text('ここをクリック', TStyle(withbox => 'n', 
+    withboxstyle => SStyle(link => 'dest')))
+
+のようにすればよい。このようにwithbox => 'n' とすると矩形は描画されない。リンクであることを示すために色を変えるとか下線を付けるとかいった工夫はユーザーに任されている。（withbox => 'b' で下線を付けることができる。）
+
+URIリンクの場合は、Dest()によるリンク先の設定は必要なく、リンク先の名前として、「URI:」に続けてURIを書けばよい。例えば
+
+  Text('米アドビ', TStyle(withbox => 'n', 
+    withboxstyle => SStyle(link => 'URI:http://www.adobe.com/')))
+
+のようにする。
+
+URIはすでにURIエンコードされていない限りURIエンコードされる。
+
+=head2 暗号化
+
+PDFは暗号化できる。PDFのバージョンによって使用できる暗号化方式の範囲が違うが、今のところPDFJではもっとも基本的な40ビットRC4暗号化をサポートしている。
+
+暗号化するには、encrypt()メソッドを用いて、オーナーパスワード、ユーザーパスワード、ユーザーへの使用許可フラグ、を指定する。
+
+  $docobj->encrypt($ownerpass, $userpass, $allow);
+
+オーナーパスワードとユーザーパスワードに同じものを指定すると、オーナー権限で開くことはできなくなる。
+
+ユーザーへの使用許可フラグは、次の記号を並べた文字列として指定する。
+
+  P … 文書の印刷
+  M … 文書内容の変更
+  C … 文書からのテキストと画像のコピー
+  N … テキスト注釈および対話フォームフィールドの追加、変更
+
+※テキスト注釈および対話フォーム機能は今のところPDFJでは未サポート
+
+=head2 PDFJ::Docクラスのメソッド
+
+  PDFJ::Doc->new($version, $pagewidth, $pageheight)
+  PDFJ::Doc->new({version => $version, pagewidth => $pagewidth, pageheight => $pageheight})
+  add_info($key => $value, ...)
+  add_info({$key => $value, ...})
+  encrypt($ownerpass, $userpass, $allow)
+  encrypt({ownerpass => $ownerpass, userpass => $userpass, allow => $allow})
+  filter($filter)
+  filter({filter => $filter})
+  print($file)
+  print({file => $file})
+  new_page($pagewidth, $pageheight)
+  new_page({pagewidth => $pagewidth, pageheight => $pageheight})
+  get_page($pagenum)
+  get_page({number => $pagenum})
+  get_lastpagenum
+  new_font($basefont, $encoding, $abasefont, $aencoding)
+  new_font({basefont => $basefont, encoding => $encoding, abasefont => $abasefont, aencoding => $aencoding})
+  italic($font1, $font2, ...)
+  italic({base => $font1, decorated => $font2})
+  bold($font1, $font2, ...)
+  bold({base => $font1, decorated => $font2})
+  new_image($src, $pxwidth, $pxheight, $width, $height, $padding, $colorspace)
+  new_image({src => $src, pxwidth => $pxwidth, pxheight => $pxheight, width => $width, height => $height, padding => $padding, colorspace => $colorspace})
+
+=head2 PDFJ::Pageクラスのメソッド
+
+  PDFJ::Page->new($docobj, $pagewidth, $pageheight)
+  pagenum
+  layer($layernum)
+  layer({layer => $layernum})
+
+=head2 PDFJ::AFontクラスのメソッド
+
+  PDFJ::AFont->new_std($docobj, $basefont, $encoding)
+  PDFJ::AFont->new_ttf($docobj, $ttffile, $encoding)
+
+=head2 PDFJ::CIDFontクラスのメソッド
+
+  PDFJ::CIDFont->new_std($docobj, $basefont, $encoding, $afontobj)
+  PDFJ::CIDFont->new_ttf($docobj, $ttffile, $encoding, $afontobj)
+
+=head2 PDFJ::Showableクラスのメソッド
+
+次のメソッドは、PDFJ::Text、PDFJ::Paragraph、PDFJ::Block、PDFJ::Image、PDFJ::Shapeの各クラスで共通して使える。
+
+  show($page, $x, $y, $align, $transtype, @transargs)
+  show({page => $page, x => $x, y => $y, align => $align, transtype => $transtype, transargs => [@transargs]})
+  width
+  height
+
+=head2 PDFJ::Textクラスのメソッド
+
+  PDFJ::Text->new($text, $style)
+  PDFJ::Text->new(@texts, $style)
+  PDFJ::Text->new([@texts], $style)
+  PDFJ::Text->new({texts => $text, style => $style})
+  PDFJ::Text->new({texts => [@text], style => $style})
+
+=head2 PDFJ::Paragraphクラスのメソッド
+
+  PDFJ::Paragraph->new($text, $style)
+  PDFJ::Paragraph->new({text => $text, style => $style})
+  linesnum
+  break($size)
+  break(@sizes)
+  break({sizes => $size})
+  break({sizes => [@sizes]})
+
+=head2 PDFJ::Blockクラスのメソッド
+
+  PDFJ::Block->new($direction, $object, $style)
+  PDFJ::Block->new($direction, @objects, $style)
+  PDFJ::Block->new($direction, [@objects], $style)
+  PDFJ::Block->new({direction => $direction, objects => $object, style => $style})
+  PDFJ::Block->new({direction => $direction, objects => [@objects], style => $style})
+  adjustwidth($size)
+  adjustwidth({size => $size})
+  adjustheight($size)
+  adjustheight({size => $size})
+  break($size)
+  break(@sizes)
+  break({sizes => $size})
+  break({sizes => [@sizes]})
+
+=head2 PDFJ::BlockSkipクラスのメソッド
+
+  PDFJ::BlockSkip->new($skip)
+  PDFJ::BlockSkip->new({skip => $skip})
+
+=head2 PDFJ::Imageクラスのメソッド
+
+  PDFJ::Image->new($docobj, $src, $pxwidth, $pxheight, $width, $height, $padding)
+  setsize($width, $height)
+  setpadding($padding)
+
+=head2 PDFJ::Shapeクラスのメソッド
+
+  PDFJ::Shape->new($style)
+  PDFJ::Shape->new({style => $style})
+
+マクロ命令（描画範囲の管理がおこなわれる）
+
+  line($x, $y, $w, $h, $style)
+  line({x => $x, y => $y, w => $w, h => $h, style => $style})
+  box($x, $y, $w, $h, $spec, $style)
+  box({x => $x, y => $y, w => $w, h => $h, spec => $spec, style => $style})
+  circle($x, $y, $r, $spec, $arcarea, $style)
+  circle({x => $x, y => $y, r => $r, spec => $spec, arcarea => $arcarea, style => $style})
+  ellipse($x, $y, $xr, $yr, $spec, $arcarea, $style)
+  ellipse({x => $x, y => $y, xr => $xr, yr => $yr, spec => $spec, arcarea => $arcarea, style => $style})
+  polygon([@coords], $spec, $style)
+  polygon({coords => [@coords], spec => $spec, style => $style})
+  arc($x, $y, $r, $start, $end, $spec, $style)
+  arc({x => $x, y => $y, r => $r, start => $start, end => $end, spec => $spec, style => $style})
+
+オブジェクト配置命令（描画範囲の管理がおこなわれる）
+
+  obj($obj, @showargs)
+  obj({obj => $obj, showargs => [@showargs]})
+
+プリミティブ命令
+
+  setboundary($x, $y)
+  gstatepush
+  gstatepop
+  linewidth($w)
+  linedash($dash, $gap, $phase)
+  ctm(@array)
+  fillcolor($color)
+  strokecolor($color)
+  fillgray($g)
+  strokegray($g)
+  fillrgb($r, $g, $b)
+  strokergb($r, $g, $b)
+  moveto($x, $y)
+  lineto($x, $y)
+  curveto($x1, $y1, $x2, $y2, $x3, $y3)
+  rectangle($x, $y, $w, $h)
+  closepath
+  newpath
+  stroke
+  closestroke
+  fill
+  fill2
+  fillstroke
+
+=head2 PDFJ::Styleクラスのメソッド
+
+次のメソッドはPDFJ::TextStyle、PDFJ::ParagraphStyle、PDFJ::BlockStyle、PDFJ::ShapeStyleのすべてで使える。
+
+  clone(%args)
+  clone({%args})
+  clone($argstr)
+
+=head2 PDFJ::TextStyleクラスのメソッド
+
+  PDFJ::TextStyle->new(%args)
+  PDFJ::TextStyle->new({%args})
+  PDFJ::TextStyle->new($argstr)
+
+=head2 PDFJ::ParagraphStyleクラスのメソッド
+
+  PDFJ::ParagraphStyle->new(%args)
+  PDFJ::ParagraphStyle->new({%args})
+  PDFJ::ParagraphStyle->new($argstr)
+
+=head2 PDFJ::BlockStyleクラスのメソッド
+
+  PDFJ::BlockStyle->new(%args)
+  PDFJ::BlockStyle->new({%args})
+  PDFJ::BlockStyle->new($argstr)
+
+=head2 PDFJ::ShapeStyleクラスのメソッド
+
+  PDFJ::ShapeStyle->new(%args)
+  PDFJ::ShapeStyle->new({%args})
+  PDFJ::ShapeStyle->new($argstr)
+
+=head2 PDFJ::Colorクラスのメソッド
+
+  PDFJ::Color->new($r, $g, $b)
+  PDFJ::Color->new($rgb)
+  PDFJ::Color->new($g)
+  PDFJ::Color->new({value => $rgb})
+  PDFJ::Color->new({value => $g})
+
+=head2 PDFJ::Outlineクラスのメソッド
+
+  PDFJ::Outline->new($title, $level)
+  PDFJ::Outline->new({title => $title, level => $level})
+
+=head2 PDFJ::Destクラスのメソッド
+
+  PDFJ::Dest->new($name)
+  PDFJ::Dest->new({name => $name})
+
+=head2 内部クラス
+
+以下は、通常はユーザーが直接扱う必要のない、PDFJ内部で使われるクラス。
+
+=over 4
+
+=item PDFJ::Fileクラス
+
+PDFJ::Docの下請け。PDF文書＝PDFJ::DocオブジェクトをPDFファイルに書き出す際に、PDFオブジェクトの索引情報などのメタデータを付加して、規定に従ったファイル構造を作る役割をする。
+
+=item PDFJ::ObjTableクラス 
+
+PDFJ::Docの下請け。PDFJ::Docオブジェクトに含まれるPDFオブジェクトを管理する。
+
+=item PDFJ::TextSpecクラス
+
+PDFJ::Textの下請けとして、テキスト属性を保持する。
+
+=item PDFJ::Object::* クラス群
+
+PDF文書はAdobe社が規定したPDFの文法に沿って構成されており、その構成単位もまた「オブジェクト」と呼ばれる。このPDFレベルのオブジェクトを、上記で説明したようなPDFJにおけるPerlオブジェクトと区別するために、「PDFオブジェクト」と呼ぶことにする。PDFJは、低レベルでプリミティブなPDFオブジェクトを隠蔽し、ユーザーが直接扱わなくてよいようにしている。もし自分でPDFオブジェクトを操作したいときは、PDFJ::Object::* クラス群を使えばよい。
+
+=item PDFJ::TTFクラス
+
+TrueTypeフォントファイル(.ttf)の内容を読みとったり、サブセットを作成したりする。
+
+=item PDFJ::TTCクラス
+
+TrueTypeCollectionフォントファイル(.ttc)を読みとって、指定した番号のフォントについてのPDFJ::TTFオブジェクトを得る。
+
+=back
+
+=head1 AUTHOR
+
+中島 靖 
+L<nakajima@netstock.co.jp|"mailto:nakajima@netstock.co.jp"> 
+L<http://hp1.jonex.ne.jp/~nakajima.yasushi/|"http://hp1.jonex.ne.jp/~nakajima.yasushi/">
+
+=head1 SEE ALSO
+
+「JIS X 4051（日本語文書の行組版方法）」(JIS、1995)
+
+「PDFリファレンス 第２版」(アドビシステムズ、2001)

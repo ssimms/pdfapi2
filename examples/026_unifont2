@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+use File::Basename;
+use PDF::API2;
+use PDF::API2::Util;
+use Unicode::UCD 'charinfo';
+use Encode qw[:all];
+use Getopt::Long;
+use utf8;
+
+$api=PDF::API2->new();
+
+$api->mediabox(595,842);
+
+$helv=$api->corefont('Helvetica-Bold',-encode=>'latin1');
+$ge=$api->corefont('Times-Roman',-encode=>'latin1');
+$g2=$api->corefont('Times-Roman',-encode=>'uni1');
+$g3=$api->corefont('Times-Roman',-encode=>'uni2');
+$g4=$api->corefont('Times-Roman',-encode=>'uni3');
+$g5=$api->corefont('Times-Roman',-encode=>'uni4');
+$g6=$api->corefont('Times-Roman',-encode=>'uni5');
+$zf=$api->corefont('zapfdingbats');
+$wd=$api->corefont('wingdings');
+
+my $sx=33;
+my $sy=45;
+my $fx=20;
+
+$uf=$api->unifont(
+    $ge,
+    [$g2,[1]],
+    [$g3,[2]],
+    [$g4,[3]],
+    [$g5,[4]],
+    [$g6,[5]],
+    [$zf,[0x26,0x27]],
+    [$wd,[0xf0]], -encode=>'shiftjis');
+
+foreach my $block (0,1,2,3,4,5,0x26,0x27,0xf0)
+{
+    print STDERR ".";
+
+    my $page = $api->page;
+    $page->mediabox(595,842);
+
+    my $gfx=$page->gfx;
+    delete $gfx->{Filter};
+    
+    foreach $x (0..15) 
+    {
+        foreach $y (0..15) 
+        {
+            $gfx->textlabel(50+($sx*$x),50+($sy*$y),$uf,$fx,pack('U',$block*256+$y*16+$x));
+            $gfx->textlabel(50+($sx*$x),50+($sy*$y)-6,$helv,6,nameByUni($block*256+$y*16+$x),-color=>'#a00000',-hspace=>80,-rotate=>-15);
+        }
+    }
+}
+
+$api->saveas("$0.pdf");
+$api->end;
+
+__END__

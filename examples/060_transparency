@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+use lib '../lib/';
+use PDF::API2;
+use PDF::API2::Util;
+use POSIX;
+
+
+$pdf=PDF::API2->new;
+$pdf->mediabox(595,842);
+
+my $TRANSPARENT = $pdf->egstate; # Called just once
+$TRANSPARENT->transparency(0.9);
+
+$fnt=$pdf->corefont('Verdana-Bold');
+
+$page = $pdf->page;
+$gfx=$page->gfx;
+
+$gfx->textlabel(30,750,$fnt,100,'100% Opaque',-color=>'#F00');
+
+$gfx->save;
+$gfx->egstate( $TRANSPARENT );
+$gfx->textlabel(30,720,$fnt,100,'90% Transparent',-color=>'#000');
+$gfx->restore;
+
+$page = $pdf->page;
+$text=$page->text;
+
+$text->save;
+$text->font( $fnt, 100 );
+$text->fillcolor( 'red' );
+$text->translate( 570, 750 );
+$text->text_right( 'Opaque 100%' );
+$text->fill;
+$text->restore;
+
+$text->textend;
+$text->save;
+$text->egstate( $TRANSPARENT );
+$text->textstart;
+$text->font( $fnt, 100 );
+$text->fillcolor( 'black' );
+$text->translate( 570, 720 );
+$text->text_right( 'Transparent 90%' );
+$text->fill;
+$text->textend;
+$text->restore;
+$text->textstart;
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__
+
+    

@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+
+use lib '../lib';
+use PDF::API2;
+use PDF::API2::Util;
+
+my $sx=33;
+my $sy=45;
+my $fx=20;
+@fns=qw{
+    Helvetica
+    Helvetica-Oblique
+    Helvetica-Bold
+    Helvetica-BoldOblique
+    Courier
+    Courier-Oblique
+    Courier-Bold
+    Courier-BoldOblique
+    Times-Roman
+    Times-Italic
+    Times-Bold
+    Times-BoldItalic
+    Symbol
+    ZapfDingbats
+    bankgothic
+    georgia
+    georgiaitalic
+    georgiabold
+    georgiabolditalic
+    trebuchet
+    trebuchetbold
+    trebuchetbolditalic
+    trebuchetitalic
+    verdana
+    verdanaitalic
+    verdanabold
+    verdanabolditalic
+    wingdings
+    webdings
+};
+
+@ecs=qw{
+    latin1 
+    latin2 
+    latin3 
+    latin4 
+    latin5 
+    latin6 
+    latin7 
+    latin8 
+    latin9 
+    latin10
+};
+
+if(scalar @ARGV)
+{
+    @fns=@ARGV;
+}
+
+foreach $fn (@fns) 
+{
+    foreach $ec (qw{ latin1 }) 
+    {
+
+        $pdf=PDF::API2->new;
+
+        $f1=$pdf->corefont('Helvetica');
+
+        print STDERR "\n$fn -- $ec\n";
+        initNameTable();
+        my $fnt=$pdf->corefont($fn,-encode => $ec);
+        my @fonts=($fnt,$fnt->automap());
+        foreach my $font (@fonts) 
+        {
+
+            my $page = $pdf->page;
+            $page->mediabox(595,842);
+
+            my $gfx=$page->gfx;
+
+            my $txt=$page->text;
+                $txt->font($font,$fx);
+
+            my $txt2=$page->text;
+
+            $txt2->textlabel(50,800,$f1,20,"font='".$font->fontname." / ".$font->name."'",-hspace=>75);
+            $txt2->textlabel(50,780,$f1,20,"encoding='$ec'");
+
+            $txt2->font($f1,5);
+            $txt2->hspace(80);
+
+            my $u=$font->underlineposition*$fx/1000;
+
+            foreach $x (0..15) 
+            {
+                print STDERR ".";
+                foreach $y (0..15) 
+                {
+                    $txt->translate(50+($sx*$x),50+($sy*$y));
+                    $txt->text(chr($y*16+$x));
+
+                    my $wx=$font->width(chr($y*16+$x))*$fx;
+
+                    $gfx->strokecolor('lightblue');
+                    $gfx->move(50+($sx*$x),50+($sy*$y)+$fx);
+                    $gfx->line(50+($sx*$x),50+($sy*$y)+$u);
+                    $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$u);
+                    $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$fx);
+                    $gfx->close;
+                    $gfx->stroke;
+
+                    $gfx->strokecolor('gray');
+                    $gfx->move(50+($sx*$x),50+($sy*$y));
+                    $gfx->line(50+($sx*$x)+$wx,50+($sy*$y));
+                    $gfx->stroke;
+
+                    $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-6);
+                    $txt2->text_right($y*16+$x);
+                    $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-11);
+                    $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($y*16+$x)));
+                    $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-16);
+                    $txt2->text_right($font->glyphByEnc($y*16+$x));
+                    $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-21);
+                    $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($y*16+$x)));
+                }
+            }
+            print STDERR "\n";
+        }
+        $pdf->saveas("$0.$fn.$ec.pdf");
+        $pdf->end();
+
+    }
+}
+
+exit;
+
+__END__

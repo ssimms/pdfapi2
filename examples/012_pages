@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use lib '../lib';
+use PDF::API2;
+
+$pdf = PDF::API2->new;
+my $font = $pdf->corefont('Arial-Bold');
+
+sub mark {
+    my ( $page ) = @_;
+
+    my $t = $page->text;
+
+    $t->font( $font, 20 );
+    $t->translate( 20, 700 );
+    $t->text( $pdf->pages );
+}
+
+for (1..8) {
+    mark $pdf->page;
+}
+
+mark $pdf->page(2);
+
+$pdf->saveas( "$0.pdf" );
+
+__END__
