@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+use lib '../lib';
+use PDF::API2;
+use PDF::API2::Util;
+
+
+$pdf=PDF::API2->new;
+
+$f1=$pdf->corefont('Helvetica',-encode=>'latin1');
+$f2=$pdf->corefont('Helvetica-Bold',-encode=>'latin1');
+
+$page = $pdf->page;
+$page->mediabox(595,842);
+
+$gfx=$page->gfx;
+$gfx->textlabel(50,700,$f2,20,'Hello World!',-color=>'red');
+
+$ant=$page->annotation;
+$ant->text("This is an open note.\nnext line", -rect=>[0,0,100,100], -open=>1);
+
+$ant=$page->annotation;
+$ant->text('This is an closed note', -rect=>[100,100,200,200]);
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__
