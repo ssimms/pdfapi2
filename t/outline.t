@@ -15,5 +15,5 @@ my $outline = $outlines->outline();
 $outline->title('Test Outline');
 $outline->dest($page2);
 
-like($pdf->stringify, qr{/Dest \[ 6 0 R /XYZ null null null \] /Title \(Test Outline\) /Parent 7 0 R},
+like($pdf->stringify, qr{/Dest \[ 6 0 R /XYZ null null null \] /Parent 7 0 R /Title \(Test Outline\)},
      q{Basic outline test});

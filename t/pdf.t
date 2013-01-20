@@ -97,6 +97,6 @@ like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /D /St 11 >> \] >>},
 $pdf = PDF::API2->new();
 $pdf->{'forcecompress'} = 0;
 $pdf->pageLabel(0, { -prefix => 'Test' });
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /D /P \(Test\) >> \] >>},
+like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D >> \] >>},
      q{Page Numbering: Decimal Characters (implicit), with prefix});
 
