@@ -1131,16 +1131,13 @@ sub readxrtr
 	#    $buf=update($fh,$buf);
     #}
     
-    if ($buf !~ m/^xref$cr/oi)
-    { 
-    	#if($self == $root)
-    	#{
-    		die "Malformed xref in PDF file $self->{' fname'}";
-    	#}
-    	#else # be tolerant if its not the root object
-    	#{
-    	#	return undef;
-    	#} 
+    if ($buf !~ m/^xref$cr/oi) { 
+        if ($buf =~ m/^\d+\s+\d+\s+obj/i) {
+            die "The PDF file uses a cross-reference stream, which is not yet supported (see Known Issues in the PDF::API2 documentation)";
+        }
+        else {
+            die "Malformed xref in PDF file $self->{' fname'}";
+        }
     }
     $buf =~ s/^xref$cr//oi;
 
