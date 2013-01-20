@@ -23,7 +23,7 @@ sub new
     if(scalar @opts > 1) {
         $self->{-isdict}=1;
         my %opt=@opts;
-        foreach my $k (sort keys %opt) {
+        foreach my $k (keys %opt) {
             $self->{$k} = $opt{$k};
         }
     } elsif(scalar @opts == 1) {
