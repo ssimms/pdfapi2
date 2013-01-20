@@ -921,7 +921,7 @@ sub save {
 
 =item $string = $pdf->stringify()
 
-Returns the document as a string.
+Returns the document as a string and destroys the object.
 
 B<Example:>
 
@@ -930,6 +930,16 @@ B<Example:>
     print $pdf->stringify();
 
 =cut
+
+# Maintainer's note: The object is being destroyed because it contains
+# circular references that would otherwise result in memory not being
+# freed if the object merely goes out of scope.  If possible, the
+# circular references should be eliminated so that stringify doesn't
+# need to be destructive.
+#
+# I've opted not to just require a separate call to release() because
+# it would likely introduce memory leaks in many existing programs
+# that use this module.
 
 sub stringify {
     my ($self)=@_;
