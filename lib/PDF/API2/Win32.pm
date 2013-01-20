@@ -1,5 +1,7 @@
 package PDF::API2::Win32;
 
+# VERSION
+
 no warnings qw[ deprecated recursion uninitialized ];
 
 

@@ -1,5 +1,7 @@
 package PDF::API2::Resource::CIDFont::CJKFont;
 
+# VERSION
+
 use base 'PDF::API2::Resource::CIDFont';
 
 use PDF::API2::Util;

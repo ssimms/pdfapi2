@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::trebuchetbold;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'TrebuchetMS,Bold',
     'type' => 'TrueType',

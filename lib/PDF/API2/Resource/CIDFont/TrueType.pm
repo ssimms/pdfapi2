@@ -1,5 +1,7 @@
 package PDF::API2::Resource::CIDFont::TrueType;
 
+# VERSION
+
 use base 'PDF::API2::Resource::CIDFont';
 
 use PDF::API2::Basic::PDF::Utils;

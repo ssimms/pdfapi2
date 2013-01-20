@@ -1,5 +1,7 @@
 package PDF::API2::Resource::XObject::Form::BarCode;
 
+# VERSION
+
 use base 'PDF::API2::Resource::XObject::Form::Hybrid';
 
 use PDF::API2::Util;

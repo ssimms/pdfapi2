@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::symbol;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Symbol',
     'type' => 'Type1',

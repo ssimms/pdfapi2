@@ -1,5 +1,7 @@
 package PDF::API2::Resource::CIDFont::TrueType::FontFile;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Dict';
 
 use Encode qw(:all);

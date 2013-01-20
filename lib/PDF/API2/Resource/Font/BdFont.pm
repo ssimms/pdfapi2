@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::BdFont;
 
+# VERSION
+
 use base 'PDF::API2::Resource::Font';
 
 use PDF::API2::Util;

@@ -1,5 +1,7 @@
 package PDF::API2::Content::Text;
 
+# VERSION
+
 use warnings;
 use strict;
 

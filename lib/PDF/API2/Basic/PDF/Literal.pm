@@ -1,6 +1,8 @@
 # Literal PDF Object for Dirty Hacks ...
 package PDF::API2::Basic::PDF::Literal;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;

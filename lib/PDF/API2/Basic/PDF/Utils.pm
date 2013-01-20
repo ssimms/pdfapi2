@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Utils;
 
+# VERSION
+
 =head1 NAME
 
 PDF::API2::Basic::PDF::Utils - Utility functions for PDF library

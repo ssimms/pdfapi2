@@ -1,5 +1,7 @@
 package PDF::API2::Resource::XObject::Image::TIFF;
 
+# VERSION
+
 use base 'PDF::API2::Resource::XObject::Image';
 
 use Compress::Zlib;

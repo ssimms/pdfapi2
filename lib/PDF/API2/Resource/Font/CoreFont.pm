@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont;
 
+# VERSION
+
 use base 'PDF::API2::Resource::Font';
 
 use File::Basename;

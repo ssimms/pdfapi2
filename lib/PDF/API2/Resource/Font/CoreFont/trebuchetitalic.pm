@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::trebuchetitalic;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'TrebuchetMS,Italic',
     'type' => 'TrueType',

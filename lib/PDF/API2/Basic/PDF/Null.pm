@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Null;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;

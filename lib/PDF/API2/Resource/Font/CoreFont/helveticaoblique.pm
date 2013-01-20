@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::helveticaoblique;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Helvetica-Oblique',
     'type' => 'Type1',

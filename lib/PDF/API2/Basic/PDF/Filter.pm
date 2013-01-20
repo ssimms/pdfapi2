@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Filter;
 
+# VERSION
+
 use PDF::API2::Basic::PDF::Filter::ASCII85Decode;
 use PDF::API2::Basic::PDF::Filter::ASCIIHexDecode;
 use PDF::API2::Basic::PDF::Filter::FlateDecode;

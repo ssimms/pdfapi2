@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::Postscript;
 
+# VERSION
+
 use base 'PDF::API2::Resource::Font';
 
 use Encode qw(:all);

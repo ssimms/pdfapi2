@@ -1,5 +1,7 @@
 package PDF::API2::Resource;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Dict';
 
 use PDF::API2::Util;

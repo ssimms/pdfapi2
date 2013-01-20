@@ -1,5 +1,7 @@
 package PDF::API2::Basic::PDF::Filter::LZWDecode;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Filter::FlateDecode';
 
 no warnings qw[ deprecated recursion uninitialized ];

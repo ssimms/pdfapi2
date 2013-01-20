@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::wingdings;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Wingdings',
     'type' => 'TrueType',

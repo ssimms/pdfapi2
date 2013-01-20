@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Glyphs;
 
+# VERSION
+
 use strict;
 use warnings;
 

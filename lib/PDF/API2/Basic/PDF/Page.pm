@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Page;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Pages';
 
 use strict;

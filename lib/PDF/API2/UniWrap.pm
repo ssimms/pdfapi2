@@ -1,5 +1,7 @@
 package PDF::API2::UniWrap;
 
+# VERSION
+
 # Implements UAX#14: Line Breaking Properties
 # David Nesting <david@fastolfe.net>
 

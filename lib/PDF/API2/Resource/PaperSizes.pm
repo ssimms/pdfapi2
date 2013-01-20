@@ -1,5 +1,7 @@
 package PDF::API2::Resource::PaperSizes;
 
+# VERSION
+
 use strict;
 use warnings;
 

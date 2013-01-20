@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::courieroblique;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Courier-Oblique',
     'type' => 'Type1',

@@ -1,5 +1,7 @@
 package PDF::API2::Resource::ColorSpace;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Array';
 
 use PDF::API2::Basic::PDF::Utils;

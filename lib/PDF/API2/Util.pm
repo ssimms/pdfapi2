@@ -1,5 +1,7 @@
 package PDF::API2::Util;
 
+# VERSION
+
 no warnings qw[ recursion uninitialized ];
 
 BEGIN {
