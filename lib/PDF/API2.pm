@@ -1,5 +1,7 @@
 package PDF::API2;
 
+# VERSION
+
 use Encode qw(:all);
 use FileHandle;
 

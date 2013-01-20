@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Shading;
 
+# VERSION
+
 use base 'PDF::API2::Resource';
 
 use PDF::API2::Basic::PDF::Utils;

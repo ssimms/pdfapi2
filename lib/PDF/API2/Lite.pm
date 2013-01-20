@@ -1,5 +1,7 @@
 package PDF::API2::Lite;
 
+# VERSION
+
 BEGIN {
 
     use PDF::API2;

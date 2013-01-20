@@ -1,5 +1,7 @@
 package PDF::API2::Basic::PDF::Filter::ASCII85Decode;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Filter';
 
 use strict;

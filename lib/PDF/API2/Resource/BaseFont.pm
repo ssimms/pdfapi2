@@ -1,5 +1,7 @@
 package PDF::API2::Resource::BaseFont;
 
+# VERSION
+
 use base 'PDF::API2::Resource';
 
 use Compress::Zlib;

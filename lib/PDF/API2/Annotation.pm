@@ -1,5 +1,7 @@
 package PDF::API2::Annotation;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Dict';
 
 use Encode qw(:all);

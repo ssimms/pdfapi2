@@ -14,6 +14,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::File;
 
+# VERSION
+
 =head1 NAME
 
 PDF::API2::Basic::PDF::File - Holds the trailers and cross-reference tables for a PDF file

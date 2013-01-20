@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::SynFont;
 
+# VERSION
+
 use base 'PDF::API2::Resource::Font';
 
 use Math::Trig;

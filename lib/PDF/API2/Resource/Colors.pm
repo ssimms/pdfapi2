@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Colors;
 
+# VERSION
+
 use strict;
 use warnings;
 

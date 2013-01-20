@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::georgiabold;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Georgia,Bold',
     'type' => 'TrueType',

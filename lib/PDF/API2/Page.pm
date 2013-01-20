@@ -1,5 +1,7 @@
 package PDF::API2::Page;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Pages';
 
 use POSIX qw(floor);

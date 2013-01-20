@@ -1,5 +1,7 @@
 package PDF::API2::Resource::XObject::Image;
 
+# VERSION
+
 use base 'PDF::API2::Resource::XObject';
 
 use PDF::API2::Util;

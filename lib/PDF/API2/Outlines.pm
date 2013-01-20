@@ -1,5 +1,7 @@
 package PDF::API2::Outlines;
 
+# VERSION
+
 use warnings;
 use strict;
 

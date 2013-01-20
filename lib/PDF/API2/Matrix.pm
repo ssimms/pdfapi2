@@ -10,6 +10,8 @@
 #=======================================================================
 package PDF::API2::Matrix;
 
+# VERSION
+
 sub new {
     my $type = shift;
     my $self = [];

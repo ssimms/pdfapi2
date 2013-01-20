@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::zapfdingbats;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'ZapfDingbats',
     'type' => 'Type1',

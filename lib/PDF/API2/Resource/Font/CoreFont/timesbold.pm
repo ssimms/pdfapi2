@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::timesbold;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Times-Bold',
     'type' => 'Type1',

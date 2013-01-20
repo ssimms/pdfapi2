@@ -1,5 +1,7 @@
 package PDF::API2::Resource::ColorSpace::Indexed::WebColor;
 
+# VERSION
+
 use base 'PDF::API2::Resource::ColorSpace::Indexed';
 
 use PDF::API2::Basic::PDF::Utils;

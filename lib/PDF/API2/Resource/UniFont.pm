@@ -1,5 +1,7 @@
 package PDF::API2::Resource::UniFont;
 
+# VERSION
+
 use Encode qw(:all);
 
 no warnings qw[ deprecated recursion uninitialized ];

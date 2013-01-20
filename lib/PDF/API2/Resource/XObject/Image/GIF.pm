@@ -1,5 +1,7 @@
 package PDF::API2::Resource::XObject::Image::GIF;
 
+# VERSION
+
 use base 'PDF::API2::Resource::XObject::Image';
 
 use IO::File;

@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::courierbold;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Courier-Bold',
     'type' => 'Type1',

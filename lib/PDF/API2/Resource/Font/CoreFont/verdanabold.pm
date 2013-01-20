@@ -1,5 +1,7 @@
 package PDF::API2::Resource::Font::CoreFont::verdanabold;
 
+# VERSION
+
 $FONTDATA = {
     'fontname' => 'Verdana,Bold',
     'type' => 'TrueType',

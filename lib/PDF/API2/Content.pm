@@ -1,5 +1,7 @@
 package PDF::API2::Content;
 
+# VERSION
+
 use base 'PDF::API2::Basic::PDF::Dict';
 
 use Compress::Zlib qw();

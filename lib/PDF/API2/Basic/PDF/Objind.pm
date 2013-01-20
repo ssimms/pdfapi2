@@ -12,6 +12,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Objind;
 
+# VERSION
+
 =head1 NAME
 
 PDF::API2::Basic::PDF::Objind - PDF indirect object reference. Also acts as an abstract

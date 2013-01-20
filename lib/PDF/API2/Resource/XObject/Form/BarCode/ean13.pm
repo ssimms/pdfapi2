@@ -1,5 +1,7 @@
 package PDF::API2::Resource::XObject::Form::BarCode::ean13;
 
+# VERSION
+
 use base 'PDF::API2::Resource::XObject::Form::BarCode';
 
 no warnings qw[ deprecated recursion uninitialized ];
