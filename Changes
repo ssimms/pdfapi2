@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+    - Give a more informative error message when a PDF file using a
+      cross-reference stream is encountered.  The Known Issues section
+      of the documentation includes pointers on how to add support in
+      case someone else can get to this before I do.
+
     - Text using TrueType fonts is now searchable again.  In version
       0.61, an undocumented -unicodemap option was added to nearly all
       of the font resource methods, which only included a ToUnicode

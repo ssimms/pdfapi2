@@ -2370,9 +2370,16 @@ __END__
 
 =back
 
-=head1 BUGS
+=head1 KNOWN ISSUES
 
 This module does not work with perl's -l command-line switch.
+
+PDFs using cross-reference streams instead of cross-reference tables
+are not yet supported.  Cross-reference streams were added as an
+option in version 1.5 of the PDF spec, but were only used infrequently
+until Adobe Acrobat 9 started using them by default.  A patch would be
+welcome -- see the PDF 1.7 specification, sections 7.5.4 and 7.5.8 for
+implementation details.
 
 =head1 AUTHOR
 
