@@ -122,8 +122,8 @@ sub outobjdeep
             $fh->print(" ");
         }
     }
-    while (($key, $val) = each %{$self})
-    {
+    foreach $key (sort keys %$self) {
+        $val = $self->{$key};
         next if ($key =~ m/^[\s\-]/o || $specs{$key});
         next if (($val || '') eq '');
         $key = PDF::API2::Basic::PDF::Name::string_to_name ($key, $pdf);

@@ -18,5 +18,5 @@ $annotation->text('This is an annotation', -rect => [ 72, 144, 172, 244 ]);
 # why the Contents section doesn't just have the simple text.  I think
 # it would be better to only use UTF-8 when necessary.
 like($pdf->stringify(),
-     qr{/Annot /Subtype /Text /Rect \[ 72 144 172 244 \] /Contents <FEFF005400680069007300200069007300200061006E00200061006E006E006F0074006100740069006F006E>},
+     qr{/Annot /Subtype /Text /Border \[ 0 0 0 \] /Contents <FEFF005400680069007300200069007300200061006E00200061006E006E006F0074006100740069006F006E> /Rect \[ 72 144 172 244 \]},
      q{Text Annotation in a rectangle});

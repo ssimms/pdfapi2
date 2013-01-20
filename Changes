@@ -16,6 +16,10 @@
       PDF::API2::Basic::PDF::Filter namespace now, rather than having
       all of the packages in Filter.pm.
 
+    - To facilitate testing and ensure that identically-generated PDFs
+      have identical output in Perl 5.17.5 or later, PDF dictionary
+      keys are now sorted during output.
+
 
 2.019     2011-03-10
 
