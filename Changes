@@ -3,6 +3,10 @@
     - Fixed numerous bugs in the string parsing code, including the
       one reported in [RT #63918] by Frank Doepper.
 
+    - [RT #41049] Rewrote literal string parsing to prevent a stack
+      overflow due to an inefficient regex (reported by Sergei
+      Fetisov).
+
     - The RunLengthDecode filter didn't actually work.  Its code has
       been rewritten and now passes basic encoding and decoding tests.
 
