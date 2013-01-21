@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - The RunLengthDecode filter didn't actually work.  Its code has
+      been rewritten and now passes basic encoding and decoding tests.
+
+
+2.020     2013-01-20
+
     - Give a more informative error message when a PDF file using a
       cross-reference stream is encountered.  The Known Issues section
       of the documentation includes pointers on how to add support in
