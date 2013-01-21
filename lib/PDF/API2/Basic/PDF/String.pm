@@ -92,31 +92,76 @@ Returns $str converted as per criteria for input from PDF file
 =cut
 
 sub convert {
-    my ($self, $str) = @_;
+    my ($self, $input) = @_;
+    my $output = '';
 
-    if ($str =~ m|^\s*\<|o) { 
-        # cleaning up hex-strings, since spec is very loose,
-        # at least openoffice exporter needs this ! - fredo
-        $str =~ s|[^0-9a-f]+||gio;
-        $str = "<$str>";
+    # Hexadecimal Strings (PDF 1.7 section 7.3.4.3)
+    if ($input =~ m|^\s*\<|o) { 
         $self->{' ishex'} = 1;
+        $output = $input;
 
-        1 while $str =~ s/\<([0-9a-f]{2})/chr(hex($1)) . '<'/oige;
-        $str =~ s/\<([0-9a-f]?)\>/chr(hex($1 . '0'))/oige;
-        $str =~ s/\<\>//og;
+        # Remove any extraneous characters to simplify processing
+        $output =~ s/[^0-9a-f]+//gio;
+        $output = "<$output>";
+
+        # Convert each sequence of two hexadecimal characters into a byte
+        1 while $output =~ s/\<([0-9a-f]{2})/chr(hex($1)) . '<'/oige;
+
+        # If a single hexadecimal character remains, append 0 and
+        # convert it into a byte.
+        $output =~ s/\<([0-9a-f])\>/chr(hex($1 . '0'))/oige;
+
+        # Remove surrounding angle brackets
+        $output =~ s/\<\>//og;
     }
+
+    # Literal Strings (PDF 1.7 section 7.3.4.2)
     else {
-        # if we import binary escapes,
-        # let it be hex on output -- fredo
-        if ($str =~ s/\\([nrtbf\\()])/$trans{$1}/ogi) {
-            $self->{' ishex'} = 1;
-        }
-        if ($str =~ s/\\([0-7]{1,3})/chr(oct($1))/oeg) {
-            $self->{' ishex'} = 1;
+        # Remove surrounding parentheses
+        $input =~ s/^\s*\((.*)\)\s*$/$1/os;
+
+        my $cr = '(?:\015\012|\015|\012)';
+        my $prev_input;
+        while ($input) {
+            if (defined $prev_input and $input eq $prev_input) {
+                die "Infinite loop while parsing literal string";
+            }
+            $prev_input = $input;
+
+            # Convert bachslash followed by up to three octal digits
+            # into that binary byte
+            if ($input =~ /^\\([0-7]{1,3})(.*)/os) {
+                $output .= chr(oct($1));
+                $input = $2;
+            }
+            # Convert backslash followed by an escaped character into that
+            # character
+            elsif ($input =~ /^\\([nrtbf\\\(\)])(.*)/osi) {
+                $output .= $trans{$1};
+                $input = $2;
+            }
+            # Ignore backslash followed by an end-of-line marker
+            elsif ($input =~ /^\\$cr(.*)/os) {
+                $input = $1;
+            }
+            # Convert an unescaped end-of-line marker to a line-feed
+            elsif ($input =~ /^\015\012?(.*)/os) {
+                $output .= "\012";
+                $input = $1;
+            }
+            # Check to see if there are any other special sequences
+            elsif ($input =~ /^(.*?)((?:\\(?:[nrtbf\\\(\)0-7]|$cr)|\015\012?).*)/os) {
+                $output .= $1;
+                $input = $2;
+            }
+            else {
+                $output .= $input;
+                $input = undef;
+            }
         }
     }
 
-    return $str;
+    return $output;
 }
 
 

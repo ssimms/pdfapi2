@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - Fixed numerous bugs in the string parsing code, including the
+      one reported in [RT #63918] by Frank Doepper.
+
     - The RunLengthDecode filter didn't actually work.  Its code has
       been rewritten and now passes basic encoding and decoding tests.
 
