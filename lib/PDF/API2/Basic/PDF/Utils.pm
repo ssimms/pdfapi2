@@ -40,7 +40,7 @@ use PDF::API2::Basic::PDF::Literal;
 use Exporter;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
-@EXPORT = qw(PDFBool PDFArray PDFDict PDFLiteral PDFName PDFNull
+@EXPORT = qw(PDFBool PDFArray PDFDict PDFName PDFNull
              PDFNum PDFStr PDFStrHex PDFUtf);
 
 =head2 PDFBool
@@ -135,16 +135,6 @@ sub PDFUtf {
     my $string = PDF::API2::Basic::PDF::String->new(@_);
     $string->{' isutf'} = 1;
     return $string;
-}
-
-=head2 PDFLiteral
-
-Creates a pdf-literal via PDF::API2::Basic::PDF::Literal->new
-
-=cut
-
-sub PDFLiteral {
-    return PDF::API2::Basic::PDF::Literal->new(@_);
 }
 
 1;
