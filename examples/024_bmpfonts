@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+
+use PDF::API2;
+use PDF::API2::Util;
+
+use PDF::API2::Resource::Font::BdFont;
+
+use Data::Dumper;
+
+my $data=PDF::API2::Resource::Font::BdFont->readBDF($ARGV[0]);
+
+print Dumper($data);
+
+$pdf=PDF::API2->new;
+
+foreach my $char (@{$data->{char2}}) {
+    my $page = $pdf->page;
+    $page->mediabox('A4'); # 595,842
+
+    my $gfx=$page->gfx;
+    print "C: $char->{NAME} ($char->{ENCODING})\n";
+    my @bbx=@{$char->{BBX}};
+
+    my $stream=pack('H*',$char->{hex});
+    
+    my $y=$bbx[1];
+    next unless($y);
+    my $x=8*length($stream)/$y;
+
+    my $img=qq|q $x 0 0 $y 50 50 cm
+BI
+/Interpolate false/Decode [1 0]/H $y/W $x/BPC 1/CS/G
+ID $stream
+EI 
+Q|;
+
+    $gfx->add($img);
+    delete $gfx->{Filter};
+}
+
+
+my $sx=33;
+my $sy=45;
+my $fx=20;
+
+my $f1=$pdf->corefont('Helvetica');
+
+my $font=$pdf->bdfont($ARGV[0]);
+
+my $page = $pdf->page;
+$page->mediabox(595,842);
+
+my $gfx=$page->gfx;
+
+my $txt=$page->text;
+$txt->strokecolor('#000');
+$txt->fillcolor('#000');
+$txt->font($font,$fx);
+
+my $txt2=$page->text;
+
+$txt2->translate(50,800);
+$txt2->font($f1,20);
+$txt2->text("font='".$font->fontname." / ".$font->name."'");
+
+$txt2->font($f1,5);
+$txt2->hspace(80);
+
+my $u=$font->underlineposition*$fx/1000;
+
+foreach $x (0..15) {
+    print STDERR ".";
+    foreach $y (0..15) {
+        $txt->translate(50+($sx*$x),50+($sy*$y));
+        $txt->text(chr($y*16+$x));
+
+        my $wx=$font->width(chr($y*16+$x))*$fx;
+
+        $gfx->strokecolor('lightblue');
+        $gfx->move(50+($sx*$x),50+($sy*$y)+$fx);
+        $gfx->line(50+($sx*$x),50+($sy*$y)+$u);
+        $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$u);
+        $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$fx);
+        $gfx->close;
+        $gfx->stroke;
+
+        $gfx->strokecolor('gray');
+        $gfx->move(50+($sx*$x),50+($sy*$y));
+        $gfx->line(50+($sx*$x)+$wx,50+($sy*$y));
+        $gfx->stroke;
+
+        $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-6);
+        $txt2->text_right($y*16+$x);
+        $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-11);
+        $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($y*16+$x)));
+        $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-16);
+        $txt2->text_right($font->glyphByEnc($y*16+$x));
+        $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-21);
+        $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($y*16+$x)));
+    }
+}
+
+delete $gfx->{Filter};
+delete $txt->{Filter};
+delete $txt2->{Filter};
+$pdf->{pdf}->{' version'}=4;
+$pdf->saveas("$0.pdf");
+
+$pdf->end();
+
+
+__END__

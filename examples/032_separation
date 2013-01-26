@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use PDF::API2;
+use PDF::API2::Util;
+use POSIX;
+use Math::Trig;
+
+my $cx=50;
+my $cy=50;
+my $cr=15;
+my $cs=30;
+my $ang=30;
+
+$pdf=PDF::API2->new;
+$pdf->mediabox(595,842);
+
+$fnt=$pdf->corefont('Verdana-Bold');
+
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'Separation Colorspace(s)',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+    my $y=0;
+    foreach my $csn (qw( Red %0ff0 Green %f0f0 Blue %ff00 Cyan %f000 Magenta %0f00 Yellow %00f0 )) {
+        my $csp=$pdf->colorspace_separation($csn,$csn);
+        $gfx->textlabel($cx,$cy+($y*$cs),$fnt,8,$csn,-color=>'#000',-hspace=>85,-right=>1);
+        foreach my $x (0 .. 0xf) {
+            $gfx->fillcolor($csp,sprintf('%0.4f',$x/0xf));
+            $gfx->circle($cx+($x+1)*$cs,$cy+($y+0.5)*$cs,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+($x+1)*$cs,$cy+($y+0.5)*$cs,$fnt,8,sprintf('%0.4f',$x/0xf),-color=>'#000',-hspace=>85,-center=>1);
+        }
+        $y++;
+    }
+
+
+    my $csp=$pdf->colorspace_separation('All','#000');
+    $gfx->textlabel($cx,$cy+($y*$cs),$fnt,8,'All',-color=>'#000',-hspace=>85,-right=>1);
+    foreach my $x (0 .. 0xf) {
+        $gfx->fillcolor($csp,sprintf('%0.4f',$x/0xf));
+        $gfx->circle($cx+($x+1)*$cs,$cy+($y+0.5)*$cs,$cr);
+        $gfx->fillstroke;
+        $gfx->textlabel($cx+($x+1)*$cs,$cy+($y+0.5)*$cs,$fnt,8,sprintf('%0.4f',$x/0xf),-color=>'#000',-hspace=>85,-center=>1);
+    }
+    $y++;
+
+    $csp=$pdf->colorspace_separation('None','#000');
+    $gfx->textlabel($cx,$cy+($y*$cs),$fnt,8,'None',-color=>'#000',-hspace=>85,-right=>1);
+    foreach my $x (0 .. 0xf) {
+        $gfx->fillcolor($csp,sprintf('%0.4f',$x/0xf));
+        $gfx->circle($cx+($x+1)*$cs,$cy+($y+0.5)*$cs,$cr);
+        $gfx->fillstroke;
+        $gfx->textlabel($cx+($x+1)*$cs,$cy+($y+0.5)*$cs,$fnt,8,sprintf('%0.4f',$x/0xf),-color=>'#000',-hspace=>85,-center=>1);
+    }
+    $y++;
+
+    delete $gfx->{Filter};
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__
+
+    

@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use lib '../lib';
+use PDF::API2;
+use PDF::API2::Util;
+
+$pdf=PDF::API2->new;
+$f1=$pdf->corefont('Verdana');
+
+$page = $pdf->page;
+$page->mediabox(595,842);
+$gfx=$page->gfx;
+$gfx->textlabel(50,780,$f1,20,"Hello World!");
+
+$pdf->saveas("$0.BASE.pdf");
+$pdf->end();
+
+$pdf=PDF::API2->open("$0.BASE.pdf");
+$f1=$pdf->corefont('Verdana');
+
+$page = $pdf->page;
+$page->mediabox(595,842);
+$gfx=$page->gfx;
+$gfx->textlabel(50,780,$f1,20,"Hello World! (2)");
+
+$pdf->saveas("$0.UPDATED.pdf");
+$pdf->end();
+
+$pdf=PDF::API2->open("$0.UPDATED.pdf");
+$f1=$pdf->corefont('Verdana');
+
+$page = $pdf->page;
+$page->mediabox(595,842);
+$gfx=$page->gfx;
+$gfx->textlabel(50,780,$f1,20,"Hello World! (3)");
+
+$str=$pdf->stringify();
+$pdf->end();
+
+$pdf=PDF::API2->openScalar($str);
+$f1=$pdf->corefont('Verdana');
+
+$page = $pdf->page;
+$page->mediabox(595,842);
+$gfx=$page->gfx;
+$gfx->textlabel(50,780,$f1,20,"Hello World! (4)");
+
+$pdf->saveas("$0.STRING.pdf");
+$pdf->end();
+
+
+
+
+
+exit;
+
+__END__

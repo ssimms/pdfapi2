@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+use lib qw{ ../lib };
+use File::Basename;
+use PDF::API2;
+use PDF::API2::Util;
+use Unicode::UCD 'charinfo';
+use Getopt::Long;
+use utf8;
+my $sx=33;
+my $sy=45;
+my $fx=20;
+my $LoremIpsum=qq|Sed ut perspici\x{0361}atis.|;
+my $encoding='latin1';
+
+GetOptions(
+    "encode|e=s" => \$encoding,
+);
+
+foreach $fn (@ARGV) {
+
+    $pdf=PDF::API2->new(-file => basename($0).'.'.basename($fn).".pdf");
+
+    $f1=$pdf->corefont('Helvetica', -encode => 'latin1');
+    $f2=$pdf->corefont('Helvetica-Bold', -encode => 'latin1');
+
+    print STDERR "\n$fn\n";
+
+    my $font=$pdf->ttfont($fn, -encode => $encoding);
+	$font->data->{nosubset}=1;
+    if(1)
+    {
+        my $page = $pdf->page;
+        $page->mediabox(595,842);
+
+        my $gfx=$page->gfx;
+
+        my $txt=$page->text;
+            $txt->font($font,$fx);
+
+        my $txt2=$page->text;
+        #delete $txt->{Filter};
+        #delete $txt2->{Filter};
+
+        $txt2->textlabel(50,800,$f1,20,"font='".$font->fontname."'");
+        $txt2->textlabel(50,780,$f1,20,"encoding='$encoding'");
+
+        $txt2->font($f1,5);
+        $txt2->hspace(80);
+
+        my $u=$font->underlineposition*$fx/1000;
+
+        foreach $x (0..15) 
+        {
+            print STDERR ".";
+            foreach $y (0..15) 
+            {
+                $txt->translate(50+($sx*$x),50+($sy*$y));
+                $txt->text(chr($y*16+$x));
+
+                my $wx=$font->width(chr($y*16+$x))*$fx;
+
+                $gfx->strokecolor('lightblue');
+                $gfx->move(50+($sx*$x),50+($sy*$y)+$fx);
+                $gfx->line(50+($sx*$x),50+($sy*$y)+$u);
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$u);
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$fx);
+                $gfx->close;
+                $gfx->stroke;
+
+                $gfx->strokecolor('gray');
+                $gfx->move(50+($sx*$x),50+($sy*$y));
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y));
+                $gfx->stroke;
+
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-6);
+                $txt2->text_right($y*16+$x);
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-11);
+                $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($y*16+$x)));
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-16);
+                $txt2->text_right($font->glyphByEnc($y*16+$x));
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-21);
+                $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($y*16+$x)));
+            }
+        }
+    }
+    
+    my $text=$LoremIpsum;
+
+    $page = $pdf->page;
+    $page->mediabox(595,842);
+    $gfx=$page->gfx;
+    $gfx->transform(-translate => [50, 800]);
+    $gfx->textstart;
+    $gfx->fillcolor('black');
+    $gfx->font($font,18);
+    $gfx->lead(18*1.25);
+    my $toprint;
+    while($text ne '')
+    {
+    	($toprint,$text)=$gfx->_text_fill_line($text,500,0);
+    	$gfx->text($toprint);
+    	$gfx->nl;
+    }
+    $gfx->textend;
+    
+    $pdf->save;
+    $pdf->end;
+}
+
+exit;
+
+__END__
+
+=head1 HISTORY
+
+    $Log$
+    Revision 1.1  2007/10/23 07:48:08  areibens
+    genesis
+
+    Revision 2.2  2007/04/07 10:26:23  areibens
+    added lorem ipsum page
+
+    Revision 2.1  2006/06/19 19:20:13  areibens
+    added details
+
+    Revision 2.0  2005/11/16 02:16:00  areibens
+    revision workaround for SF cvs import not to screw up CPAN
+
+    Revision 1.2  2005/11/16 01:27:48  areibens
+    genesis2
+
+    Revision 1.1  2005/11/16 01:19:24  areibens
+    genesis
+
+    Revision 1.3  2005/09/12 16:55:05  fredo
+    various updates
+
+    Revision 1.2  2004/12/31 02:58:49  fredo
+    no message
+
+    Revision 1.1  2004/04/06 23:04:06  fredo
+    genesis
+
+
+=cut
