@@ -41,8 +41,7 @@ use Exporter;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 @EXPORT = qw(PDFBool PDFArray PDFDict PDFLiteral PDFName PDFNull
-             PDFNum PDFStr PDFStrHex PDFUtf asPDFBool asPDFName
-             asPDFNum asPDFStr);
+             PDFNum PDFStr PDFStrHex PDFUtf);
 
 =head2 PDFBool
 
