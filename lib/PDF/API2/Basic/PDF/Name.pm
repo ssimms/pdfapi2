@@ -34,14 +34,14 @@ escaping working, particular to Names.
 =cut
 
 sub from_pdf {
-    my ($class, $str, $pdf) = @_;
-    my ($self) = $class->SUPER::from_pdf($str);
+    my ($class, $string, $pdf) = @_;
+    my ($self) = $class->SUPER::from_pdf($string);
 
     $self->{'val'} = name_to_string($self->{'val'}, $pdf);
     return $self;
 }
 
-=head2 $n->convert ($str, $pdf)
+=head2 $n->convert ($string, $pdf)
 
 Converts a name into a string by removing the / and converting any hex
 munging.
@@ -49,10 +49,10 @@ munging.
 =cut
 
 sub convert {
-    my ($self, $str, $pdf) = @_;
+    my ($self, $string, $pdf) = @_;
 
-    $str = name_to_string($str, $pdf);
-    return $str;
+    $string = name_to_string($string, $pdf);
+    return $string;
 }
 
 =head2 $s->as_pdf ($pdf)
@@ -64,53 +64,53 @@ PDF File object for which the name is intended if supplied.
 
 sub as_pdf {
     my ($self, $pdf) = @_;
-    my $str = $self->{'val'};
+    my $string = $self->{'val'};
 
-    $str = string_to_name($str, $pdf);
-    return '/' . $str;
+    $string = string_to_name($string, $pdf);
+    return '/' . $string;
 }
 
 
-# Prior to PDF version 1.2, `#' was a literal character.  Embedded
+# Prior to PDF version 1.2, '#' was a literal character.  Embedded
 # spaces were implicitly allowed in names as well but it would be best
-# to ignore that (PDF reference 2nd edition, Appendix H, section 3.2.4.3).
+# to ignore that (PDF 1.3, section H.3.2.4.3).
 
-=head2 PDF::API2::Basic::PDF::Name->string_to_name ($str, $pdf)
+=head2 PDF::API2::Basic::PDF::Name->string_to_name ($string, $pdf)
 
-Suitably encode the string $str for output in the File object $pdf
+Suitably encode the string $string for output in the File object $pdf
 (the exact format may depend on the version of $pdf).
 
 =cut
 
 sub string_to_name ($;$) {
-    my ($str, $pdf) = @_;
+    my ($string, $pdf) = @_;
 
     # PDF 1.0 and 1.1 didn't treat the # symbol as an escape character
     unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 2) { 
-        $str =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|'#' . sprintf('%02X', ord($1))|oge; 
+        $string =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|'#' . sprintf('%02X', ord($1))|oge; 
     }
 
-    return $str;
+    return $string;
 }
 
-=head2 PDF::API2::Basic::PDF::Name->name_to_string ($str, $pdf)
+=head2 PDF::API2::Basic::PDF::Name->name_to_string ($string, $pdf)
 
-Suitably decode the string $str as read from the File object $pdf (the
-exact decoding may depend on the version of $pdf).  Principally, undo
-the hex encoding for PDF versions > 1.1.
+Suitably decode the string $string as read from the File object $pdf
+(the exact decoding may depend on the version of $pdf).  Principally,
+undo the hex encoding for PDF versions > 1.1.
 
 =cut
 
 sub name_to_string ($;$) {
-    my ($str, $pdf) = @_;
-    $str =~ s|^/||o;
+    my ($string, $pdf) = @_;
+    $string =~ s|^/||o;
 
     # PDF 1.0 and 1.1 didn't treat the # symbol as an escape character
     unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 2) {
-        $str =~ s/#([0-9a-f]{2})/chr(hex($1))/oige;
+        $string =~ s/#([0-9a-f]{2})/chr(hex($1))/oige;
     }
 
-    return $str;
+    return $string;
 }
 
 1;
