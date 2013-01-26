@@ -80,20 +80,16 @@ sub as_pdf {
 Suitably encode the string $str for output in the File object $pdf
 (the exact format may depend on the version of $pdf).
 
-Note: This function only encodes names properly for PDF version 1.2
-and higher.
-
 =cut
-
-# Technical Note: The code checking whether this is for version 1.1
-# was commented out before it was entered into version control.  I'm
-# not sure why.  (Steve Simms, 2010-08-28)
 
 sub string_to_name ($;$) {
     my ($str, $pdf) = @_;
-#   unless (defined($pdf) and $pdf->{' version'} < 2) { 
+
+    # PDF 1.0 and 1.1 didn't treat the # symbol as an escape character
+    unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 2) { 
         $str =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|'#' . sprintf('%02X', ord($1))|oge; 
-#   }
+    }
+
     return $str;
 }
 
@@ -109,7 +105,8 @@ sub name_to_string ($;$) {
     my ($str, $pdf) = @_;
     $str =~ s|^/||o;
 
-    unless (defined($pdf) and $pdf->{' version'} and $pdf->{' version'} < 2) {
+    # PDF 1.0 and 1.1 didn't treat the # symbol as an escape character
+    unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 2) {
         $str =~ s/#([0-9a-f]{2})/chr(hex($1))/oige;
     }
 
