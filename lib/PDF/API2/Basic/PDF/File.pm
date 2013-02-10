@@ -446,7 +446,7 @@ sub create_file
 
     $self->{' OUTFILE'} = $fh;
     $fh->print('%PDF-1.' . ($self->{' version'} || '2') . "\n");
-    $fh->print("%\xC7\xEC\xF3\xA2\n");   # and some binary stuff in a comment
+    $fh->print("%\xC6\xCD\xCD\xB5\n");   # and some binary stuff in a comment
     $self;
 }
 
