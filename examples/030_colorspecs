@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+
+use PDF::API2;
+use PDF::API2::Util;
+use POSIX;
+use Math::Trig;
+
+my $cx=315;
+my $cy=400;
+my $cr=15;
+my $cs=32;
+my $ang=30;
+
+$pdf=PDF::API2->new;
+$pdf->mediabox(595,842);
+
+$fnt=$pdf->corefont('Verdana-Bold');
+
+foreach my $z (0 .. 0xf) {
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'RGB Colorspace',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t=sprintf('#%01X%01X%01X',$x,$z,$y);
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+($x-8)*$cs,$cy+($y-8)*$cs,$fnt,8,$t,-color=>'#000',-rotate=>$ang,-hspace=>85,-center=>1);
+        }
+    }
+}
+
+foreach my $z (0 .. 0xf) {
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'RGB Colorspace (Gamma=2.2)',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t=sprintf('#%01X%01X%01X',$x,$z,$y);
+            $gfx->fillcolor($x/0xf,$z/0xf,$y/0xf);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+($x-8)*$cs,$cy+($y-8)*$cs,$fnt,8,$t,-color=>'#000',-rotate=>$ang,-hspace=>85,-center=>1);
+        }
+    }
+}
+
+foreach my $z (0 .. 0xf) {
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'CMYK Colorspace',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t=sprintf('%%%01X%01X%01X0',$x,$z,$y);
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+($x-8)*$cs,$cy+($y-8)*$cs,$fnt,8,$t,-color=>'#000',-rotate=>$ang,-hspace=>85,-center=>1);
+        }
+    }
+}
+
+foreach my $z (0 .. 0xf) {
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'Lab Colorspace',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t=sprintf('$%01X%01X%01X',$z,$x,$y);
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+($x-8)*$cs,$cy+($y-8)*$cs,$fnt,8,$t,-color=>'#000',-rotate=>$ang,-hspace=>85,-center=>1);
+        }
+    }
+}
+
+my @cols=sort keys %PDF::API2::Util::colors;
+
+while (scalar @cols > 0) {
+    $page = $pdf->page;
+    $gfx=$page->gfx;
+    
+    $gfx->textlabel(300,750,$fnt,20,'Named Colors (RGB)',-color=>'#000',-hspace=>125,-center=>1);
+
+    $gfx->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        last if(scalar @cols == 0);
+        foreach my $y (0 .. 0xf) { 
+            last if(scalar @cols == 0);
+            my $t=shift @cols;
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs,$cr);
+            $gfx->fillstroke;
+            $gfx->textlabel($cx+($x-8)*$cs,$cy+($y-8)*$cs,$fnt,7,$t,-color=>'#000',-rotate=>$ang,-hspace=>85,-center=>1);
+        }
+    }
+}
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__
+
+    

@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+use lib '../lib';
+use PDF::API2;
+use PDF::API2::Util;
+
+
+$pdf=PDF::API2->new;
+
+$f1=$pdf->corefont('Helvetica',-encode=>'latin1');
+$f2=$pdf->corefont('Helvetica-Bold',-encode=>'latin1');
+
+$page = $pdf->page;
+$page->mediabox(595,842);
+
+$gfx=$page->gfx;
+$gfx->textlabel(50,700,$f2,20,'Normal Text in Red',-color=>'red');
+$gfx->textlabel(50,600,$f2,20,'Normal Text in Blue Underline in Red+Yellow',
+    -color=>'#0000CC',
+    -rotate=>-45,
+    -hspace=>65,
+    -underline=>[4,[1,'red'],7,[1.5,'yellow'],11,2],
+);
+
+$gfx->textlabel(300,600,$f2,20,'Text Centered',
+    -color=>'#0000CC',
+    -rotate=>45,
+    -center=>1,
+    -underline=>[4,[2,'red']],
+);
+
+$gfx->textlabel(550,600,$f2,20,'Text Right',
+    -color=>'#0000CC',
+    -rotate=>-45,
+    -right=>1,
+    -underline=>[4,[2,'red']],
+);
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__
