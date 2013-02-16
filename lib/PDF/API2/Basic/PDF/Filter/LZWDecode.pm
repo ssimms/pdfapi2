@@ -6,107 +6,67 @@ use base 'PDF::API2::Basic::PDF::Filter::FlateDecode';
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-our @basedict = map {pack("C", $_)} (0 .. 255, 0, 0);
+sub new {
+    my $class = shift();
+    my $self = {};
 
-sub new
-{
-    my ($class) = @_;
-    my ($self) = {};
-
-    $self->{indict} = [@basedict];
-    $self->{bits} = 9;
-    $self->{insize} = $self->{bits};
-    $self->{resetcode}=1<<($self->{insize}-1);
-    $self->{endcode}=$self->{resetcode}+1;
-    $self->{nextcode}=$self->{endcode}+1;
+    $self->{'table'} = [map { pack('C', $_) } (0 .. 255, 0, 0)];
+    $self->{'initial_code_length'} = 9;
+    $self->{'code_length'} = 9;
+    $self->{'clear_table'} = 256;
+    $self->{'eod_marker'} = 257;
+    $self->{'next_code'} = 258;
 
     bless $self, $class;
+    return $self;
 }
 
-sub infilt
-{
-    my ($self, $dat, $last) = @_;
-    my ($num, $cache, $cache_size, $res);
+sub infilt {
+    my ($self, $data, $is_last) = @_;
+    my ($code, $partial_code, $partial_bits, $result);
 
-    while ($dat ne '' || $cache_size > 0)
-    {
-        ($num, $cache, $cache_size) = $self->read_dat(\$dat, $cache, $cache_size, $self->{'insize'});
+    while ($data ne '' or $partial_bits) {
+        ($code, $partial_code, $partial_bits) = $self->read_dat(\$data, $partial_code, $partial_bits, $self->{'code_length'});
+        $self->{'code_length'}++ if $self->{'next_code'} == (1 << $self->{'code_length'});
 
-        # this was a little arkward to comprehand
-        # here is a better version -- fredo
-        $self->{'insize'}++ if($self->{nextcode} == (1<<$self->{'insize'}));
-        if($num==$self->{resetcode}) {
-            $self->{'insize'}=$self->{bits};
-            $self->{nextcode}=$self->{endcode}+1;
+        if ($code == $self->{'clear_table'}) {
+            $self->{'code_length'} = $self->{'initial_code_length'};
+            $self->{'next_code'} = $self->{'eod_marker'} + 1;
             next;
-        } elsif($num==$self->{endcode}) {
+        }
+        elsif ($code == $self->{'eod_marker'}) {
             last;
-        } elsif($num<$self->{resetcode}) {
-            $self->{'indict'}[$self->{nextcode}] = $self->{'indict'}[$num];
-            $res.=$self->{'indict'}[$self->{nextcode}];
-            $self->{nextcode}++;
-        } elsif($num>$self->{endcode}) {
-            $self->{'indict'}[$self->{nextcode}] = $self->{'indict'}[$num];
-            $self->{'indict'}[$self->{nextcode}].= substr($self->{'indict'}[$num+1],0,1);
-            $res.=$self->{'indict'}[$self->{nextcode}];
-            $self->{nextcode}++;
-        } else {
-            die "we shouldn't be here !";
+        }
+        elsif ($code > $self->{'eod_marker'}) {
+            $self->{'table'}[$self->{'next_code'}] = $self->{'table'}[$code];
+            $self->{'table'}[$self->{'next_code'}] .= substr($self->{'table'}[$code + 1], 0, 1);
+            $result .= $self->{'table'}[$self->{'next_code'}];
+            $self->{'next_code'}++;
+        }
+        else {
+            $self->{'table'}[$self->{'next_code'}] = $self->{'table'}[$code];
+            $result .= $self->{'table'}[$self->{'next_code'}];
+            $self->{'next_code'}++;
         }
     }
-    return $res;
+    return $result;
 }
 
-sub infilt2
-{
-    my ($self, $dat, $last) = @_;
-    my ($num, $cache, $cache_size, $res);
+sub read_dat {
+    my ($self, $data_ref, $partial_code, $partial_bits, $code_length) = @_;
+    $partial_bits = 0 unless defined $partial_bits;
 
-    while ($dat ne '' || $cache_size > 0)
-    {
-        ($num, $cache, $cache_size) = $self->read_dat(\$dat, $cache, $cache_size, $self->{'insize'});
-
-        # this was a little arkward to comprehand
-        # here is a better version -- fredo
-        if($num==$self->{resetcode}) {
-            $self->{'insize'}=$self->{bits};
-            $self->{nextcode}=$self->{endcode}+1;
-            next;
-        } elsif($num==$self->{endcode}) {
-            last;
-        } elsif($num<$self->{resetcode}) {
-            $self->{'indict'}[$self->{nextcode}] = $self->{'indict'}[$num];
-            $res.=$self->{'indict'}[$self->{nextcode}];
-            $self->{nextcode}++;
-        } elsif($num>$self->{endcode}) {
-            $self->{'indict'}[$self->{nextcode}] = $self->{'indict'}[$num];
-            $self->{'indict'}[$self->{nextcode}].= substr($self->{'indict'}[$num+1],0,1);
-            $res.=$self->{'indict'}[$self->{nextcode}];
-            $self->{nextcode}++;
-        } else {
-            die "we shouldn't be here !";
-        }
-        $self->{'insize'}++ if($self->{nextcode} == (1<<$self->{'insize'}));
-    }
-    return $res;
-}
-
-sub read_dat
-{
-    my ($self, $rdat, $cache, $size, $len) = @_;
-    my ($res);
-
-    while ($size < $len)
-    {
-        $cache = ($cache << 8) + unpack("C", $$rdat);
-        substr($$rdat, 0, 1) = '';
-        $size += 8;
+    while ($partial_bits < $code_length) {
+        $partial_code = ($partial_code << 8) + unpack('C', $$data_ref);
+        substr($$data_ref, 0, 1) = '';
+        $partial_bits += 8;
     }
 
-    $res = $cache >> ($size - $len);
-    $cache &= (1 << ($size - $len)) - 1;
-    $size -= $len;
-    ($res, $cache, $size);
+    my $code = $partial_code >> ($partial_bits - $code_length);
+    $partial_code &= (1 << ($partial_bits - $code_length)) - 1;
+    $partial_bits -= $code_length;
+
+    return ($code, $partial_code, $partial_bits);
 }
 
 1;
