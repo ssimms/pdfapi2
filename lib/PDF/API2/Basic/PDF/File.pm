@@ -245,9 +245,9 @@ sub open {
     foreach my $offset (1..64) {
     	$fh->seek($end - 16 * $offset, 0);
     	$fh->read($buffer, 16 * $offset);
-    	last if $buffer =~ m/startxref($cr|\s*)\d+($cr|\s*)\%\%eof.*?/oi;
+    	last if $buffer =~ m/startxref($cr|\s*)\d+($cr|\s*)\%\%eof.*?/i;
     }
-    unless ($buffer =~ m/startxref[^\d]+([0-9]+)($cr|\s*)\%\%eof.*?/oi) {
+    unless ($buffer =~ m/startxref[^\d]+([0-9]+)($cr|\s*)\%\%eof.*?/i) {
         die "Malformed PDF file $filename";
     }
     my $xpos = $1;
@@ -341,7 +341,7 @@ sub append_file {
     }
     $tdict->{'Size'} = $self->{'Size'};
 
-    foreach my $key (grep { $_ !~ m/^\s/o } keys %$self) {
+    foreach my $key (grep { $_ !~ m/^\s/ } keys %$self) {
         $tdict->{$key} = $self->{$key} unless defined $tdict->{$key};
     }
 
@@ -417,7 +417,7 @@ sub close_file {
     $tdict->{'Size'} = $self->{'Size'} || PDFNum(1);
     $tdict->{'Prev'} = PDFNum($self->{' loc'}) if $self->{' loc'};
     if ($self->{' update'}) {
-        foreach my $key (grep ($_ !~ m/^[\s\-]/o, keys %$self)) {
+        foreach my $key (grep ($_ !~ m/^[\s\-]/, keys %$self)) {
             $tdict->{$key} = $self->{$key} unless defined $tdict->{$key};
         }
 
@@ -453,34 +453,34 @@ sub readval {
     $str = update($fh, $str);
 
     # Dictionary
-    if ($str =~ m/^<</so) {
+    if ($str =~ m/^<</s) {
         $str = substr ($str, 2);
         $str = update($fh, $str);
         $result = PDFDict();
 
-        while ($str !~ m/^>>/o) {
-            if ($str =~ s|^/($reg_char+)||o) {
+        while ($str !~ m/^>>/) {
+            if ($str =~ s|^/($reg_char+)||) {
                 my $key = PDF::API2::Basic::PDF::Name::name_to_string($1, $self);
                 ($value, $str) = $self->readval($str, %opts);
                 $result->{$key} = $value;
             } 
-            elsif ($str =~ s|^/$ws_char+||o) { 
+            elsif ($str =~ s|^/$ws_char+||) { 
                 # fixes a broken key problem of acrobat. -- fredo
                 ($value, $str) = $self->readval($str, %opts);
                 $result->{'null'} = $value;
             } 
-            elsif ($str =~ s|^//|/|o) { 
+            elsif ($str =~ s|^//|/|) { 
                 # fixes again a broken key problem of illustrator/enfocus. -- fredo
                 ($value, $str) = $self->readval($str, %opts);
                 $result->{'null'} = $value;
             }
             $str = update($fh, $str); # thanks gareth.jones@stud.man.ac.uk
         }
-        $str =~ s/^>>//o;
+        $str =~ s/^>>//;
         $str = update($fh, $str);
         # streams can't be followed by a lone carriage-return.
         # fredo: yes they can !!! -- use the MacOS Luke.
-        if (($str =~ s/^stream(?:(?:\015\012)|\012|\015)//o) and ($result->{'Length'}->val != 0)) {   # stream
+        if (($str =~ s/^stream(?:(?:\015\012)|\012|\015)//) and ($result->{'Length'}->val != 0)) {   # stream
             my $length = $result->{'Length'}->val;
             $result->{' streamsrc'} = $fh;
             $result->{' streamloc'} = $fh->tell - length($str);
@@ -509,10 +509,10 @@ sub readval {
     }
 
     # Indirect Object
-    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+R/so) {
+    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+R/s) {
         my $num = $1;
         $value = $2;
-        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+R//so;
+        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+R//s;
         unless ($result = $self->test_obj($num, $value)) {
             $result = PDF::API2::Basic::PDF::Objind->new();
             $result->{' objnum'} = $num;
@@ -526,11 +526,11 @@ sub readval {
     } 
 
     # Object
-    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj/so) {
+    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj/s) {
         my $obj;
         my $num = $1;
         $value = $2;
-        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj//so;
+        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj//s;
         ($obj, $str) = $self->readval($str, %opts, 'objnum' => $num, 'objgen' => $value);
         if ($result = $self->test_obj($num, $value)) {
             $result->merge($obj);
@@ -541,18 +541,18 @@ sub readval {
             $result->{' realised'} = 1;
         }
         $str = update($fh, $str);       # thanks to kundrat@kundrat.sk
-        $str =~ s/^endobj//o;
+        $str =~ s/^endobj//;
     }
 
     # Name
-    elsif ($str =~ m|^/($reg_char+)|so) {
+    elsif ($str =~ m|^/($reg_char+)|s) {
         $value = $1;
-        $str =~ s|^/($reg_char+)||so;
+        $str =~ s|^/($reg_char+)||s;
         $result = PDF::API2::Basic::PDF::Name->from_pdf($value, $self);
     } 
 
     # Literal String
-    elsif ($str =~ m/^\(/o) {
+    elsif ($str =~ m/^\(/) {
         # We now need to find an unbalanced, unescaped right-paren.
         # This can't be done with a regex.
         my $value = '(';
@@ -561,26 +561,26 @@ sub readval {
         my $nested_level = 1;
         while (1) {
             # Ignore everything up to the first escaped or parenthesis character
-            if ($str =~ /^([^\\()]+)(.*)/so) {
+            if ($str =~ /^([^\\()]+)(.*)/s) {
                 $value .= $1;
                 $str = $2;
             }
 
             # Ignore escaped parentheses
-            if ($str =~ /^(\\[()])/o) {
+            if ($str =~ /^(\\[()])/) {
                 $value .= $1;
                 $str = substr($str, 2);
             }
 
             # Left parenthesis: increase nesting
-            elsif ($str =~ /^\(/o) {
+            elsif ($str =~ /^\(/) {
                 $value .= '(';
                 $str = substr($str, 1);
                 $nested_level++;
             }
 
             # Right parenthesis: decrease nesting
-            elsif ($str =~ /^\)/o) {
+            elsif ($str =~ /^\)/) {
                 $value .= ')';
                 $str = substr($str, 1);
                 $nested_level--;
@@ -588,7 +588,7 @@ sub readval {
             }
 
             # Other escaped character
-            elsif ($str =~ /^(\\[^()])/o) {
+            elsif ($str =~ /^(\\[^()])/) {
                 $value .= $1;
                 $str = substr($str, 2);
             }
@@ -606,43 +606,43 @@ sub readval {
     } 
 
     # Hex String
-    elsif ($str =~ m/^</o) {
-        $str =~ s/^<//o;
+    elsif ($str =~ m/^</) {
+        $str =~ s/^<//;
         $fh->read($str, 255, length($str)) while (0 > index($str, '>'));
-        ($value, $str) = ($str =~ /^(.*?)>(.*?)$/so);
+        ($value, $str) = ($str =~ /^(.*?)>(.*?)$/s);
         $result = PDF::API2::Basic::PDF::String->from_pdf('<' . $value . '>');
     } 
 
     # Array
-    elsif ($str =~ m/^\[/o) {
-        $str =~ s/^\[//o;
+    elsif ($str =~ m/^\[/) {
+        $str =~ s/^\[//;
         $str = update($fh, $str);
         $result = PDFArray();
-        while ($str !~ m/^\]/o) {
+        while ($str !~ m/^\]/) {
             ($value, $str) = $self->readval($str, %opts);
             $result->add_elements($value);
             $str = update($fh, $str);   # str might just be exhausted!
         }
-        $str =~ s/^\]//o;
+        $str =~ s/^\]//;
     } 
 
     # Boolean
-    elsif ($str =~ m/^(true|false)$irreg_char/o) {
+    elsif ($str =~ m/^(true|false)$irreg_char/) {
         $value = $1;
-        $str =~ s/^(?:true|false)//o;
+        $str =~ s/^(?:true|false)//;
         $result = PDF::API2::Basic::PDF::Bool->from_pdf($value);
     } 
 
     # Number
-    elsif ($str =~ m/^([+-.0-9]+)$irreg_char/o) {
+    elsif ($str =~ m/^([+-.0-9]+)$irreg_char/) {
         $value = $1;
-        $str =~ s/^([+-.0-9]+)//o;
+        $str =~ s/^([+-.0-9]+)//;
         $result = PDF::API2::Basic::PDF::Number->from_pdf($value);
     } 
 
     # Null
-    elsif ($str =~ m/^null$irreg_char/o) {
-        $str =~ s/^null//o;
+    elsif ($str =~ m/^null$irreg_char/) {
+        $str =~ s/^null//;
         $result = PDF::API2::Basic::PDF::Null->new;
     } 
 
@@ -650,7 +650,7 @@ sub readval {
         die "Can't parse `$str' near " . ($fh->tell()) . " length " . length($str) . ".";
     }
 
-    $str =~ s/^$ws_char*//os;
+    $str =~ s/^$ws_char*//s;
     return ($result, $str);
 }
 
@@ -871,7 +871,7 @@ sub copy {
     my ($self, $out, $filter) = @_;
     my ($obj, $minl, $mini, $ming);
 
-    foreach my $key (grep { not m/^[\s\-]/o } keys %$self) {
+    foreach my $key (grep { not m/^[\s\-]/ } keys %$self) {
         $out->{$key} = $self->{$key} unless defined $out->{$key};
     }
 
@@ -957,21 +957,21 @@ sub update {
         # we are inside a (possible binary) stream
         # so we fetch data till we see an 'endstream'
         # -- fredo/2004-09-03
-        while ($str !~ m/endstream/o and not $fh->eof()) {
+        while ($str !~ m/endstream/ and not $fh->eof()) {
             print STDERR 'fpos=' . tell($fh) . ' strlen=' . length($str) . "\n" if $readDebug;
             $fh->read($str, 314, length($str));
         }
     }
     else {
-        $str =~ s/^$ws_char*//o;
-        while ($str !~ m/$cr/o and not $fh->eof()) {
+        $str =~ s/^$ws_char*//;
+        while ($str !~ m/$cr/ and not $fh->eof()) {
             print STDERR 'fpos=' . tell($fh) . ' strlen=' . length($str) . "\n" if $readDebug;
             $fh->read($str, 314, length($str));
             $str =~ s/^$ws_char*//so;
         }
-        while ($str =~ m/^\%/o) { # restructured by fredo/2003-03-23
+        while ($str =~ m/^\%/) { # restructured by fredo/2003-03-23
             print STDERR 'fpos=' . tell($fh) . ' strlen=' . length($str) . "\n" if $readDebug;
-            $fh->read($str, 314, length($str)) while ($str !~ m/$cr/o and not $fh->eof());
+            $fh->read($str, 314, length($str)) while ($str !~ m/$cr/ and not $fh->eof());
             $str =~ s/^\%[^\015\012]+$ws_char*//so; # fixed for reportlab -- fredo
         }
     }
@@ -1034,13 +1034,13 @@ sub readxrtr {
     
     ## seams that some products calculate wrong prev entries (short)
     ## so we seek ahead to find one -- fredo; save for now
-    #while($buf !~ m/^xref$cr/oi && !eof($fh))
+    #while($buf !~ m/^xref$cr/i && !eof($fh))
     #{
-    #    $buf =~ s/^(\s+|\S+|.)//oi;
+    #    $buf =~ s/^(\s+|\S+|.)//i;
     #    $buf=update($fh,$buf);
     #}
     
-    unless ($buf =~ m/^xref$cr/oi) { 
+    unless ($buf =~ m/^xref$cr/i) { 
         if ($buf =~ m/^\d+\s+\d+\s+obj/i) {
             die "The PDF file uses a cross-reference stream, which is not yet supported (see Known Issues in the PDF::API2 documentation)";
         }
@@ -1048,27 +1048,27 @@ sub readxrtr {
             die "Malformed xref in PDF file $self->{' fname'}";
         }
     }
-    $buf =~ s/^xref$cr//oi;
+    $buf =~ s/^xref$cr//i;
 
     my $xlist = {};
-    while ($buf =~ m/^([0-9]+)$ws_char+([0-9]+)$cr(.*?)$/so) {
+    while ($buf =~ m/^([0-9]+)$ws_char+([0-9]+)$cr(.*?)$/s) {
         $xmin = $1;
         $xnum = $2;
         $buf  = $3;
         $xdiff = length($buf);
 
         $fh->read($buf, 20 * $xnum - $xdiff + 15, $xdiff);
-        while ($xnum-- > 0 and $buf =~ s/^0*([0-9]*)$ws_char+0*([0-9]+)$ws_char+([nf])$cr//o) { 
+        while ($xnum-- > 0 and $buf =~ s/^0*([0-9]*)$ws_char+0*([0-9]+)$ws_char+([nf])$cr//) { 
             $xlist->{$xmin} = [$1, $2, $3] unless exists $xlist->{$xmin};
             $xmin++;
         }
     }
 
-    if ($buf !~ /^\s*trailer\b/oi) {
+    if ($buf !~ /^\s*trailer\b/i) {
         die "Malformed trailer in PDF file $self->{' fname'} at " . ($fh->tell - length($buf));
     }
 
-    $buf =~ s/^\s*trailer\b//oi;
+    $buf =~ s/^\s*trailer\b//i;
 
     ($tdict, $buf) = $self->readval($buf);
     $tdict->{' loc'} = $xpos;
