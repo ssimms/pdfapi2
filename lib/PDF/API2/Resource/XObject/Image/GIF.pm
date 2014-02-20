@@ -87,7 +87,7 @@ sub deGIF {
     #    print STDERR "ptr=$ptr,tag=$tag,bits=$bits,next=$nextcode\n";
     #    print STDERR "tag to large\n" if($tag>$nextcode);
         $ptr+=$bits;
-        $bits++ if($nextcode == (1<<$bits));
+        $bits++ if $nextcode == 1<<$bits and $bits < 12;
         if($tag==$resetcode) {
             $bits=$ibits;
             $nextcode=$endcode+1;
