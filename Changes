@@ -2317,7 +2317,7 @@ generated from the CVS logs.
 2004-04-07 12:50  fredo
 
 	* lib/PDF/API2/Resource/ColorSpace/Separation.pm: fixed RGB
-	  semantics to match CMYK `tint´ behaviour
+	  semantics to match CMYK "tint" behaviour
 
 2004-04-07 12:49  fredo
 

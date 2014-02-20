@@ -21,7 +21,7 @@ PDF::API2::Resource::ColorSpace::Indexed::ACTFile
 
 Returns a new colorspace object created from an adobe color table file (ACT/8BCT).
 See
-Adobe Photoshop® 6.0 --
+Adobe Photoshop(R) 6.0 --
 File Formats Specification Version 6.0 Release 2,
 November 2000
 for details.
