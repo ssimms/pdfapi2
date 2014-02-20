@@ -13,6 +13,9 @@
     - The RunLengthDecode filter didn't actually work.  Its code has
       been rewritten and now passes basic encoding and decoding tests.
 
+    - Fix Code128 barcode switching from Code C to Code B in certain
+      cases (reported by Doru Petrescu).
+
 
 2.020     2013-01-20
 
