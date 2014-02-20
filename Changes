@@ -7,6 +7,9 @@
       overflow due to an inefficient regex (reported by Sergei
       Fetisov).
 
+    - [RT #91822] Fix compression of GIF images to ensure that output
+      codes don't exceed 12 bits (reported by Vadim Repin).
+
     - The RunLengthDecode filter didn't actually work.  Its code has
       been rewritten and now passes basic encoding and decoding tests.
 
