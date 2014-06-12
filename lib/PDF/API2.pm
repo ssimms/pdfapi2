@@ -137,46 +137,25 @@ sub open {
     die "File '$file' does not exist." unless -f $file;
     die "File '$file' is not readable." unless -r $file;
 
-    my $self = {};
-    bless $self, $class;
-    $self->default('compression', 1);
-    $self->default('subset', 1);
-    $self->default('update', 1);
-    foreach my $parameter (keys %options) {
-        $self->default($parameter, $options{$parameter});
-    }
-    
-    my $filestr;
-    $self->{'content_ref'} = \$filestr;
+    my $content;
     my $scalar_fh = FileHandle->new();
-    CORE::open($scalar_fh, '+<', \$filestr) or die "Can't begin scalar IO";
+    CORE::open($scalar_fh, '+<', \$content) or die "Can't begin scalar IO";
     binmode $scalar_fh, ':raw';
 
     my $disk_fh = FileHandle->new();
     CORE::open($disk_fh, '<', $file);
     binmode $disk_fh, ':raw';
     $disk_fh->seek(0, 0);
+    my $data;
     while (not $disk_fh->eof()) {
-        $disk_fh->read($in, 512);
-        $scalar_fh->print($in);
+        $disk_fh->read($data, 512);
+        $scalar_fh->print($data);
     }
     $disk_fh->close();
     $scalar_fh->seek(0, 0);
 
-    $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($scalar_fh, 1);
+    my $self = $class->openScalar($content, %options);
     $self->{'pdf'}->{' fname'} = $file;
-    $self->{'pdf'}->{'Root'}->realise();
-    $self->{'pages'} = $self->{pdf}->{'Root'}->{'Pages'}->realise();
-    $self->{'pdf'}->{' version'} = 3;
-    $self->{'pdf'}->{' apipagecount'} = 0;
-    my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
-    $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
-    $self->{'catalog'} = $self->{'pdf'}->{'Root'};
-    $self->{'reopened'} = 1;
-    $self->{'time'} = '_' . pdfkey(time());
-    $self->{'forcecompress'} = $^O eq 'os390' ? 0 : 1;
-    $self->{'fonts'} = {};
-    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
     return $self;
 }
@@ -199,7 +178,7 @@ B<Example:>
 =cut
 
 sub openScalar {
-    my ($class, $file, %options) = @_;
+    my ($class, $content, %options) = @_;
 
     my $self = {};
     bless $self, $class;
@@ -210,9 +189,9 @@ sub openScalar {
         $self->default($parameter, $options{$parameter});
     }
 
-    $self->{'content_ref'} = \$file;
+    $self->{'content_ref'} = \$content;
     my $fh;
-    CORE::open($fh, '+<', \$file) or die "Can't begin scalar IO";
+    CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
 
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($fh, 1);
     $self->{'pdf'}->{'Root'}->realise();
