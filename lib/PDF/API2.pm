@@ -522,14 +522,17 @@ enables importing of annotations (B<*EXPERIMENTAL*>).
 =cut
 
 sub default {
-    my ($self,$parameter,$var)=@_;
-    $parameter=~s/[^a-zA-Z\d]//g;
-    $parameter=lc($parameter);
-    my $temp=$self->{$parameter};
-    if(defined $var) {
-        $self->{$parameter}=$var;
+    my ($self, $parameter, $value) = @_;
+
+    # Parameter names may consist of lowercase letters, numbers, and underscores
+    $parameter = lc $parameter;
+    $parameter =~ s/[^a-z\d_]//g;
+
+    my $previous_value = $self->{$parameter};
+    if (defined $value) {
+        $self->{$parameter} = $value;
     }
-    return($temp);
+    return $previous_value;
 }
 
 =item $bool = $pdf->isEncrypted()
