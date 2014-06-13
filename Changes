@@ -17,6 +17,12 @@
       that have extraneous spaces on the first line (reported by
       Abhinav Kaushik).
 
+    - [RT #94505] For Code128 barcodes, the initial character set is
+      now optional (defaults to B or C depending on the content to be
+      encoded).  The initial character set can be passed as a capital
+      letter, and the program will die if an invalid character set is
+      requested (requested by Andrea Nall).
+
 
 2.021     2014-02-20
 
