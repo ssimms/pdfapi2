@@ -118,7 +118,7 @@ sub tounicodemap {
     $cmap.=qq|   /Supplement 0\n|;
     $cmap.=qq|>> def\n|;
     $cmap.=sprintf(qq|/CMapName /pdfapi2-%s+0 def\n|,$self->name);
-    if(UNIVERSAL::can($self,'uniByCId') && UNIVERSAL::can($self,'glyphNum')) {
+    if($self->can('uniByCId') and $self->can('glyphNum')) {
         # this is a type0 font
         $cmap.=sprintf(qq|1 begincodespacerange <0000> <%04X> endcodespacerange\n|,$self->glyphNum-1);
         for(my $j=0;$j<$self->glyphNum;$j++) {

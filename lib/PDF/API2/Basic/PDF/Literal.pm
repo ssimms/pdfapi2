@@ -9,6 +9,7 @@ use strict;
 
 use PDF::API2::Basic::PDF::Filter;
 use PDF::API2::Basic::PDF::Name;
+use Scalar::Util qw(blessed);
 
 no warnings qw[ deprecated recursion uninitialized ];
 
@@ -58,7 +59,7 @@ sub outobjdeep
             {
                 $fh->print('<<'.join(' ', map { '/'.PDF::API2::Basic::PDF::Name::string_to_name($_).' '.$self->{$k}->{$_} } sort keys %{$self->{$k}})." >>\n");
             } 
-            elsif(UNIVERSAL::can($self->{$k},'outobj')) 
+            elsif(blessed($self->{$k}) and $self->{$k}->can('outobj'))
             {
                 $self->{$k}->outobj($fh, $pdf, %opts);
                 $fh->print("\n");

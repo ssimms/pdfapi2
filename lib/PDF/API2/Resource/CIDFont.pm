@@ -161,7 +161,7 @@ sub cidsByStr
     {
         $text=$self->cidsByUtf(decode($self->data->{encode},$text));
     } 
-    elsif(!is_utf8($text) && UNIVERSAL::can($self,'issymbol') && $self->issymbol && $self->data->{decode} eq 'ident') 
+    elsif(!is_utf8($text) && $self->can('issymbol') && $self->issymbol && $self->data->{decode} eq 'ident') 
     {
         $text=pack('U*',(map { $_+0xf000 } unpack('C*',$text)));
         $text=$self->cidsByUtf($text);
@@ -227,7 +227,7 @@ sub text
 sub text_cid 
 {
     my ($self,$text,$size)=@_;
-    if(UNIVERSAL::can($self,'fontfile'))
+    if($self->can('fontfile'))
     {
         foreach my $g (unpack('n*',$text)) 
         {
@@ -248,7 +248,7 @@ sub text_cid
 sub text_cid_kern 
 {
     my ($self,$text,$size,$ident)=@_;
-    if(UNIVERSAL::can($self,'fontfile'))
+    if($self->can('fontfile'))
     {
         foreach my $g (unpack('n*',$text)) 
         {

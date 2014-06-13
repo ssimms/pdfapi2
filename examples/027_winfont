@@ -45,7 +45,7 @@ foreach my $k (sort keys %wxf)
         }
     }
 
-    if(UNIVERSAL::can($xf,'uniByCId') && UNIVERSAL::can($xf,'glyphNum')) 
+    if($xf->can('uniByCId') and $xf->can('glyphNum'))
     {
         my @cids=(0 .. $xf->glyphNum-1);
         my @fbbx = $xf->fontbbox;
