@@ -96,7 +96,6 @@ sub new {
     my $self={};
     bless($self,$class);
     $self->{pdf}=PDF::API2::Basic::PDF::File->new();
-    $self->{time}='_'.pdfkey(time());
 
     $self->{pdf}->{' version'} = 4;
     $self->{pages} = PDF::API2::Basic::PDF::Pages->new($self->{pdf});
@@ -203,7 +202,6 @@ sub open_scalar {
     $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     $self->{'reopened'} = 1;
-    $self->{'time'} = '_' . pdfkey(time());
     $self->{'forcecompress'} = $^O eq 'os390' ? 0 : 1;
     $self->{'fonts'} = {};
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
