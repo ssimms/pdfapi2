@@ -11,7 +11,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::XObject::Image
+PDF::API2::Resource::XObject::Image - Base class for external raster image objects
 
 =head1 METHODS
 
@@ -19,7 +19,7 @@ PDF::API2::Resource::XObject::Image
 
 =item $res = PDF::API2::Resource::XObject::Image->new $pdf, $name
 
-Returns a image-resource object. base class for all types of bitmap-images.
+Returns a image-resource object.
 
 =cut
 
@@ -148,14 +148,8 @@ sub outobjdeep {
     $self->SUPER::outobjdeep(@opts);
 }
 
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-Alfred Reibenschuh
-
 =cut
+
+1;

@@ -13,7 +13,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::XObject::Image::TIFF
+PDF::API2::Resource::XObject::Image::TIFF - TIFF image support
 
 =head1 METHODS
 
@@ -603,14 +603,8 @@ sub readTags {
   }
 }
 
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-Alfred Reibenschuh
-
 =cut
+
+1;

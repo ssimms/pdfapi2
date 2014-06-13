@@ -9,7 +9,7 @@ use warnings;
 
 =head1 NAME
 
-PDF::API2::Resource::XObject::Form::BarCode::code128
+PDF::API2::Resource::XObject::Form::BarCode::code128 - Code 128 and EAN-128 barcode support 
 
 =head1 METHODS
 

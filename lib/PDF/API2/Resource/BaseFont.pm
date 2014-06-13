@@ -13,7 +13,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::BaseFont
+PDF::API2::Resource::BaseFont - Base class for font resources
 
 =head1 METHODS
 
@@ -786,14 +786,8 @@ sub text
 
 sub isvirtual { return(0); }
 
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-Alfred Reibenschuh.
-
 =cut
+
+1;

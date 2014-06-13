@@ -11,7 +11,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource
+PDF::API2::Resource - Base class for PDF resources
 
 =head1 METHODS
 
@@ -80,14 +80,8 @@ sub outobjdeep {
     $self->SUPER::outobjdeep($fh, $pdf, %opts);
 }
 
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-Alfred Reibenschuh
-
 =cut
+
+1;

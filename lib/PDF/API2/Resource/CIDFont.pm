@@ -13,7 +13,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::CIDFont
+PDF::API2::Resource::CIDFont - Base class for CID fonts
 
 =head1 METHODS
 
@@ -360,16 +360,8 @@ sub outobjdeep
     $self->SUPER::outobjdeep($fh, $pdf, %opts);
 }
 
-
-1;
-
-__END__
-
 =back
-
-=head1 AUTHOR
-
-alfred reibenschuh
 
 =cut
 
+1;
