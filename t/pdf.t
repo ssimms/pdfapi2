@@ -14,7 +14,7 @@ is($info{'Producer'}, 'PDF::API2 Test Suite', 'Check info string');
 my $gfx = $pdf->page->gfx();
 $gfx->fillcolor('blue');
 
-my $new = PDF::API2->openScalar($pdf->stringify());
+my $new = PDF::API2->open_scalar($pdf->stringify());
 %info = $new->info();
 is($info{'Producer'}, 'PDF::API2 Test Suite', 'Check info string after save and reload');
 
@@ -33,7 +33,7 @@ like($string, qr/0 0 1 rg/,
 
 # Add a second page with a different page size
 
-$new = PDF::API2->openScalar($string);
+$new = PDF::API2->open_scalar($string);
 $pdf->{'forcecompress'} = 0;
 my $page = $pdf->page();
 my $font = $pdf->corefont('Helvetica');
@@ -41,7 +41,7 @@ $page->mediabox(0, 0, 72, 144);
 my $text = $page->text();
 $text->font($font, 12);
 $text->text('This is a test');
-$pdf = PDF::API2->openScalar($pdf->stringify());
+$pdf = PDF::API2->open_scalar($pdf->stringify());
 $form = $new->importPageIntoForm($pdf, 2);
 $form->{'-docompress'} = 0;
 delete $form->{'Filter'};
