@@ -3,6 +3,9 @@
     - Added $pdf->version() get/set method.  When opening an existing
       PDF, the existing version number will now be retained.
 
+    - Renamed openScalar to open_scalar in PDF::API2.  The old name
+      still works but should be considered deprecated.
+
 
 2.021     2014-02-20
 

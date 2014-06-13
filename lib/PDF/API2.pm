@@ -155,13 +155,13 @@ sub open {
     $disk_fh->close();
     $scalar_fh->seek(0, 0);
 
-    my $self = $class->openScalar($content, %options);
+    my $self = $class->open_scalar($content, %options);
     $self->{'pdf'}->{' fname'} = $file;
 
     return $self;
 }
 
-=item $pdf = PDF::API2->openScalar($pdf_string)
+=item $pdf = PDF::API2->open_scalar($pdf_string)
 
 Opens a PDF contained in a string.
 
@@ -172,13 +172,16 @@ B<Example:>
     undef $/;  # Read the whole file at once
     $pdf_string = <$fh>;
 
-    $pdf = PDF::API2->openScalar($pdf_string);
+    $pdf = PDF::API2->open_scalar($pdf_string);
     ...
     $pdf->saveas('our/new.pdf');
 
 =cut
 
-sub openScalar {
+# Deprecated (renamed)
+sub openScalar { return open_scalar(@_); }
+
+sub open_scalar {
     my ($class, $content, %options) = @_;
 
     my $self = {};

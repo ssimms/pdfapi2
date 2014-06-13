@@ -37,7 +37,7 @@ $gfx->textlabel(50,780,$f1,20,"Hello World! (3)");
 $str=$pdf->stringify();
 $pdf->end();
 
-$pdf=PDF::API2->openScalar($str);
+$pdf=PDF::API2->open_scalar($str);
 $f1=$pdf->corefont('Verdana');
 
 $page = $pdf->page;
