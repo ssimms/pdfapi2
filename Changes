@@ -10,6 +10,10 @@
       that it doesn't always lead to a crash (reported by Dietrich
       Streifert).
 
+    - [RT #47974] Accept malformed xref subsections (with a warning)
+      that have extraneous spaces on the first line (reported by
+      Abhinav Kaushik).
+
 
 2.021     2014-02-20
 

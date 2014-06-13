@@ -1052,10 +1052,15 @@ sub readxrtr {
     $buf =~ s/^xref$cr//i;
 
     my $xlist = {};
-    while ($buf =~ m/^([0-9]+)$ws_char+([0-9]+)$cr(.*?)$/s) {
+    while ($buf =~ m/^$ws_char*([0-9]+)$ws_char+([0-9]+)$ws_char*$cr(.*?)$/s) {
+        my $old_buf = $buf;
         $xmin = $1;
         $xnum = $2;
         $buf  = $3;
+        unless ($old_buf =~ /^[0-9]+ [0-9]+$cr/) {
+            # See PDF 1.7 section 7.5.4: Cross-Reference Table
+            warn q{Malformed xref in PDF file: subsection shall begin with a line containing two numbers separated by a SPACE (20h)};
+        }
         $xdiff = length($buf);
 
         $fh->read($buf, 20 * $xnum - $xdiff + 15, $xdiff);
