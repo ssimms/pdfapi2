@@ -186,9 +186,6 @@ sub open_scalar {
 
     my $self = {};
     bless $self, $class;
-    $self->default('compression', 1);
-    $self->default('subset', 1);
-    $self->default('update', 1);
     foreach my $parameter (keys %options) {
         $self->default($parameter, $options{$parameter});
     }
