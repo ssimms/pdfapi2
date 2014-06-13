@@ -71,6 +71,22 @@ sub new {
     return $self;
 }
 
+=head2 $type = $d->type($type)
+
+Get/Set the standard Type key.  It can be passed, and will return, a text value rather than a Name object.
+
+=cut
+
+sub type {
+    my $self = shift();
+    if (scalar @_) {
+        my $type = shift();
+        $self->{'Type'} = ref($type) ? $type : PDF::API2::Basic::PDF::Name->new($type);
+    }
+    return unless exists $self->{'Type'};
+    return $self->{'Type'}->val();
+}
+
 =head2 $d->outobjdeep($fh)
 
 Outputs the contents of the dictionary to a PDF file. This is a recursive call.
