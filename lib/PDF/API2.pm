@@ -463,30 +463,30 @@ sub preferences {
         $args{'-fit'} = 1 unless scalar keys %args;
 
         if (defined $args{'-fit'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('Fit'));
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('Fit'));
         }
         elsif (defined $args{'-fith'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitH'), PDFNum($args{'-fith'}));
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('FitH'), PDFNum($args{'-fith'}));
         }
         elsif (defined $args{'-fitb'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitB'));
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('FitB'));
         }
         elsif (defined $args{'-fitbh'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitBH'), PDFNum($args{'-fitbh'}));
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('FitBH'), PDFNum($args{'-fitbh'}));
         }
         elsif (defined $args{'-fitv'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitV'), PDFNum($args{'-fitv'}));
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('FitV'), PDFNum($args{'-fitv'}));
         }
         elsif (defined $args{'-fitbv'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitBV'), PDFNum($args{'-fitbv'}));
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('FitBV'), PDFNum($args{'-fitbv'}));
         }
         elsif (defined $args{'-fitr'}) {
             croak 'insufficient parameters to -fitr => []' unless scalar @{$args{'-fitr'}} == 4;
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitR'), map { PDFNum($_) } @{$args{'-fitr'}});
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('FitR'), map { PDFNum($_) } @{$args{'-fitr'}});
         }
         elsif (defined $args{'-xyz'}) {
             croak 'insufficient parameters to -xyz => []' unless scalar @{$args{'-xyz'}} == 3;
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('XYZ'), map { PDFNum($_) } @{$args{'-xyz'}});
+            $self->{'catalog'}->{'OpenAction'} = PDFArray(PDFNum($page), PDFName('XYZ'), map { PDFNum($_) } @{$args{'-xyz'}});
         }
     }
     $self->{'pdf'}->out_obj($self->{'catalog'});
