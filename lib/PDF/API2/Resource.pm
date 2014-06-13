@@ -4,10 +4,11 @@ package PDF::API2::Resource;
 
 use base 'PDF::API2::Basic::PDF::Dict';
 
-use PDF::API2::Util;
-use PDF::API2::Basic::PDF::Utils;
+use strict;
+use warnings;
 
-no warnings qw[ deprecated recursion uninitialized ];
+use PDF::API2::Util qw(pdfkey);
+use PDF::API2::Basic::PDF::Utils; # PDFName
 
 =head1 NAME
 
@@ -17,67 +18,59 @@ PDF::API2::Resource - Base class for PDF resources
 
 =over
 
-=item $res = PDF::API2::Resource->new $pdf, $name
+=item $resource = PDF::API2::Resource->new($pdf, $name)
 
 Returns a resource object.
 
 =cut
 
 sub new {
-    my ($class,$pdf,$name) = @_;
-    my $self;
+    my ($class, $pdf, $name) = @_;
+    $class = ref($class) if ref($class);
 
-    $class = ref $class if ref $class;
+    my $self = $class->SUPER::new();
 
-    $self=$class->SUPER::new();
-    $pdf->new_obj($self) unless($self->is_obj($pdf));
+    # Instead of having a separate new_api call, check the type here.
+    if ($pdf->isa('PDF::API2')) {
+        $self->{' api'} = $pdf;
+        $pdf = $pdf->{'pdf'};
+    }
 
-    $self->name($name || pdfkey());
+    $pdf->new_obj($self) unless $self->is_obj($pdf);
 
-    $self->{' apipdf'}=$pdf;
+    $self->name($name or pdfkey());
 
-    return($self);
+    $self->{' apipdf'} = $pdf;
+
+    return $self;
 }
 
-=item $res = PDF::API2::Resource->new_api $api, $name
+# Deprecated (rolled into new)
+sub new_api { return new(@_); }
 
-Returns a resource object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
+=item $name = $resource->name()
+=item $resource->name($name)
 
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
-=item $name = $res->name $name
-
-Returns or sets the Name of the resource.
+Get or set the name of the resource.
 
 =cut
 
 sub name {
-    my $self=shift @_;
-    if(scalar @_ >0 && defined($_[0])) {
-        $self->{Name}=PDFName($_[0]);
+    my $self = shift @_;
+    if (scalar @_ and defined $_[0]) {
+        $self->{'Name'} = PDFName($_[0]);
     }
-    return($self->{Name}->val);
+    return $self->{'Name'}->val();
 }
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf, %options) = @_;
 
-    return $self->SUPER::outobjdeep($fh, $pdf) if defined $opts{'passthru'};
-    foreach my $k (qw/ api apipdf /) {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
-    }
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    return $self->SUPER::outobjdeep($fh, $pdf) if defined $options{'passthru'};
+
+    delete $self->{' api'};
+    delete $self->{' apipdf'};
+    $self->SUPER::outobjdeep($fh, $pdf, %options);
 }
 
 =back
