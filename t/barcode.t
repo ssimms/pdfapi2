@@ -14,7 +14,7 @@ my $xo_codabar = $pdf->xo_codabar();
 isa_ok($xo_codabar, q{PDF::API2::Resource::XObject::Form::BarCode::codabar},
        q{xo_codabar loads});
 
-my $xo_code128 = $pdf->xo_code128();
+my $xo_code128 = $pdf->xo_code128(-code => 0);
 isa_ok($xo_code128, q{PDF::API2::Resource::XObject::Form::BarCode::code128},
        q{xo_code128 loads});
 

@@ -188,6 +188,18 @@ sub encode_128 {
     my ($self, $code, $string) = @_;
     my @bars;
     my $checksum_value;
+
+    # Default to Code C if all characters are digits (and there are at
+    # least two of them).  Otherwise, default to Code B.
+    $code ||= $string =~ /^\d{2,}$/ ? 'c' : 'b';
+
+    # Allow the character set to be passed as a capital letter
+    # (consistent with the specification).
+    $code = lc($code) if $code =~ /^[A-C]$/;
+
+    # Ensure a valid character set has been chosen.
+    die "Character set must be A, B, or C (not '$code')" unless $code =~ /^[a-c]$/;
+
     if ($code eq 'a') {
         push @bars, encode_128_char($code, $bar128Sa);
         $checksum_value = 103;
