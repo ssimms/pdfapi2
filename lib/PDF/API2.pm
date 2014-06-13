@@ -901,7 +901,7 @@ sub update {
 
 =item $pdf->saveas($file)
 
-Saves the document to file.
+Save the document to $file and remove the object structure from memory.
 
 B<Example:>
 
@@ -941,7 +941,7 @@ sub save {
 
 =item $string = $pdf->stringify()
 
-Returns the document as a string and destroys the object.
+Return the document as a string and remove the object structure from memory.
 
 B<Example:>
 
@@ -981,7 +981,13 @@ sub release { $_[0]->end; return(undef);}
 
 =item $pdf->end()
 
-Destroys the document.
+Remove the object structure from memory.  PDF::API2 contains circular
+references, so this call is necessary in long-running processes to
+keep from running out of memory.
+
+This will be called automatically when you save or stringify a PDF.
+You should only need to call it explicitly if you are reading PDF
+files and not writing them.
 
 =cut
 
