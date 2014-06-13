@@ -1,32 +1,32 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
 use PDF::API2;
 
-if(2 > scalar @ARGV) {
-    print <<"EOT";
-Usage: $0 <outfile> <infile1> ... <infileN>
+unless (scalar @ARGV >= 3) {
+    print qq{Usage: $0 <input1.pdf> <input2.pdf> ... <output.pdf>
 
-merges serveral pdf files into on ;-)
-
-cheers, 
-fredo
-EOT
+Combine all pages from the input PDF files into a single output PDF file.
+};
+    exit;
 }
 
-my $outfile=shift @ARGV;
+my $output_file = pop(@ARGV);
 
-my $pdf=PDF::API2->new;
+my $output_pdf = PDF::API2->new();
 
-foreach my $in (@ARGV) {
-    print STDERR "loading file $in .";
-    my $inpdf=PDF::API2->open($in);
-    my $pages=scalar @{$inpdf->{pagestack}};
-    foreach my $page (1..$pages) {
-        print STDERR "$page.";
-        $pdf->importpage($inpdf,$page);
+foreach my $input_file (@ARGV) {
+    print "Loading $input_file:";
+    my $input_pdf = PDF::API2->open($input_file);
+    foreach my $page_number (1 .. $input_pdf->pages()) {
+        print " $page_number,";
+        $output_pdf->importpage($input_pdf, $page_number);
     }
-    $inpdf->end();
-    print STDERR " done.\n";
+    $input_pdf->end();
+    print " Done.\n\n";
 }
 
-$pdf->saveas($outfile);
+print "Writing $output_file\n";
+$output_pdf->saveas($output_file);
