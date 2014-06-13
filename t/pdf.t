@@ -19,7 +19,7 @@ my $new = PDF::API2->open_scalar($pdf->stringify());
 is($info{'Producer'}, 'PDF::API2 Test Suite', 'Check info string after save and reload');
 
 ##
-## importpage
+## import_page
 ##
 
 $pdf = $new;
@@ -29,7 +29,7 @@ $form->{'-docompress'} = 0;
 delete $form->{'Filter'};
 my $string = $new->stringify();
 like($string, qr/0 0 1 rg/,
-     q{Page imported by importpage contains content from original});
+     q{Page imported by import_page contains content from original});
 
 # Add a second page with a different page size
 

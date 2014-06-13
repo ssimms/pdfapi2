@@ -1331,7 +1331,7 @@ sub importPageIntoForm {
     return($xo);
 }
 
-=item $page = $pdf->importpage($source_pdf, $source_page_number, $target_page_number)
+=item $page = $pdf->import_page($source_pdf, $source_page_number, $target_page_number)
 
 Imports a page from $source_pdf and adds it to the specified position
 in $pdf.
@@ -1349,7 +1349,7 @@ B<Example:>
     $old = PDF::API2->open('our/old.pdf');
 
     # Add page 2 from the old PDF as page 1 of the new PDF
-    $page = $pdf->importpage($old, 2);
+    $page = $pdf->import_page($old, 2);
 
     $pdf->saveas('our/new.pdf');
 
@@ -1357,7 +1357,10 @@ B<Note:> You can only import a page from an existing PDF file.
 
 =cut
 
-sub importpage {
+# Deprecated (renamed)
+sub importpage { import_page(@_); }
+
+sub import_page {
     my $self=shift @_;
     my $s_pdf=shift @_;
     my $s_idx=shift @_||0;

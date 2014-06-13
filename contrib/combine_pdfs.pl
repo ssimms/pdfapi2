@@ -22,7 +22,7 @@ foreach my $input_file (@ARGV) {
     my $input_pdf = PDF::API2->open($input_file);
     foreach my $page_number (1 .. $input_pdf->pages()) {
         print " $page_number,";
-        $output_pdf->importpage($input_pdf, $page_number);
+        $output_pdf->import_page($input_pdf, $page_number);
     }
     $input_pdf->end();
     print " Done.\n\n";

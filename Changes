@@ -3,8 +3,11 @@
     - Added $pdf->version() get/set method.  When opening an existing
       PDF, the existing version number will now be retained.
 
-    - Renamed openScalar to open_scalar in PDF::API2.  The old name
-      still works but should be considered deprecated.
+    - Renamed the following in PDF::API2:
+        - importpage to import_page
+        - openScalar to open_scalar
+
+      The old names are deprecated.
 
     - [RT #69503] Fix the -firstpage option to $pdf->preferences() so
       that it doesn't always lead to a crash (reported by Dietrich
