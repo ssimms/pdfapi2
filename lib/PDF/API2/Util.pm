@@ -135,7 +135,7 @@ sub float {
         $value =~ s/\.$//;
         return $value;
     } else {
-        my $value = sprintf('%.'.abs($ad).'f',$f);
+        my $value = sprintf('%.*f', abs($ad), $f);
         # Remove trailing zeros
         $value =~ s/(\.\d*?)0+$/$1/;
         $value =~ s/\.$//;
