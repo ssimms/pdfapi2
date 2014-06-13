@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - Added $pdf->version() get/set method.  When opening an existing
+      PDF, the existing version number will now be retained.
+
+
+2.021     2014-02-20
+
     - Fixed numerous bugs in the string parsing code, including the
       one reported in [RT #63918] by Frank Doepper.
 

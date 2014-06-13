@@ -2,6 +2,7 @@ package PDF::API2;
 
 # VERSION
 
+use Carp;
 use Encode qw(:all);
 use FileHandle;
 
@@ -196,7 +197,7 @@ sub openScalar {
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($fh, 1);
     $self->{'pdf'}->{'Root'}->realise();
     $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
-    $self->{'pdf'}->{' version'} = 3;
+    $self->{'pdf'}->{' version'} ||= 3;
     $self->{'pdf'}->{' apipagecount'} = 0;
     my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
     $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
@@ -515,6 +516,22 @@ sub default {
         $self->{$parameter} = $value;
     }
     return $previous_value;
+}
+
+=item $version = $pdf->version([$new_version])
+
+Get/set the PDF version (e.g. 1.4)
+
+=cut
+
+sub version {
+    my $self = shift();
+    if (scalar @_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^(?:1\.)?([0-9]+)$/;
+        $self->{'pdf'}->{' version'} = $1;
+    }
+    return '1.' . $self->{'pdf'}->{' version'};
 }
 
 =item $bool = $pdf->isEncrypted()
