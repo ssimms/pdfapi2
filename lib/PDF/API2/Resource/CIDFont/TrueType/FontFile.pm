@@ -646,8 +646,6 @@ sub glyphNum { return ( $_[0]->font->{'maxp'}->read->{'numGlyphs'} ); }
 sub outobjdeep {
     my ($self, $fh, $pdf, %opts) = @_;
 
-    return $self->SUPER::outobjdeep($fh, $pdf) if defined $opts{'passthru'};
-
     my $f = $self->font;
 
     if($self->iscff) {
