@@ -66,8 +66,6 @@ sub name {
 sub outobjdeep {
     my ($self, $fh, $pdf, %options) = @_;
 
-    return $self->SUPER::outobjdeep($fh, $pdf) if defined $options{'passthru'};
-
     delete $self->{' api'};
     delete $self->{' apipdf'};
     $self->SUPER::outobjdeep($fh, $pdf, %options);

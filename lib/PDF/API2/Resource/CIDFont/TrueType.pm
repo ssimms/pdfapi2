@@ -151,8 +151,6 @@ sub outobjdeep
 {
     my ($self, $fh, $pdf, %opts) = @_;
 
-    return $self->SUPER::outobjdeep($fh, $pdf) if defined $opts{'passthru'};
-
     my $notdefbefore=1;
 
     my $wx=PDFArray();

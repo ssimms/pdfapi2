@@ -72,7 +72,6 @@ sub subtype {
 sub outobjdeep {
     my ($self, $fh, $pdf, %opts) = @_;
 
-    return $self->SUPER::outobjdeep($fh, $pdf) if defined $opts{'passthru'};
     foreach my $k (qw/ api apipdf /) {
         $self->{" $k"}=undef;
         delete($self->{" $k"});
