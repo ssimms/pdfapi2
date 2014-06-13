@@ -13,7 +13,7 @@ no warnings qw[ recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::NamedDestination
+PDF::API2::NamedDestination - Add named destination shortcuts to a PDF
 
 =head1 METHODS
 
@@ -266,14 +266,8 @@ sub dest
     return($self);
 }
 
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-Alfred Reibenschuh
-
 =cut
+
+1;

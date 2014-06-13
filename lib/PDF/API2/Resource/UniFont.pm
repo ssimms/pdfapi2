@@ -8,7 +8,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::UniFont
+PDF::API2::Resource::UniFont - Unicode Font Support
 
 =head1 METHODS
 
@@ -282,8 +282,8 @@ sub text
     return($newtext);
 }
 
-1;
-
-__END__
-
 =back
+
+=cut
+
+1;

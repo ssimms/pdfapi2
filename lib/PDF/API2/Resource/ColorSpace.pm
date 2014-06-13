@@ -11,7 +11,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::ColorSpace
+PDF::API2::Resource::ColorSpace - Base class for PDF color spaces
 
 =head1 METHODS
 
@@ -92,6 +92,8 @@ sub outobjdeep {
     $self->SUPER::outobjdeep(@opts);
 }
 
-1;
-
 =back
+
+=cut
+
+1;

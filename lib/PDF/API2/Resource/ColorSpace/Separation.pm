@@ -11,7 +11,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::ColorSpace::Separation
+PDF::API2::Resource::ColorSpace::Separation - Support for color space separations
 
 =head1 METHODS
 
@@ -155,8 +155,8 @@ sub param {
     return($_[0]);
 }
 
-1;
-
-__END__
-
 =back
+
+=cut
+
+1;

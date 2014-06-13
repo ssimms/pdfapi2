@@ -11,7 +11,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::XObject::Form
+PDF::API2::Resource::XObject::Form - Base class for external form objects
 
 =head1 METHODS
 
@@ -19,7 +19,7 @@ PDF::API2::Resource::XObject::Form
 
 =item $res = PDF::API2::Resource::XObject::Form->new $pdf
 
-Returns a form-resource object. base class for all types of form-xobjects.
+Returns a form-resource object.
 
 =cut
 
@@ -119,15 +119,8 @@ sub outobjdeep {
     $self->SUPER::outobjdeep(@opts);
 }
 
-
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-alfred reibenschuh
-
 =cut
+
+1;

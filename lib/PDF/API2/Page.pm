@@ -17,7 +17,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Page
+PDF::API2::Page - Methods to interact with individual pages
 
 =head1 METHODS
 
@@ -410,14 +410,8 @@ sub outobjdeep {
     $self->SUPER::outobjdeep(@opts);
 }
 
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-Alfred Reibenschuh
-
 =cut
+
+1;

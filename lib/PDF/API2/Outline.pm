@@ -11,7 +11,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Outline
+PDF::API2::Outline - Manage PDF outlines (aka bookmarks)
 
 =head1 METHODS
 
@@ -337,14 +337,8 @@ sub outobjdeep {
     return @ret;
 }
 
-1;
-
-__END__
-
 =back
 
-=head1 AUTHOR
-
-alfred reibenschuh
-
 =cut
+
+1;
