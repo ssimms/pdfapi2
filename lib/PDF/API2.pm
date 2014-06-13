@@ -91,28 +91,29 @@ B<Example:>
 =cut
 
 sub new {
-    my $class=shift(@_);
-    my %opt=@_;
-    my $self={};
-    bless($self,$class);
-    $self->{pdf}=PDF::API2::Basic::PDF::File->new();
+    my ($class, %options) = @_;
 
-    $self->{pdf}->{' version'} = 4;
-    $self->{pages} = PDF::API2::Basic::PDF::Pages->new($self->{pdf});
-    $self->{pages}->proc_set(qw( PDF Text ImageB ImageC ImageI ));
-    $self->{pages}->{Resources}||=PDFDict();
-    $self->{pdf}->new_obj($self->{pages}->{Resources}) unless($self->{pages}->{Resources}->is_obj($self->{pdf}));
-    $self->{catalog}=$self->{pdf}->{Root};
-    $self->{fonts}={};
-    $self->{pagestack}=[];
-    $self->{forcecompress}= ($^O eq 'os390') ? 0 : 1;
-    $self->preferences(%opt);
-    if($opt{-file}) {
-        $self->{' filed'}=$opt{-file};
-        $self->{pdf}->create_file($opt{-file});
+    my $self = {};
+    bless $self, $class;
+    $self->{'pdf'} = PDF::API2::Basic::PDF::File->new();
+
+    $self->{'pdf'}->{' version'} = 4;
+    $self->{'pages'} = PDF::API2::Basic::PDF::Pages->new($self->{'pdf'});
+    $self->{'pages'}->proc_set(qw(PDF Text ImageB ImageC ImageI));
+    $self->{'pages'}->{'Resources'} ||= PDFDict();
+    $self->{'pdf'}->new_obj($self->{'pages'}->{'Resources'}) unless $self->{'pages'}->{'Resources'}->is_obj($self->{'pdf'});
+    $self->{'catalog'} = $self->{'pdf'}->{'Root'};
+    $self->{'fonts'} = {};
+    $self->{'pagestack'} = [];
+    $self->{'forcecompress'} = $^O eq 'os390' ? 0 : 1;
+    $self->preferences(%options);
+    if ($options{'-file'}) {
+        $self->{' filed'} = $options{'-file'};
+        $self->{'pdf'}->create_file($options{'-file'});
     }
-    $self->{infoMeta}=[qw(  Author CreationDate ModDate Creator Producer Title Subject Keywords  )];
-    $self->info( 'Producer' => "PDF::API2 $VERSION [$^O]" );
+    $self->{'infoMeta'}=[qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
+    $self->info('Producer' => "PDF::API2 $VERSION [$^O]");
+
     return $self;
 }
 
@@ -197,7 +198,6 @@ sub open_scalar {
     $self->{'pdf'}->{'Root'}->realise();
     $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
     $self->{'pdf'}->{' version'} ||= 3;
-    $self->{'pdf'}->{' apipagecount'} = 0;
     my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
     $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
@@ -384,92 +384,112 @@ B<Example:>
 =cut
 
 sub preferences {
-    my $self=shift @_;
-    my %opt=@_;
-    if($opt{-fullscreen}) {
-        $self->{catalog}->{PageMode}=PDFName('FullScreen');
-    } elsif($opt{-thumbs}) {
-        $self->{catalog}->{PageMode}=PDFName('UseThumbs');
-    } elsif($opt{-outlines}) {
-        $self->{catalog}->{PageMode}=PDFName('UseOutlines');
-    } else {
-        $self->{catalog}->{PageMode}=PDFName('UseNone');
+    my ($self, %options) = @_;
+
+    # Page Mode Options
+    if ($options{'-fullscreen'}) {
+        $self->{'catalog'}->{'PageMode'} = PDFName('FullScreen');
     }
-    if($opt{-singlepage}) {
-        $self->{catalog}->{PageLayout}=PDFName('SinglePage');
-    } elsif($opt{-onecolumn}) {
-        $self->{catalog}->{PageLayout}=PDFName('OneColumn');
-    } elsif($opt{-twocolumnleft}) {
-        $self->{catalog}->{PageLayout}=PDFName('TwoColumnLeft');
-    } elsif($opt{-twocolumnright}) {
-        $self->{catalog}->{PageLayout}=PDFName('TwoColumnRight');
-    } else {
-        $self->{catalog}->{PageLayout}=PDFName('SinglePage');
+    elsif ($options{'-thumbs'}) {
+        $self->{'catalog'}->{'PageMode'} = PDFName('UseThumbs');
+    }
+    elsif ($options{'-outlines'}) {
+        $self->{'catalog'}->{'PageMode'} = PDFName('UseOutlines');
+    }
+    else {
+        $self->{'catalog'}->{'PageMode'} = PDFName('UseNone');
     }
 
-    $self->{catalog}->{ViewerPreferences}||=PDFDict();
-    $self->{catalog}->{ViewerPreferences}->realise;
-
-    if($opt{-hidetoolbar}) {
-        $self->{catalog}->{ViewerPreferences}->{HideToolbar}=PDFBool(1);
+    # Page Layout Options
+    if ($options{'-singlepage'}) {
+        $self->{'catalog'}->{'PageLayout'} = PDFName('SinglePage');
     }
-    if($opt{-hidemenubar}) {
-        $self->{catalog}->{ViewerPreferences}->{HideMenubar}=PDFBool(1);
+    elsif ($options{'-onecolumn'}) {
+        $self->{'catalog'}->{'PageLayout'} = PDFName('OneColumn');
     }
-    if($opt{-hidewindowui}) {
-        $self->{catalog}->{ViewerPreferences}->{HideWindowUI}=PDFBool(1);
+    elsif ($options{'-twocolumnleft'}) {
+        $self->{'catalog'}->{'PageLayout'} = PDFName('TwoColumnLeft');
     }
-    if($opt{-fitwindow}) {
-        $self->{catalog}->{ViewerPreferences}->{FitWindow}=PDFBool(1);
+    elsif ($options{'-twocolumnright'}) {
+        $self->{'catalog'}->{'PageLayout'} = PDFName('TwoColumnRight');
     }
-    if($opt{-centerwindow}) {
-        $self->{catalog}->{ViewerPreferences}->{CenterWindow}=PDFBool(1);
-    }
-    if($opt{-displaytitle}) {
-        $self->{catalog}->{ViewerPreferences}->{DisplayDocTitle}=PDFBool(1);
-    }
-    if($opt{-righttoleft}) {
-        $self->{catalog}->{ViewerPreferences}->{Direction}=PDFName("R2L");
+    else {
+        $self->{'catalog'}->{'PageLayout'} = PDFName('SinglePage');
     }
 
-    if($opt{-afterfullscreenthumbs}) {
-        $self->{catalog}->{ViewerPreferences}->{NonFullScreenPageMode}=PDFName('UseThumbs');
-    } elsif($opt{-afterfullscreenoutlines}) {
-        $self->{catalog}->{ViewerPreferences}->{NonFullScreenPageMode}=PDFName('UseOutlines');
-    } else {
-        $self->{catalog}->{ViewerPreferences}->{NonFullScreenPageMode}=PDFName('UseNone');
+    # Viewer Preferences
+    $self->{'catalog'}->{'ViewerPreferences'} ||= PDFDict();
+    $self->{'catalog'}->{'ViewerPreferences'}->realise();
+
+    if ($options{'-hidetoolbar'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'HideToolbar'} = PDFBool(1);
+    }
+    if ($options{'-hidemenubar'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'HideMenubar'} = PDFBool(1);
+    }
+    if ($options{'-hidewindowui'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'HideWindowUI'} = PDFBool(1);
+    }
+    if ($options{'-fitwindow'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'FitWindow'} = PDFBool(1);
+    }
+    if ($options{'-centerwindow'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'CenterWindow'} = PDFBool(1);
+    }
+    if ($options{'-displaytitle'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'DisplayDocTitle'} = PDFBool(1);
+    }
+    if ($options{'-righttoleft'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'Direction'} = PDFName('R2L');
     }
 
-    if($opt{-printscalingnone}) {
-		$self->{catalog}->{ViewerPreferences}->{PrintScaling}=PDFName("None");
+    if ($options{'-afterfullscreenthumbs'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'NonFullScreenPageMode'} = PDFName('UseThumbs');
+    }
+    elsif ($options{'-afterfullscreenoutlines'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'NonFullScreenPageMode'} = PDFName('UseOutlines');
+    }
+    else {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'NonFullScreenPageMode'} = PDFName('UseNone');
     }
 
-    if($opt{-firstpage}) {
-        my ($page,%o)=@{$opt{-firstpage}};
+    if ($options{'-printscalingnone'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'PrintScaling'} = PDFName('None');
+    }
 
-        $o{-fit}=1 if(scalar(keys %o)<1);
+    # Open Action
+    if ($options{'-firstpage'}) {
+        my ($page, %args) = @{$options{-firstpage}};
+        $args{'-fit'} = 1 unless scalar keys %args;
 
-        if(defined $o{-fit}) {
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('Fit'));
-        } elsif(defined $o{-fith}) {
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('FitH'),PDFNum($o{-fith}));
-        } elsif(defined $o{-fitb}) {
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('FitB'));
-        } elsif(defined $o{-fitbh}) {
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('FitBH'),PDFNum($o{-fitbh}));
-        } elsif(defined $o{-fitv}) {
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('FitV'),PDFNum($o{-fitv}));
-        } elsif(defined $o{-fitbv}) {
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('FitBV'),PDFNum($o{-fitbv}));
-        } elsif(defined $o{-fitr}) {
-            die "insufficient parameters to -fitr => [] " unless(scalar @{$o{-fitr}} == 4);
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('FitR'),map {PDFNum($_)} @{$o{-fitr}});
-        } elsif(defined $o{-xyz}) {
-            die "insufficient parameters to -xyz => [] " unless(scalar @{$o{-xyz}} == 3);
-            $self->{catalog}->{OpenAction}=PDFArray($page,PDFName('XYZ'),map {PDFNum($_)} @{$o{-xyz}});
+        if (defined $args{'-fit'}) {
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('Fit'));
+        }
+        elsif (defined $args{'-fith'}) {
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitH'), PDFNum($args{'-fith'}));
+        }
+        elsif (defined $args{'-fitb'}) {
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitB'));
+        }
+        elsif (defined $args{'-fitbh'}) {
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitBH'), PDFNum($args{'-fitbh'}));
+        }
+        elsif (defined $args{'-fitv'}) {
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitV'), PDFNum($args{'-fitv'}));
+        }
+        elsif (defined $args{'-fitbv'}) {
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitBV'), PDFNum($args{'-fitbv'}));
+        }
+        elsif (defined $args{'-fitr'}) {
+            croak 'insufficient parameters to -fitr => []' unless scalar @{$args{'-fitr'}} == 4;
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitR'), map { PDFNum($_) } @{$args{'-fitr'}});
+        }
+        elsif (defined $args{'-xyz'}) {
+            croak 'insufficient parameters to -xyz => []' unless scalar @{$args{'-xyz'}} == 3;
+            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('XYZ'), map { PDFNum($_) } @{$args{'-xyz'}});
         }
     }
-    $self->{pdf}->out_obj($self->{catalog});
+    $self->{'pdf'}->out_obj($self->{'catalog'});
 
     return $self;
 }
@@ -832,34 +852,34 @@ sub finishobjects {
 }
 
 sub proc_pages {
-    my ($pdf, $pgs) = @_;
-    my ($pg, $pgref, @pglist);
+    my ($pdf, $object) = @_;
 
-    if(defined($pgs->{Resources})) {
+    if (defined $object->{'Resources'}) {
         eval {
-            $pgs->{Resources}->realise;
+            $object->{'Resources'}->realise();
         };
     }
-    foreach $pg ($pgs->{'Kids'}->elementsof) {
-        $pg->realise;
-        if ($pg->{'Type'}->val =~ m/^Pages$/o) 
-        {
-            my @morepages = proc_pages($pdf, $pg);
-            push(@pglist, @morepages);
-        } 
-        else 
-        {
+
+    my @pages;
+    $pdf->{' apipagecount'} ||= 0;
+    foreach my $page ($object->{'Kids'}->elementsof()) {
+        $page->realise();
+        if ($page->{'Type'}->val() eq 'Pages') {
+            push @pages, proc_pages($pdf, $page);
+        }
+        else {
             $pdf->{' apipagecount'}++;
-            $pg->{' pnum'} = $pdf->{' apipagecount'};
-            if(defined($pg->{Resources})) {
+            $page->{' pnum'} = $pdf->{' apipagecount'};
+            if (defined $page->{'Resources'}) {
                 eval {
-                    $pg->{Resources}->realise;
+                    $page->{'Resources'}->realise();
                 };
             }
-            push (@pglist, $pg);
+            push @pages, $page;
         }
     }
-    return(@pglist);
+
+    return @pages;
 }
 
 =item $pdf->update()
