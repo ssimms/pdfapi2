@@ -48,13 +48,13 @@ sub read_gd {
     $self->bpc(8);
     $self->colorspace('DeviceRGB');
 
-    if(UNIVERSAL::can($gd,'jpeg') && ($c > 256) && !$opts{-lossless}) {
+    if($gd->can('jpeg') && ($c > 256) && !$opts{-lossless}) {
 
         $self->filters('DCTDecode');
         $self->{' nofilt'}=1;
         $self->{' stream'}=$gd->jpeg(75);
 
-    } elsif(UNIVERSAL::can($gd,'raw')) {
+    } elsif($gd->can('raw')) {
 
         $self->filters('FlateDecode');
         $self->{' stream'}=$gd->raw;

@@ -9,6 +9,7 @@ BEGIN {
     use PDF::API2::Basic::PDF::Utils;
 
     use POSIX qw( ceil floor );
+    use Scalar::Util qw(blessed);
 
     use vars qw( $hasWeakRef );
 
@@ -100,9 +101,9 @@ sub saveas {
     }
     $self->{api}->end;
     foreach my $k (keys %{$self}) {
-        if(UNIVERSAL::can($k,'release')) {
+        if(blessed($k) and $k->can('release')) {
             $k->release(1);
-        } elsif(UNIVERSAL::can($k,'end')) {
+        } elsif(blessed($k) and $k->can('end')) {
             $k->end;
         }
         $self->{$k}=undef;

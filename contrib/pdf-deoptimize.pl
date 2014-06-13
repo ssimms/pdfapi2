@@ -4,6 +4,7 @@ use PDF::API2::Basic::PDF::File;
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2;
 use Compress::Zlib;
+use Scalar::Util qw(blessed);
 
 sub walk_obj {
     my ($objs,$spdf,$tpdf,$obj,@keys)=@_;
@@ -24,13 +25,13 @@ sub walk_obj {
 
   $objs->{scalar $obj}=$tobj;
 
-    if(ref($obj)=~/Array$/ || (UNIVERSAL::can($obj,'isa') && $obj->isa('PDF::API2::Basic::PDF::Array'))) {
+    if(ref($obj)=~/Array$/ || (blessed($obj) && $obj->isa('PDF::API2::Basic::PDF::Array'))) {
         $tobj->{' val'}=[];
         foreach my $k ($obj->elementsof) {
             $k->realise if(ref($k)=~/Objind$/);
             $tobj->add_elements(walk_obj($objs,$spdf,$tpdf,$k));
         }
-    } elsif(ref($obj)=~/Dict$/ || (UNIVERSAL::can($obj,'isa') && $obj->isa('PDF::API2::Basic::PDF::Dict'))) {
+    } elsif(ref($obj)=~/Dict$/ || (blessed($obj) && $obj->isa('PDF::API2::Basic::PDF::Dict'))) {
         @keys=keys(%{$tobj}) if(scalar @keys <1);
         foreach my $k (@keys) {
             next if($k=~/^ /);

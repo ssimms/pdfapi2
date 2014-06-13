@@ -19,6 +19,7 @@ use PDF::API2::Basic::PDF::Filter::ASCIIHexDecode;
 use PDF::API2::Basic::PDF::Filter::FlateDecode;
 use PDF::API2::Basic::PDF::Filter::LZWDecode;
 use PDF::API2::Basic::PDF::Filter::RunLengthDecode;
+use Scalar::Util qw(blessed reftype);
 
 no warnings qw[ deprecated recursion uninitialized ];
 
@@ -92,11 +93,11 @@ sub release
     while (my $item = shift @tofree)
     {
         my $ref = ref($item);
-        if (UNIVERSAL::can($item, 'release'))
+        if (blessed($item) and $item->can('release'))
         { $item->release(); }
         elsif ($ref eq 'ARRAY')
         { push( @tofree, @{$item} ); }
-        elsif (UNIVERSAL::isa($ref, 'HASH'))
+        elsif (defined(reftype($ref)) and reftype($ref) eq 'HASH')
         { release($item); }
     }
 

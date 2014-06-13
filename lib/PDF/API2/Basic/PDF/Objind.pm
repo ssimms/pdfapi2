@@ -60,6 +60,8 @@ Holds a direct reference to the next free object in the free list.
 use strict;
 use warnings;
 
+use Scalar::Util qw(blessed reftype);
+
 use vars qw($uidc @inst %inst);
 $uidc = "pdfuid000";
 
@@ -117,13 +119,13 @@ sub release {
         # common case: value is not reference
         my $ref = ref($item) || next;
 
-        if (UNIVERSAL::can($item, 'release')) {
+        if (blessed($item) and $item->can('release')) {
             $item->release();
         } 
         elsif ($ref eq 'ARRAY') {
             push @tofree, @$item;
         } 
-        elsif (UNIVERSAL::isa($ref, 'HASH')) {
+        elsif (defined(reftype($ref)) and reftype($ref) eq 'HASH') {
             release($item);
         }
     }
@@ -283,7 +285,7 @@ sub copy {
     foreach my $k (keys %$self) {
         next if $inst{$k};
         next if defined $res->{$k};
-        if (UNIVERSAL::can($self->{$k}, "is_obj") && !$self->{$k}->is_obj($pdf)) {
+        if (blessed($self->{$k}) and $self->{$k}->can('is_obj') and not $self->{$k}->is_obj($pdf)) {
             $res->{$k} = $self->{$k}->copy($pdf);
         }
         else {

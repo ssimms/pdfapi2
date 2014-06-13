@@ -1260,7 +1260,9 @@ sub importPageIntoForm {
     my $s_pdf=shift @_;
     my $s_idx=shift @_||0;
 
-	UNIVERSAL::isa($s_pdf, 'PDF::API2') || die "Invalid usage: 1st argument must be PDF::API2 instance, not: ".ref($s_pdf);
+    unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
+        die "Invalid usage: 1st argument must be PDF::API2 instance, not: " . ref($s_pdf);
+    }
 
     my ($s_page,$xo);
 
@@ -1367,7 +1369,9 @@ sub import_page {
     my $t_idx=shift @_||0;
     my ($s_page,$t_page);
 
-	UNIVERSAL::isa($s_pdf, 'PDF::API2') || die "Invalid usage: 1st argument must be PDF::API2 instance, not: ".ref($s_pdf);
+    unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
+        die "Invalid usage: 1st argument must be PDF::API2 instance, not: " . ref($s_pdf);
+    }
 	
     if(ref($s_idx) eq 'PDF::API2::Page') {
         $s_page=$s_idx;

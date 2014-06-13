@@ -141,6 +141,8 @@ is in PDF which contains the location of the previous cross-reference table.
 use strict;
 no strict "refs";
 
+use Scalar::Util qw(blessed);
+
 use vars qw($cr $irreg_char $reg_char $ws_char $delim_char %types);
 
 $ws_char = '[ \t\r\n\f\0]';
@@ -293,7 +295,7 @@ sub release {
     }
 
     while (my $item = shift @tofree) {
-        if (UNIVERSAL::can($item, 'release')) {
+        if (blessed($item) and $item->can('release')) {
             $item->release(1);
         }
         elsif (ref($item) eq 'ARRAY') {
