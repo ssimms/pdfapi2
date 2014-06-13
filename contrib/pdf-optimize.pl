@@ -63,6 +63,6 @@ $spdf=PDF::API2::Basic::PDF::File->open($ARGV[0]);
 $tpdf=PDF::API2::Basic::PDF::File->_new;
 $mycache={};
 $tpdf->{Root}=walk_obj($mycache,$spdf,$tpdf,$spdf->{Root});
-$tpdf->{Info}=walk_obj($mycache,$spdf,$tpdf,$spdf->{Info});
+$tpdf->{Info}=walk_obj($mycache,$spdf,$tpdf,$spdf->{Info}) if $spdf->{Info};
 
 $tpdf->out_file($ARGV[1]);
