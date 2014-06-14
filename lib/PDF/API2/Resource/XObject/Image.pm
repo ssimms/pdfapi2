@@ -17,136 +17,129 @@ PDF::API2::Resource::XObject::Image - Base class for external raster image objec
 
 =over
 
-=item $res = PDF::API2::Resource::XObject::Image->new $pdf, $name
+=item $image = PDF::API2::Resource::XObject::Image->new($pdf, $name)
 
-Returns a image-resource object.
+Returns an image resource object.
 
 =cut
 
 sub new {
-    my ($class,$pdf,$name) = @_;
-    my $self;
-
-    $class = ref $class if ref $class;
-
-    $self=$class->SUPER::new($pdf,$name);
-    $pdf->new_obj($self) unless($self->is_obj($pdf));
+    my ($class, $pdf, $name) = @_;
+    my $self = $class->SUPER::new($pdf, $name);
 
     $self->subtype('Image');
 
-    $self->{' apipdf'}=$pdf;
-
-    return($self);
+    return $self;
 }
 
-=item $res = PDF::API2::Resource::XObject::Image->new_api $api, $name
+# Deprecated (rolled into new)
+sub new_api { return new(@_); }
 
-Returns a image resource object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
+=item $width = $image->width($width)
 
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
-=item $wd = $img->width
+Get or set the width value for the image object.
 
 =cut
 
 sub width {
-    my $self = shift @_;
-    my $x=shift @_;
-    $self->{Width}=PDFNum($x) if(defined $x);
-    return($self->{Width}->val);
+    my $self = shift();
+    $self->{'Width'} = PDFNum(shift()) if scalar @_;
+    return $self->{'Width'}->val();
 }
 
-=item $ht = $img->height
+=item $height = $image->height($height)
+
+Get or set the height value for the image object.
 
 =cut
 
 sub height {
-    my $self = shift @_;
-    my $x=shift @_;
-    $self->{Height}=PDFNum($x) if(defined $x);
-    return($self->{Height}->val);
+    my $self = shift();
+    $self->{'Height'} = PDFNum(shift()) if scalar @_;
+    return $self->{'Height'}->val();
 }
 
-=item $img->smask $smaskobj
+=item $image->smask($xobject)
+
+Set the soft-mask image object.
 
 =cut
 
 sub smask {
-    my $self = shift @_;
-    my $maskobj = shift @_;
-    $self->{SMask}=$maskobj;
+    my $self = shift();
+    $self->{'SMask'} = shift();
+
     return $self;
 }
 
-=item $img->mask @maskcolorange
+=item $image->mask(@color_range)
+
+=item $image->mask($xobject)
+
+Set the mask to an image mask XObject or an array containing a range
+of colors to be applied as a color key mask.
 
 =cut
 
 sub mask {
-    my $self = shift @_;
-    $self->{Mask}=PDFArray(map { PDFNum($_) } @_);
+    my $self = shift();
+    if (ref($_[0])) {
+        $self->{'Mask'} = shift();
+    }
+    else {
+        $self->{'Mask'} = PDFArray(map { PDFNum($_) } @_);
+    }
+
     return $self;
 }
 
-=item $img->imask $maskobj
+# Deprecated (rolled into mask)
+sub imask { return mask(@_); }
 
-=cut
+=item $image->colorspace($name)
 
-sub imask {
-    my $self = shift @_;
-    $self->{Mask}=shift @_;
-    return $self;
-}
+=item $image->colorspace($array)
 
-=item $img->colorspace $csobj
+Set the color space used by the image.  Depending on the color space,
+this will either be just the name of the color space, or it will be an
+array containing the color space and any required parameters.
+
+If passing an array, parameters must already be encoded as PDF
+objects.  The array itself may also be a PDF object.  If not, one will
+be created.
 
 =cut
 
 sub colorspace {
-    my $self = shift @_;
-    my $obj = shift @_;
-    $self->{'ColorSpace'}=ref $obj ? $obj : PDFName($obj) ;
-    return $self;
-}
-
-=item $img->filters @filternames
-
-=cut
-
-sub filters {
-    my $self = shift @_;
-    $self->{Filter}=PDFArray(map { ref($_) ? $_ : PDFName($_) } @_);
-    return $self;
-}
-
-=item $img->bpc $num
-
-=cut
-
-sub bpc {
-    my $self = shift @_;
-    $self->{BitsPerComponent}=PDFNum(shift @_);
-    return $self;
-}
-
-sub outobjdeep {
-    my ($self, @opts) = @_;
-    foreach my $k (qw/ api apipdf /) {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
+    my ($self, @values) = @_;
+    if (scalar @values == 1 and ref($values[0])) {
+        $self->{'ColorSpace'} = $values[0];
     }
-    $self->SUPER::outobjdeep(@opts);
+    elsif (scalar @values == 1) {
+        $self->{'ColorSpace'} = PDFName($values[0]);
+    }
+    else {
+        $self->{'ColorSpace'} = PDFArray(@values);
+    }
+
+    return $self;
 }
+
+=item $image->bits_per_component($integer)
+
+Set the number of bits used to represent each color component.
+
+=cut
+
+sub bits_per_component {
+    my $self = shift();
+    $self->{'BitsPerComponent'} = PDFNum(shift());
+
+    return $self;
+}
+
+# Deprecated (renamed)
+sub bpc { return bits_per_component(@_); }
 
 =back
 
