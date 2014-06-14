@@ -33,7 +33,7 @@ sub new {
 }
 
 # Deprecated (rolled into new)
-sub new_api { return new(@_); }
+sub new_api { my $self = shift(); return $self->new(@_); }
 
 =item $type = $xobject->subtype($type)
 

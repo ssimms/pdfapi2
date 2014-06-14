@@ -34,7 +34,7 @@ sub new {
 }
 
 # Deprecated (rolled into new)
-sub new_api { return new(@_); }
+sub new_api { my $self = shift(); return $self->new(@_); }
 
 =item ($llx, $lly, $urx, $ury) = $form->bbox($llx, $lly, $urx, $ury)
 
