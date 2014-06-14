@@ -4,10 +4,10 @@ package PDF::API2::Resource::XObject::Form;
 
 use base 'PDF::API2::Resource::XObject';
 
-use PDF::API2::Util;
-use PDF::API2::Basic::PDF::Utils;
+use strict;
+use warnings;
 
-no warnings qw[ deprecated recursion uninitialized ];
+use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME
 
@@ -17,106 +17,75 @@ PDF::API2::Resource::XObject::Form - Base class for external form objects
 
 =over
 
-=item $res = PDF::API2::Resource::XObject::Form->new $pdf
+=item $form = PDF::API2::Resource::XObject::Form->new($pdf)
 
-Returns a form-resource object.
+Creates a form resource.
 
 =cut
 
 sub new {
-    my ($class,$pdf) = @_;
-    my $self;
-
-    $class = ref $class if ref $class;
-
-    $self=$class->SUPER::new($pdf,pdfkey());
-    $pdf->new_obj($self) unless($self->is_obj($pdf));
+    my ($class, $pdf, $name) = @_;
+    my $self = $class->SUPER::new($pdf, $name);
 
     $self->subtype('Form');
-    $self->{FormType}=PDFNum(1);
+    $self->{'FormType'} = PDFNum(1);
 
-    $self->{' apipdf'}=$pdf;
-
-    return($self);
+    return $self;
 }
 
-=item $res = PDF::API2::Resource::XObject::Form->new_api $api, $name
+# Deprecated (rolled into new)
+sub new_api { return new(@_); }
 
-Returns a form resource object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
+=item ($llx, $lly, $urx, $ury) = $form->bbox($llx, $lly, $urx, $ury)
 
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
-=item ($llx, $lly, $urx, $ury) = $res->bbox $llx, $lly, $urx, $ury
+Get or set the coordinates of the form object's bounding box
 
 =cut
 
 sub bbox {
-    my $self = shift @_;
-    my @b;
-    if(@b=@_){
-        $self->{BBox}=PDFArray(map { PDFNum($_) } @b);
+    my $self = shift();
+
+    if (scalar @_) {
+        $self->{'BBox'} = PDFArray(map { PDFNum($_) } @_);
     }
-    @b=$self->{BBox}->elementsof;
-    return(map { $_->val } @b);
+
+    return map { $_->val() } $self->{'BBox'}->elements();
 }
 
-=item $res->resource $type, $key, $obj
+=item $resource = $form->resource($type, $key)
 
-Adds a resource to the form.
+=item $form->resource($type, $key, $object, $force)
 
-B<Example:>
+Get or add a resource required by the form's contents, such as a Font, XObject, ColorSpace, etc.
 
-    $res->resource('Font',$fontkey,$fontobj);
-    $res->resource('XObject',$imagekey,$imageobj);
-    $res->resource('Shading',$shadekey,$shadeobj);
-    $res->resource('ColorSpace',$spacekey,$speceobj);
-
-B<Note:> You only have to add the required resources, if
-they are NOT handled by the *font*, *image*, *shade* or *space*
-methods.
+By default, an existing C<$key> will not be overwritten.  Set C<$force> to override this behavior.
 
 =cut
 
 sub resource {
-    my ($self, $type, $key, $obj, $force) = @_;
+    my ($self, $type, $key, $object, $force) = @_;
     # we are a self-contained content stream.
 
-    $self->{Resources}||=PDFDict();
+    $self->{'Resources'} ||= PDFDict();
 
-    my $dict=$self->{Resources};
-    $dict->realise if(ref($dict)=~/Objind$/);
+    my $dict = $self->{'Resources'};
+    $dict->realise() if ref($dict) =~ /Objind$/;
 
-    $dict->{$type}||= PDFDict();
-    $dict->{$type}->realise if(ref($dict->{$type})=~/Objind$/);
-    unless (defined $obj) {
-        return($dict->{$type}->{$key} || undef);
-    } else {
-        if($force) {
-            $dict->{$type}->{$key}=$obj;
-        } else {
-            $dict->{$type}->{$key}||= $obj;
-        }
-        return($dict);
+    $dict->{$type} ||= PDFDict();
+    $dict->{$type}->realise() if ref($dict->{$type}) =~ /Objind$/;
+
+    unless (defined $object) {
+        return $dict->{$type}->{$key} || undef;
     }
-}
 
-sub outobjdeep {
-    my ($self, @opts) = @_;
-    foreach my $k (qw/ api apipdf /) {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
+    if ($force) {
+        $dict->{$type}->{$key} = $object;
     }
-    $self->SUPER::outobjdeep(@opts);
+    else {
+        $dict->{$type}->{$key} ||= $object;
+    }
+
+    return $dict;
 }
 
 =back
