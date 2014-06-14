@@ -4,10 +4,10 @@ package PDF::API2::Resource::XObject;
 
 use base 'PDF::API2::Resource';
 
-use PDF::API2::Util;
-use PDF::API2::Basic::PDF::Utils;
+use strict;
+use warnings;
 
-no warnings qw[ deprecated recursion uninitialized ];
+use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME
 
@@ -17,66 +17,36 @@ PDF::API2::Resource::XObject - Base class for external objects
 
 =over
 
-=item $res = PDF::API2::Resource::XObject->new $pdf, $name
+=item $xobject = PDF::API2::Resource::XObject->new($pdf, $name)
 
-Returns a xobject-resource object.
+Creates an XObject resource.
 
 =cut
 
 sub new {
-    my ($class,$pdf,$name) = @_;
-    my $self;
+    my ($class, $pdf, $name) = @_;
+    my $self = $class->SUPER::new($pdf, $name);
 
-    $class = ref $class if ref $class;
+    $self->type('XObject');
 
-    $self=$class->SUPER::new($pdf,$name);
-    $pdf->new_obj($self) unless($self->is_obj($pdf));
-
-    $self->{Type}=PDFName('XObject');
-
-    $self->{' apipdf'}=$pdf;
-
-    return($self);
+    return $self;
 }
 
-=item $res = PDF::API2::Resource::XObject->new_api $api, $name
+# Deprecated (rolled into new)
+sub new_api { return new(@_); }
 
-Returns a xobject resource object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
+=item $type = $xobject->subtype($type)
 
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
-=item $name = $res->subtype $typename
-
-Returns or sets the Subtype of the xobject resource.
+Get or set the Subtype of the XObject resource.
 
 =cut
 
 sub subtype {
-    my $self=shift @_;
-    if(scalar @_ >0 && defined($_[0])) {
-        $self->{Subtype}=PDFName($_[0]);
+    my $self = shift();
+    if (scalar @_) {
+        $self->{'Subtype'} = PDFName(shift());
     }
-    return($self->{Subtype}->val);
-}
-
-sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    foreach my $k (qw/ api apipdf /) {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
-    }
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    return $self->{'Subtype'}->val();
 }
 
 =back
