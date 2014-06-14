@@ -4,9 +4,10 @@ package PDF::API2::Resource::XObject::Image;
 
 use base 'PDF::API2::Resource::XObject';
 
-use PDF::API2::Basic::PDF::Utils;
+use strict;
+use warnings;
 
-no warnings qw[ deprecated recursion uninitialized ];
+use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME
 
