@@ -75,10 +75,17 @@ sub removeobj {
 Returns a list of all the elements in the array. Notice that this is
 not the array itself but the elements in the array.
 
+Also available as C<elements>.
+
 =cut
 
 sub elementsof {
     return wantarray ? @{$_[0]->{' val'}} : scalar @{$_[0]->{' val'}};
+}
+
+sub elements {
+    my $self = shift();
+    return @{$self->{' val'}};
 }
 
 =head2 $a->add_elements
