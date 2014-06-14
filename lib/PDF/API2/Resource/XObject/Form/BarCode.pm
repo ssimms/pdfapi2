@@ -11,212 +11,171 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
-PDF::API2::Resource::XObject::Form::BarCode - Base class for one-dimensional barcode support in PDFs
+PDF::API2::Resource::XObject::Form::BarCode - Base class for one-dimensional barcodes
 
 =head1 METHODS
 
 =over
 
-=item $res = PDF::API2::Resource::XObject::Form::BarCode->new $pdf, %opts
+=item $barcode = PDF::API2::Resource::XObject::Form::BarCode->new($pdf, %options)
 
-Returns a barcode-form object.
+Creates a barcode form resource.
 
 =cut
 
 sub new {
-    my ($class,$pdf,%opts) = @_;
-    my $self;
+    my ($class, $pdf, %options) = @_;
+    my $self = $class->SUPER::new($pdf);
 
-    $class = ref $class if ref $class;
+    $self->{' bfont'} = $options{'-font'};
 
-    $self=$class->SUPER::new($pdf);
+    $self->{' umzn'} = $options{'-umzn'} || 0;    # (u)pper (m)ending (z)o(n)e
+    $self->{' lmzn'} = $options{'-lmzn'} || 0;    # (l)ower (m)ending (z)o(n)e
+    $self->{' zone'} = $options{'-zone'} || 0;
+    $self->{' quzn'} = $options{'-quzn'} || 0;    # (qu)iet (z)o(n)e
+    $self->{' ofwt'} = $options{'-ofwt'} || 0.01; # (o)ver(f)low (w)id(t)h
+    $self->{' fnsz'} = $options{'-fnsz'};         # (f)o(n)t(s)i(z)e
+    $self->{' spcr'} = $options{'-spcr'} || '';
 
-    $self->{' bfont'}=$opts{-font};
-
-    $self->{' umzn'}=$opts{-umzn} || 0;    # (u)pper (m)ending (z)o(n)e
-    $self->{' lmzn'}=$opts{-lmzn} || 0;    # (l)ower (m)ending (z)o(n)e
-    $self->{' zone'}=$opts{-zone} || 0;
-    $self->{' quzn'}=$opts{-quzn} || 0;    # (qu)iet (z)o(n)e
-    $self->{' ofwt'}=$opts{-ofwt} || 0.01; # (o)ver(f)low (w)id(t)h
-    $self->{' fnsz'}=$opts{-fnsz};         # (f)o(n)t(s)i(z)e
-    $self->{' spcr'}=$opts{-spcr} || '';
-
-    return($self);
+    return $self;
 }
 
-=item $res = PDF::API2::Resource::XObject::Form::BarCode->new_api $api, %opts
+# Deprecated (rolled into new)
+sub new_api { my $self = shift(); return $self->new(@_); }
 
-Returns a barcode-form object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
-sub outobjdeep {
-    my ($self, @opts) = @_;
-    $self->SUPER::outobjdeep(@opts);
-}
-
-my %bar_wdt=(
+my %bar_widths=(
      0 => 0,
-     1 => 1,
-     2 => 2,
-     3 => 3,
-     4 => 4,
-     5 => 5,
-     6 => 6,
-     7 => 7,
-     8 => 8,
-     9 => 9,
-    'a' => 1,
-    'b' => 2,
-    'c' => 3,
-    'd' => 4,
-    'e' => 5,
-    'f' => 6,
-    'g' => 7,
-    'h' => 8,
-    'i' => 9,
-    'A' => 1,
-    'B' => 2,
-    'C' => 3,
-    'D' => 4,
-    'E' => 5,
-    'F' => 6,
-    'G' => 7,
-    'H' => 8,
-    'I' => 9,
+     1 => 1, 'a' => 1, 'A' => 1,
+     2 => 2, 'b' => 2, 'B' => 2,
+     3 => 3, 'c' => 3, 'C' => 3,
+     4 => 4, 'd' => 4, 'D' => 4,
+     5 => 5, 'e' => 5, 'E' => 5,
+     6 => 6, 'f' => 6, 'F' => 6,
+     7 => 7, 'g' => 7, 'G' => 7,
+     8 => 8, 'h' => 8, 'H' => 8,
+     9 => 9, 'i' => 9, 'I' => 9,
 );
 
 sub encode {
-        my $self=shift @_;
-        my $string=shift @_;
-        my @bar;
-
-        my @c=split(//,$string);
-
-        @bar = map { [ $self->encode_string($_), $_ ] } @c;
-
-        return(@bar);
+    my ($self, $string) = @_;
+    my @bars = map { [ $self->encode_string($_), $_ ] } split //, $string;
+    return @bars;
 }
 
 sub encode_string {
-        my $self=shift @_;
-        my $string=shift @_;
-        my $bar;
-        my @c=split(//,$string);
+    my ($self, $string) = @_;
 
-        foreach my $char (@c) {
-                $bar.=$self->encode_char($char);
-        }
-        return($bar);
+    my $bar;
+    foreach my $character (split //, $string) {
+        $bar .= $self->encode_char($character);
+    }
+    return $bar;
 }
 
 sub drawbar {
-    my $self=shift @_;
-    my @bar=@{shift @_};
-    my $bartext=shift @_;
-    my $ext=shift @_;
+    my $self = shift();
+    my @bar = @{shift()};
+    my $bartext = shift();
 
-    my $x=$self->{' quzn'};
-    my ($code,$str,$f,$t,$l,$h,$xo);
+    my $x = $self->{' quzn'};
+    my ($code, $str, $f, $t, $l, $h, $xo);
     $self->fillcolor('black');
     $self->strokecolor('black');
 
-    my $bw=1;
+    my $bw = 1;
     foreach my $b (@bar) {
-        if(ref($b)) {
-            ($code,$str)=@{$b};
-        } else {
-            $code=$b;
-            $str=undef;
+        if (ref($b)) {
+            ($code, $str) = @{$b};
         }
-        $xo=0;
-        foreach my $c (split(//,$code)) {
-            my $w=$bar_wdt{$c};
-            $xo+=$w/2;
-            if($c=~/[0-9]/) {
-                $l=$self->{' quzn'} + $self->{' lmzn'};
-                $h=$self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $t=$self->{' quzn'};
-                $f=$self->{' fnsz'}||$self->{' lmzn'};
-            } elsif($c=~/[a-z]/) {
-                $l=$self->{' quzn'};
-                $h=$self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $t=$self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $f=$self->{' fnsz'}||$self->{' umzn'};
-            } elsif($c=~/[A-Z]/) {
-                $l=$self->{' quzn'};
-                $h=$self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'};
-                $f=$self->{' fnsz'}||$self->{' umzn'};
-                $t=$self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'} - $f;
-            } else {
-                $l=$self->{' quzn'} + $self->{' lmzn'};
-                $h=$self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $t=$self->{' quzn'};
-                $f=$self->{' fnsz'}||$self->{' lmzn'};
+        else {
+            $code = $b;
+            $str = undef;
+        }
+
+        $xo = 0;
+        foreach my $c (split //, $code) {
+            my $w = $bar_widths{$c};
+            $xo += $w / 2;
+            if ($c =~ /[0-9]/) {
+                $l = $self->{' quzn'} + $self->{' lmzn'};
+                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $t = $self->{' quzn'};
+                $f = $self->{' fnsz'} || $self->{' lmzn'};
             }
-            if($bw) {
-                if($c ne '0') {
-                    $self->linewidth($w-$self->{' ofwt'});
-                    $self->move($x+$xo,$l);
-                    $self->line($x+$xo,$h);
-                    $self->stroke;
+            elsif ($c =~ /[a-z]/) {
+                $l = $self->{' quzn'};
+                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $t = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $f = $self->{' fnsz'} || $self->{' umzn'};
+            }
+            elsif ($c =~ /[A-Z]/) {
+                $l = $self->{' quzn'};
+                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'};
+                $f = $self->{' fnsz'} || $self->{' umzn'};
+                $t = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'} - $f;
+            }
+            else {
+                $l = $self->{' quzn'} + $self->{' lmzn'};
+                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $t = $self->{' quzn'};
+                $f = $self->{' fnsz'} || $self->{' lmzn'};
+            }
+
+            if ($bw) {
+                unless ($c eq '0') {
+                    $self->linewidth($w - $self->{' ofwt'});
+                    $self->move($x + $xo, $l);
+                    $self->line($x + $xo, $h);
+                    $self->stroke();
                 }
-                $bw=0;
-            } else {
-                $bw=1;
+                $bw = 0;
             }
-            $xo+=$w/2;
+            else {
+                $bw = 1;
+            }
+            $xo += $w / 2;
         }
-        if(defined($str) && ($self->{' lmzn'}>0)) {
-            $str=join($self->{' spcr'},split(//,$str));
-            $self->textstart;
-            $self->translate($x+($xo/2),$t);
-            $self->font($self->{' bfont'},$f);
+
+        if (defined($str) and $self->{' lmzn'}) {
+            $str = join($self->{' spcr'}, split //, $str);
+            $self->textstart();
+            $self->translate($x + ($xo / 2), $t);
+            $self->font($self->{' bfont'}, $f);
             $self->text_center($str);
-            $self->textend;
+            $self->textend();
         }
-        $x+=$xo;
+        $x += $xo;
     }
-    if(defined $bartext) {
-        $f=$self->{' fnsz'}||$self->{' lmzn'};
-        $t=$self->{' quzn'}-$f;
-        $self->textstart;
-        $self->translate(($self->{' quzn'}+$x)/2,$t);
-        $self->font($self->{' bfont'},$f);
+    if (defined $bartext) {
+        $f = $self->{' fnsz'} || $self->{' lmzn'};
+        $t = $self->{' quzn'} - $f;
+        $self->textstart();
+        $self->translate(($self->{' quzn'} + $x) / 2, $t);
+        $self->font($self->{' bfont'}, $f);
         $self->text_center($bartext);
-        $self->textend;
+        $self->textend();
     }
-    $self->{' w'}=$self->{' quzn'}+$x;
-    $self->{' h'}=2*$self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-    $self->{BBox}=PDFArray(PDFNum(0),PDFNum(0),PDFNum($self->{' w'}),PDFNum($self->{' h'}));
+    $self->{' w'} = $self->{' quzn'} + $x;
+    $self->{' h'} = 2 * $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+    $self->{'BBox'} = PDFArray(PDFNum(0), PDFNum(0), PDFNum($self->{' w'}), PDFNum($self->{' h'}));
 }
 
-=item $wd = $bc->width
+=item $width = $barcode->width()
 
 =cut
 
 sub width {
-    my $self = shift @_;
-    return($self->{' w'});
+    my $self = shift();
+    return $self->{' w'};
 }
 
-=item $ht = $bc->height
+=item $height = $barcode->height()
 
 =cut
 
 sub height {
-    my $self = shift @_;
-    return($self->{' h'});
+    my $self = shift();
+    return $self->{' h'};
 }
 
 =back
