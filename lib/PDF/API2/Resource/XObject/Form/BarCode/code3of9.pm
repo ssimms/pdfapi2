@@ -30,13 +30,12 @@ sub new {
     return $self;
 }
 
-my $code3of9     = q(1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%*);
-my $code3of9_chk = q(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%);
+my $code3of9 = q(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%*);
 
 my @bar3of9 = qw(
-    2112111121  1122111121  2122111111  1112211121
-    2112211111  1122211111  1112112121  2112112111
-    1122112111  1112212111  2111121121  1121121121
+    1112212111  2112111121  1122111121  2122111111
+    1112211121  2112211111  1122211111  1112112121
+    2112112111  1122112111  2111121121  1121121121
     2121121111  1111221121  2111221111  1121221111
     1111122121  2111122111  1121122111  1111222111
     2111111221  1121111221  2121111211  1111211221
@@ -201,7 +200,7 @@ sub encode_3of9_string_w_chk {
     my $checksum = 0;
     foreach my $char (split //, $string) {
         $bar .= encode_3of9_char($char);
-        $checksum += index($code3of9_chk, $char);
+        $checksum += index($code3of9, $char);
     }
 
     $checksum %= 43;
