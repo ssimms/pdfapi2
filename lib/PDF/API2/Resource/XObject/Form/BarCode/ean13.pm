@@ -4,120 +4,137 @@ package PDF::API2::Resource::XObject::Form::BarCode::ean13;
 
 use base 'PDF::API2::Resource::XObject::Form::BarCode';
 
-no warnings qw[ deprecated recursion uninitialized ];
+use strict;
+use warnings;
 
 sub new {
-    my ($class,$pdf,%opts) = @_;
-    my $self;
+    my ($class, $pdf, %options) = @_;
+    my $self = $class->SUPER::new($pdf, %options);
 
-    $class = ref $class if ref $class;
+    my @bars = $self->encode($options{'-code'});
 
-    $self=$class->SUPER::new($pdf,%opts);
+    $self->drawbar([@bars]);
 
-    my @bar = $self->encode($opts{-code});
-
-    $self->drawbar([@bar]);
-
-    return($self);
+    return $self;
 }
 
-
-my @ean_code_odd =qw( 3211 2221 2122 1411 1132 1231 1114 1312 1213 3112 );
-my @ean_code_even=qw( 1123 1222 2212 1141 2311 1321 4111 2131 3121 2113 );
+my @ean_code_odd  = qw( 3211 2221 2122 1411 1132 1231 1114 1312 1213 3112 );
+my @ean_code_even = qw( 1123 1222 2212 1141 2311 1321 4111 2131 3121 2113 );
 
 sub encode {
-    my $self=shift @_;
-    my $string=shift @_;
-    my @c=split(//,$string);
-    my ($enc,@bar);
-    my $v=shift @c;
-    push(@bar,['07',"$v"]);
-    push(@bar,'a1a');
-    if($v==0) {
-        foreach(0..5) {
-            my $f=shift @c;
-            push(@bar,[$ean_code_odd[$f],"$f"]);
+    my ($self, $string) = @_;
+    my @c = split //, $string;
+
+    # The first digit determines the even/odd pattern of the next six
+    # digits, and is printed to the left of the barcode
+    my $v = shift @c;
+    my @bars = (['07', $v]);
+
+    # Start Code
+    push @bars, 'a1a';
+
+    # Digits 2-7
+    if ($v == 0) {
+        foreach (0..5) {
+            my $digit = shift @c;
+            push @bars, [$ean_code_odd[$digit], $digit];
         }
-    } elsif($v==1) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-    } elsif($v==2) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-    } elsif($v==3) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-    } elsif($v==4) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-    } elsif($v==5) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-    } elsif($v==6) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-    } elsif($v==7) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-    } elsif($v==8) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-    } elsif($v==9) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_even[$f],"$f"]);
-        $f=shift @c; push(@bar,[$ean_code_odd[$f],"$f"]);
     }
-    push(@bar,'1a1a1');
-    foreach(0..5) {
-        my $f=shift @c;
-        push(@bar,[$ean_code_odd[$f],"$f"]);
+    elsif ($v == 1) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
     }
-    push(@bar,'a1a');
-    return @bar;
+    elsif ($v == 2) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+    }
+    elsif ($v == 3) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+    }
+    elsif ($v == 4) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+    }
+    elsif ($v == 5) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+    }
+    elsif ($v == 6) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+    }
+    elsif ($v == 7) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+    }
+    elsif ($v == 8) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+    }
+    elsif ($v == 9) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+        $digit = shift @c; push @bars, [$ean_code_even[$digit], $digit];
+        $digit = shift @c; push @bars, [$ean_code_odd[$digit],  $digit];
+    }
+
+    # Center Code
+    push @bars, '1a1a1';
+
+    # Digits 8-13
+    for (0..5) {
+        my $digit = shift @c;
+        push @bars, [$ean_code_odd[$digit], $digit];
+    }
+
+    # Stop Code
+    push @bars, 'a1a';
+
+    return @bars;
 }
 
 1;
