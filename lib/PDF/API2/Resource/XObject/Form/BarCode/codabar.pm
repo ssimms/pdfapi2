@@ -4,27 +4,23 @@ package PDF::API2::Resource::XObject::Form::BarCode::codabar;
 
 use base 'PDF::API2::Resource::XObject::Form::BarCode';
 
-no warnings qw[ deprecated recursion uninitialized ];
+use strict;
+use warnings;
 
 sub new {
-    my ($class,$pdf,%opts) = @_;
-    my $self;
+    my ($class, $pdf, %options) = @_;
+    my $self = $class->SUPER::new($pdf, %options);
 
-    $class = ref $class if ref $class;
+    my @bars = $self->encode($options{'-code'});
 
-    $self=$class->SUPER::new($pdf,%opts);
+    $self->drawbar([@bars]);
 
-    my @bar = $self->encode($opts{-code});
-
-    $self->drawbar([@bar]);
-
-    return($self);
+    return $self;
 }
 
+my $codabar = q|0123456789-$:/.+ABCD|;
 
-my $codabar=q|0123456789-$:/.+ABCD|;
-
-my @barcodabar=qw(
+my @barcodabar = qw(
     11111221 11112211 11121121 22111111 11211211
     21111211 12111121 12112111 12211111 21121111
     11122111 11221111 21112121 21211121 21212111
@@ -32,9 +28,9 @@ my @barcodabar=qw(
 );
 
 sub encode_char {
-        my $self=shift @_;
-        my $char=uc(shift @_);
-        return($barcodabar[index($codabar,$char)]);
+    my $self = shift();
+    my $char = uc shift();
+    return $barcodabar[index($codabar, $char)];
 }
 
 1;
