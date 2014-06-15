@@ -23,6 +23,10 @@
       letter, and the program will die if an invalid character set is
       requested (requested by Andrea Nall).
 
+    - Interleaved 2 of 5 barcodes now prepend a zero when an odd
+      number of digits is specified, which is standard behavior.
+      Previously, a zero was appended instead.
+
 
 2.021     2014-02-20
 
