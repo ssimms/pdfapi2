@@ -26,7 +26,7 @@ my $xo_3of9 = $pdf->xo_3of9();
 isa_ok($xo_3of9, q{PDF::API2::Resource::XObject::Form::BarCode::code3of9},
        q{xo_3of9 loads});
 
-my $xo_ean13 = $pdf->xo_ean13();
+my $xo_ean13 = $pdf->xo_ean13(-code => '0123456789012');
 isa_ok($xo_ean13, q{PDF::API2::Resource::XObject::Form::BarCode::ean13},
        q{xo_ean13 loads});
 
