@@ -93,7 +93,7 @@ sub encode_3of9 {
         $display = $string;
 
         # Encode, but don't display, non-printable characters
-        $display =~ s/[:cntrl:]//g;
+        $display =~ s/[[:cntrl:]]//g;
 
         $string = join('', map { $extended_map[ord($_)] } split //, $string);
     }
