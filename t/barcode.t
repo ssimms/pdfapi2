@@ -18,7 +18,7 @@ my $xo_code128 = $pdf->xo_code128(-code => 0);
 isa_ok($xo_code128, q{PDF::API2::Resource::XObject::Form::BarCode::code128},
        q{xo_code128 loads});
 
-my $xo_2of5int = $pdf->xo_2of5int();
+my $xo_2of5int = $pdf->xo_2of5int(-code => 0);
 isa_ok($xo_2of5int, q{PDF::API2::Resource::XObject::Form::BarCode::int2of5},
        q{xo_2of5int loads});
 
