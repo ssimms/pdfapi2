@@ -11,19 +11,9 @@ sub new {
     my ($class, $pdf, %options) = @_;
     my $self = $class->SUPER::new($pdf, %options);
 
-    my @bars;
-    if ($options{'-ext'} and $options{'-chk'}) {
-        @bars = encode_3of9_ext_w_chk($options{'-code'});
-    }
-    elsif ($options{'-ext'}) {
-        @bars = encode_3of9_ext($options{'-code'});
-    }
-    elsif ($options{'-chk'}) {
-        @bars = encode_3of9_w_chk($options{'-code'});
-    }
-    else {
-        @bars = encode_3of9($options{'-code'});
-    }
+    my @bars = encode_3of9($options{'-code'},
+                           $options{'-chk'} ? 1 : 0,
+                           $options{'-ext'} ? 1 : 0);
 
     $self->drawbar([@bars]);
 
@@ -178,87 +168,55 @@ my %bar3of9ext = (
 );
 
 sub encode_3of9_char {
-    my $char = shift();
-    return $bar3of9[index($code3of9, $char)];
+    my $character = shift();
+    return $bar3of9[index($code3of9, $character)];
 }
 
 sub encode_3of9_string {
-    my $string = shift();
+    my ($string, $is_mod43) = @_;
 
     my $bar;
-    foreach my $char (split //, $string) {
-        $bar .= encode_3of9_char($char);
-    }
-
-    return $bar;
-}
-
-sub encode_3of9_string_w_chk {
-    my $string = shift();
-
-    my $bar = '';
     my $checksum = 0;
     foreach my $char (split //, $string) {
         $bar .= encode_3of9_char($char);
         $checksum += index($code3of9, $char);
     }
 
-    $checksum %= 43;
-    $bar .= $bar3of9[$checksum];
+    if ($is_mod43) {
+        $checksum %= 43;
+        $bar .= $bar3of9[$checksum];
+    }
 
     return $bar;
 }
 
+# Deprecated (rolled into encode_3of9_string)
+sub encode_3of9_string_w_chk { return encode_3of9_string(shift(), 1); }
+
 sub encode_3of9 {
-    my $string = shift();
+    my ($string, $is_mod43, $is_extended) = @_;
 
-    $string = uc $string;
-    $string =~ s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
-
-    my @bars;
-    push @bars, encode_3of9_char('*');
-    push @bars, [ encode_3of9_string($string), $string ];
-    push @bars, encode_3of9_char('*');
-
-    return @bars;
-}
-
-sub encode_3of9_w_chk {
-    my $string = shift();
-
-    $string = uc $string;
-    $string =~ s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
+    my $display;
+    if ($is_extended) {
+        $display = $string;
+        $string = join('', map { $bar3of9ext{$_} } split //, $string);
+    }
+    else {
+        $string = uc $string;
+        $string =~ s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
+        $display = $string;
+    }
 
     my @bars;
     push @bars, encode_3of9_char('*');
-    push @bars, [ encode_3of9_string_w_chk($string), $string ];
+    push @bars, [ encode_3of9_string($string, $is_mod43), $display ];
     push @bars, encode_3of9_char('*');
-
     return @bars;
 }
 
-sub encode_3of9_ext {
-    my $string = shift();
-    my $encode = join('', map { $bar3of9ext{$_} } split //, $string);
-
-    my @bars;
-    push @bars, encode_3of9_char('*');
-    push @bars, [ encode_3of9_string($encode), $string ];
-    push @bars, encode_3of9_char('*');
-
-    return @bars;
-}
-
-sub encode_3of9_ext_w_chk {
-    my $string = shift();
-    my $encode = join('', map { $bar3of9ext{$_} } split //, $string);
-
-    my @bars;
-    push @bars, encode_3of9_char('*');
-    push @bars, [ encode_3of9_string_w_chk($encode), $string ];
-    push @bars, encode_3of9_char('*');
-
-    return @bars;
-}
+# Deprecated (rolled into encode_3of9)
+sub encode_3of9_w_chk     { return encode_3of9(shift(), 1, 0); }
+sub encode_3of9_ext       { return encode_3of9(shift(), 0, 1); }
+sub encode_3of9_ext_w_chk { return encode_3of9(shift(), 1, 1); }
 
 1;
