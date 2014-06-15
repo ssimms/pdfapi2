@@ -197,14 +197,20 @@ sub encode_3of9 {
     my ($string, $is_mod43, $is_extended) = @_;
 
     my $display;
-    if ($is_extended) {
-        $display = $string;
-        $string = join('', map { $bar3of9ext{$_} } split //, $string);
-    }
-    else {
+    unless ($is_extended) {
         $string = uc $string;
         $string =~ s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
         $display = $string;
+    }
+    else {
+        # Extended Code39 supports all 7-bit ASCII characters
+        $string =~ s/[^\x00-\x7f]//g;
+        $display = $string;
+
+        # Encode, but don't display, non-printable characters
+        $display =~ s/[:cntrl:]//g;
+
+        $string = join('', map { $bar3of9ext{$_} } split //, $string);
     }
 
     my @bars;
