@@ -4,36 +4,36 @@ package PDF::API2::Resource::XObject::Form::BarCode::code3of9;
 
 use base 'PDF::API2::Resource::XObject::Form::BarCode';
 
-no warnings qw[ deprecated recursion uninitialized ];
+use strict;
+use warnings;
 
 sub new {
-    my ($class,$pdf,%opts) = @_;
-    my $self;
+    my ($class, $pdf, %options) = @_;
+    my $self = $class->SUPER::new($pdf, %options);
 
-    $class = ref $class if ref $class;
-
-    $self=$class->SUPER::new($pdf,%opts);
-
-    my @bar;
-    if($opts{-ext} && $opts{-chk}) {
-        @bar = &encode_3of9_ext_w_chk($opts{-code});
-    } elsif($opts{-ext}) {
-        @bar = &encode_3of9_ext($opts{-code});
-    } elsif($opts{-chk}) {
-        @bar = &encode_3of9_w_chk($opts{-code});
-    } else {
-        @bar = &encode_3of9($opts{-code});
+    my @bars;
+    if ($options{'-ext'} and $options{'-chk'}) {
+        @bars = encode_3of9_ext_w_chk($options{'-code'});
+    }
+    elsif ($options{'-ext'}) {
+        @bars = encode_3of9_ext($options{'-code'});
+    }
+    elsif ($options{'-chk'}) {
+        @bars = encode_3of9_w_chk($options{'-code'});
+    }
+    else {
+        @bars = encode_3of9($options{'-code'});
     }
 
-    $self->drawbar([@bar]);
+    $self->drawbar([@bars]);
 
-    return($self);
+    return $self;
 }
 
-my $code3of9 = q|1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%*|;
-my $code3of9_chk = q|0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%|;
+my $code3of9     = q(1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%*);
+my $code3of9_chk = q(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%);
 
-my @bar3of9 = qw/
+my @bar3of9 = qw(
     2112111121  1122111121  2122111111  1112211121
     2112211111  1122211111  1112112121  2112112111
     1122112111  1112212111  2111121121  1121121121
@@ -45,10 +45,9 @@ my @bar3of9 = qw/
     2221111111  1211211121  2211211111  1221211111
     1211112121  2211112111  1221112111  1212121111
     1212111211  1211121211  1112121211  abaababaa1
-/;
+);
 
-
-my %bar3of9ext=(
+my %bar3of9ext = (
     "\x00" => '%U',
     "\x01" => '$A',
     "\x02" => '$B',
@@ -180,87 +179,87 @@ my %bar3of9ext=(
 );
 
 sub encode_3of9_char {
-    my $char=shift @_;
-    return($bar3of9[index($code3of9,$char)]);
+    my $char = shift();
+    return $bar3of9[index($code3of9, $char)];
 }
 
 sub encode_3of9_string {
-    my $string=shift @_;
-    my $bar;
-    my @c=split(//,$string);
+    my $string = shift();
 
-    foreach my $char (@c) {
-        $bar.=encode_3of9_char($char);
+    my $bar;
+    foreach my $char (split //, $string) {
+        $bar .= encode_3of9_char($char);
     }
-    return($bar);
+
+    return $bar;
 }
 
 sub encode_3of9_string_w_chk {
-    my $string=shift @_;
-    my ($bar,$num);
-    my @c=split(//,$string);
+    my $string = shift();
 
-    foreach my $char (@c) {
-        $num+=index($code3of9_chk,$char);
-        $bar.=encode_3of9_char($char);
+    my $bar = '';
+    my $checksum = 0;
+    foreach my $char (split //, $string) {
+        $bar .= encode_3of9_char($char);
+        $checksum += index($code3of9_chk, $char);
     }
-    $num%=43;
-    $bar.=$bar3of9[$num];
-    return($bar);
+
+    $checksum %= 43;
+    $bar .= $bar3of9[$checksum];
+
+    return $bar;
 }
 
 sub encode_3of9 {
-    my $string=shift @_;
-    my @bar;
+    my $string = shift();
 
-    $string=uc($string);
-    $string=~s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
+    $string = uc $string;
+    $string =~ s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
 
-    push(@bar, encode_3of9_char('*') );
-    push(@bar, [ encode_3of9_string($string), $string ] );
-    push(@bar, $bar[0] );
+    my @bars;
+    push @bars, encode_3of9_char('*');
+    push @bars, [ encode_3of9_string($string), $string ];
+    push @bars, encode_3of9_char('*');
 
-    return(@bar);
+    return @bars;
 }
 
 sub encode_3of9_w_chk {
-    my $string=shift @_;
-    my @bar;
+    my $string = shift();
 
-    $string=uc($string);
-    $string=~s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
+    $string = uc $string;
+    $string =~ s/[^0-9A-Z\-\.\ \$\/\+\%]+//g;
 
-    push(@bar, encode_3of9_char('*') );
-    push(@bar, [ encode_3of9_string_w_chk($string), $string ] );
-    push(@bar, $bar[0] );
+    my @bars;
+    push @bars, encode_3of9_char('*');
+    push @bars, [ encode_3of9_string_w_chk($string), $string ];
+    push @bars, encode_3of9_char('*');
 
-    return(@bar);
+    return @bars;
 }
 
 sub encode_3of9_ext {
-    my $string=shift @_;
-    my @c=split(//,$string);
-    my ($enc,@bar);
-    map { $enc.=$bar3of9ext{$_}; } (@c);
+    my $string = shift();
+    my $encode = join('', map { $bar3of9ext{$_} } split //, $string);
 
-    push(@bar, encode_3of9_char('*') );
-    push(@bar, [ encode_3of9_string($enc), $string ] );
-    push(@bar, $bar[0] );
+    my @bars;
+    push @bars, encode_3of9_char('*');
+    push @bars, [ encode_3of9_string($encode), $string ];
+    push @bars, encode_3of9_char('*');
 
-    return(@bar);
+    return @bars;
 }
 
 sub encode_3of9_ext_w_chk {
-    my $string=shift @_;
-    my @c=split(//,$string);
-    my ($enc,@bar);
-    map { $enc.=$bar3of9ext{$_}; } (@c);
+    my $string = shift();
+    my $encode = join('', map { $bar3of9ext{$_} } split //, $string);
 
-    push(@bar, encode_3of9_char('*') );
-    push(@bar, [ encode_3of9_string_w_chk($enc), $string ] );
-    push(@bar, $bar[0] );
+    my @bars;
+    push @bars, encode_3of9_char('*');
+    push @bars, [ encode_3of9_string_w_chk($encode), $string ];
+    push @bars, encode_3of9_char('*');
 
-    return(@bar);
+    return @bars;
 }
 
 1;
