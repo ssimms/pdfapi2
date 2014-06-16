@@ -43,7 +43,7 @@ sub new {
 # Deprecated (rolled into new)
 sub new_api { my $self = shift(); return $self->new(@_); }
 
-my %bar_widths=(
+my %bar_widths = (
      0 => 0,
      1 => 1, 'a' => 1, 'A' => 1,
      2 => 2, 'b' => 2, 'B' => 2,
@@ -74,90 +74,93 @@ sub encode_string {
 
 sub drawbar {
     my $self = shift();
-    my @bar = @{shift()};
-    my $bartext = shift();
+    my @sets = @{shift()};
+    my $caption = shift();
 
-    my $x = $self->{' quzn'};
-    my ($code, $str, $f, $t, $l, $h, $xo);
     $self->fillcolor('black');
     $self->strokecolor('black');
 
-    my $bw = 1;
-    foreach my $b (@bar) {
-        if (ref($b)) {
-            ($code, $str) = @{$b};
+    my $x = $self->{' quzn'};
+    my $is_space_next = 0;
+    foreach my $set (@sets) {
+        my ($code, $label);
+        if (ref($set)) {
+            ($code, $label) = @{$set};
         }
         else {
-            $code = $b;
-            $str = undef;
+            $code = $set;
+            $label = undef;
         }
 
-        $xo = 0;
-        foreach my $c (split //, $code) {
-            my $w = $bar_widths{$c};
-            $xo += $w / 2;
-            if ($c =~ /[0-9]/) {
-                $l = $self->{' quzn'} + $self->{' lmzn'};
-                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $t = $self->{' quzn'};
-                $f = $self->{' fnsz'} || $self->{' lmzn'};
+        my $code_width = 0;
+        my ($font_size, $y_label);
+        foreach my $bar (split //, $code) {
+            my $bar_width = $bar_widths{$bar};
+
+            my ($y0, $y1);
+            if ($bar =~ /[0-9]/) {
+                $y0 = $self->{' quzn'} + $self->{' lmzn'};
+                $y1 = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $y_label   = $self->{' quzn'};
+                $font_size = $self->{' fnsz'} || $self->{' lmzn'};
             }
-            elsif ($c =~ /[a-z]/) {
-                $l = $self->{' quzn'};
-                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $t = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $f = $self->{' fnsz'} || $self->{' umzn'};
+            elsif ($bar =~ /[a-z]/) {
+                $y0 = $self->{' quzn'};
+                $y1 = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $y_label   = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $font_size = $self->{' fnsz'} || $self->{' umzn'};
             }
-            elsif ($c =~ /[A-Z]/) {
-                $l = $self->{' quzn'};
-                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'};
-                $f = $self->{' fnsz'} || $self->{' umzn'};
-                $t = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'} - $f;
+            elsif ($bar =~ /[A-Z]/) {
+                $y0 = $self->{' quzn'};
+                $y1 = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'};
+                $font_size = $self->{' fnsz'} || $self->{' umzn'};
+                $y_label   = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'} - $font_size;
             }
             else {
-                $l = $self->{' quzn'} + $self->{' lmzn'};
-                $h = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $t = $self->{' quzn'};
-                $f = $self->{' fnsz'} || $self->{' lmzn'};
+                $y0 = $self->{' quzn'} + $self->{' lmzn'};
+                $y1 = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $y_label   = $self->{' quzn'};
+                $font_size = $self->{' fnsz'} || $self->{' lmzn'};
             }
 
-            if ($bw) {
-                unless ($c eq '0') {
-                    $self->linewidth($w - $self->{' ofwt'});
-                    $self->move($x + $xo, $l);
-                    $self->line($x + $xo, $h);
-                    $self->stroke();
-                }
-                $bw = 0;
+            unless ($is_space_next or $bar eq '0') {
+                $self->linewidth($bar_width - $self->{' ofwt'});
+                $self->move($x + $code_width + $bar_width / 2, $y0);
+                $self->line($x + $code_width + $bar_width / 2, $y1);
+                $self->stroke();
             }
-            else {
-                $bw = 1;
-            }
-            $xo += $w / 2;
+            $is_space_next = not $is_space_next;
+
+            $code_width += $bar_width;
         }
 
-        if (defined($str) and $self->{' lmzn'}) {
-            $str = join($self->{' spcr'}, split //, $str);
+        if (defined($label) and $self->{' lmzn'}) {
+            $label = join($self->{' spcr'}, split //, $label);
             $self->textstart();
-            $self->translate($x + ($xo / 2), $t);
-            $self->font($self->{' bfont'}, $f);
-            $self->text_center($str);
+            $self->translate($x + ($code_width / 2), $y_label);
+            $self->font($self->{' bfont'}, $font_size);
+            $self->text_center($label);
             $self->textend();
         }
-        $x += $xo;
+
+        $x += $code_width;
     }
-    if (defined $bartext) {
-        $f = $self->{' fnsz'} || $self->{' lmzn'};
-        $t = $self->{' quzn'} - $f;
+
+    $x += $self->{' quzn'};
+
+    if (defined $caption) {
+        my $font_size = $self->{' fnsz'} || $self->{' lmzn'};
+        my $y_caption = $self->{' quzn'} - $font_size;
         $self->textstart();
-        $self->translate(($self->{' quzn'} + $x) / 2, $t);
-        $self->font($self->{' bfont'}, $f);
-        $self->text_center($bartext);
+        $self->translate($x / 2, $y_caption);
+        $self->font($self->{' bfont'}, $font_size);
+        $self->text_center($caption);
         $self->textend();
     }
-    $self->{' w'} = $self->{' quzn'} + $x;
+
+    $self->{' w'} = $x;
     $self->{' h'} = 2 * $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-    $self->{'BBox'} = PDFArray(PDFNum(0), PDFNum(0), PDFNum($self->{' w'}), PDFNum($self->{' h'}));
+    $self->bbox(0, 0, $self->{' w'}, $self->{' h'});
 }
 
 =item $width = $barcode->width()
