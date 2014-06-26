@@ -27,6 +27,11 @@
       number of digits is specified, which is standard behavior.
       Previously, a zero was appended instead.
 
+    - $page->rotate(0) now sets rotation to 0 degrees rather than
+      deleting an existing page rotation command.  Page rotation is
+      inherited, so this is necessary to undo any inherited page
+      rotation.
+
 
 2.021     2014-02-20
 

@@ -230,20 +230,11 @@ Rotates the page by the given degrees, which must be a multiple of 90.
 
 sub rotate {
     my ($self, $degrees) = @_;
-    $degrees = floor($degrees / 90);
-    while ($degrees > 4) {
-        $degrees -= 4;
-    }
-    while ($degrees < 0) {
-        $degrees += 4;
-    }
 
-    if ($degrees == 0) {
-        delete $self->{'Rotate'};
-    }
-    else {
-        $self->{'Rotate'} = PDFNum($degrees * 90);
-    }
+    # Ignore rotation of 360 or more (in either direction)
+    $degrees = $degrees % 360;
+
+    $self->{'Rotate'} = PDFNum($degrees);
 
     return $self;
 }
