@@ -163,7 +163,7 @@ sub encode_128_string {
                 }
             }
             else {
-                $character .= shift(@characters) if $character =~ /\d/;
+                $character .= shift(@characters) if $character =~ /\d/ and scalar @characters;
                 if ($character =~ /^[^\d]*$/ or $character =~ /^\d[^\d]*$/) {
                     ($bar, $index) = encode_128_char_idx($code, "\xCB");
                     push @bars, $bar;
