@@ -229,20 +229,23 @@ Rotates the page by the given degrees, which must be a multiple of 90.
 =cut
 
 sub rotate {
-    my ($self,$deg) = @_;
-    $deg=floor($deg/90);
-    while($deg>4) {
-        $deg-=4;
+    my ($self, $degrees) = @_;
+    $degrees = floor($degrees / 90);
+    while ($degrees > 4) {
+        $degrees -= 4;
     }
-    while($deg<0) {
-        $deg+=4;
+    while ($degrees < 0) {
+        $degrees += 4;
     }
-    if($deg==0) {
-        delete $self->{Rotate};
-    } else {
-        $self->{Rotate}=PDFNum($deg*90);
+
+    if ($degrees == 0) {
+        delete $self->{'Rotate'};
     }
-    return($self);
+    else {
+        $self->{'Rotate'} = PDFNum($degrees * 90);
+    }
+
+    return $self;
 }
 
 =item $gfx = $page->gfx $prepend
