@@ -233,7 +233,7 @@ sub encode_ean128 {
     $string =~ s/(\d+)([a-zA-Z]+)/$1\xcb$2/g;
     $string =~ s/([a-zA-Z]+)(\d+)/$1\xcc$2/g;
 
-    return encode_128('c', "\xf1$string");
+    return $self->encode_128('c', "\xf1$string");
 }
 
 1;
