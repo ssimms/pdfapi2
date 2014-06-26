@@ -60,4 +60,19 @@ sub encode {
     return @bars;
 }
 
+sub calculate_check_digit {
+    my ($self, $string) = @_;
+    my @digits = split //, $string;
+    my $weight = 1;
+    my $checksum = 0;
+    foreach my $i (0..11) {
+        $checksum += $digits[$i] * $weight;
+        $weight = $weight == 1 ? 3 : 1;
+    }
+
+    $checksum = $checksum % 10;
+    return 0 unless $checksum;
+    return 10 - $checksum;
+}
+
 1;
