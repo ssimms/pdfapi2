@@ -32,6 +32,8 @@
       inherited, so this is necessary to undo any inherited page
       rotation.
 
+    - Fix: Attempts to use EAN-128 barcodes resulted in an error.
+
 
 2.021     2014-02-20
 
