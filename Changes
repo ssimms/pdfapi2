@@ -34,6 +34,10 @@
 
     - Fix: Attempts to use EAN-128 barcodes resulted in an error.
 
+    - Add a more informative error when text() is called without first
+      setting a font(), and when font() is called without including a
+      font size.
+
 
 2.021     2014-02-20
 
