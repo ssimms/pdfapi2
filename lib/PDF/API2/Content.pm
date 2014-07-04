@@ -4,6 +4,7 @@ package PDF::API2::Content;
 
 use base 'PDF::API2::Basic::PDF::Dict';
 
+use Carp;
 use Compress::Zlib qw();
 use Encode;
 use Math::Trig;
@@ -1543,6 +1544,9 @@ sub _font {
 }
 sub font {
     my ($self, $font, $size) = @_;
+    unless ($size) {
+        croak q{A font size is required};
+    }
     $self->fontset($font, $size);
     $self->add(_font($font, $size));
     $self->{' fontset'} = 1;
@@ -1743,6 +1747,9 @@ sub text {
     my ($self, $text, %opt) = @_;
     my $wd = 0;
     if ($self->{' fontset'}==0) {
+        unless (defined $self->{' font'} and $self->{' fontsize'}) {
+            croak q{Can't add text without first setting a font and font size};
+        }
         $self->font($self->{' font'},$self->{' fontsize'});
         $self->{' fontset'}=1;
     }
