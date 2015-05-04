@@ -1288,6 +1288,7 @@ sub importPageIntoForm {
     $self->{apiimportcache}||={};
     $self->{apiimportcache}->{$s_pdf}||={};
 
+    # Should never get past MediaBox, since it is a required object.
     foreach my $k (qw( MediaBox ArtBox TrimBox BleedBox CropBox )) {
         #next unless(defined $s_page->{$k});
         #my $box = walk_obj($self->{apiimportcache}->{$s_pdf},$s_pdf->{pdf},$self->{pdf},$s_page->{$k});
@@ -1407,7 +1408,18 @@ sub import_page {
     # all that nasty resources from polluting
     # our very own resource naming space.
     my $xo = $self->importPageIntoForm($s_pdf,$s_page);
-    $t_page->mediabox( map { $_->val } $xo->{BBox}->elementsof) if(defined $xo->{BBox});
+
+    # copy all page dimensions
+    foreach my $k (qw( MediaBox ArtBox TrimBox BleedBox CropBox )) {
+        my $prop = $s_page->find_prop($k);
+        next unless defined $prop;
+
+        my $box = walk_obj({}, $s_pdf->{pdf}, $self->{pdf}, $prop);
+        my $method = lc($k);
+
+        $t_page->$method(map { $_->val } $box->elementsof);
+    }
+
     $t_page->gfx->formimage($xo,0,0,1);
 
     # copy annotations and/or form elements as well
