@@ -113,7 +113,7 @@ sub mediabox {
 
 =item ($llx, $lly, $urx, $ury) = $page->get_mediabox
 
-Gets the mediabox based one best estimates or the default.
+Gets the mediabox based on best estimates or the default.
 
 =cut
 
@@ -138,7 +138,7 @@ sub cropbox {
 
 =item ($llx, $lly, $urx, $ury) = $page->get_cropbox
 
-Gets the cropbox based one best estimates or the default.
+Gets the cropbox based on best estimates or the default.
 
 =cut
 
@@ -163,7 +163,7 @@ sub bleedbox {
 
 =item ($llx, $lly, $urx, $ury) = $page->get_bleedbox
 
-Gets the bleedbox based one best estimates or the default.
+Gets the bleedbox based on best estimates or the default.
 
 =cut
 
@@ -186,7 +186,7 @@ sub trimbox {
 
 =item ($llx, $lly, $urx, $ury) = $page->get_trimbox
 
-Gets the trimbox based one best estimates or the default.
+Gets the trimbox based on best estimates or the default.
 
 =cut
 
@@ -211,7 +211,7 @@ sub artbox {
 
 =item ($llx, $lly, $urx, $ury) = $page->get_artbox
 
-Gets the artbox based one best estimates or the default.
+Gets the artbox based on best estimates or the default.
 
 =cut
 
