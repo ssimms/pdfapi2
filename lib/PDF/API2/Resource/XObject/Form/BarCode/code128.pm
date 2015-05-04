@@ -37,7 +37,7 @@ sub new {
         @bars = $self->encode_128($options{'-type'}, $options{'-code'});
     }
 
-    $self->drawbar(\@bars);
+    $self->drawbar(\@bars, $options{'caption'});
 
     return $self;
 }

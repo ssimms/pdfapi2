@@ -13,7 +13,7 @@ sub new {
 
     my @bars = $self->encode($options{'-code'});
 
-    $self->drawbar([@bars]);
+    $self->drawbar([@bars], $options{'caption'});
 
     return $self;
 }

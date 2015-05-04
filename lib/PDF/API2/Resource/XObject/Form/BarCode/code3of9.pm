@@ -15,7 +15,7 @@ sub new {
                            $options{'-chk'} ? 1 : 0,
                            $options{'-ext'} ? 1 : 0);
 
-    $self->drawbar([@bars]);
+    $self->drawbar([@bars], $options{'caption'});
 
     return $self;
 }

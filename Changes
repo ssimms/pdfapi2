@@ -7,6 +7,11 @@
       back according to the defaults listed in the PDF spec (patch by
       Don Huettl of Grant Street Group).
 
+    - Barcodes now take an optional -caption argument that will be
+      printed beneath the barcode.  This can replace or be used in
+      conjunction with the text representation of the barcode
+      (requested by Gareth Tunley).
+
 
 2.023     2014-09-12
 
