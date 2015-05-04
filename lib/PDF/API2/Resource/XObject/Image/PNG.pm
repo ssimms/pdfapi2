@@ -4,11 +4,11 @@ package PDF::API2::Resource::XObject::Image::PNG;
 
 use base 'PDF::API2::Resource::XObject::Image';
 
-use Compress::Zlib;
-use POSIX qw(ceil floor);
+use POSIX qw(ceil);
 
 use IO::File;
 use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Filter::Predictor;
 use PDF::API2::Basic::PDF::Utils;
 
 no warnings qw[ deprecated recursion uninitialized ];
@@ -32,7 +32,10 @@ sub new {
     open($fh,$file);
     binmode($fh);
     seek($fh,8,0);
+    $self->{Length}=PDFNum(-s $file);
     $self->{' stream'}='';
+    $self->{' streamloc'}=0;
+    $self->{' streamsrc'}=$fh;
     $self->{' nofilt'}=1;
     while(!eof($fh)) {
         read($fh,$buf,4);
@@ -152,9 +155,7 @@ sub new {
                 # $dict->{Filter}=PDFArray(PDFName('ASCIIHexDecode'));
                 $dict->{BitsPerComponent}=PDFNum(8);
                 $self->{SMask}=$dict;
-                my $scanline=1+ceil($bpc*$w/8);
-                my $bpp=ceil($bpc/8);
-                my $clearstream=unprocess($bpc,$bpp,1,$w,$h,$scanline,\$self->{' stream'});
+                my $clearstream=PDF::API2::Basic::PDF::Filter::Predictor->new($self)->infilt;
                 foreach my $n (0..($h*$w)-1) {
                     vec($dict->{' stream'},$n,8)=vec($trns,vec($clearstream,$n,$bpc),8);
                 #    print STDERR vec($trns,vec($clearstream,$n,$bpc),8)."=".vec($clearstream,$n,$bpc).",";
@@ -173,6 +174,7 @@ sub new {
             my $dict=PDFDict();
             $self->{DecodeParms}=PDFArray($dict);
             # $dict->{Predictor}=PDFNum(15);
+            $dict->{Alpha}=PDFNum(1);
             $dict->{BitsPerComponent}=PDFNum($bpc);
             $dict->{Colors}=PDFNum(1);
             $dict->{Columns}=PDFNum($w);
@@ -189,9 +191,7 @@ sub new {
                 $dict->{BitsPerComponent}=PDFNum($bpc);
                 $self->{SMask}=$dict;
             }
-            my $scanline=1+ceil($bpc*2*$w/8);
-            my $bpp=ceil($bpc*2/8);
-            my $clearstream=unprocess($bpc,$bpp,2,$w,$h,$scanline,\$self->{' stream'});
+            my $clearstream=PDF::API2::Basic::PDF::Filter::Predictor->new($self)->infilt;
             delete $self->{' nofilt'};
             delete $self->{' stream'};
             foreach my $n (0..($h*$w)-1) {
@@ -210,6 +210,7 @@ sub new {
             my $dict=PDFDict();
             $self->{DecodeParms}=PDFArray($dict);
             # $dict->{Predictor}=PDFNum(15);
+            $dict->{Alpha}=PDFNum(1);
             $dict->{BitsPerComponent}=PDFNum($bpc);
             $dict->{Colors}=PDFNum(3);
             $dict->{Columns}=PDFNum($w);
@@ -226,9 +227,7 @@ sub new {
                 $dict->{BitsPerComponent}=PDFNum($bpc);
                 $self->{SMask}=$dict;
             }
-            my $scanline=1+ceil($bpc*4*$w/8);
-            my $bpp=ceil($bpc*4/8);
-            my $clearstream=unprocess($bpc,$bpp,4,$w,$h,$scanline,\$self->{' stream'});
+            my $clearstream=PDF::API2::Basic::PDF::Filter::Predictor->new($self)->infilt;
             delete $self->{' nofilt'};
             delete $self->{' stream'};
             foreach my $n (0..($h*$w)-1) {
@@ -252,63 +251,6 @@ sub new_api {
     $obj->{' api'}=$api;
 
     return($obj);
-}
-
-sub PaethPredictor {
-    my ($a, $b, $c)=@_;
-    my $p = $a + $b - $c;
-    my $pa = abs($p - $a);
-    my $pb = abs($p - $b);
-    my $pc = abs($p - $c);
-    if(($pa <= $pb) && ($pa <= $pc)) {
-        return $a;
-    } elsif($pb <= $pc) {
-        return $b;
-    } else {
-        return $c;
-    }
-}
-
-sub unprocess {
-    my ($bpc,$bpp,$comp,$width,$height,$scanline,$sstream)=@_;
-    my $stream=uncompress($$sstream);
-    my $prev='';
-    my $clearstream='';
-    foreach my $n (0..$height-1) {
-        # print STDERR "line $n:";
-        my $line=substr($stream,$n*$scanline,$scanline);
-        my $filter=vec($line,0,8);
-        my $clear='';
-        $line=substr($line,1);
-        # print STDERR " filter=$filter";
-        if($filter==0) {
-            $clear=$line;
-        } elsif($filter==1) {
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+vec($clear,$x-$bpp,8))%256;
-            }
-        } elsif($filter==2) {
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+vec($prev,$x,8))%256;
-            }
-        } elsif($filter==3) {
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+floor((vec($clear,$x-$bpp,8)+vec($prev,$x,8))/2))%256;
-            }
-        } elsif($filter==4) {
-            # die "paeth/png filter not supported.";
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+PaethPredictor(vec($clear,$x-$bpp,8),vec($prev,$x,8),vec($prev,$x-$bpp,8)))%256;
-            }
-        }
-        $prev=$clear;
-        foreach my $x (0..($width*$comp)-1) {
-            vec($clearstream,($n*$width*$comp)+$x,$bpc)=vec($clear,$x,$bpc);
-        #    print STDERR "".vec($clear,$x,$bpc).",";
-        }
-        # print STDERR "\n";
-    }
-    return($clearstream);
 }
 
 1;

@@ -43,6 +43,7 @@ sub infilt
 {
     my ($self, $dat, $last) = @_;
     my ($res, $status) = $self->{'infilt'}->inflate("$dat");
+    # TODO: Ideally we should call the Predictor filter from here.
     $res;
 }
 
