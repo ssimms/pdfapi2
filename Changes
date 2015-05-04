@@ -1,5 +1,15 @@
 {{$NEXT}}
 
+    - [RT #104133] Include all bounding boxes when importing a page
+      (patch by Don Huettl of Grant Street Group).
+
+    - [RT #104133] When retrieving bounding boxes for a page, fall
+      back according to the defaults listed in the PDF spec (patch by
+      Don Huettl of Grant Street Group).
+
+
+2.023     2014-09-12
+
     - The fix for [RT #69503] broke a previously-working case where a
       page object could be passed (and was expected).  The -firstpage
       option now accepts a page object or a page number.  Thanks to

@@ -144,7 +144,7 @@ Gets the cropbox based one best estimates or the default.
 
 sub get_cropbox {
     my $self = shift();
-    return _get_bbox($self, [qw(CropBox BleedBox TrimBox ArtBox MediaBox)]);
+    return _get_bbox($self, [qw(CropBox MediaBox BleedBox TrimBox ArtBox)]);
 }
 
 =item $page->bleedbox $w, $h
@@ -169,7 +169,7 @@ Gets the bleedbox based one best estimates or the default.
 
 sub get_bleedbox {
     my $self = shift();
-    return _get_bbox($self, [qw(BleedBox TrimBox ArtBox MediaBox CropBox)]);
+    return _get_bbox($self, [qw(BleedBox CropBox MediaBox TrimBox ArtBox)]);
 }
 
 =item $page->trimbox $w, $h
@@ -192,7 +192,7 @@ Gets the trimbox based one best estimates or the default.
 
 sub get_trimbox {
     my $self = shift();
-    return _get_bbox($self, [qw(TrimBox ArtBox MediaBox CropBox BleedBox)]);
+    return _get_bbox($self, [qw(TrimBox CropBox MediaBox ArtBox BleedBox)]);
 }
 
 =item $page->artbox $w, $h
@@ -217,7 +217,7 @@ Gets the artbox based one best estimates or the default.
 
 sub get_artbox {
     my $self = shift();
-    return _get_bbox($self, [qw(ArtBox TrimBox BleedBox CropBox MediaBox)]);
+    return _get_bbox($self, [qw(ArtBox CropBox MediaBox TrimBox BleedBox)]);
 }
 
 =item $page->rotate $deg
