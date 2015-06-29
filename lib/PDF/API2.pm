@@ -135,8 +135,8 @@ B<Example:>
 
 sub open {
     my ($class, $file, %options) = @_;
-    die "File '$file' does not exist." unless -f $file;
-    die "File '$file' is not readable." unless -r $file;
+    croak "File '$file' does not exist" unless -f $file;
+    croak "File '$file' is not readable" unless -r $file;
 
     my $content;
     my $scalar_fh = FileHandle->new();
