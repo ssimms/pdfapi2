@@ -12,6 +12,9 @@
       conjunction with the text representation of the barcode
       (requested by Gareth Tunley).
 
+    - [RT #105581] Calls to width() in BaseFont are now significantly
+      faster (patch by Dmitri Tikhonov).
+
 
 2.023     2014-09-12
 
