@@ -624,17 +624,22 @@ is used either in native or utf8 format (check utf8-flag).
 sub width {
     my ($self,$text)=@_;
     my $width=0;
+    my @widths_cache;
     if(is_utf8($text)) {
         $text=$self->strByUtf($text)
     }
-    my $lastglyph='';
-    foreach my $n (unpack('C*',$text)) 
-    {
-        $width+=$self->wxByEnc($n);
-        if($self->{-dokern} && ref($self->data->{kern}))
+    if ($self->{-dokern} && ref($self->data->{kern})) {
+        my $lastglyph='';
+        foreach my $n (unpack('C*',$text)) 
         {
+            $width += ($widths_cache[$n] //= $self->wxByEnc($n));
             $width+=$self->data->{kern}->{$lastglyph.':'.$self->data->{e2n}->[$n]};
             $lastglyph=$self->data->{e2n}->[$n];
+        }
+    } else {
+        foreach my $n (unpack('C*',$text)) 
+        {
+            $width += ($widths_cache[$n] //= $self->wxByEnc($n));
         }
     }
     $width/=1000;
