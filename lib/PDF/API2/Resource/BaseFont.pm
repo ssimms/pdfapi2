@@ -628,18 +628,16 @@ sub width {
     if(is_utf8($text)) {
         $text=$self->strByUtf($text)
     }
-    if ($self->{-dokern} && ref($self->data->{kern})) {
-        my $lastglyph='';
-        foreach my $n (unpack('C*',$text)) 
+
+    my $kern = $self->{-dokern} && ref($self->data->{kern});
+    my $lastglyph='';
+    foreach my $n (unpack('C*',$text)) 
+    {
+        $width += ($widths_cache[$n] //= $self->wxByEnc($n));
+        if ($kern)
         {
-            $width += ($widths_cache[$n] //= $self->wxByEnc($n));
             $width+=$self->data->{kern}->{$lastglyph.':'.$self->data->{e2n}->[$n]};
             $lastglyph=$self->data->{e2n}->[$n];
-        }
-    } else {
-        foreach my $n (unpack('C*',$text)) 
-        {
-            $width += ($widths_cache[$n] //= $self->wxByEnc($n));
         }
     }
     $width/=1000;
