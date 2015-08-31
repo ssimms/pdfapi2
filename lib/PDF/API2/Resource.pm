@@ -49,6 +49,7 @@ sub new {
 sub new_api { my $self = shift(); return $self->new(@_); }
 
 =item $name = $resource->name()
+
 =item $resource->name($name)
 
 Get or set the name of the resource.
