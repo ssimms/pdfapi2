@@ -1,5 +1,13 @@
 {{$NEXT}}
 
+    - The previous release included a patch that broke compatibility
+      with Perl 5.8.x.  The minimum supported version is now Perl
+      5.8.5, and there is a .perl-version file to facilitate testing
+      using plenv.
+
+
+2.024     2015-09-18
+
     - [RT #104133] Include all bounding boxes when importing a page
       (patch by Don Huettl of Grant Street Group).
 
