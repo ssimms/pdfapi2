@@ -633,7 +633,8 @@ sub width {
     my $lastglyph='';
     foreach my $n (unpack('C*',$text)) 
     {
-        $width += ($widths_cache[$n] //= $self->wxByEnc($n));
+        $widths_cache[$n] = $self->wxByEnc($n) unless defined $widths_cache[$n];
+        $width += $widths_cache[$n];
         if ($kern)
         {
             $width+=$self->data->{kern}->{$lastglyph.':'.$self->data->{e2n}->[$n]};
