@@ -46,6 +46,9 @@ sub infilt {
         die "Invalid predictor: $predictor";
     }
 
+    delete $param->{Alpha};
+    delete $param->{Height};
+
     return $obj->{' stream'};
 }
 
@@ -84,8 +87,8 @@ sub _depredict_png {
     my $columns = $param->{Columns}->val;
     my $height  = $param->{Height}->val;
 
-    my $bpp      = ceil($bpc * $colors / 8);
     my $comp     = $colors + $alpha;
+    my $bpp      = ceil($bpc * $comp / 8);
     my $scanline = 1 + ceil($bpp * $columns);
 
     my $prev='';

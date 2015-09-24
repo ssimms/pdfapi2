@@ -129,6 +129,7 @@ sub new {
             die "bits>8 of palette in png not supported.";
         } else {
             my $dict=PDFDict();
+            my $parm=$dict;
             $pdf->new_obj($dict);
             $dict->{Filter}=PDFArray(PDFName('FlateDecode'));
             $dict->{' stream'}=$palete;
@@ -142,6 +143,7 @@ sub new {
             $dict->{BitsPerComponent}=PDFNum($bpc);
             $dict->{Colors}=PDFNum(1);
             $dict->{Columns}=PDFNum($w);
+            $dict->{Height}=PDFNum($h);
             if(defined $trns && !$opts{-notrans}) {
                 $trns.="\xFF" x 256;
                 $dict=PDFDict();
@@ -156,6 +158,7 @@ sub new {
                 $dict->{BitsPerComponent}=PDFNum(8);
                 $self->{SMask}=$dict;
                 my $clearstream=PDF::API2::Basic::PDF::Filter::Predictor->new($self)->infilt;
+                delete $parm->{Height};
                 foreach my $n (0..($h*$w)-1) {
                     vec($dict->{' stream'},$n,8)=vec($trns,vec($clearstream,$n,$bpc),8);
                 #    print STDERR vec($trns,vec($clearstream,$n,$bpc),8)."=".vec($clearstream,$n,$bpc).",";
@@ -172,8 +175,9 @@ sub new {
             $self->colorspace('DeviceGray');
             $self->bpc($bpc);
             my $dict=PDFDict();
+            my $parm=$dict;
             $self->{DecodeParms}=PDFArray($dict);
-            # $dict->{Predictor}=PDFNum(15);
+            $dict->{Predictor}=PDFNum(15);
             $dict->{Alpha}=PDFNum(1);
             $dict->{BitsPerComponent}=PDFNum($bpc);
             $dict->{Colors}=PDFNum(1);
@@ -194,6 +198,9 @@ sub new {
             my $clearstream=PDF::API2::Basic::PDF::Filter::Predictor->new($self)->infilt;
             delete $self->{' nofilt'};
             delete $self->{' stream'};
+            delete $parm->{Alpha};
+            delete $parm->{Height};
+            delete $parm->{Predictor};
             foreach my $n (0..($h*$w)-1) {
                 vec($dict->{' stream'},$n,$bpc)=vec($clearstream,($n*2)+1,$bpc);
                 vec($self->{' stream'},$n,$bpc)=vec($clearstream,$n*2,$bpc);
@@ -208,12 +215,14 @@ sub new {
             $self->colorspace('DeviceRGB');
             $self->bpc($bpc);
             my $dict=PDFDict();
+            my $parm=$dict;
             $self->{DecodeParms}=PDFArray($dict);
-            # $dict->{Predictor}=PDFNum(15);
+            $dict->{Predictor}=PDFNum(15);
             $dict->{Alpha}=PDFNum(1);
             $dict->{BitsPerComponent}=PDFNum($bpc);
             $dict->{Colors}=PDFNum(3);
             $dict->{Columns}=PDFNum($w);
+            $dict->{Height}=PDFNum($h);
 
             $dict=PDFDict();
             unless($opts{-notrans}) {
@@ -230,6 +239,9 @@ sub new {
             my $clearstream=PDF::API2::Basic::PDF::Filter::Predictor->new($self)->infilt;
             delete $self->{' nofilt'};
             delete $self->{' stream'};
+            delete $parm->{Alpha};
+            delete $parm->{Height};
+            delete $parm->{Predictor};
             foreach my $n (0..($h*$w)-1) {
                 vec($dict->{' stream'},$n,$bpc)=vec($clearstream,($n*4)+3,$bpc);
                 vec($self->{' stream'},($n*3),$bpc)=vec($clearstream,($n*4),$bpc);
