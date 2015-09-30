@@ -548,9 +548,9 @@ sub readval {
     }
 
     # Name
-    elsif ($str =~ m|^/($reg_char+)|s) {
+    elsif ($str =~ m|^/($reg_char*)|s) {
         $value = $1;
-        $str =~ s|^/($reg_char+)||s;
+        $str =~ s|^/($reg_char*)||s;
         $result = PDF::API2::Basic::PDF::Name->from_pdf($value, $self);
     } 
 

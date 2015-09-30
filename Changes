@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - [RT #107333] Accept an empty string as a valid Name, per PDF
+      spec 1.7 section 7.3.5 (patch by Mark Balitsky).
+
+
+2.025     2015-09-23
+
     - The previous release included a patch that broke compatibility
       with Perl 5.8.x.  The minimum supported version is now Perl
       5.8.5, and there is a .perl-version file to facilitate testing
