@@ -3,6 +3,10 @@
     - [RT #107333] Accept an empty string as a valid Name, per PDF
       spec 1.7 section 7.3.5 (patch by Mark Balitsky).
 
+    - [RT #98551] Rename aliases 2A, 4A, 2B, and 4B to 2A0, 4A0, 2B0,
+      and 4B0.  The old names will continue to work, but are now
+      undocumented (patch by Phil Perry).
+
 
 2.025     2015-09-23
 

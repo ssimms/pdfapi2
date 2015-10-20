@@ -76,8 +76,8 @@ sub update {
 =item $page->mediabox $alias
 
 Sets the mediabox.  This method supports the following aliases:
-'4A', '2A', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6',
-'4B', '2B', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6',
+'4A0', '2A0', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6',
+'4B0', '2B0', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6',
 'LETTER', 'BROADSHEET', 'LEDGER', 'TABLOID', 'LEGAL',
 'EXECUTIVE', and '36X36'.
 
