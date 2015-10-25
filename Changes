@@ -7,6 +7,9 @@
       and 4B0.  The old names will continue to work, but are now
       undocumented (patch by Phil Perry).
 
+    - Add -mils and -color as options for barcodes.  Reset linedash so
+      that barcodes are always solid lines (patch by Erelen).
+
 
 2.025     2015-09-23
 

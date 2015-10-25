@@ -31,11 +31,13 @@ sub new {
 
     $self->{' umzn'} = $options{'-umzn'} || 0;    # (u)pper (m)ending (z)o(n)e
     $self->{' lmzn'} = $options{'-lmzn'} || 0;    # (l)ower (m)ending (z)o(n)e
-    $self->{' zone'} = $options{'-zone'} || 0;
+    $self->{' zone'} = $options{'-zone'} || 0;    # barcode height
     $self->{' quzn'} = $options{'-quzn'} || 0;    # (qu)iet (z)o(n)e
     $self->{' ofwt'} = $options{'-ofwt'} || 0.01; # (o)ver(f)low (w)id(t)h
     $self->{' fnsz'} = $options{'-fnsz'};         # (f)o(n)t(s)i(z)e
-    $self->{' spcr'} = $options{'-spcr'} || '';
+    $self->{' spcr'} = $options{'-spcr'} || '';   # (sp)a(c)e(r) between chars in label
+    $self->{' mils'} = $options{'-mils'} || 1000/72; # single barcode unit width. 1 mil = 1/1000 of one inch. 1000/72 - for backward compatibility
+    $self->{' color'} = $options{'-color'} || 'black'; # barcode color
 
     return $self;
 }
@@ -77,11 +79,13 @@ sub drawbar {
     my @sets = @{shift()};
     my $caption = shift();
 
-    $self->fillcolor('black');
-    $self->strokecolor('black');
+    $self->fillcolor($self->{' color'});
+    $self->strokecolor($self->{' color'});
+    $self->linedash();
 
     my $x = $self->{' quzn'};
     my $is_space_next = 0;
+    my $wdt_factor = $self->{' mils'} / 1000 * 72;
     foreach my $set (@sets) {
         my ($code, $label);
         if (ref($set)) {
@@ -95,7 +99,7 @@ sub drawbar {
         my $code_width = 0;
         my ($font_size, $y_label);
         foreach my $bar (split //, $code) {
-            my $bar_width = $bar_widths{$bar};
+            my $bar_width = $bar_widths{$bar} * $wdt_factor;
 
             my ($y0, $y1);
             if ($bar =~ /[0-9]/) {
