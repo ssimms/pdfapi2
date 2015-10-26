@@ -1,6 +1,6 @@
 package PDF::API2::Basic::PDF::Filter::Predictor;
 
-our $VERSION = '2.023.1'; # VERSION
+# VERSION
 
 use base 'PDF::API2::Basic::PDF::Filter';
 
