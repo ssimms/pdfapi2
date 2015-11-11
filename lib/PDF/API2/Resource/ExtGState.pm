@@ -216,15 +216,18 @@ sub linejoin {
     return($self);
 }
 
-=item $egs->meterlimit $limit
+=item $egs->miterlimit $limit
 
 =cut
 
-sub meterlimit {
+sub miterlimit {
     my ($self,$var)=@_;
     $self->{ML}=PDFNum($var);
     return($self);
 }
+
+# Deprecated: miterlimit was originally named incorrectly
+sub meterlimit { return miterlimit(@_) }
 
 =item $egs->dash @dash
 

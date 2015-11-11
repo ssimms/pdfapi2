@@ -1,4 +1,4 @@
-use Test::More tests => 30;
+use Test::More tests => 31;
 
 use warnings;
 use strict;
@@ -74,6 +74,15 @@ $gfx->linejoin(1);
 like($pdf->stringify, qr/1 j/, q{linejoin(1)});
 
 # Miter Limit
+
+$pdf = PDF::API2->new();
+$pdf->{forcecompress} = 0;
+$gfx = $pdf->page->gfx();
+
+$gfx->miterlimit(3);
+like($pdf->stringify, qr/3 M/, q{miterlimit(3)});
+
+# Meter Limit (incorrectly named, deprecated)
 
 $pdf = PDF::API2->new();
 $pdf->{forcecompress} = 0;

@@ -463,27 +463,33 @@ sub linejoin {
     $this->add(_linejoin($linejoin));
 }
 
-=item $content->meterlimit($ratio)
+=item $content->miterlimit($ratio)
 
-Note: This method is named incorrectly, and will be renamed in a
-future release.
+Sets the miter limit when the line join style is a miter join.
 
-Sets the miter (not meter) limit when the line join style is a miter
-join.
+The C<$ratio> is the maximum length of the miter (inner to outer
+corner) divided by the line width. Any miter above this ratio will be
+converted to a bevel join. The practical effect is that lines meeting
+at shallow angles are chopped off instead of producing long pointed
+corners.
 
-The ratio is the maximum length of the miter divided by the line
-width.  Any miter above this ratio will be converted to a bevel join.
+There is no documented default miter limit.
 
 =cut
 
-sub _meterlimit {
-    my ($limit)=@_;
+sub miterlimit {
+    my ($self, $limit) = @_;
+    $self->add(_miterlimit($limit));
+}
+
+sub _miterlimit {
+    my ($limit) = @_;
     return ($limit, 'M');
 }
-sub meterlimit {
-    my ($this, $limit)=@_;
-    $this->add(_meterlimit($limit));
-}
+
+# Deprecated: miterlimit was originally named incorrectly
+sub  meterlimit { return  miterlimit(@_) }
+sub _meterlimit { return _miterlimit(@_) }
 
 =item $content->linedash()
 
