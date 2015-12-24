@@ -699,7 +699,7 @@ sub read_objnum {
 
         $src->read_stream if $src->{' nofilt'};
 
-        my ($map, $objects) = $src->{' stream'} =~ /^([\d ]+)(.*)$/;
+        my ($map, $objects) = $src->{' stream'} =~ /^([\d ]+)(.*)$/s;
         my @mappings = split(/\s+/, $map);
         my $count = scalar(@mappings);
 
@@ -707,7 +707,7 @@ sub read_objnum {
 
         if ($mappings[$index] != $num)
         {
-            die "Objind $num does not exist at index $index";
+            die "Objind $num does not exist at index $index " . $src->{' stream'};
         }
 
         my $start = $mappings[++$index];
