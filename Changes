@@ -13,6 +13,8 @@
     - [RT #98549] Rename meterlimit to miterlimit (patch by Phil
       Perry).
 
+    - Fixed an infinite loop when RunLengthDecode is used for output.
+
 
 2.025     2015-09-23
 

@@ -26,6 +26,7 @@ sub outfilt {
         }
         else {
             $unrepeated = $input;
+            $input = '';
         }
 
         # Print any non-repeating bytes at the beginning of the input
