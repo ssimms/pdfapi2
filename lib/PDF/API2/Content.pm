@@ -1609,29 +1609,34 @@ sub distance {
     $self->{' textlinematrix'}->[0]=$dx;
 }
 
+=item $content->cr()
+
 =item $content->cr($vertical_offset)
 
-If passed with an argument, moves to the start of the next line,
-offset by the given value.
+Moves the cursor to the start of the line when called without an
+argument.  If leading has been set, the cursor will move to the next
+line instead.
 
-If passed without an argument, moves to the start of the next line.
+An offset can be passed as an argument to override the leading value.
+A positive offset will move the cursor up, and a negative offset will
+move the cursor down.
 
-Note that this is equivalent to a carriage return plus line feed.  To
-get just a carriage return, pass zero as the argument.
+Pass zero as the argument to ignore the leading and get just a
+carriage return.
 
 =cut
 
 sub cr {
-    my ($self, $para) = @_;
-    if (defined($para)) {
-        $self->add(0,float($para),'Td');
-        $self->matrix_update(0,$para);
+    my ($self, $offset) = @_;
+    if (defined $offset) {
+        $self->add(0, float($offset), 'Td');
+        $self->matrix_update(0, $offset);
     }
     else {
         $self->add('T*');
-        $self->matrix_update(0,$self->lead);
+        $self->matrix_update(0, $self->lead() * -1);
     }
-    $self->{' textlinematrix'}->[0]=0;
+    $self->{' textlinematrix'}->[0] = 0;
 }
 
 =item $content->nl()
@@ -1644,6 +1649,7 @@ sub nl {
     my $self = shift();
     $self->add('T*');
     $self->matrix_update(0, $self->lead() * -1);
+    $self->{' textlinematrix'}->[0] = 0;
 }
 
 =item ($tx, $ty) = $content->textpos()
