@@ -495,35 +495,41 @@ sub _meterlimit { return _miterlimit(@_) }
 
 =item $content->linedash($length)
 
-=item $content->linedash($on, $off)
+=item $content->linedash($dash_length, $gap_length, ...)
+
+=item $content->linedash(-pattern => [$dash_length, $gap_length, ...], -shift => $offset)
 
 Sets the line dash pattern.
 
-If passed without any arguments, a solid line will be drawn.
+If called without any arguments, a solid line will be drawn.
 
-If passed with one argument, the strokes and spaces will have equal
+If called with one argument, the dashes and gaps will have equal
 lengths.
 
-If passed with two arguments, the strokes will have length C<$on>, and
-the spaces will have length C<$off>.
+If called with two or more arguments, the arguments represent
+alternating dash and gap lengths.
+
+If called with a hash of arguments, a dash phase may be set, which
+specifies the distance into the pattern at which to start the dash.
 
 =cut
 
 sub _linedash {
-    my (@a)=@_;
-    if (scalar @a < 1) {
-        return ('[',']','0','d');
+    my @a = @_;
+    unless (scalar @a) {
+        return ('[', ']', '0', 'd');
     } 
     else {
-        if ($a[0]=~/^\-/) {
-            # Note: This is undocumented, and will probably go away in
-            # the future.
-            my %a=@a;
-            $a{-pattern}=[$a{-full}||0,$a{-clear}||0] unless(ref $a{-pattern});
-            return ('[',floats(@{$a{-pattern}}),']',($a{-shift}||0),'d');
+        if ($a[0] =~ /^\-/) {
+            my %a = @a;
+
+            # Deprecated: the -full and -clear options will be removed in a future release
+            $a{'-pattern'} = [$a{'-full'} || 0, $a{'-clear'} || 0] unless exists $a{'-pattern'};
+
+            return ('[', floats(@{$a{'-pattern'}}), ']', ($a{'-shift'} || 0), 'd');
         } 
         else {
-            return ('[',floats(@a),'] 0 d');
+            return ('[', floats(@a), '] 0 d');
         }
     }
 }
