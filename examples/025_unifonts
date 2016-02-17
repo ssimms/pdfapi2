@@ -87,7 +87,7 @@ foreach my $fontname ('KozMin','KozMin-Bold + Times','KozGo-Italic + Trebuchet-I
 	$y-=15;
 	$line=<DATA>;
 	$line=~s|[\012\015]+$||go;
-	$gfx->textlabel(50,$y,$font,10,$line,-hspace=>80);
+	$gfx->textlabel(50,$y,$font,10,$line,-hscale=>80);
     }
 }
 

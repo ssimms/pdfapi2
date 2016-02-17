@@ -83,11 +83,11 @@ foreach $fn (@fns)
 
             my $txt2=$page->text;
 
-            $txt2->textlabel(50,800,$f1,20,"font='".$font->fontname." / ".$font->name."'",-hspace=>75);
+            $txt2->textlabel(50,800,$f1,20,"font='".$font->fontname." / ".$font->name."'",-hscale=>75);
             $txt2->textlabel(50,780,$f1,20,"encoding='$ec'");
 
             $txt2->font($f1,5);
-            $txt2->hspace(80);
+            $txt2->hscale(80);
 
             my $u=$font->underlineposition*$fx/1000;
 

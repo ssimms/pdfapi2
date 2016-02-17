@@ -64,7 +64,7 @@ $txt2->font($f1,20);
 $txt2->text("font='".$font->fontname." / ".$font->name."'");
 
 $txt2->font($f1,5);
-$txt2->hspace(80);
+$txt2->hscale(80);
 
 my $u=$font->underlineposition*$fx/1000;
 

@@ -46,7 +46,7 @@ foreach $fn (@ARGV) {
         $txt2->textlabel(50,780,$f1,20,"encoding='$encoding'");
 
         $txt2->font($f1,5);
-        $txt2->hspace(80);
+        $txt2->hscale(80);
 
         my $u=$font->underlineposition*$fx/1000;
 

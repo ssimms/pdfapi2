@@ -46,7 +46,7 @@ foreach $fn (@ARGV) {
         $txt2->textlabel(50,780,$f1,20,"encoding='$encoding'");
 
         $txt2->font($f1,5);
-        $txt2->hspace(80);
+        $txt2->hscale(80);
 
         my $u=$font->underlineposition*$fx/1000;
 
@@ -131,7 +131,7 @@ foreach $fn (@ARGV) {
                 $gfx->add($font->text_cid(pack('n',$xo)),'Tj');
 
                 $gfx->font($f1,100);
-                $gfx->hspace(80);
+                $gfx->hscale(80);
                 $gfx->translate(25,860);
                 $gfx->text("G+$xo"); 
                 $gfx->translate(25,10);
@@ -145,7 +145,7 @@ foreach $fn (@ARGV) {
                     $gfx->fillcolor('blue');
                 }
 
-                $gfx->hspace(70);
+                $gfx->hscale(70);
                 $gfx->translate(975,860);
                 $gfx->text_right($name);
 
@@ -155,7 +155,7 @@ foreach $fn (@ARGV) {
 
                 $gfx->fillcolor('#008000');
                 $gfx->translate(500,950);
-                $gfx->hspace(70);
+                $gfx->hscale(70);
                 my $ci = charinfo($font->uniByCId($xo) || 0);
                 $gfx->font($f2,50);
                 $gfx->text_center($ci->{name});

@@ -75,7 +75,7 @@ foreach $fn (qw[
                 $gfx->add($font->text_cid(pack('n',$xo)),'Tj');
 
                 $gfx->font($f1,80);
-                $gfx->hspace(80);
+                $gfx->hscale(80);
                 $gfx->translate(25,810);
                 $gfx->text("G+$xo"); 
                 $gfx->translate(25,10);
@@ -94,7 +94,7 @@ foreach $fn (qw[
                     $gfx->fillcolor('blue');
                 }
                 $gfx->translate(975,910);
-                $gfx->hspace(70);
+                $gfx->hscale(70);
                 $gfx->text_right($name);
 
                 $gfx->textend;

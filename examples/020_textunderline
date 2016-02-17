@@ -18,7 +18,7 @@ $gfx->textlabel(50,700,$f2,20,'Normal Text in Red',-color=>'red');
 $gfx->textlabel(50,600,$f2,20,'Normal Text in Blue Underline in Red+Yellow',
     -color=>'#0000CC',
     -rotate=>-45,
-    -hspace=>65,
+    -hscale=>65,
     -underline=>[4,[1,'red'],7,[1.5,'yellow'],11,2],
 );
 

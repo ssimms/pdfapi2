@@ -19,7 +19,7 @@ sub new {
     $self->{' font'} = undef;
     $self->{' fontsize'} = 0;
     $self->{' charspace'} = 0;
-    $self->{' hspace'} = 100;
+    $self->{' hscale'} = 100;
     $self->{' wordspace'} = 0;
     $self->{' lead'} = 0;
     $self->{' rise'} = 0;
@@ -50,7 +50,7 @@ sub outobjdeep {
 
     # Maintainer's Note: This list of keys isn't the same as the list
     # in new().  Should it be?
-    foreach my $key (qw(api apipdf apipage font fontsize charspace hspace
+    foreach my $key (qw(api apipdf apipage font fontsize charspace hscale
                         wordspace lead rise render matrix fillcolor
                         strokecolor translate scale skew rotate)) {
         delete $self->{" $key"};

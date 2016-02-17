@@ -51,7 +51,7 @@ foreach my $block (0,1,2,3,4,5,0x26,0x27,0xf0)
         foreach $y (0..15) 
         {
             $gfx->textlabel(50+($sx*$x),50+($sy*$y),$uf,$fx,pack('U',$block*256+$y*16+$x));
-            $gfx->textlabel(50+($sx*$x),50+($sy*$y)-6,$helv,6,nameByUni($block*256+$y*16+$x),-color=>'#a00000',-hspace=>80,-rotate=>-15);
+            $gfx->textlabel(50+($sx*$x),50+($sy*$y)-6,$helv,6,nameByUni($block*256+$y*16+$x),-color=>'#a00000',-hscale=>80,-rotate=>-15);
         }
     }
 }

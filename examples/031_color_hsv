@@ -20,7 +20,7 @@ foreach my $z (0xf,0xE,0xd,0xC,0xb,0xA,0x8) {
     $page = $pdf->page;
     $gfx=$page->gfx;
     
-    $gfx->textlabel(300,750,$fnt,20,'HSV Colorspace',-color=>'#000',-hspace=>125,-center=>1);
+    $gfx->textlabel(300,750,$fnt,20,'HSV Colorspace',-color=>'#000',-hscale=>125,-center=>1);
 
     $gfx->strokecolor('#000');
     foreach my $s (0 .. 0x7) {
@@ -30,7 +30,7 @@ foreach my $z (0xf,0xE,0xd,0xC,0xb,0xA,0x8) {
             $gfx->fillcolor($t);
             $gfx->circle($cx+cos(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cy+sin(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cr);
             $gfx->fillstroke;
-            $gfx->textlabel($cx+cos(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cy-2+sin(deg2rad(360*$h/(12*$ha)))*$cs*$s,$fnt,6,$t,-color=>'#000',-hspace=>80,-center=>1);
+            $gfx->textlabel($cx+cos(deg2rad(360*$h/(12*$ha)))*$cs*$s,$cy-2+sin(deg2rad(360*$h/(12*$ha)))*$cs*$s,$fnt,6,$t,-color=>'#000',-hscale=>80,-center=>1);
         }
     }
 }

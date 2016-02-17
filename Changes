@@ -13,6 +13,8 @@
     - [RT #98549] Rename meterlimit to miterlimit (patch by Phil
       Perry).
 
+    - [RT #98534] Rename hspace to hscale (patch by Phil Perry).
+
     - Fixed an infinite loop when RunLengthDecode is used for output.
 
 

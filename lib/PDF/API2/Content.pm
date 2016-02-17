@@ -44,7 +44,7 @@ sub new {
     $self->{' fontset'}=0;
     $self->{' fontsize'}=0;
     $self->{' charspace'}=0;
-    $self->{' hspace'}=100;
+    $self->{' hscale'}=100;
     $self->{' wordspace'}=0;
     $self->{' lead'}=0;
     $self->{' rise'}=0;
@@ -66,7 +66,7 @@ sub outobjdeep {
     my $self = shift @_;
     $self->textend;
     foreach my $k (qw[ api apipdf apiistext apipage font fontset fontsize 
-                       charspace hspace wordspace lead rise render matrix
+                       charspace hscale wordspace lead rise render matrix
                        textmatrix textlinematrix fillcolor strokecolor
                        translate scale skew rotate ]) {
         $self->{" $k"}=undef;
@@ -1365,28 +1365,31 @@ sub wordspace {
     return $self->{' wordspace'};
 }
 
-=item $scale = $content->hspace($scale)
+=item $scale = $content->hscale($scale)
 
-Note: This method is named incorrectly, and will be renamed in a
-future release.
-
-Sets the percentage of horizontal text scaling (not spacing).  This is
-initially 100 (i.e. no scaling), and must be passed as an integer.
+Sets and returns the percentage of horizontal text scaling.  Enter a
+scale greater than 100 to stretch text, less than 100 to squeeze
+text, or 100 to disable any existing scaling.
 
 =cut
 
-sub _hspace {
-    my ($para) = @_;
-    return float($para, 6) . ' Tz';
+sub _hscale {
+    my ($scale) = @_;
+    return float($scale, 6) . ' Tz';
 }
-sub hspace {
-    my ($self,$para)=@_;
-    if (defined $para) {
-        $self->{' hspace'}=$para;
-        $self->add(_hspace($para));
+
+sub hscale {
+    my ($self, $scale) = @_;
+    if (defined $scale) {
+        $self->{' hscale'} = $scale;
+        $self->add(_hscale($scale));
     }
-    return $self->{' hspace'};
+    return $self->{' hscale'};
 }
+
+# Deprecated: hscale was originally named incorrectly (as hspace)
+sub  hspace { return  hscale(@_) }
+sub _hspace { return _hscale(@_) }
 
 =item $leading = $content->lead($leading)
 
@@ -1489,7 +1492,7 @@ sub textstate {
     my %state;
     if (scalar @_) {
         %state = @_;
-        foreach my $k (qw( charspace hspace wordspace lead rise render )) {
+        foreach my $k (qw( charspace hscale wordspace lead rise render )) {
             next unless($state{$k});
             $self->can($k)->($self, $state{$k});
         }
@@ -1512,7 +1515,7 @@ sub textstate {
         %state = ();
     } 
     else {
-        foreach my $k (qw( font fontsize charspace hspace wordspace lead rise render )) {
+        foreach my $k (qw( font fontsize charspace hscale wordspace lead rise render )) {
             $state{$k}=$self->{" $k"};
         }
         $state{matrix}=[@{$self->{" matrix"}}];
@@ -1767,8 +1770,8 @@ sub text {
 
     if (defined $opt{-indent}) {
     # changed fot acrobat 8 and possible others
-    #    $self->add('[',(-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hspace)),']','TJ');
-        $self->add($self->{' font'}->text($text, $self->{' fontsize'}, (-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hspace))));
+    #    $self->add('[',(-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hscale())),']','TJ');
+        $self->add($self->{' font'}->text($text, $self->{' fontsize'}, (-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hscale()))));
     }
     else {
         $self->add($self->{' font'}->text($text,$self->{' fontsize'}));
@@ -1821,7 +1824,7 @@ sub advancewidth {
     my ($self,$text,@opts) = @_;
     if(scalar @opts > 1) {
         my %opts=@opts;
-        foreach my $k (qw[ font fontsize wordspace charspace hspace]) {
+        foreach my $k (qw[ font fontsize wordspace charspace hscale]) {
             $opts{$k}=$self->{" $k"} unless(defined $opts{$k});
         }
         my $glyph_width = $opts{font}->width($text)*$opts{fontsize};
@@ -1829,7 +1832,7 @@ sub advancewidth {
         my $num_char = length($text);
         my $word_spaces = $opts{wordspace}*$num_space;
         my $char_spaces = $opts{charspace}*$num_char;
-        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$opts{hspace}/100;
+        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$opts{hscale}/100;
         return $advance;
     }
     else {
@@ -1838,7 +1841,7 @@ sub advancewidth {
         my $num_char = length($text);
         my $word_spaces = $self->wordspace*$num_space;
         my $char_spaces = $self->charspace*$num_char;
-        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$self->hspace/100;
+        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$self->hscale()/100;
         return $advance;
     }
 }
@@ -1849,10 +1852,10 @@ sub advancewidth {
 
 sub text_justified {
     my ($self,$text,$width,%opts) = @_;
-    my $hs = $self->hspace;
-    $self->hspace($hs*($width/$self->advancewidth($text)));
+    my $hs = $self->hscale();
+    $self->hscale($hs*($width/$self->advancewidth($text)));
     $self->text($text,%opts);
-    $self->hspace($hs);
+    $self->hscale($hs);
     return $width;
 }
 
@@ -1902,13 +1905,13 @@ sub text_fill_justified {
     my ($self,$text,$width,%opts) = @_;
     my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
     my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
-    my $hs=$self->hspace;
+    my $hs=$self->hscale();
     my $w=$self->advancewidth($line);
     if ($ret||$w>=$width) {
-        $self->hspace($hs*($width/$w));
+        $self->hscale($hs*($width/$w));
     }
     $width=$self->text($line,%opts);
-    $self->hspace($hs);
+    $self->hscale($hs);
     return($width,$ret);
 }
 
@@ -2031,7 +2034,7 @@ sub textlabel {
     $self->font($font,$size);
 
     $self->charspace($opts{-charspace})     if($opts{-charspace});
-    $self->hspace($opts{-hspace})           if($opts{-hspace});
+    $self->hscale($opts{-hscale})           if($opts{-hscale});
     $self->wordspace($opts{-wordspace})     if($opts{-wordspace});
     $self->render($opts{-render})           if($opts{-render});
 
@@ -2142,7 +2145,7 @@ sub textstart {
         $self->{' fontset'}=0;
         $self->{' fontsize'}=0;
         $self->{' charspace'}=0;
-        $self->{' hspace'}=100;
+        $self->{' hscale'}=100;
         $self->{' wordspace'}=0;
         $self->{' lead'}=0;
         $self->{' rise'}=0;
