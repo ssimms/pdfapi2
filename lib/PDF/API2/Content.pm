@@ -1634,17 +1634,16 @@ sub cr {
     $self->{' textlinematrix'}->[0]=0;
 }
 
-=item $content->nl
+=item $content->nl()
 
 Moves to the start of the next line.
 
 =cut
 
 sub nl {
-    my ($self, $width) = @_;
+    my $self = shift();
     $self->add('T*');
-    $self->matrix_update(-($width||0),-$self->lead);
-    $self->{' textlinematrix'}->[0]=0;
+    $self->matrix_update(0, $self->lead() * -1);
 }
 
 =item ($tx, $ty) = $content->textpos()
