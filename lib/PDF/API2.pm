@@ -1174,8 +1174,8 @@ sub openpage {
                 delete $content->{-docompress};
                 $content->{Length}=PDFNum(length($content->{' stream'}));
             }
-            $page->{' fixed'}=1;
         }
+        $page->{' fixed'}=1;
     }
 
     $self->{pdf}->out_obj($page);
