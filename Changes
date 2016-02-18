@@ -17,6 +17,8 @@
 
     - Fixed an infinite loop when RunLengthDecode is used for output.
 
+    - [RT #65582] Fix embedding of OpenType fonts (fix by Simon Cozens).
+
 
 2.025     2015-09-23
 

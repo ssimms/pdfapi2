@@ -435,7 +435,7 @@ sub new {
 	$data->{noembed} = $opts{-noembed}==1 ? 1 : 0;
     $data->{iscff} = (defined $font->{'CFF '}) ? 1 : 0;
 
-    $self->{Subtype}=PDFName('Type1C') if($data->{iscff});
+    $self->{Subtype}=PDFName('CIDFontType0C') if($data->{iscff});
 
     $data->{fontfamily}=$font->{'name'}->read->find_name(1);
     $data->{fontname}=$font->{'name'}->read->find_name(4);
