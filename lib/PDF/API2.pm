@@ -2362,73 +2362,9 @@ sub named_destination
 
 =back
 
-=head1 RESOURCE METHODS
-
-=over
-
-=item $pdf->resource($type, $key, $obj, $force)
-
-Adds a resource to the global PDF tree.
-
-B<Example:>
-
-    $pdf->resource('Font', $fontkey, $fontobj);
-    $pdf->resource('XObject', $imagekey, $imageobj);
-    $pdf->resource('Shading', $shadekey, $shadeobj);
-    $pdf->resource('ColorSpace', $spacekey, $speceobj);
-
-B<Note:> You only have to add the required resources if they are NOT
-handled by the font, image, shade or space methods.
-
-=cut
-
-sub resource 
-{
-    return(undef);
-    my ($self, $type, $key, $obj, $force) = @_;
-
-    $self->{pages}->{Resources}||=PDFDict();
-
-    my $dict=$self->{pages}->{Resources};
-    $dict->realise if(ref($dict)=~/Objind$/);
-
-    $self->{pdf}->new_obj($dict) unless($dict->is_obj($self->{pdf}));
-
-    $dict->{$type}=$dict->{$type} || PDFDict();
-    $dict->{$type}->realise if(ref($dict->{$type})=~/Objind$/);
-
-    if(defined($obj)) 
-    {
-        if($force) 
-        {
-            $dict->{$type}->{$key}=$obj;
-        } 
-        else 
-        {
-            $dict->{$type}->{$key}=$dict->{$type}->{$key} || $obj;
-        }
-
-        $self->{pdf}->out_obj($dict)
-            if($dict->is_obj($self->{pdf}));
-
-        $self->{pdf}->out_obj($dict->{$type})
-            if($dict->{$type}->is_obj($self->{pdf}));
-
-        $self->{pdf}->out_obj($obj)
-            if($obj->is_obj($self->{pdf}));
-
-        $self->{pdf}->out_obj($self->{pages});
-
-        return($dict);
-    }
-    return($dict->{$type}->{$key} || undef);
-}
-
 1;
 
 __END__
-
-=back
 
 =head1 KNOWN ISSUES
 
