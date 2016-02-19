@@ -258,9 +258,23 @@ sub read_stream {
 
     my @filters;
     if (defined $self->{'Filter'}) {
+        my $i = 0;
         foreach my $filter ($self->{'Filter'}->elementsof()) {
             my $filter_class = "PDF::API2::Basic::PDF::Filter::" . $filter->val();
-            push(@filters, $filter_class->new());
+            unless ($self->{'DecodeParms'}) {
+                push(@filters, $filter_class->new());
+            }
+            elsif ($self->{'Filter'}->isa('PDF::API2::Basic::PDF::Name') and $self->{'DecodeParms'}->isa('PDF::API2::Basic::PDF::Dict')) {
+                push(@filters, $filter_class->new($self->{'DecodeParms'}));
+            }
+            elsif ($self->{'DecodeParms'}->isa('PDF::API2::Basic::PDF::Array')) {
+                my $parms = $self->{'DecodeParms'}->val->[$i];
+                push(@filters, $filter_class->new($parms));
+            }
+            else {
+                push(@filters, $filter_class->new());
+            }
+            $i++;
         }
     }
 
