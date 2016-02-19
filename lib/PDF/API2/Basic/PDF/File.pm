@@ -1164,28 +1164,28 @@ sub readxrtr {
             $start = shift(@index);
             $last = $start + shift(@index) - 1;
 
-        for $xmin ($start...$last)
-        {
-            my @cols;
-
-            for my $w (@widths)
+            for $xmin ($start...$last)
             {
-                my $data;
-                $data = $self->_unpack($w, substr($stream, 0, $w, '')) if $w;
-
-                push @cols, $data;
+                my @cols;
+    
+                for my $w (@widths)
+                {
+                    my $data;
+                    $data = $self->_unpack($w, substr($stream, 0, $w, '')) if $w;
+    
+                    push @cols, $data;
+                }
+    
+                $cols[0] //= 1;
+                die 'Invalid XRefStm entry type: ', $cols[0] if $cols[0] > 2;
+    
+                next if exists $xlist->{$xmin};
+    
+                my @objind = ($cols[1], $cols[2] // ($xmin ? 0 : 65535));
+                push @objind, ($cols[0] == 0 ? 'f' : 'n') if $cols[0] < 2;
+    
+                $xlist->{$xmin} = \@objind;
             }
-
-            $cols[0] //= 1;
-            die 'Invalid XRefStm entry type: ', $cols[0] if $cols[0] > 2;
-
-            next if exists $xlist->{$xmin};
-
-            my @objind = ($cols[1], $cols[2] // ($xmin ? 0 : 65535));
-            push @objind, ($cols[0] == 0 ? 'f' : 'n') if $cols[0] < 2;
-
-            $xlist->{$xmin} = \@objind;
-        }
         }
     }
     else
