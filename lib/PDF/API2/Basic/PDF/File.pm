@@ -454,7 +454,7 @@ sub readval {
     my $fh = $self->{' INFILE'};
     my ($result, $value);
 
-    my $update = $opts{update} // 1;
+    my $update = defined($opts{update}) ? $opts{update} : 1;
     $str = update($fh, $str) if $update;
 
     # Dictionary
@@ -1162,12 +1162,12 @@ sub readxrtr {
                     push @cols, $data;
                 }
     
-                $cols[0] //= 1;
+                $cols[0] = 1 unless defined $cols[0];
                 die 'Invalid XRefStm entry type: ', $cols[0] if $cols[0] > 2;
     
                 next if exists $xlist->{$xmin};
     
-                my @objind = ($cols[1], $cols[2] // ($xmin ? 0 : 65535));
+                my @objind = ($cols[1], defined($cols[2]) ? $cols[2] : ($xmin ? 0 : 65535));
                 push @objind, ($cols[0] == 0 ? 'f' : 'n') if $cols[0] < 2;
     
                 $xlist->{$xmin} = \@objind;
