@@ -166,7 +166,6 @@ use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Bool;
 use PDF::API2::Basic::PDF::Dict;
-use PDF::API2::Basic::PDF::Filter::Predictor;
 use PDF::API2::Basic::PDF::Name;
 use PDF::API2::Basic::PDF::Number;
 use PDF::API2::Basic::PDF::Objind;
@@ -174,7 +173,6 @@ use PDF::API2::Basic::PDF::String;
 use PDF::API2::Basic::PDF::Page;
 use PDF::API2::Basic::PDF::Pages;
 use PDF::API2::Basic::PDF::Null;
-use PDF::API2::Resource::XObject::Image::PNG;
 use POSIX qw(ceil floor);
 
 no warnings qw[ deprecated recursion uninitialized ];
