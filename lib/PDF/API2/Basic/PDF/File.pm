@@ -1064,27 +1064,14 @@ for details.
 
 =cut
 
-sub _unpack
-{
+sub _unpack_xref_stream {
     my ($self, $width, $data) = @_;
 
-    die "Invalid column width: $width" if $width < 1 || $width > 4;
+    return unpack('C', $data)       if $width == 1;
+    return unpack('n', $data)       if $width == 2;
+    return unpack('N', "\x00$data") if $width == 3;
 
-    my $template;
-
-    if ($width == 1)
-    {
-        return unpack('C', $data);
-    }
-    elsif ($width == 2)
-    {
-        return unpack('n', $data);
-    }
-    else
-    {
-        $data = "\x00$data" if $width == 3;
-        return unpack('N', $data);
-    }
+    die "Invalid column width: $width";
 }
 
 sub readxrtr {
@@ -1171,7 +1158,7 @@ sub readxrtr {
                 for my $w (@widths)
                 {
                     my $data;
-                    $data = $self->_unpack($w, substr($stream, 0, $w, '')) if $w;
+                    $data = $self->_unpack_xref_stream($w, substr($stream, 0, $w, '')) if $w;
     
                     push @cols, $data;
                 }
