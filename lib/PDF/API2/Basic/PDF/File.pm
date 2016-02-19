@@ -1150,17 +1150,19 @@ sub readxrtr {
         my $start = 0;
         my $last;
 
+        my @index;
         if (defined $tdict->{Index})
         {
-            my $index = $tdict->{Index}->val;
-
-            $start = $index->[0]->val;
-            $last  = $start + $index->[1]->val - 1;
+            @index = map { $_->val() } @{$tdict->{Index}->val};
         }
         else
         {
-            $last = $tdict->{Size}->val - 1;
+            @index = (0, $tdict->{Size}->val - 1);
         }
+
+        while (scalar @index) {
+            $start = shift(@index);
+            $last = $start + shift(@index) - 1;
 
         for $xmin ($start...$last)
         {
@@ -1183,6 +1185,7 @@ sub readxrtr {
             push @objind, ($cols[0] == 0 ? 'f' : 'n') if $cols[0] < 2;
 
             $xlist->{$xmin} = \@objind;
+        }
         }
     }
     else
