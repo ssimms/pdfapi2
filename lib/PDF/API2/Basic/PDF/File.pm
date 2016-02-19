@@ -697,7 +697,8 @@ sub read_objnum {
 
         $src->read_stream if $src->{' nofilt'};
 
-        my ($map, $objects) = $src->{' stream'} =~ /^([\d ]+)(.*)$/;
+        my $map = substr($src->{' stream'}, 0, $src->{'First'}->val);
+        my $objects = substr($src->{' stream'}, $src->{'First'}->val);
         my @mappings = split(/\s+/, $map);
         my $count = scalar(@mappings);
 
