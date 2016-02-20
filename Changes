@@ -1,7 +1,7 @@
 {{$NEXT}}
 
     - [RT #48683] Add support for PDFs with cross-reference streams
-      (patch by Don Huettl of Grant Street Group).
+      and object streams (patch by Don Huettl of Grant Street Group).
 
     - [RT #107333] Accept an empty string as a valid Name, per PDF
       spec 1.7 section 7.3.5 (patch by Mark Balitsky).
@@ -24,6 +24,8 @@
 
     - [RT #67767] Allow an empty page to be imported into a PDF using
       importPageIntoForm (reported by Antti Lankila).
+
+    - [RT #66341] Various fixes for ASCII85Decode and LZWDecode.
 
 
 2.025     2015-09-23
