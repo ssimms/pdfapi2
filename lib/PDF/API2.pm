@@ -23,7 +23,7 @@ use PDF::API2::NamedDestination;
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC), 
+our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC),
                   qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
 
 =head1 NAME
@@ -567,7 +567,7 @@ sub isEncrypted {
     my $self=shift @_;
     return(defined($self->{pdf}->{'Encrypt'}) ? 1 : 0);
 }
-    
+
 =item %infohash = $pdf->info(%infohash)
 
 Gets/sets the info structure of the document.
@@ -619,7 +619,7 @@ sub info {
       foreach my $k (@{$self->{infoMeta}}) {
         next unless(defined $self->{pdf}->{'Info'}->{$k});
         $opt{$k}=$self->{pdf}->{'Info'}->{$k}->val;
-        if ((unpack('n',$opt{$k})==0xfffe) or (unpack('n',$opt{$k})==0xfeff)) 
+        if ((unpack('n',$opt{$k})==0xfffe) or (unpack('n',$opt{$k})==0xfeff))
         {
             $opt{$k} = decode('UTF-16', $self->{pdf}->{'Info'}->{$k}->val);
         }
@@ -642,7 +642,7 @@ B<Example:>
 
 =cut
 
-sub infoMetaAttributes 
+sub infoMetaAttributes
 {
     my ($self,@attr) = @_;
     if(scalar @attr > 0) {
@@ -717,23 +717,23 @@ B<Example:>
 sub xmpMetadata {
     my $self=shift @_;
 
-    if(!defined($self->{catalog}->{Metadata})) 
+    if(!defined($self->{catalog}->{Metadata}))
     {
             $self->{catalog}->{Metadata}=PDFDict();
             $self->{catalog}->{Metadata}->{Type}=PDFName('Metadata');
             $self->{catalog}->{Metadata}->{Subtype}=PDFName('XML');
             $self->{pdf}->new_obj($self->{catalog}->{Metadata});
-    } 
-    else 
+    }
+    else
     {
         $self->{catalog}->{Metadata}->realise;
         $self->{catalog}->{Metadata}->{' stream'}=unfilter($self->{catalog}->{Metadata}->{Filter}, $self->{catalog}->{Metadata}->{' stream'});
         delete $self->{catalog}->{Metadata}->{' nofilt'};
         delete $self->{catalog}->{Metadata}->{Filter};
     }
-    
+
     my $md=$self->{catalog}->{Metadata};
-    
+
     if(defined $_[0])
     {
         $md->{' stream'}=$_[0];
@@ -784,13 +784,13 @@ B<Example:>
         -start => 1,
         -prefix => 'A-'
     });
-    
+
     # Numbering for Appendix B
     $pdf->pageLabel( 36, {
         -start => 1,
         -prefix => 'B-'
     });
-    
+
     # Numbering for the Index
     $pdf->pageLabel(40, {
         -style => 'Roman'
@@ -818,7 +818,7 @@ sub pageLabel {
                             $opts->{'-style'} eq 'roman' ? 'r' :
                             $opts->{'-style'} eq 'Alpha' ? 'A' :
                             $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
-                          
+
         if (defined $opts->{'-prefix'}) {
             $d->{'P'} = PDFStr($opts->{'-prefix'});
         }
@@ -1087,103 +1087,99 @@ B<Example:>
 =cut
 
 sub openpage {
-    my $self=shift @_;
-    my $index=shift @_||0;
-    my ($page,$rotate,$media,$trans);
+    my $self = shift();
+    my $index = shift() || 0;
+    my ($page, $rotate, $media, $trans);
 
-    if($index==0) 
-    {
-        $page=$self->{pagestack}->[-1];
-    } 
-    elsif($index<0) 
-    {
-        $page=$self->{pagestack}->[$index];
-    } 
-    else 
-    {
-        $page=$self->{pagestack}->[$index-1];
+    if ($index == 0) {
+        $page = $self->{'pagestack'}->[-1];
     }
-    return undef unless(ref $page);
-    
-    if(ref($page) ne 'PDF::API2::Page') 
-    {
-        bless($page,'PDF::API2::Page');
-        $page->{' apipdf'}=$self->{pdf};
-        $page->{' api'}=$self;
-        $self->{pdf}->out_obj($page);
-        if(($rotate=$page->find_prop('Rotate')) && (!defined($page->{' fixed'}) || $page->{' fixed'}<1)) 
-        {
-            $rotate=($rotate->val+360)%360;
+    elsif ($index<0) {
+        $page = $self->{'pagestack'}->[$index];
+    }
+    else {
+        $page = $self->{'pagestack'}->[$index - 1];
+    }
+    return unless ref($page);
 
-            if($rotate!=0 && !$self->default('nounrotate')) {
-                $page->{Rotate}=PDFNum(0);
+    if (ref($page) ne 'PDF::API2::Page') {
+        bless $page, 'PDF::API2::Page';
+        $page->{' apipdf'} = $self->{'pdf'};
+        $page->{' api'} = $self;
+        $self->{'pdf'}->out_obj($page);
+        if (($rotate = $page->find_prop('Rotate')) && (!defined($page->{' fixed'}) || $page->{' fixed'} < 1)) {
+            $rotate = ($rotate->val() + 360) % 360;
+
+            if ($rotate != 0 && !$self->default('nounrotate')) {
+                $page->{'Rotate'} = PDFNum(0);
                 foreach my $mediatype (qw( MediaBox CropBox BleedBox TrimBox ArtBox )) {
-                    if($media=$page->find_prop($mediatype)) {
-                        $media=[ map{ $_->val } $media->elementsof ];
-                    } else {
-                        $media=[0,0,612,792];
-                        next if($mediatype ne 'MediaBox');
+                    if ($media = $page->find_prop($mediatype)) {
+                        $media = [ map { $_->val() } $media->elementsof() ];
                     }
-                    if($rotate==90) {
-                        $trans="0 -1 1 0 0 $media->[2] cm" if($mediatype eq 'MediaBox');
-                        $media=[$media->[1],$media->[0],$media->[3],$media->[2]];
-                    } elsif($rotate==180) {
-                        $trans="-1 0 0 -1 $media->[2] $media->[3] cm" if($mediatype eq 'MediaBox');
-                    } elsif($rotate==270) {
-                        $trans="0 1 -1 0 $media->[3] 0 cm" if($mediatype eq 'MediaBox');
-                        $media=[$media->[1],$media->[0],$media->[3],$media->[2]];
+                    else {
+                        $media = [0, 0, 612, 792];
+                        next if $mediatype ne 'MediaBox';
                     }
-                    $page->{$mediatype}=PDFArray(map { PDFNum($_) } @{$media});
+                    if ($rotate == 90) {
+                        $trans = "0 -1 1 0 0 $media->[2] cm" if $mediatype eq 'MediaBox';
+                        $media = [$media->[1], $media->[0], $media->[3], $media->[2]];
+                    }
+                    elsif ($rotate == 180) {
+                        $trans = "-1 0 0 -1 $media->[2] $media->[3] cm" if $mediatype eq 'MediaBox';
+                    }
+                    elsif ($rotate == 270) {
+                        $trans = "0 1 -1 0 $media->[3] 0 cm" if $mediatype eq 'MediaBox';
+                        $media = [$media->[1], $media->[0], $media->[3], $media->[2]];
+                    }
+                    $page->{$mediatype} = PDFArray(map { PDFNum($_) } @$media);
                 }
-            } else {
-                $trans="";
             }
-        } else {
-            $trans="";
+            else {
+                $trans = '';
+            }
+        }
+        else {
+            $trans = '';
         }
 
-        if(defined $page->{Contents} && (!defined($page->{' fixed'}) || $page->{' fixed'}<1) ) {
-            $page->fixcontents;
-            my $uncontent=$page->{Contents};
-            delete $page->{Contents};
-            my $content=$page->gfx();
+        if (defined $page->{'Contents'} && (!defined($page->{' fixed'}) || $page->{' fixed'} < 1)) {
+            $page->fixcontents();
+            my $uncontent = delete $page->{'Contents'};
+            my $content = $page->gfx();
             $content->add(" $trans ");
 
-            if($self->default('pageencaps'))
-            {
-                $content->{' stream'}.=" q ";
+            if ($self->default('pageencaps')) {
+                $content->{' stream'} .= ' q ';
             }
-            foreach my $k ($uncontent->elementsof) 
-            {
-                $k->realise;
-                    $content->{' stream'}.=" ".unfilter($k->{Filter}, $k->{' stream'})." ";
+            foreach my $k ($uncontent->elementsof()) {
+                $k->realise();
+                $content->{' stream'} .= ' ' . unfilter($k->{'Filter'}, $k->{' stream'}) . ' ';
             }
-            if($self->default('pageencaps'))
-            {
-                $content->{' stream'}.=" Q ";
+            if ($self->default('pageencaps')) {
+                $content->{' stream'} .= ' Q ';
             }
 
             ## $content->{Length}=PDFNum(length($content->{' stream'}));
-            # this  will be fixed by the following code or content or filters
+            # this will be fixed by the following code or content or filters
 
             ## if we like compress we will do it now to do quicker saves
-            if($self->{forcecompress}>0){
-            ##    $content->compressFlate;
-                $content->{' stream'}=dofilter($content->{Filter}, $content->{' stream'});
-                $content->{' nofilt'}=1;
-                delete $content->{-docompress};
-                $content->{Length}=PDFNum(length($content->{' stream'}));
+            if ($self->{'forcecompress'} > 0) {
+                ## $content->compressFlate;
+                $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
+                $content->{' nofilt'} = 1;
+                delete $content->{'-docompress'};
+                $content->{'Length'} = PDFNum(length($content->{' stream'}));
             }
         }
-        $page->{' fixed'}=1;
+        $page->{' fixed'} = 1;
     }
 
-    $self->{pdf}->out_obj($page);
-    $self->{pdf}->out_obj($self->{pages});
-    $page->{' apipdf'}=$self->{pdf};
-    $page->{' api'}=$self;
-    $page->{' reopened'}=1;
-    return($page);
+    $self->{'pdf'}->out_obj($page);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $page->{' apipdf'} = $self->{'pdf'};
+    $page->{' api'} = $self;
+    $page->{' reopened'} = 1;
+    return $page;
 }
 
 
@@ -1203,7 +1199,7 @@ sub walk_obj {
 ####die "infinite loop while copying objects" if($obj->{' copied'});
 
     $tobj=$obj->copy($spdf); ## thanks to: yaheath // Fri, 17 Sep 2004
-    
+
 ####$obj->{' copied'}=1;
     $tpdf->new_obj($tobj) if($obj->is_obj($spdf));
 
@@ -1258,7 +1254,7 @@ B<Example:>
     $xo = $pdf->importPageIntoForm($old, 2);
 
     # Add it to the new PDF's first page at 1/2 scale
-    $gfx->formimage($xo, 0, 0, 0.5); 
+    $gfx->formimage($xo, 0, 0, 0.5);
 
     $pdf->saveas('our/new.pdf');
 
@@ -1384,7 +1380,7 @@ sub import_page {
     unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
         die "Invalid usage: 1st argument must be PDF::API2 instance, not: " . ref($s_pdf);
     }
-	
+
     if(ref($s_idx) eq 'PDF::API2::Page') {
         $s_page=$s_idx;
     } else {
@@ -2091,7 +2087,7 @@ sub colorspace_separation {
 
 Returns a new DeviceN colorspace object based on the parameters.
 
-B<Example:> 
+B<Example:>
 
     $cy = $pdf->colorspace_separation('Cyan',    '%f000');
     $ma = $pdf->colorspace_separation('Magenta', '%0f00');
@@ -2110,7 +2106,7 @@ colorspace specified.
 sub colorspace_devicen {
     my ($self,$clrs,$samples)=@_;
     $samples||=2;
-    
+
     require PDF::API2::Resource::ColorSpace::DeviceN;
     my $obj=PDF::API2::Resource::ColorSpace::DeviceN->new_api($self,$clrs,$samples);
 
@@ -2286,20 +2282,20 @@ sub named_destination
     $root->{Names}->{$cat}->{-vals}||={};
     $root->{Names}->{$cat}->{Limits}||=PDFArray();
     $root->{Names}->{$cat}->{Names}||=PDFArray();
-    
+
     unless(defined $obj)
     {
         $obj=PDF::API2::NamedDestination->new_api($self);
     }
     $root->{Names}->{$cat}->{-vals}->{$name}=$obj;
-    
+
     my @names=sort {$a cmp $b} keys %{$root->{Names}->{$cat}->{-vals}};
-    
+
     $root->{Names}->{$cat}->{Limits}->{' val'}->[0]=PDFStr($names[0]);
     $root->{Names}->{$cat}->{Limits}->{' val'}->[1]=PDFStr($names[-1]);
-    
+
     @{$root->{Names}->{$cat}->{Names}->{' val'}}=();
-    
+
     foreach my $k (@names)
     {
         push @{$root->{Names}->{$cat}->{Names}->{' val'}},
