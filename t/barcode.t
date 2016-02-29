@@ -10,7 +10,7 @@ $pdf->{forcecompress} = 0;
 
 # Check to ensure all barcode types can be loaded
 
-my $xo_codabar = $pdf->xo_codabar();
+my $xo_codabar = $pdf->xo_codabar(-code => 0);
 isa_ok($xo_codabar, q{PDF::API2::Resource::XObject::Form::BarCode::codabar},
        q{xo_codabar loads});
 
@@ -124,4 +124,3 @@ require PDF::API2::Resource::XObject::Form::BarCode::int2of5;
 is(join('', map { ref($_) ? $_->[0] : $_ } PDF::API2::Resource::XObject::Form::BarCode::int2of5->encode('0123456789')),
    'aaaa12112121121222111121121122112111212112122112112211baaa',
    q{Correctly encoded Interleaved 2 of 5 barcode});
-
