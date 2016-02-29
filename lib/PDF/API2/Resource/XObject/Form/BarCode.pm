@@ -7,7 +7,8 @@ use base 'PDF::API2::Resource::XObject::Form::Hybrid';
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
-no warnings qw[ deprecated recursion uninitialized ];
+use strict;
+use warnings;
 
 =head1 NAME
 
