@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::trebuchetitalic;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'TrebuchetMS,Italic',
     'type' => 'TrueType',
     'apiname' => 'TrIt',

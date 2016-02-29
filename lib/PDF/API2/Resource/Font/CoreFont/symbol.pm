@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::symbol;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Symbol',
     'type' => 'Type1',
     'apiname' => 'Sym',

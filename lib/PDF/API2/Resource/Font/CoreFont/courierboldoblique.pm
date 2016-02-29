@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::courierboldoblique;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Courier-BoldOblique',
     'type' => 'Type1',
     'apiname' => 'CoBoIt',

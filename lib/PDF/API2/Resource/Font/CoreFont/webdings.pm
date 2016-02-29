@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::webdings;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Webdings',
     'type' => 'TrueType',
     'apiname' => 'Web',

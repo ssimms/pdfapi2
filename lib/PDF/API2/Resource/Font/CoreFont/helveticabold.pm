@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::helveticabold;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Helvetica-Bold',
     'type' => 'Type1',
     'apiname' => 'HeBo',

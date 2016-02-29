@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::helveticaoblique;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Helvetica-Oblique',
     'type' => 'Type1',
     'apiname' => 'HeIt',

@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::timesitalic;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Times-Italic',
     'type' => 'Type1',
     'apiname' => 'TiIt',

@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::georgiabolditalic;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Georgia,BoldItalic',
     'type' => 'TrueType',
     'apiname' => 'GeBoIt',

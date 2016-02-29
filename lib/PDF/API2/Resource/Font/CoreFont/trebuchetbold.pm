@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::trebuchetbold;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'TrebuchetMS,Bold',
     'type' => 'TrueType',
     'apiname' => 'TrBo',

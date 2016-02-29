@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::timesbolditalic;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Times-BoldItalic',
     'type' => 'Type1',
     'apiname' => 'TiBoIt',

@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::timesroman;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Times-Roman',
     'type' => 'Type1',
     'apiname' => 'TiRo',

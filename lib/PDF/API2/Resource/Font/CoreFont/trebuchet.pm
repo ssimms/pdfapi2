@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::trebuchet;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'TrebuchetMS',
     'type' => 'TrueType',
     'apiname' => 'Treb',

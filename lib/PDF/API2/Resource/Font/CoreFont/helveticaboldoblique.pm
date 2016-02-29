@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::helveticaboldoblique;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Helvetica-BoldOblique',
     'type' => 'Type1',
     'apiname' => 'HeBi',

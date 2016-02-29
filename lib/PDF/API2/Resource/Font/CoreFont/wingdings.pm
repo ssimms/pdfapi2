@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::wingdings;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Wingdings',
     'type' => 'TrueType',
     'apiname' => 'WiDi',

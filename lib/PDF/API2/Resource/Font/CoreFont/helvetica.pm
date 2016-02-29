@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::helvetica;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Helvetica',
     'type' => 'Type1',
     'apiname' => 'Helv',

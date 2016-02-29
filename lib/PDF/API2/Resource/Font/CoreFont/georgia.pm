@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::georgia;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Georgia',
     'type' => 'TrueType',
     'apiname' => 'Geor',

@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::georgiabold;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Georgia,Bold',
     'type' => 'TrueType',
     'apiname' => 'GeBo',

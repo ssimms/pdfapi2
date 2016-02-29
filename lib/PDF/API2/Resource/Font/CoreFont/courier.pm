@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::courier;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Courier',
     'type' => 'Type1',
     'apiname' => 'Cour',

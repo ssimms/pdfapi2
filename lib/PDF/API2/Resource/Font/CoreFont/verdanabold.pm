@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::verdanabold;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Verdana,Bold',
     'type' => 'TrueType',
     'apiname' => 'VeBo',

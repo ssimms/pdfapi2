@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::timesbold;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'Times-Bold',
     'type' => 'Type1',
     'apiname' => 'TiBo',

@@ -2,7 +2,10 @@ package PDF::API2::Resource::Font::CoreFont::bankgothic;
 
 # VERSION
 
-$FONTDATA = {
+use strict;
+use warnings;
+
+our $FONTDATA = {
     'fontname' => 'BankGothicMediumBT',
     'type' => 'TrueType',
     'apiname' => 'BaGo',
