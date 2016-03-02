@@ -255,6 +255,7 @@ sub open {
         die "Malformed PDF file $filename";
     }
     my $xpos = $1;
+    $self->{' xref_position'} = $xpos;
 
     my $tdict = $self->readxrtr($xpos, $self);
     foreach my $key (keys %$tdict) {
