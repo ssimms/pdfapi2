@@ -5,7 +5,7 @@ use warnings;
 
 # VERSION
 
-use PDF::API2;
+use PDF::API2::Basic::PDF::File;
 
 my $file = shift(@ARGV);
 unless ($file) {
@@ -13,16 +13,15 @@ unless ($file) {
     exit;
 }
 
-my $pdf = PDF::API2->open($file) or die "Unable to open $file: $!";
+my $pdf = PDF::API2::Basic::PDF::File->open($file) or die "Unable to open $file: $!";
 my $command = shift(@ARGV);
 
 unless ($command) {
-    print "PDF Version: " . $pdf->version() . "\n";
-    print "XRef Table:  " . $pdf->{'pdf'}->{' xref_position'} . "\n";
-    print "Page Count:  " . $pdf->pages() . "\n";
-    print "Objects:     " . scalar(keys %{$pdf->{'pdf'}->{' objects'}}) . "\n";
-    print "Info:        " . _obj_reference($pdf->{'pdf'}->{'Info'}) . "\n" if $pdf->{'pdf'}->{'Info'};
-    print "Root:        " . _obj_reference($pdf->{'pdf'}->{'Root'}) . "\n" if $pdf->{'pdf'}->{'Root'};
+    print "PDF Version: " . $pdf->{' version'} . "\n";
+    print "XRef Table:  " . $pdf->{' xref_position'} . "\n";
+    print "Objects:     " . scalar(keys %{$pdf->{' objects'}}) . "\n";
+    print "Info:        " . _obj_reference($pdf->{'Info'}) . "\n" if $pdf->{'Info'};
+    print "Root:        " . _obj_reference($pdf->{'Root'}) . "\n" if $pdf->{'Root'};
     print "\n";
     print "To view an object:\n";
     print "$0 obj <id> [generation]\n";
@@ -33,8 +32,8 @@ unless ($command) {
 }
 elsif ($command eq 'xref') {
     my $location = shift(@ARGV);
-    $location = $pdf->{'pdf'}->{' xref_position'} unless defined $location;
-    my $object = $pdf->{'pdf'}->readxrtr($location);
+    $location = $pdf->{' xref_position'} unless defined $location;
+    my $object = $pdf->readxrtr($location);
     print "XRef at $location\n";
     print '--------' . ('-' x length($location)) . "\n";
     _print_obj($object);
@@ -43,10 +42,15 @@ elsif ($command eq 'obj') {
     my $id = shift(@ARGV);
     die "Missing required object number" unless $id and $id =~ /^[0-9]+$/;
     my $generation = shift(@ARGV) || 0;
-    my $object = $pdf->{'pdf'}->read_objnum($id, $generation);
+    my $object = $pdf->read_objnum($id, $generation);
     print "Object $id\n";
     print '-------' . ('-' x length($id)) . "\n";
-    _print_obj($object);
+    unless ($object) {
+        print "[Unable to read object]\n";
+    }
+    else {
+        _print_obj($object);
+    }
 }
 
 sub _print_obj {
@@ -91,8 +95,13 @@ sub _obj_dictionary {
                     $data->{$key} = '<Object ' . $object->{$key}->{' objnum'} . ($object->{$key}->{' objgen'} ? ' ' . $object->{$key}->{' objgen'} : '') . '>';
                 }
                 else {
-                    $data->{$key} = "\n" . _obj_dictionary($object->{$key}, $indent + 1);
-                    chomp $data->{$key};
+                    unless (scalar grep { $_ !~ /^ / } keys %{$object->{$key}}) {
+                        $data->{$key} = '<Empty Dictionary>';
+                    }
+                    else {
+                        $data->{$key} = "\n" . _obj_dictionary($object->{$key}, $indent + 1);
+                        chomp $data->{$key};
+                    }
                 }
             }
             elsif ($object->{$key}->isa('PDF::API2::Basic::PDF::Name') or
@@ -151,9 +160,14 @@ sub _obj_array {
                     push @elements, '<Object ' . $element->{' objnum'} . ($element->{' objgen'} ? ' ' . $element->{' objgen'} : '') . '>';
                 }
                 else {
-                    $is_complex = 1;
-                    push @elements, "Dictionary: \n" . _obj_dictionary($element, $indent + 1);
-                    chomp $elements[-1];
+                    unless (scalar grep { $_ !~ /^ / } keys %$element) {
+                        push @elements, "<Empty Dictionary>";
+                    }
+                    else {
+                        $is_complex = 1;
+                        push @elements, "Dictionary: \n" . _obj_dictionary($element, $indent + 1);
+                        chomp $elements[-1];
+                    }
                 }
             }
             elsif ($element->isa('PDF::API2::Basic::PDF::Name') or
