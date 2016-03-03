@@ -65,11 +65,11 @@ sub _print_obj {
         if ($@) {
             print "[Stream could not be read or decoded]\n";
         }
-        elsif ($object->{' stream'} =~ /^[[:print:]]+$/) {
+        elsif ($ENV{'FORCE'} or $object->{' stream'} =~ /^[[:print:]]+$/) {
             print $object->{' stream'} . "\n";
         }
         else {
-            print "[Stream contains non-printable characters]\n";
+            print "[Stream contains non-printable characters.  Set environment FORCE=1 to show the stream anyway.]\n";
         }
     }
 }
