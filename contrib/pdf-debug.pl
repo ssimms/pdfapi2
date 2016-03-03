@@ -54,7 +54,25 @@ elsif ($command eq 'obj') {
 
 sub _print_obj {
     my $object = shift();
-    print _obj_dictionary($object) if $object->isa('PDF::API2::Basic::PDF::Dict');
+    if ($object->isa('PDF::API2::Basic::PDF::Dict')) {
+        print _obj_dictionary($object);
+    }
+    elsif ($object->isa('PDF::API2::Basic::PDF::Array')) {
+        print _obj_array($object) . "\n";
+    }
+    elsif ($object->isa('PDF::API2::Basic::PDF::Name') or
+           $object->isa('PDF::API2::Basic::PDF::Number') or
+           $object->isa('PDF::API2::Basic::PDF::String')) {
+        if ($object->val() =~ /^[[:print:]]+$/) {
+            print $object->val() . "\n";
+        }
+        else {
+            print $object->as_pdf() . "\n";
+        }
+    }
+    else {
+        print "[" . ref($object) . "]\n";
+    }
 
     if ($object->{' stream'}) {
         print "\n";
