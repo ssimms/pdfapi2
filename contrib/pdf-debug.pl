@@ -19,7 +19,6 @@ my $command = shift(@ARGV);
 unless ($command) {
     print "PDF Version: " . $pdf->{' version'} . "\n";
     print "XRef Table:  " . $pdf->{' xref_position'} . "\n";
-    print "Objects:     " . scalar(keys %{$pdf->{' objects'}}) . "\n";
     print "Info:        " . _obj_reference($pdf->{'Info'}) . "\n" if $pdf->{'Info'};
     print "Root:        " . _obj_reference($pdf->{'Root'}) . "\n" if $pdf->{'Root'};
     print "\n";
