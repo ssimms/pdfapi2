@@ -1145,7 +1145,7 @@ sub readxrtr {
         }
         else
         {
-            @index = (0, $tdict->{Size}->val - 1);
+            @index = (0, $tdict->{Size}->val);
         }
 
         while (scalar @index) {
