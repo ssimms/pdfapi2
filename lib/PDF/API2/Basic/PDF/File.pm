@@ -490,7 +490,13 @@ sub readval {
             my $length = $result->{'Length'}->val;
             $result->{' streamsrc'} = $fh;
             $result->{' streamloc'} = $fh->tell - length($str);
-            $result->{' streamloc'}-- if $fh->eof;
+
+            # The following line was added as part of the initial XRef Stream patch, but it breaks
+            # streams that are near the end of a file (starting the stream one byte early, resulting
+            # in corruption).
+            #
+            # $result->{' streamloc'}-- if $fh->eof;
+
             unless ($opts{'nostreams'}) {
                 if ($length > length($str)) {
                     $value = $str;
