@@ -628,7 +628,7 @@ sub readval {
     elsif ($str =~ m/^</) {
         $str =~ s/^<//;
         $fh->read($str, 255, length($str)) while (0 > index($str, '>'));
-        ($value, $str) = ($str =~ /^(.*?)>(.*?)$/s);
+        ($value, $str) = ($str =~ /^(.*?)>(.*)/s);
         $result = PDF::API2::Basic::PDF::String->from_pdf('<' . $value . '>');
     } 
 
