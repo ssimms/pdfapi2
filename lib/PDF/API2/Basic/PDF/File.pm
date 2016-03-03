@@ -456,7 +456,10 @@ sub readval {
     my ($result, $value);
 
     my $update = defined($opts{update}) ? $opts{update} : 1;
-    $str = update($fh, $str) if $update;
+    $str = update($fh, $str);
+
+    $str =~ s/^$ws_char+//;               # Ignore initial white space
+    $str =~ s/^\%[^\015\012]*$ws_char+//; # Ignore comments
 
     # Dictionary
     if ($str =~ m/^<</s) {
@@ -465,6 +468,9 @@ sub readval {
         $result = PDFDict();
 
         while ($str !~ m/^>>/) {
+            $str =~ s/^$ws_char+//;               # Ignore initial white space
+            $str =~ s/^\%[^\015\012]*$ws_char+//; # Ignore comments
+
             if ($str =~ s|^/($reg_char+)$ws_char?||) {
                 my $key = PDF::API2::Basic::PDF::Name::name_to_string($1, $self);
                 ($value, $str) = $self->readval($str, %opts);
@@ -632,6 +638,9 @@ sub readval {
         $str = update($fh, $str) if $update;
         $result = PDFArray();
         while ($str !~ m/^\]/) {
+            $str =~ s/^$ws_char+//;               # Ignore initial white space
+            $str =~ s/^\%[^\015\012]*$ws_char+//; # Ignore comments
+
             ($value, $str) = $self->readval($str, %opts);
             $result->add_elements($value);
             $str = update($fh, $str) if $update;   # str might just be exhausted!
@@ -663,7 +672,7 @@ sub readval {
         die "Can't parse `$str' near " . ($fh->tell()) . " length " . length($str) . ".";
     }
 
-    $str =~ s/^$ws_char*//s;
+    $str =~ s/^$ws_char+//s;
     return ($result, $str);
 }
 
@@ -1019,7 +1028,7 @@ sub update {
         while ($str =~ m/^\%/) { # restructured by fredo/2003-03-23
             print STDERR 'fpos=' . tell($fh) . ' strlen=' . length($str) . "\n" if $readDebug;
             $fh->read($str, 314, length($str)) while ($str !~ m/$cr/ and not $fh->eof());
-            $str =~ s/^\%[^\015\012]+$ws_char*//so; # fixed for reportlab -- fredo
+            $str =~ s/^\%[^\015\012]*$ws_char*//so; # fixed for reportlab -- fredo
         }
     }
 
