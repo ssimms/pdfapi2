@@ -1137,14 +1137,16 @@ sub readxrtr {
 
         ($tdict, $buf) = $self->readval($buf);
     }
-    elsif ($buf =~ m/^\d+\s+\d+\s+obj/i)
+    elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i)
     {
+        my ($xref_obj, $xref_gen) = ($1, $2);
+
         # XRef streams.
         ($tdict, $buf) = $self->readval($buf);
 
         unless ($tdict->{' stream'})
         {
-            die "Malformed XRefStm object in PDF file $self->{' fname'}";
+            die "Malformed XRefStm at $xref_obj $xref_gen obj in PDF file $self->{' fname'}";
         }
         $tdict->read_stream(1);
 
@@ -1181,7 +1183,9 @@ sub readxrtr {
                 }
     
                 $cols[0] = 1 unless defined $cols[0];
-                die 'Invalid XRefStm entry type: ', $cols[0] if $cols[0] > 2;
+                if ($cols[0] > 2) {
+                    die "Invalid XRefStm entry type ($cols[0]) at $xref_obj $xref_gen obj";
+                }
     
                 next if exists $xlist->{$xmin};
     
