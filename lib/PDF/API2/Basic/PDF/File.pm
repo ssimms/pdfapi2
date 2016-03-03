@@ -1130,7 +1130,7 @@ sub readxrtr {
         {
             die "Malformed XRefStm object in PDF file $self->{' fname'}";
         }
-        $tdict->read_stream();
+        $tdict->read_stream(1);
 
         my $stream = $tdict->{' stream'};
         my @widths = map { $_->val } @{$tdict->{W}->val};
