@@ -110,10 +110,12 @@ sub _depredict_png {
             }
         }
         elsif ($filter == 4) {
-            # die "paeth/png filter not supported.";
             foreach my $x (0 .. length($line) - 1) {
                 vec($clear, $x, 8) = (vec($line, $x, 8) + _paeth_predictor(vec($clear, $x - $bpp, 8), vec($prev, $x, 8), vec($prev, $x - $bpp, 8))) % 256;
             }
+        }
+        else {
+            die "Unexpected depredictor algorithm $filter requested on line $n (valid options are 0-4)";
         }
         $prev = $clear;
         foreach my $x (0 .. ($columns * $comp) - 1) {
