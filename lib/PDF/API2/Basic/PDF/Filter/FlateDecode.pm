@@ -68,6 +68,10 @@ sub _depredict_png {
     my ($self, $stream) = @_;
     my $param  = $self->{'DecodeParms'};
 
+    my $prev = '';
+    $stream = $self->{'_depredict_next'} . $stream if defined $self->{'_depredict_next'};
+    $prev   = $self->{'_depredict_prev'}           if defined $self->{'_depredict_prev'};
+
     my $alpha   = $param->{Alpha}            ? $param->{Alpha}->val()            : 0;
     my $bpc     = $param->{BitsPerComponent} ? $param->{BitsPerComponent}->val() : 8;
     my $colors  = $param->{Colors}           ? $param->{Colors}->val()           : 1;
@@ -78,9 +82,8 @@ sub _depredict_png {
     my $bpp      = ceil($bpc * $comp / 8);
     my $scanline = 1 + ceil($bpp * $columns);
 
-    my $prev = '';
     my $clearstream = '';
-    my $lastrow = ($height || (length($stream) / $scanline)) - 1;
+    my $lastrow = ($height || int(length($stream) / $scanline)) - 1;
     foreach my $n (0 .. $lastrow) {
         # print STDERR "line $n:";
         my $line = substr($stream, $n * $scanline, $scanline);
@@ -119,6 +122,8 @@ sub _depredict_png {
         }
         # print STDERR "\n";
     }
+    $self->{'_depredict_next'} = substr($stream, ($lastrow + 1) * $scanline);
+    $self->{'_depredict_prev'} = $prev;
 
     return $clearstream;
 }
