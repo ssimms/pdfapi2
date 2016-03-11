@@ -1,5 +1,17 @@
 {{$NEXT}}
 
+    - This release contains seven fixes for parsing PDFs.  They mostly
+      affect files using cross-reference streams, which were first
+      supported in the previous release.  Thanks to Marco Pessotto and
+      Stuart Henderson for their help identifying and troubleshooting
+      bugs.
+
+    - Added contrib/pdf-debug.pl to help track down issues related to
+      opening and parsing PDFs.
+
+
+2.026     2016-02-24
+
     - [RT #48683] Add support for PDFs with cross-reference streams
       and object streams (patch by Don Huettl of Grant Street Group).
 
