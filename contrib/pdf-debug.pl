@@ -70,6 +70,9 @@ sub _print_obj {
             print $object->as_pdf() . "\n";
         }
     }
+    elsif ($object->isa('PDF::API2::Basic::PDF::Null')) {
+        print "<Null>\n"
+    }
     else {
         print "[" . ref($object) . "]\n";
     }
@@ -130,6 +133,9 @@ sub _obj_dictionary {
                 else {
                     $data->{$key} = $object->{$key}->as_pdf();
                 }
+            }
+            elsif ($object->{$key}->isa('PDF::API2::Basic::PDF::Null')) {
+                $data->{$key} = '<Null>';
             }
             elsif ($object->{$key}->isa('PDF::API2::Basic::PDF::Objind') and $object->{$key}->{' objnum'}) {
                 $data->{$key} = '<Object ' . $object->{$key}->{' objnum'} . ($object->{$key}->{' objgen'} ? ' ' . $object->{$key}->{' objgen'} : '') . '>';
@@ -196,6 +202,9 @@ sub _obj_array {
                 else {
                     push @elements, $element->as_pdf();
                 }
+            }
+            elsif ($element->isa('PDF::API2::Basic::PDF::Null')) {
+                push @elements, '<Null>';
             }
             elsif ($element->isa('PDF::API2::Basic::PDF::Objind') and $element->{' objnum'}) {
                 push @elements, '<Object ' . $element->{' objnum'} . ($element->{' objgen'} ? ' ' . $element->{' objgen'} : '') . '>';
