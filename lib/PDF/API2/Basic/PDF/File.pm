@@ -711,7 +711,7 @@ sub read_objnum {
         my $src = $self->read_objnum($object_location->[0], 0, %opts);
         die 'Cannot find the compressed object stream' unless $src;
 
-        $src->read_stream if $src->{' nofilt'};
+        $src->read_stream(1) if $src->{' nofilt'};
 
         my $map = substr($src->{' stream'}, 0, $src->{'First'}->val);
         my $objects = substr($src->{' stream'}, $src->{'First'}->val);
