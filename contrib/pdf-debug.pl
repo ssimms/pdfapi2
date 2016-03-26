@@ -178,7 +178,10 @@ sub _obj_array {
             push @elements, $element;
         }
         else {
-            if ($element->isa('PDF::API2::Basic::PDF::Dict')) {
+            if ($element->isa('PDF::API2::Basic::PDF::Array')) {
+                push @elements, _obj_array($element, $indent + 1);
+            }
+            elsif ($element->isa('PDF::API2::Basic::PDF::Dict')) {
                 if ($element->{' objnum'}) {
                     push @elements, '<Object ' . $element->{' objnum'} . ($element->{' objgen'} ? ' ' . $element->{' objgen'} : '') . '>';
                 }
