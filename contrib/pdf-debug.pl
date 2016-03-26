@@ -85,7 +85,7 @@ sub _print_obj {
         if ($@) {
             print "[Stream could not be read or decoded]\n";
         }
-        elsif ($ENV{'FORCE'} or $object->{' stream'} =~ /^[[:print:]]+$/) {
+        elsif ($ENV{'FORCE'} or $object->{' stream'} =~ /^[[:print:]]*$/) {
             print $object->{' stream'} . "\n";
         }
         else {
