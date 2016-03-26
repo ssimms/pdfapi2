@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - [RT #113290] Fix for reading objects inside an object stream in
+      a large PDF (patch by Marco Pessotto).
+
+
+2.027     2016-03-11
+
     - This release contains seven fixes for parsing PDFs.  They mostly
       affect files using cross-reference streams, which were first
       supported in the previous release.  Thanks to Marco Pessotto and
