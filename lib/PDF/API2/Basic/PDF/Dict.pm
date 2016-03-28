@@ -323,6 +323,28 @@ sub read_stream {
     return $self;
 }
 
+=head2 stream_as_string
+
+Return the stream content, either reading from streamfile or from the
+stream variable.
+
+=cut
+
+sub stream_content {
+    my $self = shift;
+    if (defined $self->{' streamfile'}) {
+        open (my $fh, '<:raw', $self->{' streamfile'}) or die "Cannot open $self->{' streamfile'}";
+        local $/ = undef;
+        my $data = <$fh>;
+        close $fh;
+        return $data;
+    }
+    else {
+        return $self->{' stream'};
+    }
+}
+
+
 =head2 $d->val
 
 Returns the dictionary, which is itself.
