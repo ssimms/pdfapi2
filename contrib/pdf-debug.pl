@@ -23,10 +23,10 @@ unless ($command) {
     print "Root:        " . _obj_reference($pdf->{'Root'}) . "\n" if $pdf->{'Root'};
     print "\n";
     print "To view an object:\n";
-    print "$0 obj <id> [generation]\n";
+    print "$0 <file.pdf> obj <id> [generation]\n";
     print "\n";
     print "To view a cross-reference dictionary (with optional offset in bytes):\n";
-    print "$0 xref [offset]\n";
+    print "$0 <file.pdf> xref [offset]\n";
     print "\n";
 }
 elsif ($command eq 'xref') {
