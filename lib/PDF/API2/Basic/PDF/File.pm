@@ -982,13 +982,13 @@ sub locate_obj {
             return $ref unless scalar(@$ref) == 3;
 
             if ($ref->[1] == $gen) {
-                return $ref->[0] if ($ref->[2] eq 'n');
-                return undef; # if $ref->[2] eq 'f'
+                return $ref->[0] if $ref->[2] eq 'n';
+                return         # if $ref->[2] eq 'f';
             }
         }
-        $tdict = $tdict->{' prev'}
+        $tdict = $tdict->{' prev'};
     }
-    return undef;
+    return;
 }
 
 
