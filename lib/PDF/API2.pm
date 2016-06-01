@@ -1183,54 +1183,51 @@ sub openpage {
 }
 
 
-# $target_object = walk_obj $obj_cache, $source_pdf, $target_pdf, $source_object [, @keys_to_copy ]
-
 sub walk_obj {
-    my ($objs,$spdf,$tpdf,$obj,@keys)=@_;
+    my ($object_cache, $source_pdf, $target_pdf, $source_object, @keys) = @_;
 
-    my $tobj;
-
-
-    if(ref($obj)=~/Objind$/) {
-        $obj->realise;
+    if (ref($source_object) =~ /Objind$/) {
+        $source_object->realise();
     }
 
-    return($objs->{scalar $obj}) if(defined $objs->{scalar $obj});
-####die "infinite loop while copying objects" if($obj->{' copied'});
+    return $object_cache->{scalar $source_object} if defined $object_cache->{scalar $source_object};
+####die "infinite loop while copying objects" if($source_object->{' copied'});
 
-    $tobj=$obj->copy($spdf); ## thanks to: yaheath // Fri, 17 Sep 2004
+    my $target_object = $source_object->copy($source_pdf); ## thanks to: yaheath // Fri, 17 Sep 2004
 
-####$obj->{' copied'}=1;
-    $tpdf->new_obj($tobj) if($obj->is_obj($spdf));
+####$source_object->{' copied'}=1;
+    $target_pdf->new_obj($target_object) if $source_object->is_obj($source_pdf);
 
-    $objs->{scalar $obj}=$tobj;
+    $object_cache->{scalar $source_object} = $target_object;
 
-    if(ref($obj)=~/Array$/) {
-        $tobj->{' val'}=[];
-        foreach my $k ($obj->elementsof) {
-            $k->realise if(ref($k)=~/Objind$/);
-            $tobj->add_elements(walk_obj($objs,$spdf,$tpdf,$k));
+    if (ref($source_object) =~ /Array$/) {
+        $target_object->{' val'} = [];
+        foreach my $k ($source_object->elementsof()) {
+            $k->realise() if ref($k) =~ /Objind$/;
+            $target_object->add_elements(walk_obj($object_cache, $source_pdf, $target_pdf, $k));
         }
-    } elsif(ref($obj)=~/Dict$/) {
-        @keys=keys(%{$tobj}) if(scalar @keys <1);
+    }
+    elsif (ref($source_object) =~ /Dict$/) {
+        @keys = keys(%$target_object) unless scalar @keys;
         foreach my $k (@keys) {
-            next if($k=~/^ /);
-            next unless(defined($obj->{$k}));
-            $tobj->{$k}=walk_obj($objs,$spdf,$tpdf,$obj->{$k});
+            next if $k =~ /^ /;
+            next unless defined $source_object->{$k};
+            $target_object->{$k} = walk_obj($object_cache, $source_pdf, $target_pdf, $source_object->{$k});
         }
-        if($obj->{' stream'}) {
-            if($tobj->{Filter}) {
-                $tobj->{' nofilt'}=1;
-            } else {
-                delete $tobj->{' nofilt'};
-                $tobj->{Filter}=PDFArray(PDFName('FlateDecode'));
+        if ($source_object->{' stream'}) {
+            if ($target_object->{'Filter'}) {
+                $target_object->{' nofilt'} = 1;
             }
-            $tobj->{' stream'}=$obj->{' stream'};
+            else {
+                delete $target_object->{' nofilt'};
+                $target_object->{'Filter'} = PDFArray(PDFName('FlateDecode'));
+            }
+            $target_object->{' stream'} = $source_object->{' stream'};
         }
     }
-    delete $tobj->{' streamloc'};
-    delete $tobj->{' streamsrc'};
-    return($tobj);
+    delete $target_object->{' streamloc'};
+    delete $target_object->{' streamsrc'};
+    return $target_object;
 }
 
 =item $xoform = $pdf->importPageIntoForm($source_pdf, $source_page_number)
