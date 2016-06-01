@@ -14,7 +14,6 @@ BEGIN {
         @EXPORT_OK 
         %colors 
         $key_var 
-        $key_var2 
         %u2n 
         %n2u 
         $pua
@@ -62,7 +61,6 @@ BEGIN {
     no warnings qw[ recursion uninitialized ];
 
     $key_var='CBA';
-    $key_var2=0;
 
     $pua=0xE000;
 
