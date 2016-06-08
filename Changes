@@ -3,6 +3,8 @@
     - [RT #113290] Fix for reading objects inside an object stream in
       a large PDF (patch by Marco Pessotto).
 
+    - Eliminate an infinite loop when reading a corrupt dictionary.
+
 
 2.027     2016-03-11
 

@@ -486,6 +486,9 @@ sub readval {
                 ($value, $str) = $self->readval($str, %opts);
                 $result->{'null'} = $value;
             }
+            else {
+                die "Invalid dictionary key";
+            }
             $str = update($fh, $str) if $update; # thanks gareth.jones@stud.man.ac.uk
         }
         $str =~ s/^>>//;
