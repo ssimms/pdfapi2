@@ -20,15 +20,13 @@ use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 our $mincache;
-our $tempbase;
+use File::Temp;
 
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Filter;
 use PDF::API2::Basic::PDF::Name;
 
 BEGIN {
-    my $temp_dir = -d '/tmp' ? '/tmp' : $ENV{TMP} || $ENV{TEMP};
-    $tempbase = sprintf("%s/%d-%d-0000", $temp_dir, $$, time());
     $mincache = 32768;
 }
 
@@ -51,6 +49,10 @@ Holds the stream contents for output
 
 Holds the stream contents in an external file rather than in memory. This is
 not the same as a PDF file stream. The data is stored in its unfiltered form.
+
+=item streamfilehandle
+
+The L<File::Temp> object used to create the streamfile
 
 =item streamloc
 
@@ -279,8 +281,8 @@ sub read_stream {
     }
 
     my $last = 0;
-    if (defined $self->{' streamfile'}) {
-        unlink ($self->{' streamfile'});
+    if (defined $self->{' streamfilehandle'}) {
+        $self->{' streamfilehandle'} = undef;
         $self->{' streamfile'} = undef;
     }
     seek $fh, $self->{' streamloc'}, 0;
@@ -298,15 +300,18 @@ sub read_stream {
             $data = $filter->infilt($data, $last);
         }
 
-        # Maintainer's Note: There are a couple of issues here:
-        # 1) File::Temp should be used for creating temporary files
-        # 2) The length check should be looking at $self->{' stream'}
-        #    rather than $data (which just contains the latest chunk)
-        if (not $force_memory and not defined $self->{' streamfile'} and ((length($data) * 2) > $mincache)) {
-            open(DICTFH, '>', $tempbase) or next;
-            binmode DICTFH, ':raw';
-            $self->{' streamfile'} = $tempbase;
-            $tempbase =~ s/-(\d+)$/'-' . ($1 + 1)/oe;        # prepare for next use
+        if (not $force_memory and not defined $self->{' streamfile'} and
+            ((length($self->{' stream'}) + length($data)) > $mincache)) {
+            my $tmpfh = File::Temp->new(TMPDIR => 1,
+                                        TEMPLATE => 'PDF-API2-XXXXXXXXXXXXX');
+
+            # hold this in the object. When going out of scope, the
+            # temporary file is removed as well
+            $self->{' streamfilehandle'} = $tmpfh or die "Cannot create a temporary file";
+
+            # and reopen the file to operate on it.
+            $self->{' streamfile'} = $tmpfh->filename;
+            open(DICTFH, '>:raw', $self->{' streamfile'}) or die "Cannot open " . $self->{' streamfile'};
             print DICTFH $self->{' stream'};
             undef $self->{' stream'};
         }
@@ -322,6 +327,28 @@ sub read_stream {
     $self->{' nofilt'} = 0;
     return $self;
 }
+
+=head2 stream_as_string
+
+Return the stream content, either reading from streamfile or from the
+stream variable.
+
+=cut
+
+sub stream_content {
+    my $self = shift;
+    if (defined $self->{' streamfile'}) {
+        open (my $fh, '<:raw', $self->{' streamfile'}) or die "Cannot open $self->{' streamfile'}";
+        local $/ = undef;
+        my $data = <$fh>;
+        close $fh;
+        return $data;
+    }
+    else {
+        return $self->{' stream'};
+    }
+}
+
 
 =head2 $d->val
 
