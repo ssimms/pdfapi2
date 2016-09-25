@@ -271,6 +271,7 @@ sub get_kids
     }
     @pglist;
 }
+
 =head2 $p->find_prop($key)
 
 Searches up through the inheritance tree to find a property.
