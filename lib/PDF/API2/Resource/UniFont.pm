@@ -36,14 +36,14 @@ B<BLOCKSPECS:>
         $block1, $block3,    # register font for block 1 + 3
         [$blockA,$blockZ],   # register font for blocks A .. Z
     ]
-    
+
 B<CODESPECS:> 
 
     [
         $cp1, $cp3,          # register font for codepoint 1 + 3
         [$cpA,$cpZ],         # register font for codepoints A .. Z
     ]
-    
+
 B<NOTE:> if you want to register a font for the entire unicode space 
 (ie. U+0000 .. U+FFFF), then simply specify a font-object without the hash-ref.
 
