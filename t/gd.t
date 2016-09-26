@@ -6,7 +6,7 @@ use strict;
 use PDF::API2;
 
 SKIP: {
-    eval "require GD";
+    eval { require GD };
     if ($@) {
         skip q{GD not installed; skipping image_gd tests}, 2;
     }
