@@ -64,7 +64,7 @@ sub new {
 
     $self->{-nocomps}=1 if($opts{-nocomps});
     $self->{-dokern}=1 if($opts{-dokern});
-    
+
     return($self);
 }
 
@@ -154,7 +154,7 @@ sub readPFAPFB {
 
 # $datahashref = $self->readAFM( $afmfile );
 
-sub readAFM 
+sub readAFM
 {
     my ($self,$file)=@_;
     my $data={};
@@ -167,9 +167,9 @@ sub readAFM
     if(! -e $file) {die "file='$file' not existant.";}
     open(AFMF, $file) or die "Can't find the AFM file for $file";
     local($/, $_) = ("\n", undef);  # ensure correct $INPUT_RECORD_SEPARATOR
-    while ($_=<AFMF>) 
+    while ($_=<AFMF>)
     {
-        if (/^StartCharMetrics/ .. /^EndCharMetrics/) 
+        if (/^StartCharMetrics/ .. /^EndCharMetrics/)
         {
         # only lines that start with "C" or "CH" are parsed
             next unless $_=~/^CH?\s/;
@@ -196,12 +196,12 @@ sub readAFM
             $data->{kern}||={};
             if($_=~m|^KPX\s+(\S+)\s+(\S+)\s+(\S+)\s*$|i)
             {
-                $data->{kern}->{"$1:$2"}=$3;    
+                $data->{kern}->{"$1:$2"}=$3;
             }
         }
         elsif(/^StartComposites/ .. /^EndComposites/)
         {
-            $data->{comps}||={}; 
+            $data->{comps}||={};
             if($_=~m|^CC\s+(\S+)\s+(\S+)\s+;|i)
             {
                 my ($name,$comp)=($1,$2);
@@ -213,32 +213,32 @@ sub readAFM
                     my @c1=split(/\s+/,shift @cv);
                     push @{$rng},$c1[1],$c1[2],$c1[3];
                 }
-                $data->{comps}->{$name}=$rng;    
+                $data->{comps}->{$name}=$rng;
             }
         }
         last if $_=~/^EndFontMetrics/;
-        if (/(^\w+)\s+(.*)/) 
+        if (/(^\w+)\s+(.*)/)
         {
             my($key,$val) = ($1, $2);
             $key = lc $key;
-            if (defined $data->{$key}) 
+            if (defined $data->{$key})
             {
             #   $data->{$key} = [ $data->{$key} ] unless ref $data->{$key};
             #   push(@{$data->{$key}}, $val);
-            } 
-            else 
+            }
+            else
             {
                 $val=~s/[\x00\x1f]+//g;
                 $data->{$key} = $val;
             }
-        } 
-        else 
+        }
+        else
         {
                 ## print STDERR "Can't parse: $_";
         }
     }
     close(AFMF);
-    unless (exists $data->{wx}->{'.notdef'}) 
+    unless (exists $data->{wx}->{'.notdef'})
     {
         $data->{wx}->{'.notdef'} = 0;
         $data->{bbox}{'.notdef'} = [0, 0, 0, 0];
@@ -250,11 +250,11 @@ sub readAFM
     $data->{fontname}=~s/[\x00-\x20]+//og;
     ## $data->{fontname}=~s/[^A-Za-z0-9]+//og;
 
-    if(defined $data->{fullname}) 
+    if(defined $data->{fullname})
     {
         $data->{altname}=$data->{fullname};
-    } 
-    else 
+    }
+    else
     {
         $data->{altname}=$data->{familyname};
         $data->{altname}.=' Italic' if($data->{italicangle}<0);
@@ -279,12 +279,12 @@ sub readAFM
     $data->{flags} = 34;
 
     $data->{uni}||=[];
-    foreach my $n (0..255) 
+    foreach my $n (0..255)
     {
         $data->{uni}->[$n]=uniByName($data->{char}->[$n] || '.notdef') || 0;
     }
     delete $data->{bbox};
-    
+
     return($data);
 }
 

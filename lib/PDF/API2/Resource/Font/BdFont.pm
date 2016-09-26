@@ -61,7 +61,7 @@ sub new {
 
     # adobe bitmap distribution font
     $self->{' data'}=$self->readBDF($file);
-    
+
     my $first=1;
     my $last=255;
 
@@ -76,7 +76,7 @@ sub new {
     $xo->{Type}=PDFName('Encoding');
     $xo->{BaseEncoding}=PDFName('WinAnsiEncoding');
     $xo->{Differences}=PDFArray(PDFNum('0'),(map { PDFName($_||'.notdef') } @{$self->data->{char}}));
-   
+
     my $procs=PDFDict();
     $pdf->new_obj($procs);
     $self->{'CharProcs'} = $procs;
@@ -213,14 +213,14 @@ sub readBDF {
         $data->{char}->[$n]||='.notdef';
     #    $data->{wx}->{$data->{char}->[$n]}=int($data->{wx}->{$data->{char}->[$n]}*1000/$data->{upm});
     }
-    
+
     $data->{uni}||=[];
     foreach my $n (0..255) {
         $data->{uni}->[$n]=uniByName($data->{char}->[$n] || '.notdef') || 0;
     }
-    $data->{ascender}=$data->{RAW_ASCENT} 
+    $data->{ascender}=$data->{RAW_ASCENT}
         || int($data->{FONT_ASCENT}*1000/$data->{upm});
-    $data->{descender}=$data->{RAW_DESCENT} 
+    $data->{descender}=$data->{RAW_DESCENT}
         || int($data->{FONT_DESCENT}*1000/$data->{upm});
 
     $data->{type}='Type3';
@@ -229,14 +229,14 @@ sub readBDF {
     $data->{issymbol} = 0;
     $data->{isfixedpitch}=0;
     $data->{italicangle}=0;
-    $data->{missingwidth}=$data->{AVERAGE_WIDTH} 
-        || int($data->{FONT_AVERAGE_WIDTH}*1000/$data->{upm}) 
-        || $data->{RAW_AVERAGE_WIDTH} 
+    $data->{missingwidth}=$data->{AVERAGE_WIDTH}
+        || int($data->{FONT_AVERAGE_WIDTH}*1000/$data->{upm})
+        || $data->{RAW_AVERAGE_WIDTH}
         || 500;
     $data->{underlineposition}=-200;
     $data->{underlinethickness}=10;
-    $data->{xheight}=$data->{RAW_XHEIGHT} 
-        || int($data->{FONT_XHEIGHT}*1000/$data->{upm}) 
+    $data->{xheight}=$data->{RAW_XHEIGHT}
+        || int($data->{FONT_XHEIGHT}*1000/$data->{upm})
         || int($data->{ascender}/2);
     $data->{firstchar}=1;
     $data->{lastchar}=255;
