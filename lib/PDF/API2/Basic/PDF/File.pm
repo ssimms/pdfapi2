@@ -475,13 +475,13 @@ sub readval {
                 my $key = PDF::API2::Basic::PDF::Name::name_to_string($1, $self);
                 ($value, $str) = $self->readval($str, %opts);
                 $result->{$key} = $value;
-            } 
-            elsif ($str =~ s|^/$ws_char+||) { 
+            }
+            elsif ($str =~ s|^/$ws_char+||) {
                 # fixes a broken key problem of acrobat. -- fredo
                 ($value, $str) = $self->readval($str, %opts);
                 $result->{'null'} = $value;
-            } 
-            elsif ($str =~ s|^//|/|) { 
+            }
+            elsif ($str =~ s|^//|/|) {
                 # fixes again a broken key problem of illustrator/enfocus. -- fredo
                 ($value, $str) = $self->readval($str, %opts);
                 $result->{'null'} = $value;
@@ -512,7 +512,7 @@ sub readval {
                 $value .= substr($str, 0, $length);
                 $result->{' stream'} = $value;
                 $result->{' nofilt'} = 1;
-                $str = update($fh, $str, 1) if $update;  # tell update we are in-stream and only need an endstream 
+                $str = update($fh, $str, 1) if $update;  # tell update we are in-stream and only need an endstream
                 $str = substr($str, index($str, 'endstream') + 9);
             }
         }
@@ -539,7 +539,7 @@ sub readval {
         $result->{' realised'} = 0;
         # gdj: FIXME: if any of the ws chars were crs, then the whole
         # string might not have been read.
-    } 
+    }
 
     # Object
     elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj/s) {
@@ -565,7 +565,7 @@ sub readval {
         $value = $1;
         $str =~ s|^/($reg_char*)||s;
         $result = PDF::API2::Basic::PDF::Name->from_pdf($value, $self);
-    } 
+    }
 
     # Literal String
     elsif ($str =~ m/^\(/) {
@@ -619,7 +619,7 @@ sub readval {
         }
 
         $result = PDF::API2::Basic::PDF::String->from_pdf($value);
-    } 
+    }
 
     # Hex String
     elsif ($str =~ m/^</) {
@@ -627,7 +627,7 @@ sub readval {
         $fh->read($str, 255, length($str)) while (0 > index($str, '>'));
         ($value, $str) = ($str =~ /^(.*?)>(.*)/s);
         $result = PDF::API2::Basic::PDF::String->from_pdf('<' . $value . '>');
-    } 
+    }
 
     # Array
     elsif ($str =~ m/^\[/) {
@@ -643,27 +643,27 @@ sub readval {
             $str = update($fh, $str) if $update;   # str might just be exhausted!
         }
         $str =~ s/^\]//;
-    } 
+    }
 
     # Boolean
     elsif ($str =~ m/^(true|false)$irreg_char/) {
         $value = $1;
         $str =~ s/^(?:true|false)//;
         $result = PDF::API2::Basic::PDF::Bool->from_pdf($value);
-    } 
+    }
 
     # Number
     elsif ($str =~ m/^([+-.0-9]+)$irreg_char/) {
         $value = $1;
         $str =~ s/^([+-.0-9]+)//;
         $result = PDF::API2::Basic::PDF::Number->from_pdf($value);
-    } 
+    }
 
     # Null
     elsif ($str =~ m/^null$irreg_char/) {
         $str =~ s/^null//;
         $result = PDF::API2::Basic::PDF::Null->new;
-    } 
+    }
 
     else {
         die "Can't parse `$str' near " . ($fh->tell()) . " length " . length($str) . ".";
@@ -1095,7 +1095,7 @@ sub readxrtr {
     $fh->seek($xpos, 0);
     $fh->read($buf, 22);
     $buf = update($fh, $buf); # fix for broken JAWS xref calculation.
-    
+
     my $xlist = {};
 
     ## seams that some products calculate wrong prev entries (short)
@@ -1105,7 +1105,7 @@ sub readxrtr {
     #    $buf =~ s/^(\s+|\S+|.)//i;
     #    $buf=update($fh,$buf);
     #}
-    
+
     if ($buf =~ s/^xref$cr//i) {
         # Plain XRef tables.
         while ($buf =~ m/^$ws_char*([0-9]+)$ws_char+([0-9]+)$ws_char*$cr(.*?)$/s) {
@@ -1120,7 +1120,7 @@ sub readxrtr {
             $xdiff = length($buf);
 
             $fh->read($buf, 20 * $xnum - $xdiff + 15, $xdiff);
-            while ($xnum-- > 0 and $buf =~ s/^0*([0-9]*)$ws_char+0*([0-9]+)$ws_char+([nf])$cr//) { 
+            while ($xnum-- > 0 and $buf =~ s/^0*([0-9]*)$ws_char+0*([0-9]+)$ws_char+([nf])$cr//) {
                 $xlist->{$xmin} = [$1, $2, $3] unless exists $xlist->{$xmin};
                 $xmin++;
             }
@@ -1170,25 +1170,25 @@ sub readxrtr {
             for $xmin ($start...$last)
             {
                 my @cols;
-    
+
                 for my $w (@widths)
                 {
                     my $data;
                     $data = $self->_unpack_xref_stream($w, substr($stream, 0, $w, '')) if $w;
-    
+
                     push @cols, $data;
                 }
-    
+
                 $cols[0] = 1 unless defined $cols[0];
                 if ($cols[0] > 2) {
                     die "Invalid XRefStm entry type ($cols[0]) at $xref_obj $xref_gen obj";
                 }
-    
+
                 next if exists $xlist->{$xmin};
-    
+
                 my @objind = ($cols[1], defined($cols[2]) ? $cols[2] : ($xmin ? 0 : 65535));
                 push @objind, ($cols[0] == 0 ? 'f' : 'n') if $cols[0] < 2;
-    
+
                 $xlist->{$xmin} = \@objind;
             }
         }
