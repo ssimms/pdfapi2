@@ -40,7 +40,7 @@ sub new_api {
     return($obj);
 }
 
-# READPPMHEADER 
+# READPPMHEADER
 # taken from Image::PBMLib
 # Copyright by Benjamin Elijah Griffin (28 Feb 2003)
 #
@@ -51,7 +51,7 @@ sub readppmheader($) {
   my %info;
   my $rc;
   $info{error} = undef;
-  
+
   $rc = read($gr, $in, 3);
 
   if (!defined($rc) or $rc != 3) {

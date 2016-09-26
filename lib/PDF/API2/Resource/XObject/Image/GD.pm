@@ -38,7 +38,7 @@ sub read_gd {
     my $self = shift @_;
     my $gd = shift @_;
     my %opts = @_;
-    
+
     my ($w,$h) = $gd->getBounds();
     my $c = $gd->colorsTotal();
 
