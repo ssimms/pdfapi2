@@ -12,9 +12,9 @@ no warnings qw[ deprecated recursion uninitialized ];
 sub new {
     my ($class,$pdf,$key,@opts)=@_;
     my ($clrs,$sampled)=@opts;
-    
+
     $sampled=2;
-    
+
     $class = ref $class if ref $class;
     $self=$class->SUPER::new($pdf,$key);
     $pdf->new_obj($self) unless($self->is_obj($pdf));
@@ -53,7 +53,7 @@ sub new {
                 @{$spec[$n]}=map { $_>1?1:$_ } @{$spec[$n]};
                 # $self->{' comments'}.="--> (@{$spec[$n]})\n";
                 # $self->{' comments'}.="\n";
-            }                
+            }
         }
         my @b=();
         foreach my $s (@spec) {

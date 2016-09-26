@@ -19,7 +19,7 @@ sub new {
 
     $self->add_elements(PDFName('Indexed'));
     $self->type('Indexed');
-    
+
     return($self);
 }
 

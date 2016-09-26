@@ -26,7 +26,7 @@ Returns a new colorspace object.
 sub new {
     my ($class,$pdf,$key,@opts)=@_;
     my ($name,@clr)=@opts;
-    
+
     $class = ref $class if ref $class;
     $self=$class->SUPER::new($pdf,$key,@opts);
     $pdf->new_obj($self) unless($self->is_obj($pdf));
