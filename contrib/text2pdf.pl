@@ -15,7 +15,7 @@
 #
 # Thanks!  (Sorry about the long comments that wrap around to the next
 # line...)
-# 
+#
 # -MC
 #
 use strict;

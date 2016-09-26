@@ -16,7 +16,7 @@ isa_ok($pdf->page,'PDF::API2::Lite');
 isa_ok($pdf->mediabox(100,100),'PDF::API2::Lite');
 
 # testing serializing (stringify)
-# this destroys something so further tests needs a refresh 
+# this destroys something so further tests needs a refresh
 # this method also contains some code which is never executed?
 my $str = $pdf->saveas('-');
 my  @lines = split/\x0a/ , $str;
