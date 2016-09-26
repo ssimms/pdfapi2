@@ -25,7 +25,7 @@ Returns a cid-font object. base class form all CID based fonts.
 
 =cut
 
-sub new 
+sub new
 {
     my ($class,$pdf,$name,@opts) = @_;
     my %opts=();
@@ -62,7 +62,7 @@ it needs an PDF::API2-object rather than a Text::PDF::File-object.
 
 =cut
 
-sub new_api 
+sub new_api
 {
     my ($class,$api,@opts)=@_;
 
@@ -81,21 +81,21 @@ sub cidByUni { return( $_[0]->data->{u2g}->{$_[1]} ); }
 
 sub cidByEnc { return( $_[0]->data->{e2g}->[$_[1]] ); }
 
-sub wxByCId 
+sub wxByCId
 {
     my $self=shift @_;
     my $g=shift @_;
     my $w;
 
-    if(ref($self->data->{wx}) eq 'ARRAY' && defined $self->data->{wx}->[$g]) 
+    if(ref($self->data->{wx}) eq 'ARRAY' && defined $self->data->{wx}->[$g])
     {
         $w = int($self->data->{wx}->[$g]);
-    } 
-    elsif(ref($self->data->{wx}) eq 'HASH' && defined $self->data->{wx}->{$g}) 
+    }
+    elsif(ref($self->data->{wx}) eq 'HASH' && defined $self->data->{wx}->{$g})
     {
         $w = int($self->data->{wx}->{$g});
-    } 
-    else 
+    }
+    else
     {
         $w = $self->missingwidth;
     }
@@ -106,18 +106,18 @@ sub wxByCId
 sub wxByUni { return( $_[0]->wxByCId($_[0]->data->{u2g}->{$_[1]}) ); }
 sub wxByEnc { return( $_[0]->wxByCId($_[0]->data->{e2g}->[$_[1]]) ); }
 
-sub width 
+sub width
 {
     my ($self,$text)=@_;
     return($self->width_cid($self->cidsByStr($text)));
 }
 
-sub width_cid 
+sub width_cid
 {
     my ($self,$text)=@_;
     my $width=0;
     my $lastglyph=0;
-    foreach my $n (unpack('n*',$text)) 
+    foreach my $n (unpack('n*',$text))
     {
         $width+=$self->wxByCId($n);
         if($self->{-dokern} && $self->haveKernPairs())
@@ -127,7 +127,7 @@ sub width_cid
                 $width-=$self->kernPairCid($lastglyph, $n);
             }
         }
-        $lastglyph=$n;                    
+        $lastglyph=$n;
     }
     $width/=1000;
     return($width);
@@ -139,7 +139,7 @@ Returns the cid-string from string based on the fonts encoding map.
 
 =cut
 
-sub _cidsByStr 
+sub _cidsByStr
 {
     my ($self,$s)=@_;
     $s=pack('n*',map { $self->cidByEnc($_) } unpack('C*',$s));
@@ -149,24 +149,24 @@ sub _cidsByStr
 sub cidsByStr
 {
     my ($self,$text)=@_;
-    if(is_utf8($text) && defined $self->data->{decode} && $self->data->{decode} ne 'ident') 
+    if(is_utf8($text) && defined $self->data->{decode} && $self->data->{decode} ne 'ident')
     {
         $text=encode($self->data->{decode},$text);
     }
-    elsif(is_utf8($text) && $self->data->{decode} eq 'ident') 
+    elsif(is_utf8($text) && $self->data->{decode} eq 'ident')
     {
         $text=$self->cidsByUtf($text);
-    } 
-    elsif(!is_utf8($text) && defined $self->data->{encode} && $self->data->{decode} eq 'ident') 
+    }
+    elsif(!is_utf8($text) && defined $self->data->{encode} && $self->data->{decode} eq 'ident')
     {
         $text=$self->cidsByUtf(decode($self->data->{encode},$text));
-    } 
-    elsif(!is_utf8($text) && $self->can('issymbol') && $self->issymbol && $self->data->{decode} eq 'ident') 
+    }
+    elsif(!is_utf8($text) && $self->can('issymbol') && $self->issymbol && $self->data->{decode} eq 'ident')
     {
         $text=pack('U*',(map { $_+0xf000 } unpack('C*',$text)));
         $text=$self->cidsByUtf($text);
     }
-    else 
+    else
     {
         $text=$self->_cidsByStr($text);
     }
@@ -186,20 +186,20 @@ sub cidsByUtf {
     return($s);
 }
 
-sub textByStr 
+sub textByStr
 {
     my ($self,$text)=@_;
     return($self->text_cid($self->cidsByStr($text)));
 }
 
-sub textByStrKern 
+sub textByStrKern
 {
     my ($self,$text,$size,$ident)=@_;
     return($self->text_cid_kern($self->cidsByStr($text),$size,$ident));
 }
 
-sub text 
-{ 
+sub text
+{
     my ($self,$text,$size,$ident)=@_;
     my $newtext=$self->textByStr($text);
     if(defined $size && $self->{-dokern})
@@ -216,7 +216,7 @@ sub text
         else
         {
 	        return("$newtext Tj");
-        }        
+        }
     }
     else
     {
@@ -224,12 +224,12 @@ sub text
     }
 }
 
-sub text_cid 
+sub text_cid
 {
     my ($self,$text,$size)=@_;
     if($self->can('fontfile'))
     {
-        foreach my $g (unpack('n*',$text)) 
+        foreach my $g (unpack('n*',$text))
         {
             $self->fontfile->subsetByCId($g);
         }
@@ -245,12 +245,12 @@ sub text_cid
     }
 }
 
-sub text_cid_kern 
+sub text_cid_kern
 {
     my ($self,$text,$size,$ident)=@_;
     if($self->can('fontfile'))
     {
-        foreach my $g (unpack('n*',$text)) 
+        foreach my $g (unpack('n*',$text))
         {
             $self->fontfile->subsetByCId($g);
         }
@@ -260,7 +260,7 @@ sub text_cid_kern
         my $newtext=' ';
         my $lastglyph=0;
         my $tBefore=0;
-        foreach my $n (unpack('n*',$text)) 
+        foreach my $n (unpack('n*',$text))
         {
             if($self->kernPairCid($lastglyph, $n))
             {
@@ -303,17 +303,17 @@ sub text_cid_kern
     }
 }
 
-sub kernPairCid 
+sub kernPairCid
 {
     return(0);
 }
 
-sub haveKernPairs 
+sub haveKernPairs
 {
     return(0);
 }
 
-sub encodeByName 
+sub encodeByName
 {
     my ($self,$enc) = @_;
     return if($self->issymbol);
@@ -323,7 +323,7 @@ sub encodeByName
     $self->data->{e2g}=[ map { $self->data->{u2g}->{$_} || 0 } @{$self->data->{e2u}} ];
 
     $self->data->{u2e}={};
-    foreach my $n (reverse 0..255) 
+    foreach my $n (reverse 0..255)
     {
         $self->data->{u2e}->{$self->data->{e2u}->[$n]}=$n unless(defined $self->data->{u2e}->{$self->data->{e2u}->[$n]});
     }
@@ -331,27 +331,27 @@ sub encodeByName
     return($self);
 }
 
-sub subsetByCId 
+sub subsetByCId
 {
     return(1);
 }
 
-sub subvec 
+sub subvec
 {
     return(1);
 }
 
-sub glyphNum 
-{ 
+sub glyphNum
+{
     my $self=shift @_;
-    if(defined $self->data->{glyphs}) 
+    if(defined $self->data->{glyphs})
     {
-        return ( $self->data->{glyphs} ); 
+        return ( $self->data->{glyphs} );
     }
-    return ( scalar @{$self->data->{wx}} ); 
+    return ( scalar @{$self->data->{wx}} );
 }
 
-sub outobjdeep 
+sub outobjdeep
 {
     my ($self, $fh, $pdf, %opts) = @_;
 
