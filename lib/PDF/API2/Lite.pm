@@ -17,7 +17,7 @@ BEGIN {
 
 no warnings qw[ deprecated recursion uninitialized ];
 
-=head1 NAME 
+=head1 NAME
 
 PDF::API2::Lite - lite pdf creation
 

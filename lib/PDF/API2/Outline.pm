@@ -201,7 +201,7 @@ specifies that the current value of that parameter is to be retained unchanged.
 
 =cut
 
-sub dest 
+sub dest
 {
     my ($self,$page,%opts)=@_;
 
@@ -209,36 +209,36 @@ sub dest
     {
         $opts{-xyz}=[undef,undef,undef] if(scalar(keys %opts)<1);
 
-        if(defined $opts{-fit}) 
+        if(defined $opts{-fit})
         {
             $self->{Dest}=PDFArray($page,PDFName('Fit'));
-        } 
-        elsif(defined $opts{-fith}) 
+        }
+        elsif(defined $opts{-fith})
         {
             $self->{Dest}=PDFArray($page,PDFName('FitH'),PDFNum($opts{-fith}));
-        } 
-        elsif(defined $opts{-fitb}) 
+        }
+        elsif(defined $opts{-fitb})
         {
             $self->{Dest}=PDFArray($page,PDFName('FitB'));
-        } 
-        elsif(defined $opts{-fitbh}) 
+        }
+        elsif(defined $opts{-fitbh})
         {
             $self->{Dest}=PDFArray($page,PDFName('FitBH'),PDFNum($opts{-fitbh}));
-        } 
-        elsif(defined $opts{-fitv}) 
+        }
+        elsif(defined $opts{-fitv})
         {
             $self->{Dest}=PDFArray($page,PDFName('FitV'),PDFNum($opts{-fitv}));
-        } 
-        elsif(defined $opts{-fitbv}) 
+        }
+        elsif(defined $opts{-fitbv})
         {
             $self->{Dest}=PDFArray($page,PDFName('FitBV'),PDFNum($opts{-fitbv}));
-        } 
-        elsif(defined $opts{-fitr}) 
+        }
+        elsif(defined $opts{-fitr})
         {
             die "insufficient parameters to ->dest( page, -fitr => [] ) " unless(scalar @{$opts{-fitr}} == 4);
             $self->{Dest}=PDFArray($page,PDFName('FitR'),map {PDFNum($_)} @{$opts{-fitr}});
-        } 
-        elsif(defined $opts{-xyz}) 
+        }
+        elsif(defined $opts{-xyz})
         {
             die "insufficient parameters to ->dest( page, -xyz => [] ) " unless(scalar @{$opts{-xyz}} == 3);
             $self->{Dest}=PDFArray($page,PDFName('XYZ'),map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{-xyz}});

@@ -70,7 +70,7 @@ sub new {
     $self->{break_table} ||= \%BREAK_TABLE;
 
     $self->{widthfunc} ||= 1;
-    
+
     bless($self, ref($pkg) || $pkg);
 }
 
@@ -183,7 +183,7 @@ sub class_properties {
             if ($_[$i-1] eq 'SP') {
                 $last_class = 'ID';
                 if ($i > 1) {
-                    $breaks[$i-2] = $self->{break_table}->{$_[$i-2]}->{ID} == 
+                    $breaks[$i-2] = $self->{break_table}->{$_[$i-2]}->{ID} ==
                         DIRECT ? DIRECT : PROHIBITED;
                 }
             }
@@ -198,7 +198,7 @@ sub class_properties {
                 } else {
                    # die "internal error: no table mapping between '$last_class' and '$_[$i]'\n"
                    #     unless defined $this_break;
-                   if(defined $this_break) 
+                   if(defined $this_break)
                    {
                     $breaks[$i-1] = $this_break;
                    }
@@ -305,5 +305,5 @@ sub break_lines {
 }
 
 1;
-        
+
 __END__

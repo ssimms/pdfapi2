@@ -24,11 +24,11 @@ PDF::API2::Content - Methods for adding graphics and text to a PDF
     # Start with a PDF page (new or opened)
     my $pdf = PDF::API2->new();
     my $page = $pdf->page();
-    
+
     # Add a new content object
     my $content = $page->gfx();
     my $content = $page->text();
-    
+
     # Then call the methods below add graphics and text to the page.
 
 =head1 METHODS
@@ -65,7 +65,7 @@ sub new {
 sub outobjdeep {
     my $self = shift @_;
     $self->textend;
-    foreach my $k (qw[ api apipdf apiistext apipage font fontset fontsize 
+    foreach my $k (qw[ api apipdf apiistext apipage font fontset fontsize
                        charspace hscale wordspace lead rise render matrix
                        textmatrix textlinematrix fillcolor strokecolor
                        translate scale skew rotate ]) {
@@ -320,14 +320,14 @@ sub matrix {
             $self->add(_matrix_text($a,$b,$c,$d,$e,$f));
             @{$self->{' textmatrix'}}=($a,$b,$c,$d,$e,$f);
             @{$self->{' textlinematrix'}}=(0,0);
-        } 
+        }
         else {
             $self->add(_matrix_gfx($a,$b,$c,$d,$e,$f));
         }
     }
     if ($self->_in_text_object()) {
         return @{$self->{' textmatrix'}};
-    } 
+    }
     else {
         return $self;
     }
@@ -518,7 +518,7 @@ sub _linedash {
     my @a = @_;
     unless (scalar @a) {
         return ('[', ']', '0', 'd');
-    } 
+    }
     else {
         if ($a[0] =~ /^\-/) {
             my %a = @a;
@@ -527,7 +527,7 @@ sub _linedash {
             $a{'-pattern'} = [$a{'-full'} || 0, $a{'-clear'} || 0] unless exists $a{'-pattern'};
 
             return ('[', floats(@{$a{'-pattern'}}), ']', ($a{'-shift'} || 0), 'd');
-        } 
+        }
         else {
             return ('[', floats(@a), '] 0 d');
         }
@@ -598,7 +598,7 @@ sub move {
         $self->{' my'}=$y;
         if ($self->_in_text_object()) {
             $self->add_post(floats($x,$y), 'm');
-        } 
+        }
         else {
             $self->add(floats($x,$y), 'm');
         }
@@ -630,7 +630,7 @@ sub line {
         $self->{' y'}=$y;
         if ($self->_in_text_object()) {
             $self->add_post(floats($x,$y), 'l');
-        } 
+        }
         else {
             $self->add(floats($x,$y), 'l');
         }
@@ -651,7 +651,7 @@ sub hline {
     my ($self, $x) = @_;
     if ($self->_in_text_object()) {
         $self->add_post(floats($x,$self->{' y'}),'l');
-    } 
+    }
     else {
         $self->add(floats($x,$self->{' y'}),'l');
     }
@@ -663,7 +663,7 @@ sub vline {
     my ($self, $y) = @_;
     if ($self->_in_text_object()) {
         $self->add_post(floats($self->{' x'},$y),'l');
-    } 
+    }
     else {
         $self->add(floats($self->{' x'},$y),'l');
     }
@@ -708,7 +708,7 @@ sub curve {
         $y3 = shift;
         if ($self->_in_text_object()) {
             $self->add_post(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
-        } 
+        }
         else {
             $self->add(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
         }
@@ -730,7 +730,7 @@ Note: The curve will not appear until you call C<stroke>.
 
 sub spline {
     my $self = shift;
-    
+
     while(scalar @_ >= 4) {
         my $cx = shift;
         my $cy = shift;
@@ -764,7 +764,7 @@ sub arctocurve {
             arctocurve($a,$b,$alpha,($beta+$alpha)/2),
             arctocurve($a,$b,($beta+$alpha)/2,$beta)
         );
-    } 
+    }
     else {
         $alpha = ($alpha * pi / 180);
         $beta  = ($beta * pi / 180);
@@ -846,7 +846,7 @@ sub bogen {
 
     $alpha_rad+=pi/2 if($x<0 and $y>0);
     $alpha_rad-=pi/2 if($x<0 and $y<0);
- 
+
     my $alpha=rad2deg($alpha_rad);
     # use the complement angle for span
     $alpha -= 180 if($spf>0);
@@ -1118,7 +1118,7 @@ C<%F000> or C<%FFFF000000000000>.
 # legacy greylevel
 #   ... only one value
 #
-# 
+#
 
 sub _makecolor {
     my ($self,$sf,@clr)=@_;
@@ -1182,7 +1182,7 @@ sub _fillcolor {
     my ($self,@clrs)=@_;
     if (ref($clrs[0]) =~ m|^PDF::API2::Resource::ColorSpace|) {
         $self->resource('ColorSpace',$clrs[0]->name,$clrs[0]);
-    } 
+    }
     elsif (ref($clrs[0]) =~ m|^PDF::API2::Resource::Pattern|) {
         $self->resource('Pattern',$clrs[0]->name,$clrs[0]);
     }
@@ -1203,7 +1203,7 @@ sub _strokecolor {
     my ($self,@clrs)=@_;
     if (ref($clrs[0]) =~ m|^PDF::API2::Resource::ColorSpace|) {
         $self->resource('ColorSpace',$clrs[0]->name,$clrs[0]);
-    } 
+    }
     elsif (ref($clrs[0]) =~ m|^PDF::API2::Resource::Pattern|) {
         $self->resource('Pattern',$clrs[0]->name,$clrs[0]);
     }
@@ -1279,7 +1279,7 @@ sub image {
     if (!defined $w) {
         $h=$img->height;
         $w=$img->width;
-    } 
+    }
     elsif (!defined $h) {
         $h=$img->height*$w;
         $w=$img->width*$w;
@@ -1311,7 +1311,7 @@ sub formimage {
     $self->save;
     if (!defined $s) {
         $self->matrix(1,0,0,1,$x,$y);
-    } 
+    }
     else {
         $self->matrix($s,0,0,$s,$x,$y);
     }
@@ -1519,7 +1519,7 @@ sub textstate {
             $self->strokecolor(@{$state{strokecolor}});
         }
         %state = ();
-    } 
+    }
     else {
         foreach my $k (qw( font fontsize charspace hscale wordspace lead rise render )) {
             $state{$k}=$self->{" $k"};
@@ -1731,7 +1731,7 @@ sub _text_underline {
     my $underlineposition=(-$self->{' font'}->underlineposition()*$self->{' fontsize'}/1000||1);
     my $underlinethickness=($self->{' font'}->underlinethickness()*$self->{' fontsize'}/1000||1);
     my $pos=1;
-    
+
     while(@underline) {
         $self->add_post(_save);
 
@@ -1927,45 +1927,45 @@ sub text_fill_justified {
 }
 
 # =item $overflow_text = $txt->paragraph $text, $width, $height, %options
-# 
+#
 # ** DEVELOPER METHOD **
-# 
+#
 # Apply the text within the rectangle and return any leftover text.
-# 
+#
 # B<Options>
-# 
+#
 # =over 4
-# 
+#
 # =item -align => $choice
-# 
+#
 # Choice is 'justified', 'right', 'center', 'left'
 # Default is 'left'
-# 
+#
 # =item -underline => $distance
-# 
+#
 # =item -underline => [ $distance, $thickness, ... ]
-# 
+#
 # If a scalar, distance below baseline,
 # else array reference with pairs of distance and line thickness.
-# 
+#
 # =item -spillover => $over
-# 
+#
 # Controls if words in a line which exceed the given width should be "spilled over" the bounds or if a new line should be used for this word.
-# 
+#
 # Over is 1 or 0
 # Default is 1
-# 
+#
 # =back
-# 
+#
 # B<Example:>
-# 
+#
 #     $txt->font($font,$fontsize);
 #     $txt->lead($lead);
 #     $txt->translate($x,$y);
 #     $overflow = $txt->paragraph( 'long paragraph here ...',
 #                                  $width,
 #                                  $y+$lead-$bottom_margin );
-# 
+#
 # =cut
 
 sub paragraph {
@@ -1996,13 +1996,13 @@ sub paragraph {
 }
 
 # =item $overflow_text = $txt->section $text, $width, $height, %options
-# 
+#
 # ** DEVELOPER METHOD **
-# 
-# Split paragraphs by newline and loop over them, reassemble leftovers 
-# when box is full and apply the text within the rectangle and return 
+#
+# Split paragraphs by newline and loop over them, reassemble leftovers
+# when box is full and apply the text within the rectangle and return
 # any leftover text.
-# 
+#
 # =cut
 
 sub section {
@@ -2036,9 +2036,9 @@ sub textlabel {
     }
     $self->save;
     $self->textstart;
-    
+
     $self->transform(%trans_opts);
-    
+
     $self->fillcolor(ref($opts{-color}) ? @{$opts{-color}} : $opts{-color}) if($opts{-color});
     $self->strokecolor(ref($opts{-strokecolor}) ? @{$opts{-strokecolor}} : $opts{-strokecolor}) if($opts{-strokecolor});
 
@@ -2051,17 +2051,17 @@ sub textlabel {
 
     if ($opts{-right} || $opts{-align}=~/^r/i) {
         $wht = $self->text_right($text,%opts);
-    } 
+    }
     elsif ($opts{-center} || $opts{-align}=~/^c/i) {
         $wht = $self->text_center($text,%opts);
-    } 
+    }
     else {
         $wht = $self->text($text,%opts);
     }
-    
+
     $self->textend;
     $self->restore;
-    
+
     if ($wastext) {
         $self->textstart;
         $self->textstate(%text_state);
@@ -2077,7 +2077,7 @@ sub metaStart {
     if (defined $obj) {
         my $dict=PDFDict();
         $dict->{Metadata}=$obj;
-        $self->resource('Properties',$obj->name,$dict);        
+        $self->resource('Properties',$obj->name,$dict);
         $self->add('/'.($obj->name));
         $self->add('BDC');
     }
@@ -2199,7 +2199,7 @@ sub resource {
     if ($self->{' apipage'}) {
         # we are a content stream on a page.
         return $self->{' apipage'}->resource($type, $key, $obj, $force);
-    } 
+    }
     else {
         # we are a self-contained content stream.
         $self->{Resources}||=PDFDict();
@@ -2211,11 +2211,11 @@ sub resource {
         $dict->{$type}->realise if(ref($dict->{$type})=~/Objind$/);
         unless (defined $obj) {
             return($dict->{$type}->{$key} || undef);
-        } 
+        }
         else {
             if ($force) {
                 $dict->{$type}->{$key}=$obj;
-            } 
+            }
             else {
                 $dict->{$type}->{$key}||=$obj;
             }

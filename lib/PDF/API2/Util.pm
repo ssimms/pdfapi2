@@ -9,13 +9,13 @@ BEGIN {
     use Encode qw(:all);
 
     use vars qw(
-        @ISA 
-        @EXPORT 
-        @EXPORT_OK 
-        %colors 
-        $key_var 
-        %u2n 
-        %n2u 
+        @ISA
+        @EXPORT
+        @EXPORT_OK
+        %colors
+        $key_var
+        %u2n
+        %n2u
         $pua
         %PaperSizes
     );
@@ -236,9 +236,9 @@ sub _HSVtoRGB { # test
         ## achromatic (grey)
         return ($v,$v,$v);
     }
-    
+
     $h %= 360;
-    
+
     $r = 2*cos(deg2rad($h));
     $g = 2*cos(deg2rad($h+120));
     $b = 2*cos(deg2rad($h+240));
@@ -247,7 +247,7 @@ sub _HSVtoRGB { # test
     $q = min($r,$g,$b);
     ($p,$q) = map { ($_<0 ? 0 : ($_>1 ? 1 : $_)) } ($p,$q);
     $f = $p - $q;
-    
+
     #if($p>=$v) {
     #    ($r,$g,$b) = map { $_*$v/$p } ($r,$g,$b);
     #} else {
@@ -540,15 +540,15 @@ sub namecolor_lab {
     }
 }
 
-sub unfilter 
+sub unfilter
 {
     my ($filter,$stream)=@_;
 
-    if(defined $filter) 
+    if(defined $filter)
     {
         # we need to fix filter because it MAY be
         # an array BUT IT COULD BE only a name
-        if(ref($filter)!~/Array$/) 
+        if(ref($filter)!~/Array$/)
         {
                $filter = PDFArray($filter);
         }
@@ -558,7 +558,7 @@ sub unfilter
 
         @filts=(map { ("PDF::API2::Basic::PDF::Filter::".($_->val))->new } $filter->elementsof);
 
-        foreach my $f (@filts) 
+        foreach my $f (@filts)
         {
             $stream = $f->infilt($stream, 1);
         }
