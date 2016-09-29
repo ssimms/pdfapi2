@@ -330,7 +330,7 @@ specifies that the current value of that parameter is to be retained unchanged.
 
 =item $ant->dest( $name )
 
-(PDF 1.2) Connect the Annotation to a "Named Destination" defined elswere.
+(PDF 1.2) Connect the Annotation to a "Named Destination" defined elsewhere.
 
 =cut
 

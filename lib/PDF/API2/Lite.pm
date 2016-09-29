@@ -570,7 +570,7 @@ sub textlead {
 
 =item $pdf->text $string
 
-Applys the given text.
+Applies the given text.
 
 =cut
 
