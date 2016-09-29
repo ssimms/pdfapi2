@@ -11,6 +11,7 @@ use POSIX qw(ceil floor);
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use strict;
 no warnings qw[ recursion uninitialized ];
 
 our $cmap = {};
@@ -236,11 +237,11 @@ sub readcffdict
         }
         elsif($b0==30) # float
         {
-            $e=1;
+            my $e=1;
             while($e)
             {
                 read($fh,$buf,1);
-                $v0=unpack('C',$buf);
+                my $v0=unpack('C',$buf);
                 foreach my $m ($v0>>8,$v0&0xf)
                 {
                     if($m<10)
@@ -356,6 +357,7 @@ sub readcffstructs
     my $data={};
     # read CFF table
     seek($fh,$font->{'CFF '}->{' OFFSET'},0);
+    my $buf;
     read($fh,$buf, 4);
     my ($cffmajor,$cffminor,$cffheadsize,$cffglobaloffsize)=unpack('C4',$buf);
 
@@ -426,7 +428,7 @@ sub new {
     $data->{obj}=$font;
 
     $class = ref $class if ref $class;
-    $self=$class->SUPER::new();
+    my $self=$class->SUPER::new();
 
     $self->{Filter}=PDFArray(PDFName('FlateDecode'));
     $self->{' font'}=$font;

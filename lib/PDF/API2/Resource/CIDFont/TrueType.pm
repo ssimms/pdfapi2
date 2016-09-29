@@ -8,6 +8,7 @@ use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Resource::CIDFont::TrueType::FontFile;
 use PDF::API2::Util;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
@@ -93,7 +94,7 @@ sub new_api
     my ($class,$api,@opts)=@_;
 
     my $obj=$class->new($api->{pdf},@opts);
-    $self->{' api'}=$api;
+    my $self->{' api'}=$api;
 
     $api->{pdf}->out_obj($api->{pages});
     return($obj);

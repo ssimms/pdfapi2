@@ -9,6 +9,7 @@ use Encode qw(:all);
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub encodeByData {
@@ -155,7 +156,7 @@ sub automap {
 
     my @fnts=();
     my $count=0;
-    while(@glyphs=splice(@nm,0,223)) 
+    while(my @glyphs=splice(@nm,0,223)) 
     {
         my $obj=$self->SUPER::new($self->{' apipdf'},$self->name.'am'.$count);
         $obj->{' data'}={ %{$data} };
