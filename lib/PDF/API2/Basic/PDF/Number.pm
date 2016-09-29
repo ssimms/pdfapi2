@@ -17,6 +17,7 @@ package PDF::API2::Basic::PDF::Number;
 use base 'PDF::API2::Basic::PDF::String';
 
 use strict;
+use warnings;
 
 =head1 NAME
 

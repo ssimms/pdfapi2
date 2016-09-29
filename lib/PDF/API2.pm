@@ -21,6 +21,7 @@ use PDF::API2::Resource::Shading;
 
 use PDF::API2::NamedDestination;
 
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC),

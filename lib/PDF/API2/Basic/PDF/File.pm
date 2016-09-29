@@ -140,6 +140,7 @@ is in PDF which contains the location of the previous cross-reference table.
 
 use strict;
 no strict "refs";
+use warnings;
 
 use Scalar::Util qw(blessed);
 

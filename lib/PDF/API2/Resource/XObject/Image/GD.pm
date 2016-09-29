@@ -7,6 +7,7 @@ use base 'PDF::API2::Resource::XObject::Image';
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {

@@ -5,6 +5,7 @@ package PDF::API2::Basic::PDF::Filter::FlateDecode;
 use base 'PDF::API2::Basic::PDF::Filter';
 
 use strict;
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 use POSIX qw(ceil floor);

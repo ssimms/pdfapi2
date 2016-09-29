@@ -27,6 +27,7 @@ A set of utility functions to save the fingers of the PDF library users!
 =cut
 
 use strict;
+use warnings;
 
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Bool;

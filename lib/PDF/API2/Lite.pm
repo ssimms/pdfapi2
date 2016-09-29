@@ -15,6 +15,7 @@ BEGIN {
 
 }
 
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME 
