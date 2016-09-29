@@ -122,16 +122,16 @@ sub read_pnm {
 
     my ($buf,$t,$s,$line);
     my ($w,$h,$bpc,$cs,$img,@img)=(0,0,'','','');
-    open(INF, "<", $file);
-    binmode(INF,':raw');
-    my $info=readppmheader(INF);
+    open(my $inf, "<", $file);
+    binmode($inf,':raw');
+    my $info=readppmheader($inf);
     if($info->{type} == 4) {
         $bpc=1;
-        read(INF,$self->{' stream'},($info->{width}*$info->{height}/8));
+        read($inf,$self->{' stream'},($info->{width}*$info->{height}/8));
         $cs='DeviceGray';
         $self->{Decode}=PDFArray(PDFNum(1),PDFNum(0));
     } elsif($info->{type} == 5) {
-        $buf.=<INF>;
+        $buf.=<$inf>;
         if($info->{max}==255){
             $s=0;
         } else {
@@ -140,11 +140,11 @@ sub read_pnm {
         $bpc=8;
         if($s>0) {
             for($line=($info->{width}*$info->{height});$line>0;$line--) {
-                read(INF,$buf,1);
+                read($inf,$buf,1);
                 $self->{' stream'}.=pack('C',(unpack('C',$buf)*$s));
             }
         } else {
-            read(INF,$self->{' stream'},$info->{width}*$info->{height});
+            read($inf,$self->{' stream'},$info->{width}*$info->{height});
         }
         $cs='DeviceGray';
     } elsif($info->{type} == 6) {
@@ -156,19 +156,19 @@ sub read_pnm {
         $bpc=8;
         if($s>0) {
             for($line=($info->{width}*$info->{height});$line>0;$line--) {
-                read(INF,$buf,1);
+                read($inf,$buf,1);
                 $self->{' stream'}.=pack('C',(unpack('C',$buf)*$s));
-                read(INF,$buf,1);
+                read($inf,$buf,1);
                 $self->{' stream'}.=pack('C',(unpack('C',$buf)*$s));
-                read(INF,$buf,1);
+                read($inf,$buf,1);
                 $self->{' stream'}.=pack('C',(unpack('C',$buf)*$s));
             }
         } else {
-            read(INF,$self->{' stream'},$info->{width}*$info->{height}*3);
+            read($inf,$self->{' stream'},$info->{width}*$info->{height}*3);
         }
         $cs='DeviceRGB';
     }
-    close(INF);
+    close($inf);
 
     $self->width($info->{width});
     $self->height($info->{height});
