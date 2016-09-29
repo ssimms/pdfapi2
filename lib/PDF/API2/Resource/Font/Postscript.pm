@@ -88,7 +88,7 @@ sub readPFAPFB {
 
     $l=-s $file;
 
-    open(INF,$file);
+    open(INF, "<", $file);
     binmode(INF,':raw');
     read(INF,$line,2);
     @lines=unpack('C*',$line);
@@ -165,7 +165,7 @@ sub readAFM
     $data->{lastchar}=0;
 
     if(! -e $file) {die "file='$file' not existant.";}
-    open(AFMF, $file) or die "Can't find the AFM file for $file";
+    open(AFMF, "<", $file) or die "Can't find the AFM file for $file";
     local($/, $_) = ("\n", undef);  # ensure correct $INPUT_RECORD_SEPARATOR
     while ($_=<AFMF>) 
     {
@@ -302,7 +302,7 @@ sub readPFM {
     $data->{char}=[];
 
     my $buf;
-    open($fh,$file) || return undef;
+    open($fh, "<", $file) || return undef;
     binmode($fh,':raw');
     read($fh,$buf,117 + 30);
 

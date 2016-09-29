@@ -201,7 +201,7 @@ sub outobjdeep {
 
     }
     elsif (defined $self->{' streamfile'}) {
-        open(DICTFH, $self->{' streamfile'}) || die "Unable to open $self->{' streamfile'}";
+        open(DICTFH, "<", $self->{' streamfile'}) || die "Unable to open $self->{' streamfile'}";
         binmode(DICTFH, ':raw');
 
         $fh->print(" stream\n");

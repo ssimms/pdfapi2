@@ -167,7 +167,7 @@ sub readBDF {
     $data->{wx}={};
 
     if(! -e $file) {die "file='$file' not existant.";}
-    open(AFMF, $file) or die "Can't find the BDF file for $file";
+    open(AFMF, "<", $file) or die "Can't find the BDF file for $file";
     local($/, $_) = ("\n", undef);  # ensure correct $INPUT_RECORD_SEPARATOR
     while ($_=<AFMF>) {
         chomp($_);
