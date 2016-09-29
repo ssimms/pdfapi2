@@ -60,7 +60,7 @@ sub data { return( $_[0]->{' data'} ); }
 
 =item $descriptor = $font->descrByData()
 
-Returns the fonts FontDescriptor key-structure based on the fonts data.
+Returns the font's FontDescriptor key-structure based on the font's data.
 
 =cut
 
@@ -168,7 +168,7 @@ sub tounicodemap {
 
 =item $name = $font->fontname()
 
-Returns the fonts name (aka. display-name).
+Returns the font's name (aka. display-name).
 
 =cut
 
@@ -176,7 +176,7 @@ sub fontname { return( $_[0]->data->{fontname} ); }
 
 =item $name = $font->altname()
 
-Returns the fonts alternative-name (aka. windows-name for a postscript font).
+Returns the font's alternative-name (aka. windows-name for a postscript font).
 
 =cut
 
@@ -184,7 +184,7 @@ sub altname { return( $_[0]->data->{altname} ); }
 
 =item $name = $font->subname()
 
-Returns the fonts subname (aka. font-variant, schriftschnitt).
+Returns the font's subname (aka. font-variant, schriftschnitt).
 
 =cut
 
@@ -192,7 +192,7 @@ sub subname { return( $_[0]->data->{subname} ); }
 
 =item $name = $font->apiname()
 
-Returns the fonts name to be used internally (should be equal to $font->name).
+Returns the font's name to be used internally (should be equal to $font->name).
 
 =cut
 
@@ -200,7 +200,7 @@ sub apiname { return( $_[0]->data->{apiname} ); }
 
 =item $issymbol = $font->issymbol()
 
-Returns the fonts symbol flag.
+Returns the font's symbol flag.
 
 =cut
 
@@ -208,7 +208,7 @@ sub issymbol { return( $_[0]->data->{issymbol} ); }
 
 =item $iscff = $font->iscff()
 
-Returns the fonts compact-font-format flag.
+Returns the font's compact-font-format flag.
 
 =cut
 
@@ -222,7 +222,7 @@ sub iscff { return( $_[0]->data->{iscff} ); }
 
 =item ($llx, $lly, $urx, $ury) = $font->fontbbox()
 
-Returns the fonts bounding-box.
+Returns the font's bounding-box.
 
 =cut
 
@@ -230,7 +230,7 @@ sub fontbbox { return( @{$_[0]->data->{fontbbox}} ); }
 
 =item $capheight = $font->capheight()
 
-Returns the fonts capheight value.
+Returns the font's capheight value.
 
 =cut
 
@@ -238,7 +238,7 @@ sub capheight { return( $_[0]->data->{capheight} ); }
 
 =item $xheight = $font->xheight()
 
-Returns the fonts xheight value.
+Returns the font's xheight value.
 
 =cut
 
@@ -246,7 +246,7 @@ sub xheight { return( $_[0]->data->{xheight} ); }
 
 =item $missingwidth = $font->missingwidth()
 
-Returns the fonts missingwidth value.
+Returns the font's missingwidth value.
 
 =cut
 
@@ -254,7 +254,7 @@ sub missingwidth { return( $_[0]->data->{missingwidth} ); }
 
 =item $maxwidth = $font->maxwidth()
 
-Returns the fonts maxwidth value.
+Returns the font's maxwidth value.
 
 =cut
 
@@ -262,7 +262,7 @@ sub maxwidth { return( $_[0]->data->{maxwidth} ); }
 
 =item $avgwidth = $font->avgwidth()
 
-Returns the fonts avgwidth value.
+Returns the font's avgwidth value.
 
 =cut
 
@@ -329,7 +329,7 @@ sub avgwidth {
 
 =item $flags = $font->flags()
 
-Returns the fonts flags value.
+Returns the font's flags value.
 
 =cut
 
@@ -337,7 +337,7 @@ sub flags { return( $_[0]->data->{flags} ); }
 
 =item $stemv = $font->stemv()
 
-Returns the fonts stemv value.
+Returns the font's stemv value.
 
 =cut
 
@@ -345,7 +345,7 @@ sub stemv { return( $_[0]->data->{stemv} ); }
 
 =item $stemh = $font->stemh()
 
-Returns the fonts stemh value.
+Returns the font's stemh value.
 
 =cut
 
@@ -353,7 +353,7 @@ sub stemh { return( $_[0]->data->{stemh} ); }
 
 =item $italicangle = $font->italicangle()
 
-Returns the fonts italicangle value.
+Returns the font's italicangle value.
 
 =cut
 
@@ -361,7 +361,7 @@ sub italicangle { return( $_[0]->data->{italicangle} ); }
 
 =item $isfixedpitch = $font->isfixedpitch()
 
-Returns the fonts isfixedpitch flag.
+Returns the font's isfixedpitch flag.
 
 =cut
 
@@ -369,7 +369,7 @@ sub isfixedpitch { return( $_[0]->data->{isfixedpitch} ); }
 
 =item $underlineposition = $font->underlineposition()
 
-Returns the fonts underlineposition value.
+Returns the font's underlineposition value.
 
 =cut
 
@@ -377,7 +377,7 @@ sub underlineposition { return( $_[0]->data->{underlineposition} ); }
 
 =item $underlinethickness = $font->underlinethickness()
 
-Returns the fonts underlinethickness value.
+Returns the font's underlinethickness value.
 
 =cut
 
@@ -385,7 +385,7 @@ sub underlinethickness { return( $_[0]->data->{underlinethickness} ); }
 
 =item $ascender = $font->ascender()
 
-Returns the fonts ascender value.
+Returns the font's ascender value.
 
 =cut
 
@@ -393,7 +393,7 @@ sub ascender { return( $_[0]->data->{ascender} ); }
 
 =item $descender = $font->descender()
 
-Returns the fonts descender value.
+Returns the font's descender value.
 
 =cut
 
@@ -479,7 +479,7 @@ sub mapByUni { return( $_[0]->data->{u2c}->{$_[1]} || 0 ); }
 
 =item $name = $font->glyphByUni $unicode
 
-Returns the glyphs name by the fonts unicode map.
+Returns the glyph's name by the fonts unicode map.
 B<BEWARE:> non-standard glyph-names are mapped onto
 the ms-symbol area (0xF000).
 
@@ -489,7 +489,7 @@ sub glyphByUni { return ( $_[0]->data->{u2n}->{$_[1]} || '.notdef' ); }
 
 =item $name = $font->glyphByEnc $char
 
-Returns the glyphs name by the fonts encoding map.
+Returns the glyph's name by the font's encoding map.
 
 =cut
 
@@ -501,7 +501,7 @@ sub glyphByEnc {
 
 =item $name = $font->glyphByMap $char
 
-Returns the glyphs name by the fonts default map.
+Returns the glyph's name by the font's default map.
 
 =cut
 
@@ -509,7 +509,7 @@ sub glyphByMap { return ( $_[0]->data->{char}->[$_[1]] ); }
 
 =item $width = $font->wxByGlyph $glyph
 
-Returns the glyphs width.
+Returns the glyph's width.
 
 =cut
 
@@ -548,7 +548,7 @@ sub wxByGlyph
 
 =item $width = $font->wxByUni $uni
 
-Returns the unicodes width.
+Returns the unicode's width.
 
 =cut
 
@@ -571,7 +571,7 @@ sub wxByUni
 
 =item $width = $font->wxByEnc $char
 
-Returns the characters width based on the current encoding.
+Returns the character's width based on the current encoding.
 
 =cut
 
@@ -593,7 +593,7 @@ sub wxByEnc
 
 =item $width = $font->wxByMap $char
 
-Returns the characters width based on the fonts default encoding.
+Returns the character's width based on the font's default encoding.
 
 =cut
 
@@ -682,7 +682,7 @@ sub utfByStr {
 
 =item $string = $font->strByUtf $utf8string
 
-Returns the encoded string from utf8-string based on the fonts encoding map.
+Returns the encoded string from utf8-string based on the font's encoding map.
 
 =cut
 
