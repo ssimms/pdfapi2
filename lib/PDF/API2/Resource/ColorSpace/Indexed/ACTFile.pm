@@ -7,6 +7,7 @@ use base 'PDF::API2::Resource::ColorSpace::Indexed';
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
@@ -32,7 +33,7 @@ sub new {
     my ($class,$pdf,$file)=@_;
     die "could not find act-file '$file'." unless(-f $file);
     $class = ref $class if ref $class;
-    $self=$class->SUPER::new($pdf,pdfkey());
+    my $self=$class->SUPER::new($pdf,pdfkey());
     $pdf->new_obj($self) unless($self->is_obj($pdf));
     $self->{' apipdf'}=$pdf;
     my $csd=PDFDict();

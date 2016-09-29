@@ -9,6 +9,7 @@ use Compress::Zlib;
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME

@@ -9,6 +9,7 @@ package PDF::API2;
 
 use Win32::TieRegistry;
 
+use strict;
 no warnings qw[ recursion uninitialized ];
 
 our $wf = {};

@@ -9,6 +9,7 @@ use Encode qw(:all);
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use strict;
 no warnings qw[ recursion uninitialized ];
 
 =head1 NAME

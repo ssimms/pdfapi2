@@ -10,6 +10,7 @@ use Unicode::UCD 'charinfo';
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME

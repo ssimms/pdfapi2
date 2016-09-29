@@ -7,6 +7,7 @@ use base 'PDF::API2::Resource::CIDFont';
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 our $fonts = {};
@@ -49,7 +50,7 @@ sub _look_for_font {
     return({%{$fonts->{$fname}}}) if(defined $fonts->{$fname});
 
     if(defined $subs->{$fname}) {
-        $data=_look_for_font($subs->{$fname}->{-alias});
+        my $data=_look_for_font($subs->{$fname}->{-alias});
         foreach my $k (keys %{$subs->{$fname}}) {
           next if($k=~/^\-/);
           if(substr($k,0,1) eq '+')
@@ -162,7 +163,7 @@ sub new_api {
     my ($class,$api,@opts)=@_;
 
     my $obj=$class->new($api->{pdf},@opts);
-    $self->{' api'}=$api;
+    my $self->{' api'}=$api;
 
     $api->{pdf}->out_obj($api->{pages});
     return($obj);

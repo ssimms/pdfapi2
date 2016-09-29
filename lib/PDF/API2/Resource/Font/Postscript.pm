@@ -10,6 +10,7 @@ use IO::File qw();
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
@@ -86,7 +87,7 @@ sub readPFAPFB {
 
     die "cannot find font '$file' ..." unless(-f $file);
 
-    $l=-s $file;
+    my $l=-s $file;
 
     open(INF,$file);
     binmode(INF,':raw');
