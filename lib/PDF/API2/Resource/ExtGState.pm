@@ -335,8 +335,8 @@ sub textknockout {
 
 =item $egs->transparency $t
 
-The graphics tranparency , with 0 being fully opaque and 1 being fully transparent.
-This is a convenience method setting proper values for strokeaplha and fillalpha.
+The graphics transparency, with 0 being fully opaque and 1 being fully transparent.
+This is a convenience method setting proper values for strokealpha and fillalpha.
 
 =cut
 
@@ -350,7 +350,7 @@ sub transparency {
 =item $egs->opacity $op
 
 The graphics opacity , with 1 being fully opaque and 0 being fully transparent.
-This is a convenience method setting proper values for strokeaplha and fillalpha.
+This is a convenience method setting proper values for strokealpha and fillalpha.
 
 =cut
 

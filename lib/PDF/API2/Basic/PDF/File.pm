@@ -82,7 +82,7 @@ have been made to the memory representation.
 
 =item maxobj (R)
 
-Contains the first useable object number above any that have already appeared
+Contains the first usable object number above any that have already appeared
 in the file so far.
 
 =item outlist (P)

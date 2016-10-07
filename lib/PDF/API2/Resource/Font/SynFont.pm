@@ -48,7 +48,7 @@ See I<perl's Encode> for the supported values.
 I<-pdfname> 
 ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be
-retrived via $pdfname=$font->name.
+retrieved via $pdfname=$font->name.
 
 I<-slant>
 ... slant/expansion factor (0.1-0.9 = slant, 1.1+ = expansion).
