@@ -18,6 +18,7 @@ BEGIN {
 
 }
 
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 our $DEBUG = 0;

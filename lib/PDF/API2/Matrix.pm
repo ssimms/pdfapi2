@@ -12,10 +12,13 @@ package PDF::API2::Matrix;
 
 # VERSION
 
+use warnings;
+
 sub new {
     my $type = shift;
     my $self = [];
     my $len = scalar(@{$_[0]});
+    my $moo;
     for (@_) {
         return undef if scalar(@{$_}) != $len;
         push(@{$self}, [@{$_}]);

@@ -11,6 +11,7 @@ use PDF::API2::Basic::PDF::Filter;
 use PDF::API2::Basic::PDF::Name;
 use Scalar::Util qw(blessed);
 
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 sub new

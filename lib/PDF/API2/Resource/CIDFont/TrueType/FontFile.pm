@@ -11,6 +11,7 @@ use POSIX qw(ceil floor);
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use warnings;
 no warnings qw[ recursion uninitialized ];
 
 our $cmap = {};

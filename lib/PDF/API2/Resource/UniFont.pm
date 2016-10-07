@@ -4,6 +4,7 @@ package PDF::API2::Resource::UniFont;
 
 use Encode qw(:all);
 
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME

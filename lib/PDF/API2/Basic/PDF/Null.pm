@@ -17,6 +17,7 @@ package PDF::API2::Basic::PDF::Null;
 use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
+use warnings;
 
 =head1 NAME
 

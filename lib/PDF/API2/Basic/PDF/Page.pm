@@ -17,6 +17,7 @@ package PDF::API2::Basic::PDF::Page;
 use base 'PDF::API2::Basic::PDF::Pages';
 
 use strict;
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 use PDF::API2::Basic::PDF::Dict;

@@ -7,6 +7,7 @@ use base 'PDF::API2::Resource::Font';
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+use warnings;
 no warnings qw[ deprecated recursion uninitialized ];
 
 our $BmpNum = 0;
