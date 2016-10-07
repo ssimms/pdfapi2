@@ -44,7 +44,7 @@ sub new {
     $csd->{Gamma}=PDFArray(map {PDFNum($_)} (2.22218, 2.22218, 2.22218));
 
     my $fh;
-    open($fh,$file);
+    open($fh, "<", $file);
     binmode($fh,':raw');
     read($fh,$csd->{' stream'},768);
     close($fh);

@@ -201,13 +201,13 @@ sub outobjdeep {
 
     }
     elsif (defined $self->{' streamfile'}) {
-        open(DICTFH, $self->{' streamfile'}) || die "Unable to open $self->{' streamfile'}";
-        binmode(DICTFH, ':raw');
+        open(my $dictfh, "<", $self->{' streamfile'}) || die "Unable to open $self->{' streamfile'}";
+        binmode($dictfh, ':raw');
 
         $fh->print(" stream\n");
         $loc = $fh->tell();
         my $stream;
-        while (read(DICTFH, $stream, 4096)) {
+        while (read($dictfh, $stream, 4096)) {
             unless ($self->{' nofilt'}) {
                 foreach my $filter (reverse @filters) {
                     $stream = $filter->outfilt($stream, 0);
@@ -215,7 +215,7 @@ sub outobjdeep {
             }
             $fh->print($stream);
         }
-        close DICTFH;
+        close $dictfh;
         unless ($self->{' nofilt'}) {
             $stream = '';
             foreach my $filter (reverse @filters) {
@@ -285,6 +285,7 @@ sub read_stream {
     }
     seek $fh, $self->{' streamloc'}, 0;
     my ($i, $data);
+    my $dictfh;
     for ($i = 0; $i < $len; $i += 4096) {
         unless ($i + 4096 > $len) {
             read $fh, $data, 4096;
@@ -303,22 +304,22 @@ sub read_stream {
         # 2) The length check should be looking at $self->{' stream'}
         #    rather than $data (which just contains the latest chunk)
         if (not $force_memory and not defined $self->{' streamfile'} and ((length($data) * 2) > $mincache)) {
-            open(DICTFH, '>', $tempbase) or next;
-            binmode DICTFH, ':raw';
+            open($dictfh, '>', $tempbase) or next;
+            binmode $dictfh, ':raw';
             $self->{' streamfile'} = $tempbase;
             $tempbase =~ s/-(\d+)$/'-' . ($1 + 1)/oe;        # prepare for next use
-            print DICTFH $self->{' stream'};
+            print $dictfh $self->{' stream'};
             undef $self->{' stream'};
         }
         if (defined $self->{' streamfile'}) {
-            print DICTFH $data;
+            print $dictfh $data;
         }
         else {
             $self->{' stream'} .= $data;
         }
     }
 
-    close DICTFH if defined $self->{' streamfile'};
+    close $dictfh if defined $self->{' streamfile'};
     $self->{' nofilt'} = 0;
     return $self;
 }

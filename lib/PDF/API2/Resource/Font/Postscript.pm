@@ -88,41 +88,41 @@ sub readPFAPFB {
 
     $l=-s $file;
 
-    open(INF,$file);
-    binmode(INF,':raw');
-    read(INF,$line,2);
+    open(my $inf, "<", $file);
+    binmode($inf,':raw');
+    read($inf,$line,2);
     @lines=unpack('C*',$line);
     if(($lines[0]==0x80) && ($lines[1]==1)) {
-        read(INF,$line,4);
+        read($inf,$line,4);
         $l1=unpack('V',$line);
-        seek(INF,$l1,1);
-        read(INF,$line,2);
+        seek($inf,$l1,1);
+        read($inf,$line,2);
         @lines=unpack('C*',$line);
         if(($lines[0]==0x80) && ($lines[1]==2)) {
-            read(INF,$line,4);
+            read($inf,$line,4);
             $l2=unpack('V',$line);
         } else {
             die "corrupt pfb in file '$file' at marker='2'.";
         }
-        seek(INF,$l2,1);
-        read(INF,$line,2);
+        seek($inf,$l2,1);
+        read($inf,$line,2);
         @lines=unpack('C*',$line);
         if(($lines[0]==0x80) && ($lines[1]==1)) {
-            read(INF,$line,4);
+            read($inf,$line,4);
             $l3=unpack('V',$line);
         } else {
             die "corrupt pfb in file '$file' at marker='3'.";
         }
-        seek(INF,0,0);
-        @lines=<INF>;
-        close(INF);
+        seek($inf,0,0);
+        @lines=<$inf>;
+        close($inf);
         $stream=join('',@lines);
         $t1stream=substr($stream,6,$l1);
         $t1stream.=substr($stream,12+$l1,$l2);
         $t1stream.=substr($stream,18+$l1+$l2,$l3);
     } elsif($line eq '%!') {
-        seek(INF,0,0);
-        while($line=<INF>) {
+        seek($inf,0,0);
+        while($line=<$inf>) {
             if(!$l1) {
                 $head.=$line;
                 if($line=~/eexec$/){
@@ -165,9 +165,9 @@ sub readAFM
     $data->{lastchar}=0;
 
     if(! -e $file) {die "file='$file' not existant.";}
-    open(AFMF, $file) or die "Can't find the AFM file for $file";
+    open(my $afmf, "<", $file) or die "Can't find the AFM file for $file";
     local($/, $_) = ("\n", undef);  # ensure correct $INPUT_RECORD_SEPARATOR
-    while ($_=<AFMF>) 
+    while ($_=<$afmf>) 
     {
         if (/^StartCharMetrics/ .. /^EndCharMetrics/) 
         {
@@ -237,7 +237,7 @@ sub readAFM
                 ## print STDERR "Can't parse: $_";
         }
     }
-    close(AFMF);
+    close($afmf);
     unless (exists $data->{wx}->{'.notdef'}) 
     {
         $data->{wx}->{'.notdef'} = 0;
@@ -302,7 +302,7 @@ sub readPFM {
     $data->{char}=[];
 
     my $buf;
-    open($fh,$file) || return undef;
+    open($fh, "<", $file) || return undef;
     binmode($fh,':raw');
     read($fh,$buf,117 + 30);
 

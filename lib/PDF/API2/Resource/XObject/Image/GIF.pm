@@ -121,7 +121,7 @@ sub new {
     $self->{' apipdf'}=$pdf;
 
     my $fh = IO::File->new;
-    open($fh,$file);
+    open($fh, "<", $file);
     binmode($fh,':raw');
     my $buf;
     $fh->read($buf,6); # signature
