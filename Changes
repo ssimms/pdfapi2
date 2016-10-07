@@ -4,6 +4,9 @@
       correctly setting the max object number (report and
       troubleshooting by Marco Pessotto).
 
+    - Handle TIFF images with strips that are wider than the image
+      (report and patch by Jeffrey Ratcliffe).
+
 
 2.028     2016-06-08
 
