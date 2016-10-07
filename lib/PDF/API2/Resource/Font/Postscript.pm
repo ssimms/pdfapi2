@@ -115,7 +115,6 @@ sub readPFAPFB {
         }
         seek($inf,0,0);
         @lines=<$inf>;
-        close($inf);
         $stream=join('',@lines);
         $t1stream=substr($stream,6,$l1);
         $t1stream.=substr($stream,12+$l1,$l2);
@@ -147,6 +146,7 @@ sub readPFAPFB {
     } else {
         die "unsupported font-format in file '$file' at marker='1'.";
     }
+    close($inf);
 
     return($l1,$l2,$l3,$t1stream);
 }
