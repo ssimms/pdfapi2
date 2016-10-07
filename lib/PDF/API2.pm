@@ -1023,15 +1023,8 @@ Returns a new page object.  By default, the page is added to the end
 of the document.  If you include an existing page number, the new page
 will be inserted in that position, pushing existing pages back.
 
-$page_number can also have one of the following values:
-
-=over
-
-=item -1 inserts the new page as the second-last page
-
-=item 0 inserts the page as the last page
-
-=back
+If $page_number is -1, the new page is inserted as the second-last page;
+if $page_number is 0, the new page is inserted as the last page.
 
 B<Example:>
 
