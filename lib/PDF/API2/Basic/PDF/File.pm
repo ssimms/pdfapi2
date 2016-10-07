@@ -456,7 +456,7 @@ sub readval {
     my ($result, $value);
 
     my $update = defined($opts{update}) ? $opts{update} : 1;
-    $str = update($fh, $str);
+    $str = update($fh, $str) if $update;
 
     $str =~ s/^$ws_char+//;               # Ignore initial white space
     $str =~ s/^\%[^\015\012]*$ws_char+//; # Ignore comments
