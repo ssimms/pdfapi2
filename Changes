@@ -7,6 +7,9 @@
     - Handle TIFF images with strips that are wider than the image
       (report and patch by Jeffrey Ratcliffe).
 
+    - [RT #98574] Increase test coverage of PDF::API2::Content (tests
+      by Phil Perry).
+
 
 2.028     2016-06-08
 
