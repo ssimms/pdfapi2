@@ -10,6 +10,14 @@
     - [RT #98574] Increase test coverage of PDF::API2::Content (tests
       by Phil Perry).
 
+    - A bunch of code cleanup and documentation updates by Paul
+      Cochrane.
+
+    - Add a missing prereq on Win32 systems (patch by Michiel Beijen).
+
+    - [RT #113514, #98552] Fix the dash() and renderingintent()
+      methods in ExtGState (reported by Vadim Repin and Phil Perry).
+
 
 2.028     2016-06-08
 

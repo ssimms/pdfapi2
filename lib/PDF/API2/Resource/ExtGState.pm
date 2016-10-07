@@ -19,7 +19,7 @@ PDF::API2::Resource::ExtGState - Graphics state dictionary support
 
 =item $egs = PDF::API2::Resource::ExtGState->new @parameters
 
-Returns a new extgstate object (called from $pdf->extgstate).
+Returns a new extgstate object (called from $pdf->egstate).
 
 =cut
 
@@ -160,6 +160,8 @@ sub halftone {
 
 =cut
 
+# Per RT #113514, this was last present in version 1.2 of the PDF
+# spec, so it can probably be removed.
 sub halftonephase {
     my ($self,$obj)=@_;
     $self->{HTP}=$obj;
@@ -235,7 +237,7 @@ sub meterlimit { return miterlimit(@_) }
 
 sub dash {
     my ($self,@dash)=@_;
-    $self->{ML}=PDFArray( map { PDFNum($_); } @dash );
+    $self->{D}=PDFArray(PDFArray( map { PDFNum($_); } @dash), PDFNum(0));
     return($self);
 }
 
@@ -255,7 +257,7 @@ sub flatness {
 
 sub renderingintent {
     my ($self,$var)=@_;
-    $self->{FL}=PDFName($var);
+    $self->{RI}=PDFName($var);
     return($self);
 }
 
