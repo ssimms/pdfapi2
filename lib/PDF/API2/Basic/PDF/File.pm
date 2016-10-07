@@ -547,7 +547,7 @@ sub readval {
         my $num = $1;
         $value = $2;
         $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj//s;
-        ($obj, $str) = $self->readval($str, %opts, 'objnum' => $num, 'objgen' => $value);
+        ($obj, $str) = $self->readval($str, %opts);
         if ($result = $self->test_obj($num, $value)) {
             $result->merge($obj);
         }
@@ -728,13 +728,13 @@ sub read_objnum {
         my $length = $index > $count ? length($objects) : $mappings[$index];
         my $stream = "$num 0 obj" . substr($objects, $start, $length);
 
-        ($object) = $self->readval($stream, %opts, objnum => $num, objgen => $gen, update => 0);
+        ($object) = $self->readval($stream, %opts, update => 0);
         return $object;
     }
 
     my $current_location = $self->{' INFILE'}->tell;
     $self->{' INFILE'}->seek($object_location, 0);
-    ($object) = $self->readval('', %opts, 'objnum' => $num, 'objgen' => $gen);
+    ($object) = $self->readval('', %opts);
     $self->{' INFILE'}->seek($current_location, 0);
     return $object;
 }
