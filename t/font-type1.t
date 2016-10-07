@@ -1,5 +1,8 @@
 use Test::More tests => 1;
 
+use warnings;
+use strict;
+
 use PDF::API2;
 
 my $pfb_file = '/usr/share/fonts/type1/gsfonts/a010013l.pfb';
