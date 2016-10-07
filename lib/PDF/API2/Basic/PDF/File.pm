@@ -1167,8 +1167,12 @@ sub readxrtr {
             $start = shift(@index);
             $last = $start + shift(@index) - 1;
 
-            for $xmin ($start...$last)
+            for my $i ($start...$last)
             {
+                # Replaced "for $xmin" because it creates a loop-specific local variable, and we
+                # need $xmin to be correct for maxobj below.
+                $xmin = $i;
+
                 my @cols;
     
                 for my $w (@widths)

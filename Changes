@@ -1,5 +1,12 @@
 {{$NEXT}}
 
+    - [RT #113293] Files with cross-reference streams weren't
+      correctly setting the max object number (report and
+      troubleshooting by Marco Pessotto).
+
+
+2.028     2016-06-08
+
     - [RT #113290] Fix for reading objects inside an object stream in
       a large PDF (patch by Marco Pessotto).
 
