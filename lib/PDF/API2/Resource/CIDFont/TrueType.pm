@@ -94,7 +94,6 @@ sub new_api
     my ($class,$api,@opts)=@_;
 
     my $obj=$class->new($api->{pdf},@opts);
-    my $self->{' api'}=$api;
 
     $api->{pdf}->out_obj($api->{pages});
     return($obj);
