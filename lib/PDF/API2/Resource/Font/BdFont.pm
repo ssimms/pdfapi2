@@ -1,13 +1,14 @@
 package PDF::API2::Resource::Font::BdFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 our $BmpNum = 0;
 
@@ -46,7 +47,7 @@ See I<perl's Encode> for the supported values.
 
 I<-pdfname> ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be
-retrived via $pdfname=$font->name.
+retrieved via $pdfname=$font->name.
 
 =cut
 
@@ -167,9 +168,9 @@ sub readBDF {
     $data->{wx}={};
 
     if(! -e $file) {die "file='$file' not existant.";}
-    open(AFMF, $file) or die "Can't find the BDF file for $file";
+    open(my $afmf, "<", $file) or die "Can't find the BDF file for $file";
     local($/, $_) = ("\n", undef);  # ensure correct $INPUT_RECORD_SEPARATOR
-    while ($_=<AFMF>) {
+    while ($_=<$afmf>) {
         chomp($_);
         if (/^STARTCHAR/ .. /^ENDCHAR/) {
             if (/^STARTCHAR\s+(\S+)/) {
@@ -196,7 +197,7 @@ sub readBDF {
                 $data->{uc($1)}.=$2;
         }
     }
-    close(AFMF);
+    close($afmf);
     unless (exists $data->{wx}->{'.notdef'}) {
         $data->{wx}->{'.notdef'} = 0;
         $data->{bbox}{'.notdef'} = [0, 0, 0, 0];

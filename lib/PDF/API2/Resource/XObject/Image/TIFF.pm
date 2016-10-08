@@ -1,15 +1,16 @@
 package PDF::API2::Resource::XObject::Image::TIFF;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Image';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Compress::Zlib;
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
@@ -186,6 +187,10 @@ sub handle_lzw
 {
     my ($self,$pdf,$tif)=@_;
     $self->filters('FlateDecode');
+    my $imageWidth = $tif->{imageWidth};
+    my $mod = $imageWidth % 8;
+    if ($mod > 0) {$imageWidth += 8 - $mod}
+    my $max_raw_strip = $imageWidth*$tif->{bitsPerSample}*$tif->{RowsPerStrip}/8;
 
     if(ref($tif->{imageOffset})) {
         $self->{' stream'}='';
@@ -196,6 +201,9 @@ sub handle_lzw
             $tif->{fh}->seek(shift @{$tif->{imageOffset}},0);
             $tif->{fh}->read($buf,shift @{$tif->{imageLength}});
             $buf=deLZW(9,$buf);
+            if (length($buf) > $max_raw_strip) {
+                $buf = substr($buf, 0, $max_raw_strip)
+            }
             $self->{' stream'}.=$buf;
         }
     }
@@ -356,7 +364,7 @@ sub new {
     seek($self->{fh},0,0);
   } else {
     $self->{fh} = IO::File->new;
-    open($self->{fh},"< $file");
+    open($self->{fh}, "<", $file);
   }
   binmode($self->{fh},':raw');
   my $fh = $self->{fh};
@@ -560,6 +568,9 @@ sub readTags {
       } elsif($valTag==277) {
         # samples per pixel
         $self->{samplesPerPixel}=$valOffset;
+      } elsif($valTag==278) {
+        # RowsPerStrip
+        $self->{RowsPerStrip}=$valOffset;
       } elsif($valTag==279) {
         # image data length/strip lengths
         if($valCount==1) {

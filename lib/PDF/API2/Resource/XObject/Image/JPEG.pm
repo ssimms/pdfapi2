@@ -1,15 +1,15 @@
 package PDF::API2::Resource::XObject::Image::JPEG;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Image';
+
+use strict;
+use warnings;
+
+# VERSION
 
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-use warnings;
 
 sub new {
     my ($class, $pdf, $file, $name) = @_;
@@ -26,7 +26,7 @@ sub new {
         $fh = $file;
     }
     else {
-        open $fh, $file;
+        open $fh, "<", $file;
     }
     binmode $fh, ':raw';
 

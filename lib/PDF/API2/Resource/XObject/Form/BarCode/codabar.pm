@@ -1,11 +1,11 @@
 package PDF::API2::Resource::XObject::Form::BarCode::codabar;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Form::BarCode';
 
 use strict;
 use warnings;
+
+# VERSION
 
 sub new {
     my ($class, $pdf, %options) = @_;

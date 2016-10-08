@@ -1,15 +1,16 @@
 package PDF::API2::Resource::CIDFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource::BaseFont';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
@@ -67,7 +68,7 @@ sub new_api
     my ($class,$api,@opts)=@_;
 
     my $obj=$class->new($api->{pdf},@opts);
-    $self->{' api'}=$api;
+    my $self->{' api'}=$api;
 
     $api->{pdf}->out_obj($api->{pages});
     return($obj);

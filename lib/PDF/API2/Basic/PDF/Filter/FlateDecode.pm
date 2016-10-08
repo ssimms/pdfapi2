@@ -1,11 +1,11 @@
 package PDF::API2::Basic::PDF::Filter::FlateDecode;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Filter';
 
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use POSIX qw(ceil floor);
 
@@ -13,13 +13,13 @@ our $havezlib;
 
 BEGIN
 {
-    eval {require "Compress/Zlib.pm";};
+    eval { require Compress::Zlib };
     $havezlib = !$@;
 }
 
 sub new
 {
-    return undef unless $havezlib;
+    return unless $havezlib;
     my ($class, $decode_parms) = @_;
     my ($self) = {
         DecodeParms => $decode_parms,

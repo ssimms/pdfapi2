@@ -1,16 +1,17 @@
 package PDF::API2::Resource::Font::Postscript;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 use IO::File qw();
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
     my ($class, $pdf, $psfile, %opts) = @_;
@@ -86,43 +87,42 @@ sub readPFAPFB {
 
     die "cannot find font '$file' ..." unless(-f $file);
 
-    $l=-s $file;
+    my $l=-s $file;
 
-    open(INF,$file);
-    binmode(INF,':raw');
-    read(INF,$line,2);
+    open(my $inf, "<", $file);
+    binmode($inf,':raw');
+    read($inf,$line,2);
     @lines=unpack('C*',$line);
     if(($lines[0]==0x80) && ($lines[1]==1)) {
-        read(INF,$line,4);
+        read($inf,$line,4);
         $l1=unpack('V',$line);
-        seek(INF,$l1,1);
-        read(INF,$line,2);
+        seek($inf,$l1,1);
+        read($inf,$line,2);
         @lines=unpack('C*',$line);
         if(($lines[0]==0x80) && ($lines[1]==2)) {
-            read(INF,$line,4);
+            read($inf,$line,4);
             $l2=unpack('V',$line);
         } else {
             die "corrupt pfb in file '$file' at marker='2'.";
         }
-        seek(INF,$l2,1);
-        read(INF,$line,2);
+        seek($inf,$l2,1);
+        read($inf,$line,2);
         @lines=unpack('C*',$line);
         if(($lines[0]==0x80) && ($lines[1]==1)) {
-            read(INF,$line,4);
+            read($inf,$line,4);
             $l3=unpack('V',$line);
         } else {
             die "corrupt pfb in file '$file' at marker='3'.";
         }
-        seek(INF,0,0);
-        @lines=<INF>;
-        close(INF);
+        seek($inf,0,0);
+        @lines=<$inf>;
         $stream=join('',@lines);
         $t1stream=substr($stream,6,$l1);
         $t1stream.=substr($stream,12+$l1,$l2);
         $t1stream.=substr($stream,18+$l1+$l2,$l3);
     } elsif($line eq '%!') {
-        seek(INF,0,0);
-        while($line=<INF>) {
+        seek($inf,0,0);
+        while($line=<$inf>) {
             if(!$l1) {
                 $head.=$line;
                 if($line=~/eexec$/){
@@ -147,6 +147,7 @@ sub readPFAPFB {
     } else {
         die "unsupported font-format in file '$file' at marker='1'.";
     }
+    close($inf);
 
     return($l1,$l2,$l3,$t1stream);
 }
@@ -165,9 +166,9 @@ sub readAFM
     $data->{lastchar}=0;
 
     if(! -e $file) {die "file='$file' not existant.";}
-    open(AFMF, $file) or die "Can't find the AFM file for $file";
+    open(my $afmf, "<", $file) or die "Can't find the AFM file for $file";
     local($/, $_) = ("\n", undef);  # ensure correct $INPUT_RECORD_SEPARATOR
-    while ($_=<AFMF>)
+    while ($_=<$afmf>)
     {
         if (/^StartCharMetrics/ .. /^EndCharMetrics/)
         {
@@ -237,7 +238,7 @@ sub readAFM
                 ## print STDERR "Can't parse: $_";
         }
     }
-    close(AFMF);
+    close($afmf);
     unless (exists $data->{wx}->{'.notdef'})
     {
         $data->{wx}->{'.notdef'} = 0;
@@ -274,7 +275,7 @@ sub readAFM
     $data->{issymbol} = 0;
     $data->{fontbbox} = [ split(/\s+/,$data->{fontbbox}) ];
 
-    $data->{apiname}=join('',map { $_=~s/[^A-Za-z0-9]+//og; $_=ucfirst(lc(substr($_,0,2))); $_; } split(/\s+/,$data->{apiname}));
+    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[A-Za-z0-9\s]+/, $data->{apiname});
 
     $data->{flags} = 34;
 
@@ -302,7 +303,7 @@ sub readPFM {
     $data->{char}=[];
 
     my $buf;
-    open($fh,$file) || return undef;
+    open($fh, "<", $file) || return;
     binmode($fh,':raw');
     read($fh,$buf,117 + 30);
 
@@ -436,8 +437,7 @@ sub readPFM {
 
     $data->{fontname}=$df{psName};
     $data->{fontname}=~s/[^A-Za-z0-9]+//og;
-    $data->{apiname}=$df{windowsName};
-    $data->{apiname}=join('',map { $_=~s/[^A-Za-z0-9]+//og; $_=ucfirst(lc(substr($_,0,2))); $_; } split(/\s+/,$data->{apiname}));
+    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[A-Za-z0-9\s]+/, $df{windowsName});
 
     $data->{upem}=1000;
 

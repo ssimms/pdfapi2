@@ -1,19 +1,20 @@
 package PDF::API2::Resource::ColorSpace::Indexed;
 
-# VERSION
-
 use base 'PDF::API2::Resource::ColorSpace';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
     my ($class,$pdf,$key,%opts)=@_;
 
     $class = ref $class if ref $class;
-    $self=$class->SUPER::new($pdf,$key,%opts);
+    my $self=$class->SUPER::new($pdf,$key,%opts);
     $pdf->new_obj($self) unless($self->is_obj($pdf));
     $self->{' apipdf'}=$pdf;
 

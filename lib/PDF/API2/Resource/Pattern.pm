@@ -1,11 +1,11 @@
 package PDF::API2::Resource::Pattern;
 
-# VERSION
-
 use base 'PDF::API2::Resource';
 
 use strict;
 use warnings;
+
+# VERSION
 
 sub new {
     my ($class, $pdf, $name) = @_;

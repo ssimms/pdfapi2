@@ -12,6 +12,9 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Filter;
 
+use strict;
+use warnings;
+
 # VERSION
 
 use PDF::API2::Basic::PDF::Filter::ASCII85Decode;
@@ -20,9 +23,6 @@ use PDF::API2::Basic::PDF::Filter::FlateDecode;
 use PDF::API2::Basic::PDF::Filter::LZWDecode;
 use PDF::API2::Basic::PDF::Filter::RunLengthDecode;
 use Scalar::Util qw(blessed reftype);
-
-use strict;
-use warnings;
 
 =head1 NAME
 

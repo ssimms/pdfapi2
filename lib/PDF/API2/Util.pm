@@ -1,8 +1,9 @@
 package PDF::API2::Util;
 
-# VERSION
-
+use strict;
 no warnings qw[ recursion uninitialized ];
+
+# VERSION
 
 BEGIN {
 
@@ -79,8 +80,7 @@ sub digestx {
     my $mdkey='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789gT';
     my $xdata="0" x $len;
     my $off=0;
-    my $set;
-    foreach $set (0..(length($ddata)<<1)) {
+    foreach my $set (0..(length($ddata)<<1)) {
         $off+=vec($ddata,$set,4);
         $off+=vec($xdata,($set & $mask),8);
         vec($xdata,($set & ($mask<<1 |1)),4)=vec($mdkey,($off & 0x7f),4);
@@ -265,7 +265,7 @@ sub _HSVtoRGB { # test
     return ($r,$g,$b);
 }
 
-sub RGBquant ($$$) {
+sub RGBquant {
     my($q1,$q2,$h)=@_;
     while($h<0){$h+=360;}
     $h%=360;

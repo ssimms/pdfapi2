@@ -1,13 +1,14 @@
 package PDF::API2::Resource::ColorSpace::DeviceN;
 
-# VERSION
-
 use base 'PDF::API2::Resource::ColorSpace';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
     my ($class,$pdf,$key,@opts)=@_;
@@ -16,7 +17,7 @@ sub new {
     $sampled=2;
 
     $class = ref $class if ref $class;
-    $self=$class->SUPER::new($pdf,$key);
+    my $self=$class->SUPER::new($pdf,$key);
     $pdf->new_obj($self) unless($self->is_obj($pdf));
     $self->{' apipdf'}=$pdf;
 
@@ -79,7 +80,7 @@ sub new_api {
     my ($class,$api,@opts)=@_;
 
     my $obj=$class->new($api->{pdf},pdfkey(),@opts);
-    $self->{' api'}=$api;
+    $obj->{' api'}=$api;
 
     return($obj);
 }

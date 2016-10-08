@@ -1,8 +1,11 @@
 package PDF::API2::Resource::CIDFont::TrueType::FontFile;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
+
+use strict;
+no warnings qw[ recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 use Font::TTF::Font;
@@ -11,15 +14,13 @@ use POSIX qw(ceil floor);
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
-no warnings qw[ recursion uninitialized ];
-
 our $cmap = {};
 
-sub _look_for_cmap ($) {
+sub _look_for_cmap {
     my $fname=lc(shift);
     $fname=~s/[^a-z0-9]+//gi;
     return({%{$cmap->{$fname}}}) if(defined $cmap->{$fname});
-    eval "require \"PDF/API2/Resource/CIDFont/CMap/$fname.cmap\"";
+    eval "require 'PDF/API2/Resource/CIDFont/CMap/$fname.cmap'";
     unless($@){
         return({%{$cmap->{$fname}}});
     } else {
@@ -236,11 +237,11 @@ sub readcffdict
         }
         elsif($b0==30) # float
         {
-            $e=1;
+            my $e=1;
             while($e)
             {
                 read($fh,$buf,1);
-                $v0=unpack('C',$buf);
+                my $v0=unpack('C',$buf);
                 foreach my $m ($v0>>8,$v0&0xf)
                 {
                     if($m<10)
@@ -356,6 +357,7 @@ sub readcffstructs
     my $data={};
     # read CFF table
     seek($fh,$font->{'CFF '}->{' OFFSET'},0);
+    my $buf;
     read($fh,$buf, 4);
     my ($cffmajor,$cffminor,$cffheadsize,$cffglobaloffsize)=unpack('C4',$buf);
 
@@ -426,7 +428,7 @@ sub new {
     $data->{obj}=$font;
 
     $class = ref $class if ref $class;
-    $self=$class->SUPER::new();
+    my $self=$class->SUPER::new();
 
     $self->{Filter}=PDFArray(PDFName('FlateDecode'));
     $self->{' font'}=$font;
@@ -464,9 +466,7 @@ sub new {
         $data->{panose}.=pack('C',$font->{'OS/2'}->{$p});
     }
 
-    $data->{apiname}=$data->{fontname};
-	$data->{apiname}=~s/[^A-Za-z0-9]+/ /og;
-    $data->{apiname}=join('',map { $_=~s/[^A-Za-z0-9]+//og; $_=ucfirst(lc(substr($_,0,2))); $_; } split(/\s+/,$data->{apiname}));
+    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[A-Za-z0-9\s]+/, $data->{fontname});
     $data->{fontname}=~s/[\x00-\x1f\s]//og;
 
     $data->{altname}=$font->{'name'}->find_name(1);

@@ -12,11 +12,11 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Number;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::String';
 
 use strict;
+
+# VERSION
 
 =head1 NAME
 

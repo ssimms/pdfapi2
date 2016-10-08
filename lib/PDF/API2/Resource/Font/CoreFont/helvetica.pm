@@ -1,11 +1,11 @@
 package PDF::API2::Resource::Font::CoreFont::helvetica;
 
-# VERSION
-
 use strict;
 use warnings;
 
-our $FONTDATA = {
+# VERSION
+
+sub data { return {
     'fontname' => 'Helvetica',
     'type' => 'Type1',
     'apiname' => 'Helv',
@@ -513,4 +513,6 @@ our $FONTDATA = {
         'fi' => '500',                           # U+0xFB01
         'fl' => '500',                           # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

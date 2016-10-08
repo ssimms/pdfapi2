@@ -1,14 +1,15 @@
 package PDF::API2::Resource::XObject::Image::GIF;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Image';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 # added from PDF::Create:
 # PDF::Image::GIFImage - GIF image support
@@ -121,7 +122,7 @@ sub new {
     $self->{' apipdf'}=$pdf;
 
     my $fh = IO::File->new;
-    open($fh,$file);
+    open($fh, "<", $file);
     binmode($fh,':raw');
     my $buf;
     $fh->read($buf,6); # signature

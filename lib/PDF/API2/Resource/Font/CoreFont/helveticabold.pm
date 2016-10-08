@@ -1,11 +1,11 @@
 package PDF::API2::Resource::Font::CoreFont::helveticabold;
 
-# VERSION
-
 use strict;
 use warnings;
 
-our $FONTDATA = {
+# VERSION
+
+sub data { return {
     'fontname' => 'Helvetica-Bold',
     'type' => 'Type1',
     'apiname' => 'HeBo',
@@ -513,4 +513,6 @@ our $FONTDATA = {
         'fi' => '611',                           # U+0xFB01
         'fl' => '611',                           # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

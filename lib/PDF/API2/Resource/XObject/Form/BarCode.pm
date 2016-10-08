@@ -1,14 +1,14 @@
 package PDF::API2::Resource::XObject::Form::BarCode;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Form::Hybrid';
-
-use PDF::API2::Util;
-use PDF::API2::Basic::PDF::Utils;
 
 use strict;
 use warnings;
+
+# VERSION
+
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME
 

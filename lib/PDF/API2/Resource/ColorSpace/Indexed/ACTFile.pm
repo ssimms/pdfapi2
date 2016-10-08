@@ -1,13 +1,14 @@
 package PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
 
-# VERSION
-
 use base 'PDF::API2::Resource::ColorSpace::Indexed';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
@@ -32,7 +33,7 @@ sub new {
     my ($class,$pdf,$file)=@_;
     die "could not find act-file '$file'." unless(-f $file);
     $class = ref $class if ref $class;
-    $self=$class->SUPER::new($pdf,pdfkey());
+    my $self=$class->SUPER::new($pdf,pdfkey());
     $pdf->new_obj($self) unless($self->is_obj($pdf));
     $self->{' apipdf'}=$pdf;
     my $csd=PDFDict();
@@ -44,7 +45,7 @@ sub new {
     $csd->{Gamma}=PDFArray(map {PDFNum($_)} (2.22218, 2.22218, 2.22218));
 
     my $fh;
-    open($fh,$file);
+    open($fh, "<", $file);
     binmode($fh,':raw');
     read($fh,$csd->{' stream'},768);
     close($fh);

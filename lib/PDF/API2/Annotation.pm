@@ -1,15 +1,16 @@
 package PDF::API2::Annotation;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
@@ -330,7 +331,7 @@ specifies that the current value of that parameter is to be retained unchanged.
 
 =item $ant->dest( $name )
 
-(PDF 1.2) Connect the Annotation to a "Named Destination" defined elswere.
+(PDF 1.2) Connect the Annotation to a "Named Destination" defined elsewhere.
 
 =cut
 

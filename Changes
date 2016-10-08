@@ -1,5 +1,28 @@
 {{$NEXT}}
 
+    - [RT #113293] Files with cross-reference streams weren't
+      correctly setting the max object number (report and
+      troubleshooting by Marco Pessotto).
+
+    - Handle TIFF images with strips that are wider than the image
+      (report and patch by Jeffrey Ratcliffe).
+
+    - [RT #98574] Increase test coverage of PDF::API2::Content (tests
+      by Phil Perry).
+
+    - A bunch of code cleanup and documentation updates by Paul
+      Cochrane.
+
+    - Add a missing prereq on Win32 systems (patch by Michiel Beijen).
+
+    - [RT #113514, #98552] Fix the dash() and renderingintent()
+      methods in ExtGState (reported by Vadim Repin and Phil Perry).
+
+    - Satisfy all Perl::Critic severity 5 policies.
+
+
+2.028     2016-06-08
+
     - [RT #113290] Fix for reading objects inside an object stream in
       a large PDF (patch by Marco Pessotto).
 

@@ -1,11 +1,11 @@
 package PDF::API2::Resource::XObject::Form;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject';
 
 use strict;
 use warnings;
+
+# VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 

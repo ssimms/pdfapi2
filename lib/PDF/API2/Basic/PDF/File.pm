@@ -14,6 +14,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::File;
 
+use strict;
+
 # VERSION
 
 =head1 NAME
@@ -82,7 +84,7 @@ have been made to the memory representation.
 
 =item maxobj (R)
 
-Contains the first useable object number above any that have already appeared
+Contains the first usable object number above any that have already appeared
 in the file so far.
 
 =item outlist (P)
@@ -137,9 +139,6 @@ is in PDF which contains the location of the previous cross-reference table.
 =head1 METHODS
 
 =cut
-
-use strict;
-no strict "refs";
 
 use Scalar::Util qw(blessed);
 
@@ -227,7 +226,7 @@ sub open {
     }
     else {
         die "File '$filename' does not exist !" unless -f $filename;
-        $fh = IO::File->new(($update ? '+' : '') . "<$filename") || return undef;
+        $fh = IO::File->new(($update ? '+' : '') . "<$filename") || return;
         $self->{' INFILE'} = $fh;
         if ($update) {
             $self->{' update'} = 1;
@@ -324,7 +323,7 @@ Appends the objects for output to the read file and then appends the appropriate
 
 sub append_file {
     my $self = shift();
-    return undef unless $self->{' update'};
+    return unless $self->{' update'};
 
     my $fh = $self->{' INFILE'};
 
@@ -456,7 +455,7 @@ sub readval {
     my ($result, $value);
 
     my $update = defined($opts{update}) ? $opts{update} : 1;
-    $str = update($fh, $str);
+    $str = update($fh, $str) if $update;
 
     $str =~ s/^$ws_char+//;               # Ignore initial white space
     $str =~ s/^\%[^\015\012]*$ws_char+//; # Ignore comments
@@ -547,7 +546,7 @@ sub readval {
         my $num = $1;
         $value = $2;
         $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj//s;
-        ($obj, $str) = $self->readval($str, %opts, 'objnum' => $num, 'objgen' => $value);
+        ($obj, $str) = $self->readval($str, %opts);
         if ($result = $self->test_obj($num, $value)) {
             $result->merge($obj);
         }
@@ -684,7 +683,7 @@ the read in object.
 sub read_obj {
     my ($self, $objind, %opts) = @_;
 
-    my $res = $self->read_objnum($objind->{' objnum'}, $objind->{' objgen'}, %opts) || return undef;
+    my $res = $self->read_objnum($objind->{' objnum'}, $objind->{' objgen'}, %opts) || return;
     $objind->merge($res) unless $objind eq $res;
     return $objind;
 }
@@ -699,7 +698,7 @@ Returns a fully read object of given number and generation in this file
 sub read_objnum {
     my ($self, $num, $gen, %opts) = @_;
 
-    my $object_location = $self->locate_obj($num, $gen) || return undef;
+    my $object_location = $self->locate_obj($num, $gen) || return;
     my $object;
 
     if (ref $object_location)
@@ -728,13 +727,13 @@ sub read_objnum {
         my $length = $index > $count ? length($objects) : $mappings[$index];
         my $stream = "$num 0 obj" . substr($objects, $start, $length);
 
-        ($object) = $self->readval($stream, %opts, objnum => $num, objgen => $gen, update => 0);
+        ($object) = $self->readval($stream, %opts, update => 0);
         return $object;
     }
 
     my $current_location = $self->{' INFILE'}->tell;
     $self->{' INFILE'}->seek($object_location, 0);
-    ($object) = $self->readval('', %opts, 'objnum' => $num, 'objgen' => $gen);
+    ($object) = $self->readval('', %opts);
     $self->{' INFILE'}->seek($current_location, 0);
     return $object;
 }
@@ -1167,8 +1166,12 @@ sub readxrtr {
             $start = shift(@index);
             $last = $start + shift(@index) - 1;
 
-            for $xmin ($start...$last)
+            for my $i ($start...$last)
             {
+                # Replaced "for $xmin" because it creates a loop-specific local variable, and we
+                # need $xmin to be correct for maxobj below.
+                $xmin = $i;
+
                 my @cols;
 
                 for my $w (@widths)

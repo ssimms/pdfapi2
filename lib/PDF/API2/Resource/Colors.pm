@@ -1,9 +1,9 @@
 package PDF::API2::Resource::Colors;
 
-# VERSION
-
 use strict;
 use warnings;
+
+# VERSION
 
 sub get_colors {
     return (

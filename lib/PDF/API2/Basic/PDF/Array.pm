@@ -12,11 +12,11 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Array;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
+
+# VERSION
 
 =head1 NAME
 

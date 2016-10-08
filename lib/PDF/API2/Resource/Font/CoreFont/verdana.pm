@@ -1,11 +1,11 @@
 package PDF::API2::Resource::Font::CoreFont::verdana;
 
-# VERSION
-
 use strict;
 use warnings;
 
-our $FONTDATA = {
+# VERSION
+
+sub data { return {
     'fontname' => 'Verdana',
     'type' => 'TrueType',
     'apiname' => 'Verd',
@@ -837,4 +837,6 @@ our $FONTDATA = {
         'fi' => '625',                           # U+0xFB01
         'fl' => '625',                           # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

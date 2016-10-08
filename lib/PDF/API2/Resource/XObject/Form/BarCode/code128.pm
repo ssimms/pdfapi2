@@ -1,11 +1,11 @@
 package PDF::API2::Resource::XObject::Form::BarCode::code128;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Form::BarCode';
 
 use strict;
 use warnings;
+
+# VERSION
 
 =head1 NAME
 

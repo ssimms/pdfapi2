@@ -1,15 +1,16 @@
 package PDF::API2::Resource::Font::CoreFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use File::Basename;
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 our $fonts;
 our $alias;
@@ -48,20 +49,19 @@ See I<perl's Encode> for the supported values.
 
 I<-pdfname> ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be
-retrived via $pdfname=$font->name.
+retrieved via $pdfname=$font->name.
 
 =cut
 
-sub _look_for_font ($)
+sub _look_for_font
 {
     my $fname=shift;
     ## return(%{$fonts->{$fname}}) if(defined $fonts->{$fname});
     eval "require PDF::API2::Resource::Font::CoreFont::$fname; ";
     unless($@)
     {
-    no strict 'refs';
-        my $obj = "PDF::API2::Resource::Font::CoreFont::".$fname;
-    $fonts->{$fname} = deep_copy(${$obj."::FONTDATA"});
+        my $class = "PDF::API2::Resource::Font::CoreFont::$fname";
+        $fonts->{$fname} = deep_copy($class->data());
         $fonts->{$fname}->{uni}||=[];
         foreach my $n (0..255)
         {

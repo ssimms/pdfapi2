@@ -1,13 +1,14 @@
 package PDF::API2::Outline;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
@@ -197,7 +198,7 @@ specifies that the current value of that parameter is to be retained unchanged.
 
 =item $otl->dest( $name )
 
-(PDF 1.2) Connect the Outline to a "Named Destination" defined elswere.
+(PDF 1.2) Connect the Outline to a "Named Destination" defined elsewhere.
 
 =cut
 

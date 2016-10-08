@@ -1,15 +1,16 @@
 package PDF::API2::Resource::Font;
 
-# VERSION
-
 use base 'PDF::API2::Resource::BaseFont';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub encodeByData {
     my ($self,$encoding)=@_;
@@ -155,7 +156,7 @@ sub automap {
 
     my @fnts=();
     my $count=0;
-    while(@glyphs=splice(@nm,0,223))
+    while(my @glyphs=splice(@nm,0,223))
     {
         my $obj=$self->SUPER::new($self->{' apipdf'},$self->name.'am'.$count);
         $obj->{' data'}={ %{$data} };

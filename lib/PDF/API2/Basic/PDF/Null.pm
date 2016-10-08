@@ -12,11 +12,11 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Null;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
+
+# VERSION
 
 =head1 NAME
 
@@ -88,7 +88,7 @@ Return undef.
 =cut
 
 sub val {
-    return undef;
+    return undef; ## no critic (undef is intentional)
 }
 
 1;

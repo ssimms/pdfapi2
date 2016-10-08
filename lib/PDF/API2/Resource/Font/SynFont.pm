@@ -1,16 +1,17 @@
 package PDF::API2::Resource::Font::SynFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Math::Trig;
 use Unicode::UCD 'charinfo';
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 
@@ -48,7 +49,7 @@ See I<perl's Encode> for the supported values.
 I<-pdfname>
 ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be
-retrived via $pdfname=$font->name.
+retrieved via $pdfname=$font->name.
 
 I<-slant>
 ... slant/expansion factor (0.1-0.9 = slant, 1.1+ = expansion).

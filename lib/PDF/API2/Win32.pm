@@ -1,14 +1,16 @@
 package PDF::API2::Win32;
 
-# VERSION
-
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 
 package PDF::API2;
 
 use Win32::TieRegistry;
 
+use strict;
 no warnings qw[ recursion uninitialized ];
 
 our $wf = {};

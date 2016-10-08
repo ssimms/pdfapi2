@@ -1,5 +1,8 @@
 package PDF::API2;
 
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
 # VERSION
 
 use Carp;
@@ -20,8 +23,6 @@ use PDF::API2::Resource::Pattern;
 use PDF::API2::Resource::Shading;
 
 use PDF::API2::NamedDestination;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC),
                   qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
@@ -1023,15 +1024,8 @@ Returns a new page object.  By default, the page is added to the end
 of the document.  If you include an existing page number, the new page
 will be inserted in that position, pushing existing pages back.
 
-$page_number can also have one of the following values:
-
-=over
-
-=item -1 inserts the new page as the second-last page
-
-=item 0 inserts the page as the last page
-
-=back
+If $page_number is -1, the new page is inserted as the second-last page;
+if $page_number is 0, the new page is inserted as the last page.
 
 B<Example:>
 
@@ -1652,9 +1646,9 @@ See Also: L<PDF::API2::Resource::Font::CoreFont>.
 =cut
 
 sub corefont {
-    my ($self,$name,@opts)=@_;
+    my ($self,$name,%opts)=@_;
     require PDF::API2::Resource::Font::CoreFont;
-    my $obj=PDF::API2::Resource::Font::CoreFont->new_api($self,$name,@opts);
+    my $obj=PDF::API2::Resource::Font::CoreFont->new_api($self,$name,%opts);
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);
     return($obj);
@@ -1833,10 +1827,10 @@ See Also: L<PDF::API2::Resource::Font::SynFont>
 =cut
 
 sub synfont {
-    my ($self,@opts)=@_;
+    my ($self,%opts)=@_;
 
     require PDF::API2::Resource::Font::SynFont;
-    my $obj=PDF::API2::Resource::Font::SynFont->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::Font::SynFont->new_api($self,%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);

@@ -1,8 +1,11 @@
 package PDF::API2::Page;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Pages';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use POSIX qw(floor);
 
@@ -12,8 +15,6 @@ use PDF::API2::Content::Text;
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 

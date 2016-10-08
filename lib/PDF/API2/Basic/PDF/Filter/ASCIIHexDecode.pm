@@ -1,11 +1,11 @@
 package PDF::API2::Basic::PDF::Filter::ASCIIHexDecode;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Filter';
 
 use strict;
 use warnings;
+
+# VERSION
 
 # Maintainer's Note: ASCIIHexDecode is described in the PDF 1.7 spec
 # in section 7.4.2.

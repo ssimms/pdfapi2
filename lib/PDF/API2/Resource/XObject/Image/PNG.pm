@@ -1,8 +1,11 @@
 package PDF::API2::Resource::XObject::Image::PNG;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Image';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -10,8 +13,6 @@ use POSIX qw(ceil floor);
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
     my ($class,$pdf,$file,$name,%opts) = @_;
@@ -25,11 +26,11 @@ sub new {
     $self->{' apipdf'}=$pdf;
 
     my $fh = IO::File->new;
-    open($fh,$file);
+    open($fh, "<", $file);
     binmode($fh,':raw');
 
     my ($buf,$l,$crc,$w,$h,$bpc,$cs,$cm,$fm,$im,$palete,$trns);
-    open($fh,$file);
+    open($fh, "<", $file);
     binmode($fh);
     seek($fh,8,0);
     $self->{' stream'}='';

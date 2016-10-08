@@ -1,8 +1,11 @@
 package PDF::API2::Content;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
+
+use strict;
+no warnings qw( deprecated recursion uninitialized );
+
+# VERSION
 
 use Carp;
 use Compress::Zlib qw();
@@ -12,8 +15,6 @@ use PDF::API2::Matrix;
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-no warnings qw( deprecated recursion uninitialized );
 
 =head1 NAME
 
@@ -2007,9 +2008,9 @@ sub paragraph {
 
 sub section {
     my ($self,$text,$width,$height,%opts)=@_;
-    my ($para,$overflow) = ("","");
+    my $overflow = '';
 
-    foreach $para (split(/\n/,$text)) {
+    foreach my $para (split(/\n/,$text)) {
         if(length($overflow) > 0) {
             $overflow .= "\n" . $para;
             next;

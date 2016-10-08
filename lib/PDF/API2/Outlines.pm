@@ -1,11 +1,11 @@
 package PDF::API2::Outlines;
 
-# VERSION
-
-use warnings;
-use strict;
-
 use base 'PDF::API2::Outline';
+
+use strict;
+use warnings;
+
+# VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 
