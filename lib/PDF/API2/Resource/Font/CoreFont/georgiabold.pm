@@ -5,7 +5,7 @@ package PDF::API2::Resource::Font::CoreFont::georgiabold;
 use strict;
 use warnings;
 
-our $FONTDATA = {
+sub data { return {
     'fontname' => 'Georgia,Bold',
     'type' => 'TrueType',
     'apiname' => 'GeBo',
@@ -856,4 +856,6 @@ our $FONTDATA = {
         'fi' => '694',                           # U+0xFB01
         'fl' => '705',                           # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

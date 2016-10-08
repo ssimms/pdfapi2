@@ -5,7 +5,7 @@ package PDF::API2::Resource::Font::CoreFont::bankgothic;
 use strict;
 use warnings;
 
-our $FONTDATA = {
+sub fontdata { return {
     'fontname' => 'BankGothicMediumBT',
     'type' => 'TrueType',
     'apiname' => 'BaGo',
@@ -510,4 +510,6 @@ our $FONTDATA = {
         'fi' => '841',                           # U+0xFB01
         'fl' => '1103',                          # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

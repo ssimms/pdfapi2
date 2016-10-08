@@ -5,7 +5,7 @@ package PDF::API2::Resource::Font::CoreFont::courieroblique;
 use strict;
 use warnings;
 
-our $FONTDATA = {
+sub data { return {
     'fontname' => 'Courier-Oblique',
     'type' => 'Type1',
     'apiname' => 'CoIt',
@@ -513,4 +513,6 @@ our $FONTDATA = {
         'fi' => '600',                           # U+0xFB01
         'fl' => '600',                           # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

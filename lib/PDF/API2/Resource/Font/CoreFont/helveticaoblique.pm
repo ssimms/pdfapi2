@@ -5,7 +5,7 @@ package PDF::API2::Resource::Font::CoreFont::helveticaoblique;
 use strict;
 use warnings;
 
-our $FONTDATA = {
+sub data { return {
     'fontname' => 'Helvetica-Oblique',
     'type' => 'Type1',
     'apiname' => 'HeIt',
@@ -512,4 +512,6 @@ our $FONTDATA = {
         'fi' => '500',                           # U+0xFB01
         'fl' => '500',                           # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

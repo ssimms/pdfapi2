@@ -5,7 +5,7 @@ package PDF::API2::Resource::Font::CoreFont::symbol;
 use strict;
 use warnings;
 
-our $FONTDATA = {
+sub data { return {
     'fontname' => 'Symbol',
     'type' => 'Type1',
     'apiname' => 'Sym',
@@ -474,4 +474,6 @@ our $FONTDATA = {
         'bracerightbt' => '494',                 # C+0xFE # U+0xF0FE
         'apple' => '790',                        # C+0xFF # U+0xF0FF
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;

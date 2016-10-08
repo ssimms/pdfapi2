@@ -59,8 +59,8 @@ sub _look_for_font
     eval "require PDF::API2::Resource::Font::CoreFont::$fname; ";
     unless($@)
     {
-        my $obj = "PDF::API2::Resource::Font::CoreFont::".$fname;
-    $fonts->{$fname} = deep_copy(${$obj."::FONTDATA"});
+        my $class = "PDF::API2::Resource::Font::CoreFont::$fname";
+        $fonts->{$fname} = deep_copy($class->data());
         $fonts->{$fname}->{uni}||=[];
         foreach my $n (0..255) 
         {

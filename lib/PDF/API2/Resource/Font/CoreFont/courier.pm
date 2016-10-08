@@ -5,7 +5,7 @@ package PDF::API2::Resource::Font::CoreFont::courier;
 use strict;
 use warnings;
 
-our $FONTDATA = {
+sub data { return {
     'fontname' => 'Courier',
     'type' => 'Type1',
     'apiname' => 'Cour',
@@ -783,4 +783,6 @@ our $FONTDATA = {
         'Zdotaccent' => [ 'Z', '0', '0', 'dotaccent', '0', '130' ],   # U=017B
         'zdotaccent' => [ 'Z', '0', '0', 'dotaccent', '0', '0' ],   # U=017C
     },
-};
+} };
+
+1;

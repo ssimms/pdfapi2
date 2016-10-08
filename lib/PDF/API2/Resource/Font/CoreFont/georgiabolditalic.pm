@@ -5,7 +5,7 @@ package PDF::API2::Resource::Font::CoreFont::georgiabolditalic;
 use strict;
 use warnings;
 
-our $FONTDATA = {
+sub data { return {
     'fontname' => 'Georgia,BoldItalic',
     'type' => 'TrueType',
     'apiname' => 'GeBoIt',
@@ -856,4 +856,6 @@ our $FONTDATA = {
         'fi' => '701',                           # U+0xFB01
         'fl' => '720',                           # U+0xFB02
     }, # HORIZ. WIDTH TABLE
-};
+} };
+
+1;
