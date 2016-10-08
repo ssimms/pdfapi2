@@ -122,7 +122,7 @@ sub find_page
 sub find_page_recurse
 {
     my ($self, $rpnum) = @_;
-    my ($res, $k);
+    my $res;
     
     if ($self->{'Count'}->realise->val <= $$rpnum)
     { 
@@ -130,7 +130,7 @@ sub find_page_recurse
         return;
     }
 
-    foreach $k ($self->{'Kids'}->realise->elementsof)
+    foreach my $k ($self->{'Kids'}->realise->elementsof)
     {
         if ($k->{'Type'}->realise->val eq 'Page')
         {
@@ -259,9 +259,9 @@ sub get_pages
 sub get_kids
 {
     my ($self) = @_;
-    my ($pgref, @pglist);
+    my @pglist;
 
-    foreach $pgref ($self->{'Kids'}->elementsof)
+    foreach my $pgref ($self->{'Kids'}->elementsof)
     {
         $pgref->realise;
         if ($pgref->{'Type'}->val =~ m/^Pages$/oi)
@@ -340,18 +340,18 @@ sub bbox
     my ($self, @bbox) = @_;
     my ($str) = $bbox[4] || 'MediaBox';
     my ($inh) = $self->find_prop($str);
-    my ($test, $i, $e);
+    my ($test, $i);
 
     if ($inh ne "")
     {
         $test = 1; $i = 0;
-        foreach $e ($inh->elementsof)
+        foreach my $e ($inh->elementsof)
         { $test &= $e->val == $bbox[$i++]; }
         return $self if $test && $i == 4;
     }
 
     $inh = PDF::API2::Basic::PDF::Array->new;
-    foreach $e (@bbox[0..3])
+    foreach my $e (@bbox[0..3])
     { $inh->add_elements(PDFNum($e)); }
     $self->{$str} = $inh;
     $self;
@@ -369,12 +369,12 @@ sub proc_set
 {
     my ($self, @entries) = @_;
     my (@temp) = @entries;
-    my ($dict, $e);
+    my $dict;
 
     $dict = $self->find_prop('Resource');
     if ($dict ne "" && defined $dict->{'ProcSet'})
     {
-        foreach $e ($dict->{'ProcSet'}->elementsof)
+        foreach my $e ($dict->{'ProcSet'}->elementsof)
         { @temp = grep($_ ne $e, @temp); }
         return $self if (scalar @temp == 0);
         @entries = @temp if defined $self->{'Resources'};
@@ -385,7 +385,7 @@ sub proc_set
 
     $self->{'Resources'}{'ProcSet'} = PDFArray() unless defined $self->{'ProcSet'};
 
-    foreach $e (@entries)
+    foreach my $e (@entries)
     { $self->{'Resources'}{'ProcSet'}->add_elements(PDFName($e)); }
     $self;
 }

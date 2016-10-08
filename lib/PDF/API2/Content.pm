@@ -2007,9 +2007,9 @@ sub paragraph {
 
 sub section {
     my ($self,$text,$width,$height,%opts)=@_;
-    my ($para,$overflow) = ("","");
+    my $overflow = '';
 
-    foreach $para (split(/\n/,$text)) {
+    foreach my $para (split(/\n/,$text)) {
         if(length($overflow) > 0) {
             $overflow .= "\n" . $para;
             next;
