@@ -22,7 +22,6 @@ use PDF::API2::Resource::Shading;
 use PDF::API2::NamedDestination;
 
 use strict;
-no strict 'vars';
 no warnings qw[ deprecated recursion uninitialized ];
 
 our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC),
@@ -1647,9 +1646,9 @@ See Also: L<PDF::API2::Resource::Font::CoreFont>.
 =cut
 
 sub corefont {
-    my ($self,$name,@opts)=@_;
+    my ($self,$name,%opts)=@_;
     require PDF::API2::Resource::Font::CoreFont;
-    my $obj=PDF::API2::Resource::Font::CoreFont->new_api($self,$name,@opts);
+    my $obj=PDF::API2::Resource::Font::CoreFont->new_api($self,$name,%opts);
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);
     return($obj);
@@ -1828,10 +1827,10 @@ See Also: L<PDF::API2::Resource::Font::SynFont>
 =cut
 
 sub synfont {
-    my ($self,@opts)=@_;
+    my ($self,%opts)=@_;
 
     require PDF::API2::Resource::Font::SynFont;
-    my $obj=PDF::API2::Resource::Font::SynFont->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::Font::SynFont->new_api($self,%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);
