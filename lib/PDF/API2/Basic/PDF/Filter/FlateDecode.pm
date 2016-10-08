@@ -13,7 +13,7 @@ our $havezlib;
 
 BEGIN
 {
-    eval {require "Compress/Zlib.pm";};
+    eval { require Compress::Zlib };
     $havezlib = !$@;
 }
 
