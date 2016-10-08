@@ -139,7 +139,6 @@ is in PDF which contains the location of the previous cross-reference table.
 =cut
 
 use strict;
-no strict "refs";
 
 use Scalar::Util qw(blessed);
 
