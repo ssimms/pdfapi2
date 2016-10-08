@@ -18,6 +18,8 @@
     - [RT #113514, #98552] Fix the dash() and renderingintent()
       methods in ExtGState (reported by Vadim Repin and Phil Perry).
 
+    - Satisfy all Perl::Critic severity 5 policies.
+
 
 2.028     2016-06-08
 
