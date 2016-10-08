@@ -7,6 +7,7 @@ use base 'PDF::API2::Basic::PDF::Array';
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
 
+use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
@@ -27,7 +28,7 @@ sub new {
     my ($class,$pdf,$key,%opts)=@_;
 
     $class = ref $class if ref $class;
-    $self=$class->SUPER::new();
+    my $self=$class->SUPER::new();
     $pdf->new_obj($self) unless($self->is_obj($pdf));
     $self->name($key || pdfkey());
     $self->{' apipdf'}=$pdf;
@@ -46,7 +47,7 @@ sub new_api {
     my ($class,$api,@opts)=@_;
 
     my $obj=$class->new($api->{pdf},@opts);
-    $self->{' api'}=$api;
+    my $self->{' api'}=$api;
 
     return($obj);
 }
