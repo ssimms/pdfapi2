@@ -393,7 +393,7 @@ sub proc_set
 sub empty
 {
     my ($self) = @_;
-    my ($parent) = $self->{'Parent'} if defined ($self->{'Parent'});
+    my $parent = $self->{'Parent'};
 
     $self->SUPER::empty;
     $self->{'Parent'} = $parent if defined $parent;
