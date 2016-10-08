@@ -1,15 +1,15 @@
 package PDF::API2::Resource::XObject::Image::GIF;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Image';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 # added from PDF::Create:
 # PDF::Image::GIFImage - GIF image support

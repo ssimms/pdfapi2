@@ -1,11 +1,11 @@
 package PDF::API2::Basic::PDF::Filter::LZWDecode;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Filter::FlateDecode';
 
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 sub new {
     my ($class, $decode_parms) = @_;

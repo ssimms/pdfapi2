@@ -10,9 +10,9 @@
 #=======================================================================
 package PDF::API2::Matrix;
 
-# VERSION
-
 use strict;
+
+# VERSION
 
 sub new {
     my $type = shift;

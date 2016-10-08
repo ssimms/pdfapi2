@@ -1,16 +1,16 @@
 package PDF::API2::Resource::Font::CoreFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use File::Basename;
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 our $fonts;
 our $alias;

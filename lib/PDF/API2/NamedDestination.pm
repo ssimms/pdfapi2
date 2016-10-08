@@ -1,16 +1,16 @@
 package PDF::API2::NamedDestination;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
+
+use strict;
+no warnings qw[ recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ recursion uninitialized ];
 
 =head1 NAME
 

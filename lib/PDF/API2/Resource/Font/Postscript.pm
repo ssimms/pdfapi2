@@ -1,17 +1,17 @@
 package PDF::API2::Resource::Font::Postscript;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 use IO::File qw();
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
     my ($class, $pdf, $psfile, %opts) = @_;

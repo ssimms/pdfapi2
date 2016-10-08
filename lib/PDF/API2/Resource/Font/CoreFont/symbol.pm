@@ -1,9 +1,9 @@
 package PDF::API2::Resource::Font::CoreFont::symbol;
 
-# VERSION
-
 use strict;
 use warnings;
+
+# VERSION
 
 sub data { return {
     'fontname' => 'Symbol',

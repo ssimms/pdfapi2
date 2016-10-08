@@ -1,14 +1,14 @@
 package PDF::API2::Resource::Font::BdFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
-
-use PDF::API2::Util;
-use PDF::API2::Basic::PDF::Utils;
 
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
+
+use PDF::API2::Util;
+use PDF::API2::Basic::PDF::Utils;
 
 our $BmpNum = 0;
 

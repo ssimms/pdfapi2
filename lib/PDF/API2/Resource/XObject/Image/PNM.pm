@@ -1,19 +1,19 @@
 package PDF::API2::Resource::XObject::Image::PNM;
 
-# VERSION
-
 # For spec details, see man pages pam(5), pbm(5), pgm(5), pnm(5),
 # ppm(5), which were pasted into the __END__ of this file in an
 # earlier revision.
 
 use base 'PDF::API2::Resource::XObject::Image';
 
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
+
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
     my ($class,$pdf,$file,$name) = @_;

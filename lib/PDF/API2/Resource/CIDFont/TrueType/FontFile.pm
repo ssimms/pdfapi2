@@ -1,8 +1,11 @@
 package PDF::API2::Resource::CIDFont::TrueType::FontFile;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
+
+use strict;
+no warnings qw[ recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 use Font::TTF::Font;
@@ -10,9 +13,6 @@ use POSIX qw(ceil floor);
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ recursion uninitialized ];
 
 our $cmap = {};
 

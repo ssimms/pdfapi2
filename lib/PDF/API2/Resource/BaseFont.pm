@@ -1,16 +1,16 @@
 package PDF::API2::Resource::BaseFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Compress::Zlib;
 use Encode qw(:all);
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 

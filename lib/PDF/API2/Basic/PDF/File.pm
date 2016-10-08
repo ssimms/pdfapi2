@@ -14,6 +14,8 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::File;
 
+use strict;
+
 # VERSION
 
 =head1 NAME
@@ -137,8 +139,6 @@ is in PDF which contains the location of the previous cross-reference table.
 =head1 METHODS
 
 =cut
-
-use strict;
 
 use Scalar::Util qw(blessed);
 

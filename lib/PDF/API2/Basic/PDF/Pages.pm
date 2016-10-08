@@ -12,12 +12,12 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Pages;
 
-# VERSION
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
 
 use base 'PDF::API2::Basic::PDF::Dict';
 
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+# VERSION
 
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Dict;

@@ -1,9 +1,9 @@
 package PDF::API2::Lite;
 
-# VERSION
-
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 BEGIN {
 

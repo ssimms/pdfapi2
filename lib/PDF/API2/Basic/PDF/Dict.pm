@@ -12,12 +12,12 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Dict;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 our $mincache;
 our $tempbase;

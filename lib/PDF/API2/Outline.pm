@@ -1,14 +1,14 @@
 package PDF::API2::Outline;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
-
-use PDF::API2::Basic::PDF::Utils;
-use PDF::API2::Util;
 
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
+
+use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Util;
 
 =head1 NAME
 

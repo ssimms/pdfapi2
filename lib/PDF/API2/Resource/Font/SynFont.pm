@@ -1,17 +1,17 @@
 package PDF::API2::Resource::Font::SynFont;
 
-# VERSION
-
 use base 'PDF::API2::Resource::Font';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Math::Trig;
 use Unicode::UCD 'charinfo';
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 

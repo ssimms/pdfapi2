@@ -12,6 +12,9 @@
 #=======================================================================
 package PDF::API2::Basic::PDF::Objind;
 
+use strict;
+use warnings;
+
 # VERSION
 
 =head1 NAME
@@ -56,9 +59,6 @@ Holds a direct reference to the next free object in the free list.
 =head1 METHODS
 
 =cut
-
-use strict;
-use warnings;
 
 use Scalar::Util qw(blessed reftype);
 

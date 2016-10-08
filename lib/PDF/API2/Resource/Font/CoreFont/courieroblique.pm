@@ -1,9 +1,9 @@
 package PDF::API2::Resource::Font::CoreFont::courieroblique;
 
-# VERSION
-
 use strict;
 use warnings;
+
+# VERSION
 
 sub data { return {
     'fontname' => 'Courier-Oblique',

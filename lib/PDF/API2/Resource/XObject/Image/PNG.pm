@@ -1,8 +1,11 @@
 package PDF::API2::Resource::XObject::Image::PNG;
 
-# VERSION
-
 use base 'PDF::API2::Resource::XObject::Image';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -10,9 +13,6 @@ use POSIX qw(ceil floor);
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub new {
     my ($class,$pdf,$file,$name,%opts) = @_;

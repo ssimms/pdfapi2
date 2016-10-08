@@ -1,8 +1,11 @@
 package PDF::API2::Content;
 
-# VERSION
-
 use base 'PDF::API2::Basic::PDF::Dict';
+
+use strict;
+no warnings qw( deprecated recursion uninitialized );
+
+# VERSION
 
 use Carp;
 use Compress::Zlib qw();
@@ -12,9 +15,6 @@ use PDF::API2::Matrix;
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
-
-use strict;
-no warnings qw( deprecated recursion uninitialized );
 
 =head1 NAME
 

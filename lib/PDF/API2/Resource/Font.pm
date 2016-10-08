@@ -1,16 +1,16 @@
 package PDF::API2::Resource::Font;
 
-# VERSION
-
 use base 'PDF::API2::Resource::BaseFont';
+
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
+# VERSION
 
 use Encode qw(:all);
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 sub encodeByData {
     my ($self,$encoding)=@_;

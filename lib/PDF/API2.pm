@@ -1,5 +1,8 @@
 package PDF::API2;
 
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
 # VERSION
 
 use Carp;
@@ -20,9 +23,6 @@ use PDF::API2::Resource::Pattern;
 use PDF::API2::Resource::Shading;
 
 use PDF::API2::NamedDestination;
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC),
                   qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );

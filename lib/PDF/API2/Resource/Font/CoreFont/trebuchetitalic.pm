@@ -1,9 +1,9 @@
 package PDF::API2::Resource::Font::CoreFont::trebuchetitalic;
 
-# VERSION
-
 use strict;
 use warnings;
+
+# VERSION
 
 sub data { return {
     'fontname' => 'TrebuchetMS,Italic',
