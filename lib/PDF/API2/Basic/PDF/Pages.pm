@@ -127,7 +127,7 @@ sub find_page_recurse
     if ($self->{'Count'}->realise->val <= $$rpnum)
     { 
         $$rpnum -= $self->{'Count'}->val; 
-        return undef;
+        return;
     }
 
     foreach $k ($self->{'Kids'}->realise->elementsof)
@@ -140,7 +140,7 @@ sub find_page_recurse
         elsif ($res = $k->realise->find_page_recurse($rpnum))
         { return $res; }
     }
-    return undef;
+    return;
 }
         
 =head2 $p->add_page($page, $pnum)
@@ -290,7 +290,7 @@ sub find_prop
         { return $self->{$prop}; }
     } elsif (defined $self->{'Parent'})
     { return $self->{'Parent'}->find_prop($prop); }
-    return undef;
+    return;
 }
 
 

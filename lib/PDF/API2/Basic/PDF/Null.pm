@@ -88,7 +88,7 @@ Return undef.
 =cut
 
 sub val {
-    return undef;
+    return undef; ## no critic (undef is intentional)
 }
 
 1;

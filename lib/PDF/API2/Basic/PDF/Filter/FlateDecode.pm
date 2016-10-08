@@ -19,7 +19,7 @@ BEGIN
 
 sub new
 {
-    return undef unless $havezlib;
+    return unless $havezlib;
     my ($class, $decode_parms) = @_;
     my ($self) = {
         DecodeParms => $decode_parms,

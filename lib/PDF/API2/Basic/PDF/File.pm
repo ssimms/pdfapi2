@@ -227,7 +227,7 @@ sub open {
     }
     else {
         die "File '$filename' does not exist !" unless -f $filename;
-        $fh = IO::File->new(($update ? '+' : '') . "<$filename") || return undef;
+        $fh = IO::File->new(($update ? '+' : '') . "<$filename") || return;
         $self->{' INFILE'} = $fh;
         if ($update) {
             $self->{' update'} = 1;
@@ -324,7 +324,7 @@ Appends the objects for output to the read file and then appends the appropriate
 
 sub append_file {
     my $self = shift();
-    return undef unless $self->{' update'};
+    return unless $self->{' update'};
 
     my $fh = $self->{' INFILE'};
 
@@ -684,7 +684,7 @@ the read in object.
 sub read_obj {
     my ($self, $objind, %opts) = @_;
 
-    my $res = $self->read_objnum($objind->{' objnum'}, $objind->{' objgen'}, %opts) || return undef;
+    my $res = $self->read_objnum($objind->{' objnum'}, $objind->{' objgen'}, %opts) || return;
     $objind->merge($res) unless $objind eq $res;
     return $objind;
 }
@@ -699,7 +699,7 @@ Returns a fully read object of given number and generation in this file
 sub read_objnum {
     my ($self, $num, $gen, %opts) = @_;
 
-    my $object_location = $self->locate_obj($num, $gen) || return undef;
+    my $object_location = $self->locate_obj($num, $gen) || return;
     my $object;
 
     if (ref $object_location)

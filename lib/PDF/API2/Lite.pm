@@ -109,7 +109,7 @@ sub saveas {
         $self->{$k}=undef;
         delete($self->{$k});
     }
-    return undef;
+    return;
 }
 
 

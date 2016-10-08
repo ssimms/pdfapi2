@@ -302,7 +302,7 @@ sub readPFM {
     $data->{char}=[];
 
     my $buf;
-    open($fh, "<", $file) || return undef;
+    open($fh, "<", $file) || return;
     binmode($fh,':raw');
     read($fh,$buf,117 + 30);
 
