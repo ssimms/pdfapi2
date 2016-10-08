@@ -2,6 +2,9 @@ package PDF::API2::Lite;
 
 # VERSION
 
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
 BEGIN {
 
     use PDF::API2;
@@ -14,9 +17,6 @@ BEGIN {
     use vars qw( $hasWeakRef );
 
 }
-
-use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME 
 

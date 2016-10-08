@@ -2,6 +2,9 @@ package PDF::API2::UniWrap;
 
 # VERSION
 
+use strict;
+no warnings qw[ deprecated recursion uninitialized ];
+
 # Implements UAX#14: Line Breaking Properties
 # David Nesting <david@fastolfe.net>
 
@@ -10,15 +13,12 @@ BEGIN {
     use Encode qw(:all);
 
     use 5.008;
-    use strict;
     use base 'Exporter';
 
     use Unicode::UCD;
     use Carp;
 
 }
-
-no warnings qw[ deprecated recursion uninitialized ];
 
 our $DEBUG = 0;
 our $columns = 75;
