@@ -134,7 +134,7 @@ sub outobjdeep {
         elsif ($self->{'Filter'} or not defined $self->{' stream'}) {
             $self->{'Length'} = PDF::API2::Basic::PDF::Number->new(0) unless defined $self->{'Length'};
             $pdf->new_obj($self->{'Length'}) unless $self->{'Length'}->is_obj($pdf);
-        } 
+        }
         else {
             $self->{'Length'} = PDF::API2::Basic::PDF::Number->new(length($self->{' stream'}));
             ## $self->{'Length'} = PDF::API2::Basic::PDF::Number->new(length($self->{' stream'}) + 1);

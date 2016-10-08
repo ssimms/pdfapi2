@@ -89,7 +89,7 @@ it needs an PDF::API2-object rather than a Text::PDF::File-object.
 
 =cut
 
-sub new_api 
+sub new_api
 {
     my ($class,$api,@opts)=@_;
 
@@ -99,18 +99,18 @@ sub new_api
     return($obj);
 }
 
-sub wxByCId 
+sub wxByCId
 {
     my $self=shift @_;
     my $g=shift @_;
     my $t = $self->fontobj->{'hmtx'}->read->{'advance'}[$g];
     my $w;
 
-    if(defined $t) 
+    if(defined $t)
     {
         $w = int($t*1000/$self->data->{upem});
-    } 
-    else 
+    }
+    else
     {
         $w = $self->missingwidth;
     }
@@ -118,7 +118,7 @@ sub wxByCId
     return($w);
 }
 
-sub haveKernPairs 
+sub haveKernPairs
 {
     my $self = shift @_;
     return($self->fontfile->haveKernPairs(@_));
@@ -130,14 +130,14 @@ sub kernPairCid
     return($self->fontfile->kernPairCid(@_));
 }
 
-sub subsetByCId 
+sub subsetByCId
 {
     my $self = shift @_;
     return if($self->iscff);
     my $g = shift @_;
     $self->fontfile->subsetByCId($g);
 }
-sub subvec 
+sub subvec
 {
     my $self = shift @_;
     return(1) if($self->iscff);
@@ -147,7 +147,7 @@ sub subvec
 
 sub glyphNum { return ( $_[0]->fontfile->glyphNum ); }
 
-sub outobjdeep 
+sub outobjdeep
 {
     my ($self, $fh, $pdf, %opts) = @_;
 
@@ -157,23 +157,23 @@ sub outobjdeep
     $self->{' de'}->{'W'} = $wx;
     my $ml;
 
-    foreach my $w (0..(scalar @{$self->data->{g2u}} - 1 )) 
+    foreach my $w (0..(scalar @{$self->data->{g2u}} - 1 ))
     {
-        if($self->subvec($w) && $notdefbefore==1) 
+        if($self->subvec($w) && $notdefbefore==1)
         {
             $notdefbefore=0;
             $ml=PDFArray();
             $wx->add_elements(PDFNum($w),$ml);
         #    $ml->add_elements(PDFNum($self->data->{wx}->[$w]));
             $ml->add_elements(PDFNum($self->wxByCId($w)));
-        } 
-        elsif($self->subvec($w) && $notdefbefore==0) 
+        }
+        elsif($self->subvec($w) && $notdefbefore==0)
         {
             $notdefbefore=0;
         #    $ml->add_elements(PDFNum($self->data->{wx}->[$w]));
             $ml->add_elements(PDFNum($self->wxByCId($w)));
-        } 
-        else 
+        }
+        else
         {
             $notdefbefore=1;
         }

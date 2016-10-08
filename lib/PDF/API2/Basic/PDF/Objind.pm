@@ -121,10 +121,10 @@ sub release {
 
         if (blessed($item) and $item->can('release')) {
             $item->release();
-        } 
+        }
         elsif ($ref eq 'ARRAY') {
             push @tofree, @$item;
-        } 
+        }
         elsif (defined(reftype($ref)) and reftype($ref) eq 'HASH') {
             release($item);
         }

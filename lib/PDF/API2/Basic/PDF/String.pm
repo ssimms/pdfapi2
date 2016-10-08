@@ -96,7 +96,7 @@ sub convert {
     my $output = '';
 
     # Hexadecimal Strings (PDF 1.7 section 7.3.4.3)
-    if ($input =~ m|^\s*\<|o) { 
+    if ($input =~ m|^\s*\<|o) {
         $self->{' ishex'} = 1;
         $output = $input;
 

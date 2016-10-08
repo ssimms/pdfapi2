@@ -26,7 +26,7 @@ Returns an annotation object (called from $page->annotation).
 
 =cut
 
-sub new 
+sub new
 {
     my ($class,%opts)=@_;
     my $self=$class->SUPER::new;
@@ -35,10 +35,10 @@ sub new
     return($self);
 }
 
-sub outobjdeep 
+sub outobjdeep
 {
     my ($self, @opts) = @_;
-    foreach my $k (qw[ api apipdf apipage ]) 
+    foreach my $k (qw[ api apipdf apipage ])
     {
         $self->{" $k"}=undef;
         delete($self->{" $k"});
@@ -53,7 +53,7 @@ options %opts (-rect, -border or 'dest-options').
 
 =cut
 
-sub link 
+sub link
 {
     my ($self,$page,%opts)=@_;
     $self->{Subtype}=PDFName('Link');
@@ -75,13 +75,13 @@ options %opts (-rect and/or -border).
 
 =cut
 
-sub url 
+sub url
 {
     my ($self,$url,%opts)=@_;
     $self->{Subtype}=PDFName('Link');
     $self->{A}=PDFDict();
     $self->{A}->{S}=PDFName('URI');
-    if(is_utf8($url)) 
+    if(is_utf8($url))
     {
         # URI must be 7-bit ascii
         utf8::downgrade($url);
@@ -106,13 +106,13 @@ options %opts (-rect and/or -border).
 
 =cut
 
-sub file 
+sub file
 {
     my ($self,$url,%opts)=@_;
     $self->{Subtype}=PDFName('Link');
     $self->{A}=PDFDict();
     $self->{A}->{S}=PDFName('Launch');
-    if(is_utf8($url)) 
+    if(is_utf8($url))
     {
         # URI must be 7-bit ascii
         utf8::downgrade($url);
@@ -137,13 +137,13 @@ and options %opts (same as dest).
 
 =cut
 
-sub pdfile 
+sub pdfile
 {
     my ($self,$url,$pnum,%opts)=@_;
     $self->{Subtype}=PDFName('Link');
     $self->{A}=PDFDict();
     $self->{A}->{S}=PDFName('GoToR');
-    if(is_utf8($url)) 
+    if(is_utf8($url))
     {
         # URI must be 7-bit ascii
         utf8::downgrade($url);
@@ -172,7 +172,7 @@ options %opts (-rect and/or -open).
 
 =cut
 
-sub text 
+sub text
 {
     my ($self,$text,%opts)=@_;
     $self->{Subtype}=PDFName('Text');
@@ -211,7 +211,7 @@ Sets the rectangle of the annotation.
 
 =cut
 
-sub rect 
+sub rect
 {
     my ($self,@r)=@_;
     die "insufficient parameters to annotation->rect( ) " unless(scalar @r == 4);
@@ -225,7 +225,7 @@ Sets the border-styles of the annotation, if applicable.
 
 =cut
 
-sub border 
+sub border
 {
     my ($self,@r)=@_;
     die "insufficient parameters to annotation->border( ) " unless(scalar @r == 3);
@@ -239,22 +239,22 @@ Sets the text-content of the annotation, if applicable.
 
 =cut
 
-sub content 
+sub content
 {
     my ($self,@t)=@_;
     my $t=join("\n",@t);
-    if(is_utf8($t) || utf8::valid($t)) 
+    if(is_utf8($t) || utf8::valid($t))
     {
         $self->{Contents}=PDFUtf($t);
-    } 
-    else 
+    }
+    else
     {
         $self->{Contents}=PDFStr($t);
     }
     return($self);
 }
 
-sub name 
+sub name
 {
     my ($self,$n)=@_;
     $self->{Name}=PDFName($n);
@@ -267,7 +267,7 @@ Display the annotation either open or closed, if applicable.
 
 =cut
 
-sub open 
+sub open
 {
     my ($self,$n)=@_;
     $self->{Open}=PDFBool( $n ? 1 : 0 );
@@ -335,7 +335,7 @@ specifies that the current value of that parameter is to be retained unchanged.
 
 =cut
 
-sub dest 
+sub dest
 {
     my ($self,$page,%opts)=@_;
 
@@ -345,36 +345,36 @@ sub dest
 
         $self->{A}||=PDFDict();
 
-        if(defined $opts{-fit}) 
+        if(defined $opts{-fit})
         {
             $self->{A}->{D}=PDFArray($page,PDFName('Fit'));
-        } 
-        elsif(defined $opts{-fith}) 
+        }
+        elsif(defined $opts{-fith})
         {
             $self->{A}->{D}=PDFArray($page,PDFName('FitH'),PDFNum($opts{-fith}));
-        } 
-        elsif(defined $opts{-fitb}) 
+        }
+        elsif(defined $opts{-fitb})
         {
             $self->{A}->{D}=PDFArray($page,PDFName('FitB'));
-        } 
-        elsif(defined $opts{-fitbh}) 
+        }
+        elsif(defined $opts{-fitbh})
         {
             $self->{A}->{D}=PDFArray($page,PDFName('FitBH'),PDFNum($opts{-fitbh}));
-        } 
-        elsif(defined $opts{-fitv}) 
+        }
+        elsif(defined $opts{-fitv})
         {
             $self->{A}->{D}=PDFArray($page,PDFName('FitV'),PDFNum($opts{-fitv}));
-        } 
-        elsif(defined $opts{-fitbv}) 
+        }
+        elsif(defined $opts{-fitbv})
         {
             $self->{A}->{D}=PDFArray($page,PDFName('FitBV'),PDFNum($opts{-fitbv}));
-        } 
-        elsif(defined $opts{-fitr}) 
+        }
+        elsif(defined $opts{-fitr})
         {
             die "insufficient parameters to ->dest( page, -fitr => [] ) " unless(scalar @{$opts{-fitr}} == 4);
             $self->{A}->{D}=PDFArray($page,PDFName('FitR'),map {PDFNum($_)} @{$opts{-fitr}});
-        } 
-        elsif(defined $opts{-xyz}) 
+        }
+        elsif(defined $opts{-xyz})
         {
             die "insufficient parameters to ->dest( page, -xyz => [] ) " unless(scalar @{$opts{-xyz}} == 3);
             $self->{A}->{D}=PDFArray($page,PDFName('XYZ'),map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{-xyz}});

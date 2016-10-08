@@ -95,11 +95,11 @@ sub descrByData {
             $des->{Style}=PDFDict();
             $des->{Style}->{Panose}=PDFStrHex($self->data->{panose});
         }
-        $des->{FontFamily}=PDFStr($self->data->{fontfamily}) 
+        $des->{FontFamily}=PDFStr($self->data->{fontfamily})
             if(defined $self->data->{fontfamily});
-        $des->{FontWeight}=PDFNum($self->data->{fontweight}) 
+        $des->{FontWeight}=PDFNum($self->data->{fontweight})
             if(defined $self->data->{fontweight});
-        $des->{FontStretch}=PDFName($self->data->{fontstretch}) 
+        $des->{FontStretch}=PDFName($self->data->{fontstretch})
             if(defined $self->data->{fontstretch});
  #   }
 
@@ -108,7 +108,7 @@ sub descrByData {
 
 sub tounicodemap {
     my $self=shift @_;
-    
+
     return($self) if(defined $self->{ToUnicode});
 
     my $cmap=qq|\%\% Custom\n\%\% CMap\n\%\%\n/CIDInit /ProcSet findresource begin\n|;
@@ -136,7 +136,7 @@ sub tounicodemap {
     } else {
         # everything else is single byte font
         $cmap.=qq|1 begincodespacerange\n<00> <FF>\nendcodespacerange\n|;
-        $cmap.=qq|256 beginbfchar\n|; 
+        $cmap.=qq|256 beginbfchar\n|;
         for(my $j=0; $j<256;$j++) {
             $cmap.=sprintf(qq|<%02X> <%04X>\n|,$j,$self->uniByEnc($j));
         }
@@ -151,7 +151,7 @@ sub tounicodemap {
     $tuni->{CIDSystemInfo}->{Registry}=PDFStr($self->name);
     $tuni->{CIDSystemInfo}->{Ordering}=PDFStr('XYZ');
     $tuni->{CIDSystemInfo}->{Supplement}=PDFNum(0);
-    
+
     $self->{' apipdf'}->new_obj($tuni);
     $tuni->{' nofilt'}=1;
     $tuni->{' stream'}=Compress::Zlib::compress($cmap);
@@ -514,11 +514,11 @@ Returns the glyph's width.
 
 =cut
 
-sub wxByGlyph 
+sub wxByGlyph
 {
     my $self=shift;
     my $val=shift;
-    my $ret=undef; 
+    my $ret=undef;
     if(ref($self->data->{wx}) eq 'HASH')
     {
     	$ret=$self->data->{wx}->{$val};
@@ -553,12 +553,12 @@ Returns the unicode's width.
 
 =cut
 
-sub wxByUni 
-{ 
+sub wxByUni
+{
     my $self=shift;
     my $val=shift;
     my $gid=$self->glyphByUni($val);
-    my $ret=$self->data->{wx}->{$gid}; 
+    my $ret=$self->data->{wx}->{$gid};
    	if(!defined($ret))
    	{
    		$ret=$self->missingwidth;
@@ -576,11 +576,11 @@ Returns the character's width based on the current encoding.
 
 =cut
 
-sub wxByEnc 
+sub wxByEnc
 {
     my ($self,$e)=@_;
     my $g=$self->glyphByEnc($e);
-    my $ret=$self->data->{wx}->{$g}; 
+    my $ret=$self->data->{wx}->{$g};
    	if(!defined($ret))
    	{
    		$ret=$self->missingwidth;
@@ -602,7 +602,7 @@ sub wxByMap
 {
     my ($self,$m)=@_;
     my $g=$self->glyphByMap($m);
-    my $ret=$self->data->{wx}->{$g}; 
+    my $ret=$self->data->{wx}->{$g};
    	if(!defined($ret))
    	{
    		$ret=$self->missingwidth;
@@ -632,7 +632,7 @@ sub width {
 
     my $kern = $self->{-dokern} && ref($self->data->{kern});
     my $lastglyph='';
-    foreach my $n (unpack('C*',$text)) 
+    foreach my $n (unpack('C*',$text))
     {
         $widths_cache[$n] = $self->wxByEnc($n) unless defined $widths_cache[$n];
         $width += $widths_cache[$n];
@@ -700,11 +700,11 @@ Returns a properly formatted representation of $text for use in the PDF.
 
 =cut
 
-sub textByStr 
+sub textByStr
 {
     my ($self,$text)=@_;
     my $newtext='';
-    if(is_utf8($text)) 
+    if(is_utf8($text))
     {
         $text=$self->strByUtf($text);
     }
@@ -715,20 +715,20 @@ sub textByStr
     return($newtext);
 }
 
-sub textByStrKern 
+sub textByStrKern
 {
     my ($self,$text)=@_;
     if($self->{-dokern} && ref($self->data->{kern}))
     {
         my $newtext=' ';
-        if(is_utf8($text)) 
+        if(is_utf8($text))
         {
             $text=$self->strByUtf($text);
         }
 
         my $lastglyph='';
         my $tBefore=0;
-        foreach my $n (unpack('C*',$text)) 
+        foreach my $n (unpack('C*',$text))
         {
             if(defined $self->data->{kern}->{$lastglyph.':'.$self->data->{e2n}->[$n]})
             {
@@ -754,7 +754,7 @@ sub textByStrKern
     }
 }
 
-sub text 
+sub text
 {
     my ($self,$text,$size,$ident)=@_;
 

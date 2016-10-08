@@ -18,7 +18,7 @@ BEGIN {
 
 }
 
-=head1 NAME 
+=head1 NAME
 
 PDF::API2::Lite - lite pdf creation
 

@@ -92,7 +92,7 @@ sub out_obj
         { $_->new_obj($self); }
         else
         { $_->out_obj($self); }
-        
+
         unless (defined $self->{'Parent'})
         {
             $_->{'Root'}{'Pages'} = $self;
@@ -101,7 +101,7 @@ sub out_obj
     }
     $self;
 }
-        
+
 
 =head2 $p->find_page($pnum)
 
@@ -114,7 +114,7 @@ sub find_page
 {
     my ($self, $pnum) = @_;
     my ($top) = $self->get_top;
-    
+
     $top->find_page_recurse(\$pnum);
 }
 
@@ -123,10 +123,10 @@ sub find_page_recurse
 {
     my ($self, $rpnum) = @_;
     my $res;
-    
+
     if ($self->{'Count'}->realise->val <= $$rpnum)
-    { 
-        $$rpnum -= $self->{'Count'}->val; 
+    {
+        $$rpnum -= $self->{'Count'}->val;
         return;
     }
 
@@ -142,7 +142,7 @@ sub find_page_recurse
     }
     return;
 }
-        
+
 =head2 $p->add_page($page, $pnum)
 
 Inserts the page before the given $pnum. $pnum can be -ve to count from the END
@@ -162,7 +162,7 @@ sub add_page
     my ($self, $page, $pnum) = @_;
     my ($top) = $self->get_top;
     my ($ppage, $ppages, $pindex, $ppnum);
-    
+
     $pnum = -1 unless (defined $pnum && $pnum <= $top->{'Count'}->val);
     if ($pnum == -1)
     { $ppage = $top->find_page($top->{'Count'}->val - 1); }
@@ -171,14 +171,14 @@ sub add_page
         $pnum = $top->{'Count'}->val + $pnum + 1 if ($pnum < 0);
         $ppage = $top->find_page($pnum);
     }
-    
+
     if (defined $ppage->{'Parent'})
     { $ppages = $ppage->{'Parent'}->realise; }
     else
     { $ppages = $self; }
-    
+
     $ppnum = scalar $ppages->{'Kids'}->realise->elementsof;
-    
+
     if ($pnum == -1)
     { $pindex = -1; }
     else
@@ -187,20 +187,20 @@ sub add_page
         { last if ($ppages->{'Kids'}{' val'}[$pindex] eq $ppage); }
         $pindex = -1 if ($pindex == $ppnum);
     }
-    
+
     $ppages->add_page_recurse($page->realise, $pindex);
     for ($ppages = $page->{'Parent'}; defined $ppages->{'Parent'}; $ppages = $ppages->{'Parent'}->realise)
     { $ppages->out_obj->{'Count'}->realise->{'val'}++; }
     $ppages->out_obj->{'Count'}->realise->{'val'}++;
     $page;
-}    
+}
 
 
 sub add_page_recurse
 {
     my ($self, $page, $index) = @_;
     my ($newpages, $ppages, $pindex, $ppnum);
-    
+
     if (scalar $self->{'Kids'}->elementsof >= 8 && $self->{'Parent'} && $index < 1)
     {
         $ppages = $self->{'Parent'}->realise;
@@ -216,7 +216,7 @@ sub add_page_recurse
     }
     else
     { $newpages = $self->out_obj; }
-    
+
     if ($index < 0)
     { push (@{$newpages->{'Kids'}->realise->{' val'}}, $page); }
     else
@@ -229,7 +229,7 @@ sub add_page_recurse
 
 Rebuilds the pages tree to make a nice balanced tree that conforms to Adobe
 recommendations. If passed a pglist then the tree is built for that list of
-pages. No check is made of whether the pglist contains pages.  
+pages. No check is made of whether the pglist contains pages.
 
 Returns the top of the tree for insertion in the root object.
 
@@ -250,7 +250,7 @@ Returns a list of page objects in the document in page order
 sub get_pages
 {
     my ($self) = @_;
-    
+
     return $self->get_top->get_kids;
 }
 
@@ -414,10 +414,10 @@ sub get_top
 {
     my ($self) = @_;
     my ($p);
-    
+
     for ($p = $self; defined $p->{'Parent'}; $p = $p->{'Parent'})
     { }
-    
+
     $p->realise;
 }
 
