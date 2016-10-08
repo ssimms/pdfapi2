@@ -44,7 +44,7 @@ sub new_api {
 # taken from Image::PBMLib
 # Copyright by Benjamin Elijah Griffin (28 Feb 2003)
 #
-sub readppmheader($) {
+sub readppmheader {
   my $gr = shift; # input file glob ref
   my $in = '';
   my $no_comments;

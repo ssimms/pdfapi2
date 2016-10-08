@@ -15,7 +15,7 @@ no warnings qw[ recursion uninitialized ];
 
 our $cmap = {};
 
-sub _look_for_cmap ($) {
+sub _look_for_cmap {
     my $fname=lc(shift);
     $fname=~s/[^a-z0-9]+//gi;
     return({%{$cmap->{$fname}}}) if(defined $cmap->{$fname});

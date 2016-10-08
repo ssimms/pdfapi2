@@ -82,7 +82,7 @@ Suitably encode the string $string for output in the File object $pdf
 
 =cut
 
-sub string_to_name ($;$) {
+sub string_to_name {
     my ($string, $pdf) = @_;
 
     # PDF 1.0 and 1.1 didn't treat the # symbol as an escape character
@@ -101,7 +101,7 @@ undo the hex encoding for PDF versions > 1.1.
 
 =cut
 
-sub name_to_string ($;$) {
+sub name_to_string {
     my ($string, $pdf) = @_;
     $string =~ s|^/||o;
 

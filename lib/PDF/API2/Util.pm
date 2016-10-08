@@ -264,7 +264,7 @@ sub _HSVtoRGB { # test
     return ($r,$g,$b);
 }
 
-sub RGBquant ($$$) {
+sub RGBquant {
     my($q1,$q2,$h)=@_;
     while($h<0){$h+=360;}
     $h%=360;

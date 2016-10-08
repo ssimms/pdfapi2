@@ -52,7 +52,7 @@ retrieved via $pdfname=$font->name.
 
 =cut
 
-sub _look_for_font ($) 
+sub _look_for_font
 {
     my $fname=shift;
     ## return(%{$fonts->{$fname}}) if(defined $fonts->{$fname});
