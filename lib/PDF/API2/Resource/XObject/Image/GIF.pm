@@ -122,9 +122,15 @@ sub new {
     $self->{' apipdf'}=$pdf;
 
     my $fh = IO::File->new;
-    open($fh, "<", $file);
-    binmode($fh,':raw');
+    if (ref($file)) {
+        $fh = $file;
+    }
+    else {
+        open $fh, "<", $file;
+    }
+    binmode $fh, ':raw';
     my $buf;
+    $fh->seek(0,0);
     $fh->read($buf,6); # signature
     die "unknown image signature '$buf' -- not a gif." unless($buf=~/^GIF[0-9][0-9][a-b]/);
 

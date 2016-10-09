@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-# VERSION
+our $VERSION = '0.001'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -1893,7 +1893,7 @@ sub unifont {
 
 =item $jpeg = $pdf->image_jpeg($file)
 
-Imports and returns a new JPEG image object.
+Imports and returns a new JPEG image object.  C<$file> may be either a filename or a filehandle.
 
 =cut
 
@@ -1909,7 +1909,7 @@ sub image_jpeg {
 
 =item $tiff = $pdf->image_tiff($file)
 
-Imports and returns a new TIFF image object.
+Imports and returns a new TIFF image object.  C<$file> may be either a filename or a filehandle.
 
 =cut
 
@@ -1925,7 +1925,7 @@ sub image_tiff {
 
 =item $pnm = $pdf->image_pnm($file)
 
-Imports and returns a new PNM image object.
+Imports and returns a new PNM image object.  C<$file> may be either a filename or a filehandle.
 
 =cut
 
@@ -1941,7 +1941,7 @@ sub image_pnm {
 
 =item $png = $pdf->image_png($file)
 
-Imports and returns a new PNG image object.
+Imports and returns a new PNG image object.  C<$file> may be either a filename or a filehandle.
 
 =cut
 
@@ -1957,7 +1957,7 @@ sub image_png {
 
 =item $gif = $pdf->image_gif($file)
 
-Imports and returns a new GIF image object.
+Imports and returns a new GIF image object.  C<$file> may be either a filename or a filehandle.
 
 =cut
 

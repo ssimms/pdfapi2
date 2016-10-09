@@ -20,6 +20,9 @@
 
     - Satisfy all Perl::Critic severity 5 policies.
 
+    - [RT #117940] Allow PNG, GIF, and PNM files to be opened from
+      filehandles in addition to filenames (patch by Johan Vromans).
+
 
 2.028     2016-06-08
 

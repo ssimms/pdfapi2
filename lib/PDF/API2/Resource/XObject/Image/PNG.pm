@@ -26,12 +26,15 @@ sub new {
     $self->{' apipdf'}=$pdf;
 
     my $fh = IO::File->new;
-    open($fh, "<", $file);
-    binmode($fh,':raw');
+    if (ref($file)) {
+        $fh = $file;
+    }
+    else {
+        open $fh, "<", $file;
+    }
+    binmode $fh, ':raw';
 
     my ($buf,$l,$crc,$w,$h,$bpc,$cs,$cm,$fm,$im,$palete,$trns);
-    open($fh, "<", $file);
-    binmode($fh);
     seek($fh,8,0);
     $self->{' stream'}='';
     $self->{' nofilt'}=1;

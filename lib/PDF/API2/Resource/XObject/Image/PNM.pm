@@ -122,8 +122,15 @@ sub read_pnm {
 
     my ($buf,$t,$s,$line);
     my ($w,$h,$bpc,$cs,$img,@img)=(0,0,'','','');
-    open(my $inf, "<", $file);
+    my $inf;
+    if (ref($file)) {
+        $inf = $file;
+    }
+    else {
+        open $inf, "<", $file;
+    }
     binmode($inf,':raw');
+    $inf->seek(0,0);
     my $info=readppmheader($inf);
     if($info->{type} == 4) {
         $bpc=1;
