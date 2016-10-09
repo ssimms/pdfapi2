@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use warnings;
 use strict;
@@ -16,3 +16,9 @@ my $gfx = $pdf->page->gfx();
 $gfx->image($jpg, 72, 144, 216, 288);
 like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add JPG to PDF});
+
+# Missing file
+
+$pdf = PDF::API2->new();
+eval { $pdf->image_jpeg('t/resources/this.file.does.not.exist') };
+ok($@, q{Fail fast if the requested file doesn't exist});

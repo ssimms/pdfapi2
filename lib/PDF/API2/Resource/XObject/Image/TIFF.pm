@@ -364,7 +364,7 @@ sub new {
     seek($self->{fh},0,0);
   } else {
     $self->{fh} = IO::File->new;
-    open($self->{fh}, "<", $file);
+    open($self->{fh}, "<", $file) or die "$!: $file";
   }
   binmode($self->{fh},':raw');
   my $fh = $self->{fh};

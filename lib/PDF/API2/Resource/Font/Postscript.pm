@@ -89,7 +89,7 @@ sub readPFAPFB {
 
     my $l=-s $file;
 
-    open(my $inf, "<", $file);
+    open(my $inf, "<", $file) or die "$!: $file";
     binmode($inf,':raw');
     read($inf,$line,2);
     @lines=unpack('C*',$line);

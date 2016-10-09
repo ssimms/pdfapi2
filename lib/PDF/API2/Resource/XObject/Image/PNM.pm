@@ -127,7 +127,7 @@ sub read_pnm {
         $inf = $file;
     }
     else {
-        open $inf, "<", $file;
+        open $inf, "<", $file or die "$!: $file";
     }
     binmode($inf,':raw');
     $inf->seek(0,0);

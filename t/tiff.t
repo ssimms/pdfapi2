@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use warnings;
 use strict;
@@ -49,3 +49,9 @@ $gfx->image($lzw_tiff, 72, 360, 216, 432);
 
 like($pdf->stringify(), qr/q 216 0 0 432 72 360 cm \S+ Do Q/,
      q{Add TIFF to PDF});
+
+# Missing file
+
+$pdf = PDF::API2->new();
+eval { $pdf->image_tiff('t/resources/this.file.does.not.exist') };
+ok($@, q{Fail fast if the requested file doesn't exist});

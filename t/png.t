@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use warnings;
 use strict;
@@ -34,3 +34,9 @@ is($png->width(), 1,
    q{Image from filehandle has a width});
 
 close $fh;
+
+# Missing file
+
+$pdf = PDF::API2->new();
+eval { $pdf->image_png('t/resources/this.file.does.not.exist') };
+ok($@, q{Fail fast if the requested file doesn't exist});

@@ -23,6 +23,9 @@
     - [RT #117940] Allow PNG, GIF, and PNM files to be opened from
       filehandles in addition to filenames (patch by Johan Vromans).
 
+    - [RT #33970] Fail fast when a referenced file can't be opened
+      (requested by Barrie Slaymaker a mere 8.5 years ago).
+
 
 2.028     2016-06-08
 

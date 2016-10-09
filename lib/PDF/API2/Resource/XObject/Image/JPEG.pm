@@ -26,7 +26,7 @@ sub new {
         $fh = $file;
     }
     else {
-        open $fh, "<", $file;
+        open $fh, "<", $file or die "$!: $file";
     }
     binmode $fh, ':raw';
 
