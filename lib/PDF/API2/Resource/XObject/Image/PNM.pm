@@ -18,7 +18,6 @@ use PDF::API2::Basic::PDF::Utils;
 sub new {
     my ($class,$pdf,$file,$name) = @_;
     my $self;
-    my $fh = IO::File->new;
 
     $class = ref $class if ref $class;
 
