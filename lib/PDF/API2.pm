@@ -298,6 +298,18 @@ Document outline visible after Full-screen mode.
 
 Set the default print setting for page scaling to none.
 
+=item -simplex
+
+Print single-sided by default.
+
+=item -duplexflipshortedge
+
+Print duplex by default and flip on the short edge of the sheet.
+
+=item -duplexfliplongedge
+
+Print duplex by default and flip on the long edge of the sheet.
+
 =back
 
 B<Initial Page Options>:
@@ -459,6 +471,16 @@ sub preferences {
 
     if ($options{'-printscalingnone'}) {
         $self->{'catalog'}->{'ViewerPreferences'}->{'PrintScaling'} = PDFName('None');
+    }
+
+    if ($options{'-simplex'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'Duplex'} = PDFName('Simplex');
+    }
+    elsif ($options{'-duplexfliplongedge'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'Duplex'} = PDFName('DuplexFlipLongEdge');
+    }
+    elsif ($options{'-duplexflipshortedge'}) {
+        $self->{'catalog'}->{'ViewerPreferences'}->{'Duplex'} = PDFName('DuplexFlipShortEdge');
     }
 
     # Open Action
