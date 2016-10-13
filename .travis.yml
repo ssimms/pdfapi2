@@ -23,8 +23,8 @@ before_install:
     - cpanm -n Devel::Cover::Report::Coveralls
 
 install:
-    - dzil authordeps --missing | cpanm --no-skip-satisfied || { cat ~/.cpanm/build.log ; false ; }
-    - dzil listdeps --author --missing | cpanm --no-skip-satisfied || { cat ~/.cpanm/build.log ; false ; }
+    - dzil authordeps --missing | cpanm -n || { cat ~/.cpanm/build.log ; false ; }
+    - dzil listdeps   --missing | cpanm -n || { cat ~/.cpanm/build.log ; false ; }
 
 script:
     - dzil test --author --release
