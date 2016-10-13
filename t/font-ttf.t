@@ -1,4 +1,5 @@
-use Test::More tests => 1;
+use Test::More tests => 2;
+my $test_count = 2;
 
 use warnings;
 use strict;
@@ -13,7 +14,7 @@ my @possible_locations = (
 my ($font_file) = grep { -f && -r } @possible_locations;
 
 SKIP: {
-    skip "Skipping TTF tests... DejaVu Sans font not found", 1
+    skip "Skipping TTF tests... DejaVu Sans font not found", $test_count
         unless $font_file;
 
     my $pdf = PDF::API2->new();
@@ -23,4 +24,7 @@ SKIP: {
     # properly.
     ok($font->glyphNum() > 0,
        q{Able to read a count of glyphs (>0) from a TrueType font});
+
+    like($font->{'Name'}->val(), qr/^De/,
+         q{Font has the expected name});
 }

@@ -275,7 +275,7 @@ sub readAFM
     $data->{issymbol} = 0;
     $data->{fontbbox} = [ split(/\s+/,$data->{fontbbox}) ];
 
-    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[A-Za-z0-9\s]+/, $data->{apiname});
+    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[^A-Za-z0-9\s]+/, $data->{apiname});
 
     $data->{flags} = 34;
 
@@ -437,7 +437,7 @@ sub readPFM {
 
     $data->{fontname}=$df{psName};
     $data->{fontname}=~s/[^A-Za-z0-9]+//og;
-    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[A-Za-z0-9\s]+/, $df{windowsName});
+    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[^A-Za-z0-9\s]+/, $df{windowsName});
 
     $data->{upem}=1000;
 

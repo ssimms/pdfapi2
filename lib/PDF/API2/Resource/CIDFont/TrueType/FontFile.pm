@@ -466,7 +466,7 @@ sub new {
         $data->{panose}.=pack('C',$font->{'OS/2'}->{$p});
     }
 
-    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[A-Za-z0-9\s]+/, $data->{fontname});
+    $data->{apiname}=join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[^A-Za-z0-9\s]+/, $data->{fontname});
     $data->{fontname}=~s/[\x00-\x1f\s]//og;
 
     $data->{altname}=$font->{'name'}->find_name(1);

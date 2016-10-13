@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - Fix a font naming issue introduced while satisfying
+      Perl::Critic.
+
 
 2.029     2016-10-10
 
