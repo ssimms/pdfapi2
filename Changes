@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+
+2.029     2016-10-10
+
     - [RT #113293] Files with cross-reference streams weren't
       correctly setting the max object number (report and
       troubleshooting by Marco Pessotto).
