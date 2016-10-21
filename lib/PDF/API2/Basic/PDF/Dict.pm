@@ -19,18 +19,12 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # VERSION
 
-our $mincache;
-our $tempbase;
+our $mincache = 32768;
 
+use File::Temp;
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Filter;
 use PDF::API2::Basic::PDF::Name;
-
-BEGIN {
-    my $temp_dir = -d '/tmp' ? '/tmp' : $ENV{TMP} || $ENV{TEMP};
-    $tempbase = sprintf("%s/%d-%d-0000", $temp_dir, $$, time());
-    $mincache = 32768;
-}
 
 =head1 NAME
 
@@ -284,11 +278,13 @@ sub read_stream {
         $self->{' streamfile'} = undef;
     }
     seek $fh, $self->{' streamloc'}, 0;
-    my ($i, $data);
+
     my $dictfh;
-    for ($i = 0; $i < $len; $i += 4096) {
-        unless ($i + 4096 > $len) {
-            read $fh, $data, 4096;
+    my $readlen = 4096;
+    for (my $i = 0; $i < $len; $i += $readlen) {
+        my $data;
+        unless ($i + $readlen > $len) {
+            read $fh, $data, $readlen;
         }
         else {
             $last = 1;
@@ -299,18 +295,14 @@ sub read_stream {
             $data = $filter->infilt($data, $last);
         }
 
-        # Maintainer's Note: There are a couple of issues here:
-        # 1) File::Temp should be used for creating temporary files
-        # 2) The length check should be looking at $self->{' stream'}
-        #    rather than $data (which just contains the latest chunk)
-        if (not $force_memory and not defined $self->{' streamfile'} and ((length($data) * 2) > $mincache)) {
-            open($dictfh, '>', $tempbase) or next;
-            binmode $dictfh, ':raw';
-            $self->{' streamfile'} = $tempbase;
-            $tempbase =~ s/-(\d+)$/'-' . ($1 + 1)/oe;        # prepare for next use
+        # Start using a temporary file if the stream gets too big
+        if (not $force_memory and not defined $self->{' streamfile'} and (length($self->{' stream'}) + length($data)) > $mincache) {
+            $dictfh = File::Temp->new(TEMPLATE => 'pdfXXXXX', SUFFIX => 'dat', TMPDIR => 1, UNLINK => 0);
+            $self->{' streamfile'} = $dictfh->filename();
             print $dictfh $self->{' stream'};
             undef $self->{' stream'};
         }
+
         if (defined $self->{' streamfile'}) {
             print $dictfh $data;
         }
