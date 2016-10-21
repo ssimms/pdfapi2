@@ -297,7 +297,7 @@ sub read_stream {
 
         # Start using a temporary file if the stream gets too big
         if (not $force_memory and not defined $self->{' streamfile'} and (length($self->{' stream'}) + length($data)) > $mincache) {
-            $dictfh = File::Temp->new(TEMPLATE => 'pdfXXXXX', SUFFIX => 'dat', TMPDIR => 1, UNLINK => 0);
+            $dictfh = File::Temp->new(TEMPLATE => 'pdfXXXXX', SUFFIX => 'dat', TMPDIR => 1);
             $self->{' streamfile'} = $dictfh->filename();
             print $dictfh $self->{' stream'};
             undef $self->{' stream'};
