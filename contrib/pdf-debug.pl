@@ -41,8 +41,17 @@ elsif ($command eq 'obj') {
     my $id = shift(@ARGV);
     die "Missing required object number" unless $id and $id =~ /^[0-9]+$/;
     my $generation = shift(@ARGV) || 0;
+
+    my $location = $pdf->locate_obj($id, $generation);
     my $object = $pdf->read_objnum($id, $generation);
-    print "Object $id\n";
+    print "Object $id";
+    unless (ref($location)) {
+        print " (file position $location)\n";
+    }
+    else {
+        my ($obj_num, $obj_idx) = @$location;
+        print " (object stream $obj_num index $obj_idx)\n";
+    }
     print '-------' . ('-' x length($id)) . "\n";
     unless ($object) {
         print "[Unable to read object]\n";
