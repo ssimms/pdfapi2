@@ -701,31 +701,38 @@ sub read_objnum {
     my $object_location = $self->locate_obj($num, $gen) || return;
     my $object;
 
-    if (ref $object_location)
-    {
-        # Compressed object.
-        my $src = $self->read_objnum($object_location->[0], 0, %opts);
-        die 'Cannot find the compressed object stream' unless $src;
+    # Compressed object
+    if (ref($object_location)) {
+        my ($object_stream_num, $object_stream_pos) = @{$object_location};
 
-        $src->read_stream(1) if $src->{' nofilt'};
+        my $object_stream = $self->read_objnum($object_stream_num, 0, %opts);
+        die 'Cannot find the compressed object stream' unless $object_stream;
 
-        my $map = substr($src->{' stream'}, 0, $src->{'First'}->val);
-        my $objects = substr($src->{' stream'}, $src->{'First'}->val);
-        my @mappings = split(/\s+/, $map);
-        my $count = scalar(@mappings);
+        $object_stream->read_stream(1) if $object_stream->{' nofilt'};
 
-        my $index = $object_location->[1] * 2;
+        # An object stream starts with pairs of integers containing object numbers and
+        # stream offsets relative to the First key
+        my @map = split /\s+/, substr($object_stream->{' stream'}, 0, $object_stream->{'First'}->val);
 
-        if ($mappings[$index] != $num)
-        {
-            die "Objind $num does not exist at index $index";
+        # ... followed by the objects themselves
+        my $objects = substr($object_stream->{' stream'}, $object_stream->{'First'}->val);
+
+        # Find the offset of the object in the stream
+        my $index = $object_stream_pos * 2;
+        die "Objind $num does not exist at index $index" unless $map[$index] == $num;
+        my $start = $map[$index + 1];
+
+        # Unless this is the last object in the stream, its length is determined by the
+        # offset of the next object
+        my $last_object_in_stream = $map[-2];
+        my $stream = "$num 0 obj ";
+        if ($last_object_in_stream == $num) {
+            $stream .= substr($objects, $start);
         }
-
-        my $start = $mappings[++$index];
-        $index += 2;
-
-        my $length = $index > $count ? length($objects) : $mappings[$index];
-        my $stream = "$num 0 obj" . substr($objects, $start, $length);
+        else {
+            my $next_start = $map[$index + 3];
+            $stream .= substr($objects, $start, $next_start - $start);
+        }
 
         ($object) = $self->readval($stream, %opts, update => 0);
         return $object;
