@@ -9,7 +9,6 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use POSIX qw(floor);
 
-use PDF::API2::Annotation;
 use PDF::API2::Content;
 use PDF::API2::Content::Text;
 
@@ -313,31 +312,29 @@ Returns a new annotation object.
 =cut
 
 sub annotation {
-    my ($self, $type, $key, $obj) = @_;
+    my $self = shift();
 
-    $self->{'Annots'}||=PDFArray();
-    $self->{'Annots'}->realise if(ref($self->{'Annots'})=~/Objind/);
-    if($self->{'Annots'}->is_obj($self->{' apipdf'}))
-    {
+    $self->{'Annots'} ||= PDFArray();
+    $self->{'Annots'}->realise() if ref($self->{'Annots'}) =~ /Objind/;
+    if ($self->{'Annots'}->is_obj($self->{' apipdf'})) {
         $self->{'Annots'}->update();
     }
-    else
-    {
+    else {
         $self->update();
     }
 
-    my $ant=PDF::API2::Annotation->new;
+    require PDF::API2::Annotation;
+    my $ant = PDF::API2::Annotation->new();
     $self->{'Annots'}->add_elements($ant);
     $self->{' apipdf'}->new_obj($ant);
-    $ant->{' apipdf'}=$self->{' apipdf'};
-    $ant->{' apipage'}=$self;
+    $ant->{' apipdf'} = $self->{' apipdf'};
+    $ant->{' apipage'} = $self;
 
-    if($self->{'Annots'}->is_obj($self->{' apipdf'}))
-    {
+    if ($self->{'Annots'}->is_obj($self->{' apipdf'})) {
         $self->{' apipdf'}->out_obj($self->{'Annots'});
     }
 
-    return($ant);
+    return $ant;
 }
 
 =item $page->resource $type, $key, $obj
