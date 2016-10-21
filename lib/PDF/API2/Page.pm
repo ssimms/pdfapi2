@@ -314,13 +314,12 @@ Returns a new annotation object.
 sub annotation {
     my $self = shift();
 
-    $self->{'Annots'} ||= PDFArray();
-    $self->{'Annots'}->realise() if ref($self->{'Annots'}) =~ /Objind/;
-    if ($self->{'Annots'}->is_obj($self->{' apipdf'})) {
-        $self->{'Annots'}->update();
-    }
-    else {
+    unless (exists $self->{'Annots'}) {
+        $self->{'Annots'} = PDFArray();
         $self->update();
+    }
+    elsif (ref($self->{'Annots'}) =~ /Objind/) {
+        $self->{'Annots'}->realise();
     }
 
     require PDF::API2::Annotation;

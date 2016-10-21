@@ -1,5 +1,12 @@
 {{$NEXT}}
 
+    - [RT #118352] Don't crash when adding an annotation to a page
+      that has an existing annotations array stored as an indirect
+      object (reported by Johan Vromans).
+
+
+2.030     2016-10-13
+
     - Fix a font naming issue introduced while satisfying
       Perl::Critic.
 
