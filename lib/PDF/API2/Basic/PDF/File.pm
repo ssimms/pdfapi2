@@ -708,14 +708,20 @@ sub read_objnum {
         my $object_stream = $self->read_objnum($object_stream_num, 0, %opts);
         die 'Cannot find the compressed object stream' unless $object_stream;
 
-        $object_stream->read_stream(1) if $object_stream->{' nofilt'};
+        $object_stream->read_stream() if $object_stream->{' nofilt'};
 
         # An object stream starts with pairs of integers containing object numbers and
         # stream offsets relative to the First key
-        my @map = split /\s+/, substr($object_stream->{' stream'}, 0, $object_stream->{'First'}->val);
-
-        # ... followed by the objects themselves
-        my $objects = substr($object_stream->{' stream'}, $object_stream->{'First'}->val);
+        my $fh;
+        my $pairs;
+        unless ($object_stream->{' streamfile'}) {
+            $pairs = substr($object_stream->{' stream'}, 0, $object_stream->{'First'}->val);
+        }
+        else {
+            open $fh, '<', $object_stream->{' streamfile'};
+            read($fh, $pairs, $object_stream->{'First'}->val());
+        }
+        my @map = split /\s+/, $pairs;
 
         # Find the offset of the object in the stream
         my $index = $object_stream_pos * 2;
@@ -725,13 +731,24 @@ sub read_objnum {
         # Unless this is the last object in the stream, its length is determined by the
         # offset of the next object
         my $last_object_in_stream = $map[-2];
-        my $stream = "$num 0 obj ";
+        my $length;
         if ($last_object_in_stream == $num) {
-            $stream .= substr($objects, $start);
+            $length = $object_stream->{'Length'} - $object_stream->{'First'}->val() - $start;
         }
         else {
             my $next_start = $map[$index + 3];
-            $stream .= substr($objects, $start, $next_start - $start);
+            $length = $next_start - $start;
+        }
+
+        # Read the object from the stream
+        my $stream = "$num 0 obj ";
+        unless ($object_stream->{' streamfile'}) {
+            $stream .= substr($object_stream->{' stream'}, $object_stream->{'First'}->val() + $start, $length);
+        }
+        else {
+            seek($fh, $object_stream->{'First'}->val() + $start, 0);
+            read($fh, $stream, $length, length($stream));
+            close $fh;
         }
 
         ($object) = $self->readval($stream, %opts, update => 0);
