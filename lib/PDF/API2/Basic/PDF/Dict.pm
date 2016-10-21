@@ -19,7 +19,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # VERSION
 
-our $mincache = 32768;
+our $mincache = 16 * 1024 * 1024;
 
 use File::Temp;
 use PDF::API2::Basic::PDF::Array;
