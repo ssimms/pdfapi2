@@ -1,5 +1,14 @@
 {{$NEXT}}
 
+    - Fix use of cache files when reading streams: temp files will now
+      be used any time a stream is larger than 16MB (by default).
+      Formerly, due to a bug, they would only be created when a 4kB
+      chunk of a stream increased to 16kB or more after being
+      decompressed.
+
+    - Update to [RT #113290]: Objects inside a large object stream are
+      now read without loading the entire object stream into memory.
+
     - [RT #118352] Don't crash when adding an annotation to a page
       that has an existing annotations array stored as an indirect
       object (reported by Johan Vromans).
