@@ -842,7 +842,7 @@ sub out_obj {
     # in the hash) (which is super-fast).
     unless (exists $self->{' outlist_cache'}{$obj}) {
         push @{$self->{' outlist'}}, $obj;
-        $self->{' outlist_cache'}{$obj}++;
+        $self->{' outlist_cache'}{$obj} = 1;
     }
     return $obj;
 }
