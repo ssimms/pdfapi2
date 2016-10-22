@@ -997,7 +997,7 @@ sub stringify {
         $self->{pdf}->append_file;
         $str=${$self->{content_ref}};
     } else {
-        my $fh = new FileHandle;
+        my $fh = FileHandle->new();
         CORE::open($fh, ">", \$str) || die "Can't begin scalar IO";
         $self->{pdf}->out_file($fh);
         $fh->close;
