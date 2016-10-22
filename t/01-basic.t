@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 7;
 
 use warnings;
 use strict;
@@ -48,20 +48,3 @@ $pdf = PDF::API2->open('t/resources/sample.pdf');
 isa_ok($pdf,
        'PDF::API2',
        q{PDF::API2->open() returns a PDF::API2 object});
-
-# Open a PDF with a cross-reference stream and an object stream
-
-$pdf = PDF::API2->open('t/resources/sample-xrefstm.pdf');
-
-isa_ok($pdf,
-       'PDF::API2',
-       q{PDF::API2->open() on a PDF with a cross-reference stream returns a PDF::API2 object});
-
-my $object = $pdf->{'pdf'}->read_objnum(9, 0);
-
-ok($object,
-   q{Read an object from an object stream});
-
-my ($key) = grep { $_ =~ /^Helv/ } keys %$object;
-ok($key,
-   q{The compressed object contains an expected key});
