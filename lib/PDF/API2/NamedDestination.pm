@@ -37,23 +37,13 @@ sub new
     return($self);
 }
 
-=item $dest = PDF::API2::NamedDestination->new_api $api
-
-Returns a destination object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a PDF::API2::PDF::File-object.
-
-=cut
-
+# Deprecated (warning added in 2.031)
 sub new_api {
-  my ($class,$api,@opts)=@_;
+    my ($class, $api2, @options) = @_;
+    warnings::warnif('deprecated', q{Call to deprecated method "new_api($api2, ...)".  Replace with "new($api2->{'pdf'}, ...)"});
 
-  my $obj=$class->new($api->{pdf},@opts);
-
-  $api->{pdf}->new_obj($obj) unless($obj->is_obj($api->{pdf}));
-
-  $api->{pdf}->out_obj($api->{pages});
-
-  return($obj);
+    my $destination = $class->new($api2->{'pdf'}, @options);
+    return $destination;
 }
 
 =item $dest->link $page, %opts

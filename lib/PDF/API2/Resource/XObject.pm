@@ -32,9 +32,6 @@ sub new {
     return $self;
 }
 
-# Deprecated (rolled into new)
-sub new_api { my $self = shift(); return $self->new(@_); }
-
 =item $type = $xobject->subtype($type)
 
 Get or set the Subtype of the XObject resource.

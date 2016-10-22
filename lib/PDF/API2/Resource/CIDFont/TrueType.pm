@@ -82,23 +82,6 @@ sub new {
 sub fontfile { return( $_[0]->{' ff'} ); }
 sub fontobj { return( $_[0]->data->{obj} ); }
 
-=item $font = PDF::API2::Resource::CIDFont::TrueType->new_api $api, $file, %options
-
-Returns a truetype-font object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api
-{
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-
-    $api->{pdf}->out_obj($api->{pages});
-    return($obj);
-}
-
 sub wxByCId
 {
     my $self=shift @_;

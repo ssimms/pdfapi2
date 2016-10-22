@@ -1672,7 +1672,7 @@ See Also: L<PDF::API2::Resource::Font::CoreFont>.
 sub corefont {
     my ($self,$name,%opts)=@_;
     require PDF::API2::Resource::Font::CoreFont;
-    my $obj=PDF::API2::Resource::Font::CoreFont->new_api($self,$name,%opts);
+    my $obj=PDF::API2::Resource::Font::CoreFont->new($self->{'pdf'},$name,%opts);
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);
     return($obj);
@@ -1721,7 +1721,7 @@ sub psfont {
     }
     $psf=_findFont($psf);
     require PDF::API2::Resource::Font::Postscript;
-    my $obj=PDF::API2::Resource::Font::Postscript->new_api($self,$psf,%opts);
+    my $obj=PDF::API2::Resource::Font::Postscript->new($self->{'pdf'},$psf,%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);
@@ -1772,7 +1772,7 @@ sub ttfont {
 
     $file = _findFont($file);
     require PDF::API2::Resource::CIDFont::TrueType;
-    my $obj = PDF::API2::Resource::CIDFont::TrueType->new_api($self, $file, %opts);
+    my $obj = PDF::API2::Resource::CIDFont::TrueType->new($self->{'pdf'}, $file, %opts);
 
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if $opts{-unicodemap};
@@ -1806,7 +1806,7 @@ sub cjkfont {
     my ($self,$name,%opts)=@_;
 
     require PDF::API2::Resource::CIDFont::CJKFont;
-    my $obj=PDF::API2::Resource::CIDFont::CJKFont->new_api($self,$name,%opts);
+    my $obj=PDF::API2::Resource::CIDFont::CJKFont->new($self->{'pdf'},$name,%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);
@@ -1854,7 +1854,7 @@ sub synfont {
     my ($self,%opts)=@_;
 
     require PDF::API2::Resource::Font::SynFont;
-    my $obj=PDF::API2::Resource::Font::SynFont->new_api($self,%opts);
+    my $obj=PDF::API2::Resource::Font::SynFont->new($self->{'pdf'},%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     $obj->tounicodemap if($opts{-unicodemap}==1);
@@ -1873,7 +1873,7 @@ sub bdfont {
     my ($self,@opts)=@_;
 
     require PDF::API2::Resource::Font::BdFont;
-    my $obj=PDF::API2::Resource::Font::BdFont->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::Font::BdFont->new($self->{'pdf'},@opts);
 
     $self->{pdf}->out_obj($self->{pages});
     ## $obj->tounicodemap; # does not support unicode!
@@ -1904,7 +1904,7 @@ sub unifont {
     my ($self,@opts)=@_;
 
     require PDF::API2::Resource::UniFont;
-    my $obj=PDF::API2::Resource::UniFont->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::UniFont->new($self->{'pdf'},@opts);
 
     return($obj);
 }
@@ -1925,7 +1925,7 @@ sub image_jpeg {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::XObject::Image::JPEG;
-    my $obj=PDF::API2::Resource::XObject::Image::JPEG->new_api($self,$file);
+    my $obj=PDF::API2::Resource::XObject::Image::JPEG->new($self->{'pdf'},$file);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -1941,7 +1941,7 @@ sub image_tiff {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::XObject::Image::TIFF;
-    my $obj=PDF::API2::Resource::XObject::Image::TIFF->new_api($self,$file);
+    my $obj=PDF::API2::Resource::XObject::Image::TIFF->new($self->{'pdf'},$file);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -1957,7 +1957,7 @@ sub image_pnm {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::XObject::Image::PNM;
-    my $obj=PDF::API2::Resource::XObject::Image::PNM->new_api($self,$file);
+    my $obj=PDF::API2::Resource::XObject::Image::PNM->new($self->{'pdf'},$file);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -1973,7 +1973,7 @@ sub image_png {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::XObject::Image::PNG;
-    my $obj=PDF::API2::Resource::XObject::Image::PNG->new_api($self,$file);
+    my $obj=PDF::API2::Resource::XObject::Image::PNG->new($self->{'pdf'},$file);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -1989,7 +1989,7 @@ sub image_gif {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::XObject::Image::GIF;
-    my $obj=PDF::API2::Resource::XObject::Image::GIF->new_api($self,$file);
+    my $obj=PDF::API2::Resource::XObject::Image::GIF->new($self->{'pdf'},$file);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2007,7 +2007,7 @@ sub image_gd {
     my ($self,$gd,%opts)=@_;
 
     require PDF::API2::Resource::XObject::Image::GD;
-    my $obj=PDF::API2::Resource::XObject::Image::GD->new_api($self,$gd,undef,%opts);
+    my $obj=PDF::API2::Resource::XObject::Image::GD->new($self->{'pdf'},$gd,undef,%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2032,7 +2032,7 @@ sub colorspace_act {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
-    my $obj=PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new_api($self,$file);
+    my $obj=PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new($self->{'pdf'},$file);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2048,7 +2048,7 @@ sub colorspace_web {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::ColorSpace::Indexed::WebColor;
-    my $obj=PDF::API2::Resource::ColorSpace::Indexed::WebColor->new_api($self);
+    my $obj=PDF::API2::Resource::ColorSpace::Indexed::WebColor->new($self->{'pdf'});
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2066,7 +2066,7 @@ sub colorspace_hue {
     my ($self,$file,%opts)=@_;
 
     require PDF::API2::Resource::ColorSpace::Indexed::Hue;
-    my $obj=PDF::API2::Resource::ColorSpace::Indexed::Hue->new_api($self);
+    my $obj=PDF::API2::Resource::ColorSpace::Indexed::Hue->new($self->{'pdf'});
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2092,7 +2092,7 @@ sub colorspace_separation {
     my ($self,$name,@clr)=@_;
 
     require PDF::API2::Resource::ColorSpace::Separation;
-    my $obj=PDF::API2::Resource::ColorSpace::Separation->new_api($self,$name,@clr);
+    my $obj=PDF::API2::Resource::ColorSpace::Separation->new($self->{'pdf'},$name,@clr);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2123,7 +2123,7 @@ sub colorspace_devicen {
     $samples||=2;
 
     require PDF::API2::Resource::ColorSpace::DeviceN;
-    my $obj=PDF::API2::Resource::ColorSpace::DeviceN->new_api($self,$clrs,$samples);
+    my $obj=PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'},$clrs,$samples);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2153,7 +2153,7 @@ sub xo_code128 {
     my ($self,@opts)=@_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::code128;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::code128->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::XObject::Form::BarCode::code128->new($self->{'pdf'},@opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2163,7 +2163,7 @@ sub xo_codabar {
     my ($self,@opts)=@_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::codabar;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::codabar->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::XObject::Form::BarCode::codabar->new($self->{'pdf'},@opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2173,7 +2173,7 @@ sub xo_2of5int {
     my ($self,@opts)=@_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::int2of5;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::int2of5->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::XObject::Form::BarCode::int2of5->new($self->{'pdf'},@opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2183,7 +2183,7 @@ sub xo_3of9 {
     my ($self,@opts)=@_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::code3of9;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::code3of9->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::XObject::Form::BarCode::code3of9->new($self->{'pdf'},@opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2193,7 +2193,7 @@ sub xo_ean13 {
     my ($self,@opts)=@_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::ean13;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::ean13->new_api($self,@opts);
+    my $obj=PDF::API2::Resource::XObject::Form::BarCode::ean13->new($self->{'pdf'},@opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2214,7 +2214,7 @@ Returns a new form XObject.
 sub xo_form {
     my ($self)=@_;
 
-    my $obj=PDF::API2::Resource::XObject::Form::Hybrid->new_api($self);
+    my $obj=PDF::API2::Resource::XObject::Form::Hybrid->new($self->{'pdf'});
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2229,7 +2229,7 @@ Returns a new extended graphics state object.
 sub egstate {
     my ($self)=@_;
 
-    my $obj=PDF::API2::Resource::ExtGState->new_api($self,pdfkey());
+    my $obj=PDF::API2::Resource::ExtGState->new($self->{'pdf'},pdfkey());
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2244,7 +2244,7 @@ Returns a new pattern object.
 sub pattern {
     my ($self,%opts)=@_;
 
-    my $obj=PDF::API2::Resource::Pattern->new_api($self,undef,%opts);
+    my $obj=PDF::API2::Resource::Pattern->new($self->{'pdf'},undef,%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2259,7 +2259,7 @@ Returns a new shading object.
 sub shading {
     my ($self,%opts)=@_;
 
-    my $obj=PDF::API2::Resource::Shading->new_api($self,undef,%opts);
+    my $obj=PDF::API2::Resource::Shading->new($self->{'pdf'},undef,%opts);
 
     $self->{pdf}->out_obj($self->{pages});
     return($obj);
@@ -2300,7 +2300,7 @@ sub named_destination
 
     unless(defined $obj)
     {
-        $obj=PDF::API2::NamedDestination->new_api($self);
+        $obj=PDF::API2::NamedDestination->new($self->{'pdf'});
     }
     $root->{Names}->{$cat}->{-vals}->{$name}=$obj;
 

@@ -56,24 +56,6 @@ sub new
     return($self);
 }
 
-=item $font = PDF::API2::Resource::CIDFont->new_api $api, $name, %options
-
-Returns a cid-font object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api
-{
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    my $self->{' api'}=$api;
-
-    $api->{pdf}->out_obj($api->{pages});
-    return($obj);
-}
-
 sub glyphByCId { return( $_[0]->data->{g2n}->[$_[1]] ); }
 
 sub uniByCId { return( $_[0]->data->{g2u}->[$_[1]] ); }

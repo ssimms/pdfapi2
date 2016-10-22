@@ -16,7 +16,4 @@ sub new {
     return $self;
 }
 
-# Deprecated (rolled into new)
-sub new_api { my $self = shift(); return $self->new(@_); }
-
 1;

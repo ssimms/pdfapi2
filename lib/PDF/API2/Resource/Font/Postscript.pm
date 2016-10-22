@@ -69,18 +69,6 @@ sub new {
     return($self);
 }
 
-sub new_api {
-    my ($class, $api, @para) = @_;
-
-    $class = ref $class if ref $class;
-    my $self = $class->new($api->{pdf},@para);
-
-    $self->{' apipdf'}=$api->{pdf};
-    $self->{' api'}=$api;
-
-    return($self);
-}
-
 sub readPFAPFB {
     my ($self,$file) = @_;
     my ($l1,$l2,$l3,$stream,$t1stream,@lines,$line,$head,$body,$tail);

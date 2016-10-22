@@ -76,15 +76,6 @@ sub new {
     return($self);
 }
 
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},pdfkey(),@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
 sub param {
     my $self=shift @_;
     return(@_);

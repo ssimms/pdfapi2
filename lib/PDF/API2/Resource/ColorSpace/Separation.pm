@@ -106,22 +106,6 @@ sub new {
     return($self);
 }
 
-=item $cs = PDF::API2::Resource::ColorSpace::Separation->new_api $api, $name
-
-Returns a separation color-space object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},pdfkey(),@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
 =item @color = $res->color
 
 Returns the base-color of the Separation-Colorspace.

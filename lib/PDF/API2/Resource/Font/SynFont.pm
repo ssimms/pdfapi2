@@ -66,6 +66,8 @@ I<-space>
 I<-caps>
 ... create synthetic small-caps.
 
+=back
+
 =cut
 
 sub new
@@ -241,35 +243,4 @@ sub new
     return($self);
 }
 
-
-=item $font = PDF::API2::Resource::Font::SynFont->new_api $api, $fontobj, %options
-
-Returns a synfont object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a PDF::API2::PDF::File-object.
-
-=cut
-
-sub new_api
-{
-  my ($class,$api,@opts)=@_;
-
-  my $obj=$class->new($api->{pdf},@opts);
-
-  $api->{pdf}->new_obj($obj) unless($obj->is_obj($api->{pdf}));
-
-  $api->{pdf}->out_obj($api->{pages});
-  return($obj);
-}
-
 1;
-
-__END__
-
-=back
-
-=head1 AUTHOR
-
-alfred reibenschuh
-
-=cut
-

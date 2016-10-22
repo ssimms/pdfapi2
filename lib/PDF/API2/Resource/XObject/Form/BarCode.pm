@@ -43,9 +43,6 @@ sub new {
     return $self;
 }
 
-# Deprecated (rolled into new)
-sub new_api { my $self = shift(); return $self->new(@_); }
-
 my %bar_widths = (
      0 => 0,
      1 => 1, 'a' => 1, 'A' => 1,

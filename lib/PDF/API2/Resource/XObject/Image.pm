@@ -32,9 +32,6 @@ sub new {
     return $self;
 }
 
-# Deprecated (rolled into new)
-sub new_api { my $self = shift(); return $self->new(@_); }
-
 =item $width = $image->width($width)
 
 Get or set the width value for the image object.

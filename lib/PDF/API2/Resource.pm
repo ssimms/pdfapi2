@@ -30,12 +30,6 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    # Instead of having a separate new_api call, check the type here.
-    if ($pdf->isa('PDF::API2')) {
-        $self->{' api'} = $pdf;
-        $pdf = $pdf->{'pdf'};
-    }
-
     $pdf->new_obj($self) unless $self->is_obj($pdf);
 
     $self->name($name or pdfkey());
@@ -45,8 +39,14 @@ sub new {
     return $self;
 }
 
-# Deprecated (rolled into new)
-sub new_api { my $self = shift(); return $self->new(@_); }
+# Deprecated (warning added in 2.031)
+sub new_api {
+    my ($class, $api2, @options) = @_;
+    warnings::warnif('deprecated', q{Call to deprecated method "new_api($api2, ...)".  Replace with "new($api2->{'pdf'}, ...)"});
+
+    my $resource = $class->new($api2->{'pdf'}, @options);
+    return $resource;
+}
 
 =item $name = $resource->name()
 

@@ -249,15 +249,6 @@ sub new {
     return($self);
 }
 
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
 sub PaethPredictor {
     my ($a, $b, $c)=@_;
     my $p = $a + $b - $c;

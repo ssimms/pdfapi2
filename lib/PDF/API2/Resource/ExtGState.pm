@@ -31,21 +31,6 @@ sub new {
     return($self);
 }
 
-=item $font = PDF::API2::Resource::ExtGState->new_api $api, $name
-
-Returns a egstate-font object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-
-    return($obj);
-}
-
 =item $egs->strokeadjust $boolean
 
 =cut

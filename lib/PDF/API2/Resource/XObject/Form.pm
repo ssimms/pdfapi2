@@ -33,9 +33,6 @@ sub new {
     return $self;
 }
 
-# Deprecated (rolled into new)
-sub new_api { my $self = shift(); return $self->new(@_); }
-
 =item ($llx, $lly, $urx, $ury) = $form->bbox($llx, $lly, $urx, $ury)
 
 Get or set the coordinates of the form object's bounding box

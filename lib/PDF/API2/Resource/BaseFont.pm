@@ -41,22 +41,6 @@ sub new {
     return($self);
 }
 
-=item $font = PDF::API2::Resource::BaseFont->new_api $api, $name
-
-Returns a font resource object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
 sub data { return( $_[0]->{' data'} ); }
 
 =item $descriptor = $font->descrByData()

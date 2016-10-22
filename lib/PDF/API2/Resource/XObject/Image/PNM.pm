@@ -31,15 +31,6 @@ sub new {
     return($self);
 }
 
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
 # READPPMHEADER
 # taken from Image::PBMLib
 # Copyright by Benjamin Elijah Griffin (28 Feb 2003)

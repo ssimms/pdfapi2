@@ -9,6 +9,10 @@
     - Update to [RT #113290]: Objects inside a large object stream are
       now read without loading the entire object stream into memory.
 
+    - DEPRECATION: The low-level new_api methods have been deprecated
+      in favor of calling new directly.  If your code uses
+      new_api($api2, ...), replace it with new($api2->{'pdf'}, ...).
+
     - [RT #118352] Don't crash when adding an annotation to a page
       that has an existing annotations array stored as an indirect
       object (reported by Johan Vromans).

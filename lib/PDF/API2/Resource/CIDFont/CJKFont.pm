@@ -152,22 +152,6 @@ sub new {
     return($self);
 }
 
-=item $font = PDF::API2::Resource::CIDFont::CJKFont->new_api $api, $cjkname, %options
-
-Returns a cjk-font object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-
-    $api->{pdf}->out_obj($api->{pages});
-    return($obj);
-}
-
 sub tounicodemap {
     my $self=shift @_;
     # noop since pdf knows its char-collection

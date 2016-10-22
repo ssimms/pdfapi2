@@ -36,22 +36,6 @@ sub new {
     return($self);
 }
 
-=item $cs = PDF::API2::Resource::ColorSpace->new_api $api, $name
-
-Returns a color-space object. This method is different from 'new' that
-it needs an PDF::API2-object rather than a Text::PDF::File-object.
-
-=cut
-
-sub new_api {
-    my ($class,$api,@opts)=@_;
-
-    my $obj=$class->new($api->{pdf},@opts);
-    $obj->{' api'}=$api;
-
-    return($obj);
-}
-
 =item $name = $res->name $name
 
 Returns or sets the Name of the resource.
