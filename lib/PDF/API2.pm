@@ -182,7 +182,7 @@ B<Example:>
 =cut
 
 # Deprecated (renamed)
-sub openScalar { return open_scalar(@_); }
+sub openScalar { return open_scalar(@_); } ## no critic
 
 sub open_scalar {
     my ($class, $content, %options) = @_;
@@ -589,8 +589,8 @@ Checks if the previously opened PDF is encrypted.
 =cut
 
 sub isEncrypted {
-    my $self=shift @_;
-    return(defined($self->{pdf}->{'Encrypt'}) ? 1 : 0);
+    my $self = shift();
+    return defined($self->{'pdf'}->{'Encrypt'}) ? 1 : 0;
 }
 
 =item %infohash = $pdf->info(%infohash)
@@ -614,8 +614,7 @@ B<Example:>
 =cut
 
 sub info {
-    my $self=shift @_;
-    my %opt=@_;
+    my ($self, %opt) = @_;
 
     if(!defined($self->{pdf}->{'Info'})) {
             $self->{pdf}->{'Info'}=PDFDict();
@@ -740,7 +739,7 @@ B<Example:>
 =cut
 
 sub xmpMetadata {
-    my $self=shift @_;
+    my ($self, $value) = @_;
 
     if(!defined($self->{catalog}->{Metadata}))
     {
@@ -759,9 +758,9 @@ sub xmpMetadata {
 
     my $md=$self->{catalog}->{Metadata};
 
-    if(defined $_[0])
+    if(defined $value)
     {
-        $md->{' stream'}=$_[0];
+        $md->{' stream'}=$value;
         delete $md->{Filter};
         delete $md->{' nofilt'};
         $self->{pdf}->out_obj($md);
@@ -925,7 +924,7 @@ B<Example:>
 =cut
 
 sub update {
-    my $self=shift @_;
+    my $self = shift();
     $self->saveas($self->{pdf}->{' fname'});
 }
 
@@ -1007,7 +1006,11 @@ sub stringify {
     return($str);
 }
 
-sub release { $_[0]->end; return(undef);}
+sub release {
+    my $self = shift();
+    $self->end();
+    return;
+}
 
 =item $pdf->end()
 
@@ -1022,16 +1025,15 @@ files and not writing them.
 =cut
 
 sub end {
-    my $self=shift(@_);
-    $self->{pdf}->release if(defined($self->{pdf}));
+    my $self = shift();
+    $self->{'pdf'}->release() if defined $self->{'pdf'};
 
-        foreach my $key (keys %{$self})
-        {
-            $self->{$key}=undef;
-            delete ($self->{$key});
-        }
+    foreach my $key (keys %$self) {
+        $self->{$key} = undef;
+        delete $self->{$key};
+    }
 
-    undef;
+    return;
 }
 
 =back
@@ -1278,9 +1280,8 @@ B<Note:> You can only import a page from an existing PDF file.
 =cut
 
 sub importPageIntoForm {
-    my $self=shift @_;
-    my $s_pdf=shift @_;
-    my $s_idx=shift @_||0;
+    my ($self, $s_pdf, $s_idx) = @_;
+    $s_idx ||= 0;
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
         die "Invalid usage: 1st argument must be PDF::API2 instance, not: " . ref($s_pdf);
@@ -1383,13 +1384,12 @@ B<Note:> You can only import a page from an existing PDF file.
 =cut
 
 # Deprecated (renamed)
-sub importpage { import_page(@_); }
+sub importpage { return import_page(@_); } ## no critic
 
 sub import_page {
-    my $self=shift @_;
-    my $s_pdf=shift @_;
-    my $s_idx=shift @_||0;
-    my $t_idx=shift @_||0;
+    my ($self, $s_pdf, $s_idx, $t_idx) = @_;
+    $s_idx ||= 0;
+    $t_idx ||= 0;
     my ($s_page,$t_page);
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
@@ -1512,7 +1512,7 @@ Returns the number of pages in the document.
 =cut
 
 sub pages {
-    my $self=shift @_;
+    my $self = shift();
     return scalar @{$self->{pagestack}};
 }
 
@@ -1629,12 +1629,13 @@ Returns the list of searched directories.
 =cut
 
 sub addFontDirs {
-    push( @FontDirs, @_ );
-    return( @FontDirs );
+    my @dirs = @_;
+    push @FontDirs, @dirs;
+    return @FontDirs;
 }
 
 sub _findFont {
-    my $font=shift @_;
+    my $font = shift();
     my @fonts=($font,map { "$_/$font" } @FontDirs);
     while((scalar @fonts > 0) && (! -f $fonts[0])) { shift @fonts; }
     return($fonts[0]);
@@ -2320,11 +2321,11 @@ sub named_destination
     return($obj);
 }
 
-=back
-
 1;
 
 __END__
+
+=back
 
 =head1 KNOWN ISSUES
 
