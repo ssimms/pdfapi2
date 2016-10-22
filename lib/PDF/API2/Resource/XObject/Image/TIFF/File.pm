@@ -79,11 +79,9 @@ sub readTag {
     return ($tag, $type, $count, $len, $off);
 }
 
-sub close {
+sub close { ## no critic
     my $self = shift();
-    my $fh = $self->{'fh'};
-    $fh->close();
-    # %{$self} = ();
+    return $self->{'fh'}->close();
 }
 
 sub readTags {
@@ -276,6 +274,8 @@ sub readTags {
         $fh->read($self->{'ifd'}, 4);
         $self->{'ifd'} = unpack($self->{'long'}, $self->{'ifd'});
     }
+
+    return $self;
 }
 
 1;

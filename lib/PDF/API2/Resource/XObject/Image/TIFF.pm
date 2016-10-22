@@ -129,6 +129,8 @@ sub handle_generic {
         $tif->{'fh'}->seek($tif->{'imageOffset'}, 0);
         $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
     }
+
+    return $self;
 }
 
 sub handle_flate {
@@ -151,6 +153,8 @@ sub handle_flate {
         $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
         $self->{' stream'} = uncompress($self->{' stream'});
     }
+
+    return $self;
 }
 
 sub handle_lzw {
@@ -182,6 +186,8 @@ sub handle_lzw {
         $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
         $self->{' stream'} = deLZW(9, $self->{' stream'});
     }
+
+    return $self;
 }
 
 sub handle_ccitt {
@@ -208,6 +214,8 @@ sub handle_ccitt {
         $tif->{'fh'}->seek($tif->{'imageOffset'}, 0);
         $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
     }
+
+    return $self;
 }
 
 sub read_tiff {
@@ -215,7 +223,7 @@ sub read_tiff {
 
     $self->width($tif->{'imageWidth'});
     $self->height($tif->{'imageHeight'});
-    if ($tif->{colorSpace} eq 'Indexed') {
+    if ($tif->{'colorSpace'} eq 'Indexed') {
         my $dict = PDFDict();
         $pdf->new_obj($dict);
         $self->colorspace(PDFArray(PDFName($tif->{'colorSpace'}), PDFName('DeviceRGB'), PDFNum(255), $dict));
@@ -225,7 +233,7 @@ sub read_tiff {
         my $straight;
         $tif->{'fh'}->read($colormap, $tif->{'colorMapLength'});
         $dict->{' stream'} = '';
-        map { $straight .= pack('C', ($_ / 256)) } unpack($tif->{'short'} . '*', $colormap);
+        $straight .= pack('C', ($_ / 256)) for unpack($tif->{'short'} . '*', $colormap);
         foreach my $c (0 .. (($tif->{'colorMapSamples'} / 3) - 1)) {
             $dict->{' stream'} .= substr($straight, $c, 1);
             $dict->{' stream'} .= substr($straight, $c + ($tif->{'colorMapSamples'} / 3), 1);
