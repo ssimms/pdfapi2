@@ -205,6 +205,42 @@ sub movie
     return($self);
 }
 
+=item $ant->fileattachment $file, %opts
+
+Defines the annotation as a file attachment with file $file and
+options %opts (-rect, -border, -content (type), -icon (name)).
+
+=cut
+
+sub fileattachment {
+    my ( $self, $file, %opts ) = @_;
+
+    my $contentype = delete $opts{-content};
+    my $icontype   = delete $opts{-icon};
+
+    $self->{Subtype} = PDFName('FileAttachment');
+    if ( is_utf8($file)) {
+        # URI must be 7-bit ascii
+        utf8::downgrade($file);
+    }
+    $self->{Contents} = PDFStr($file);
+    $self->{Name} = PDFName( $icontype || 'None');
+
+    $self->{FS} = PDFDict();
+    $self->{FS}->{F} = PDFStr($file);
+    $self->{FS}->{Type} = PDFName('F');
+    $self->{FS}->{EF} = PDFDict($file);
+    $self->{FS}->{EF}->{F} = PDFDict($file);
+    $self->{' apipdf'}->new_obj($self->{FS}->{EF}->{F});
+    $self->{FS}->{EF}->{F}->{Type} = PDFName('EmbeddedFile');
+    $self->{FS}->{EF}->{F}->{SubType} = PDFName($contentype) if $contentype;
+    $self->{FS}->{EF}->{F}->{' streamfile'}=$file;
+
+    $self->rect(@{$opts{-rect}}) if (defined $opts{-rect});
+    $self->border(@{$opts{-border}}) if (defined $opts{-border});
+    return($self);
+}
+
 =item $ant->rect $llx, $lly, $urx, $ury
 
 Sets the rectangle of the annotation.
