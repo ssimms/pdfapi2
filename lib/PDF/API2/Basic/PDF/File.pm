@@ -733,7 +733,7 @@ sub read_objnum {
         my $last_object_in_stream = $map[-2];
         my $length;
         if ($last_object_in_stream == $num) {
-            $length = $object_stream->{'Length'} - $object_stream->{'First'}->val() - $start;
+            $length = $object_stream->{'Length'}->val() - $object_stream->{'First'}->val() - $start;
         }
         else {
             my $next_start = $map[$index + 3];
