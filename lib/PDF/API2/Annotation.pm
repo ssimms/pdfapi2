@@ -205,17 +205,17 @@ sub movie
     return($self);
 }
 
-=item $ant->fileattachment $file, %opts
+=item $ant->file_attachment $file, %opts
 
 Defines the annotation as a file attachment with file $file and
-options %opts (-rect, -border, -content (type), -icon (name)).
+options %opts (-rect, -border, -type, -icon (name)).
 
 =cut
 
-sub fileattachment {
+sub file_attachment {
     my ( $self, $file, %opts ) = @_;
 
-    my $contentype = delete $opts{-content};
+    my $contentype = delete $opts{-type};
     my $icontype   = delete $opts{-icon};
 
     $self->{Subtype} = PDFName('FileAttachment');
