@@ -106,7 +106,7 @@ sub new {
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     $self->{'fonts'} = {};
     $self->{'pagestack'} = [];
-    $self->{'forcecompress'} = $^O eq 'os390' ? 0 : 1;
+    $self->{'forcecompress'} = 1;
     $self->preferences(%options);
     if ($options{'-file'}) {
         $self->{' filed'} = $options{'-file'};
@@ -205,7 +205,7 @@ sub open_scalar {
     $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     $self->{'reopened'} = 1;
-    $self->{'forcecompress'} = $^O eq 'os390' ? 0 : 1;
+    $self->{'forcecompress'} = 1;
     $self->{'fonts'} = {};
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
