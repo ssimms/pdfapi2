@@ -616,40 +616,44 @@ B<Example:>
 sub info {
     my ($self, %opt) = @_;
 
-    if(!defined($self->{pdf}->{'Info'})) {
-            $self->{pdf}->{'Info'}=PDFDict();
-            $self->{pdf}->new_obj($self->{'pdf'}->{'Info'});
-    } else {
-        $self->{pdf}->{'Info'}->realise;
+    if (not defined($self->{'pdf'}->{'Info'})) {
+        $self->{'pdf'}->{'Info'} = PDFDict();
+        $self->{'pdf'}->new_obj($self->{'pdf'}->{'Info'});
+    }
+    else {
+        $self->{'pdf'}->{'Info'}->realise();
     }
 
-    if(scalar @_) {
-      foreach my $k (@{$self->{infoMeta}}) {
-        next unless(defined $opt{$k});
-        if(is_utf8($opt{$k})) {
-            $self->{pdf}->{'Info'}->{$k}=PDFUtf($opt{$k}||'NONE');
-        #} elsif(is_utf8($opt{$k}) || utf8::valid($opt{$k})) {
-        #    $self->{pdf}->{'Info'}->{$k}=PDFUtf($opt{$k}||'NONE');
-        } else {
-            $self->{pdf}->{'Info'}->{$k}=PDFStr($opt{$k}||'NONE');
+    # Maintenance Note: Since we're not shifting at the beginning of
+    # this sub, this "if" will always be true
+    if (scalar @_) {
+        foreach my $k (@{$self->{'infoMeta'}}) {
+            next unless defined $opt{$k};
+            if (is_utf8($opt{$k})) {
+                $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
+            }
+            #elsif (is_utf8($opt{$k}) || utf8::valid($opt{$k})) {
+            #    $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
+            #}
+            else {
+                $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
+            }
         }
-      }
-      $self->{pdf}->out_obj($self->{pdf}->{'Info'});
+        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Info'});
     }
 
-
-    if(defined $self->{pdf}->{'Info'}) {
-      %opt=();
-      foreach my $k (@{$self->{infoMeta}}) {
-        next unless(defined $self->{pdf}->{'Info'}->{$k});
-        $opt{$k}=$self->{pdf}->{'Info'}->{$k}->val;
-        if ((unpack('n',$opt{$k})==0xfffe) or (unpack('n',$opt{$k})==0xfeff))
-        {
-            $opt{$k} = decode('UTF-16', $self->{pdf}->{'Info'}->{$k}->val);
+    if (defined $self->{'pdf'}->{'Info'}) {
+        %opt = ();
+        foreach my $k (@{$self->{'infoMeta'}}) {
+            next unless defined $self->{'pdf'}->{'Info'}->{$k};
+            $opt{$k} = $self->{'pdf'}->{'Info'}->{$k}->val();
+            if ((unpack('n', $opt{$k}) == 0xfffe) or (unpack('n', $opt{$k}) == 0xfeff)) {
+                $opt{$k} = decode('UTF-16', $self->{'pdf'}->{'Info'}->{$k}->val());
+            }
         }
-      }
-  }
-  return(%opt);
+    }
+
+    return %opt;
 }
 
 =item @metadata_attributes = $pdf->infoMetaAttributes(@metadata_attributes)
@@ -666,14 +670,15 @@ B<Example:>
 
 =cut
 
-sub infoMetaAttributes
-{
-    my ($self,@attr) = @_;
-    if(scalar @attr > 0) {
-        my %at = map { $_ => $_ } (@{$self->{infoMeta}},@attr);
-        @{$self->{infoMeta}}=(keys %at);
+sub infoMetaAttributes {
+    my ($self, @attr) = @_;
+
+    if (scalar @attr) {
+        my %at = map { $_ => 1 } @{$self->{'infoMeta'}}, @attr;
+        @{$self->{'infoMeta'}} = keys %at;
     }
-    return(@{$self->{infoMeta}});
+
+    return @{$self->{'infoMeta'}};
 }
 
 =item $xml = $pdf->xmpMetadata($xml)
@@ -741,32 +746,30 @@ B<Example:>
 sub xmpMetadata {
     my ($self, $value) = @_;
 
-    if(!defined($self->{catalog}->{Metadata}))
-    {
-            $self->{catalog}->{Metadata}=PDFDict();
-            $self->{catalog}->{Metadata}->{Type}=PDFName('Metadata');
-            $self->{catalog}->{Metadata}->{Subtype}=PDFName('XML');
-            $self->{pdf}->new_obj($self->{catalog}->{Metadata});
+    if (not defined($self->{'catalog'}->{'Metadata'})) {
+        $self->{'catalog'}->{'Metadata'} = PDFDict();
+        $self->{'catalog'}->{'Metadata'}->{'Type'} = PDFName('Metadata');
+        $self->{'catalog'}->{'Metadata'}->{'Subtype'} = PDFName('XML');
+        $self->{'pdf'}->new_obj($self->{'catalog'}->{'Metadata'});
     }
-    else
-    {
-        $self->{catalog}->{Metadata}->realise;
-        $self->{catalog}->{Metadata}->{' stream'}=unfilter($self->{catalog}->{Metadata}->{Filter}, $self->{catalog}->{Metadata}->{' stream'});
-        delete $self->{catalog}->{Metadata}->{' nofilt'};
-        delete $self->{catalog}->{Metadata}->{Filter};
+    else {
+        $self->{'catalog'}->{'Metadata'}->realise();
+        $self->{'catalog'}->{'Metadata'}->{' stream'} = unfilter($self->{'catalog'}->{'Metadata'}->{'Filter'}, $self->{'catalog'}->{'Metadata'}->{' stream'});
+        delete $self->{'catalog'}->{'Metadata'}->{' nofilt'};
+        delete $self->{'catalog'}->{'Metadata'}->{'Filter'};
     }
 
-    my $md=$self->{catalog}->{Metadata};
+    my $md = $self->{'catalog'}->{'Metadata'};
 
-    if(defined $value)
-    {
-        $md->{' stream'}=$value;
-        delete $md->{Filter};
+    if (defined $value) {
+        $md->{' stream'} = $value;
+        delete $md->{'Filter'};
         delete $md->{' nofilt'};
-        $self->{pdf}->out_obj($md);
-        $self->{pdf}->out_obj($self->{catalog});
+        $self->{'pdf'}->out_obj($md);
+        $self->{'pdf'}->out_obj($self->{'catalog'});
     }
-    return($md->{' stream'});
+
+    return $md->{' stream'};
 }
 
 =item $pdf->pageLabel($index, $options)
@@ -870,13 +873,16 @@ B<Example:>
 =cut
 
 sub finishobjects {
-    my ($self,@objs)=@_;
-    if($self->{reopened}) {
-        die "invalid method invokation: no file, use 'saveas' instead.";
-    } elsif($self->{' filed'}) {
-        $self->{pdf}->ship_out(@objs);
-    } else {
-        die "invalid method invokation: no file, use 'saveas' instead.";
+    my ($self, @objs) = @_;
+
+    if ($self->{'reopened'}) {
+        die "invalid method invocation: no file, use 'saveas' instead.";
+    }
+    elsif ($self->{' filed'}) {
+        $self->{'pdf'}->ship_out(@objs);
+    }
+    else {
+        die "invalid method invocation: no file, use 'saveas' instead.";
     }
 }
 
@@ -925,7 +931,7 @@ B<Example:>
 
 sub update {
     my $self = shift();
-    $self->saveas($self->{pdf}->{' fname'});
+    $self->saveas($self->{'pdf'}->{' fname'});
 }
 
 =item $pdf->saveas($file)
@@ -941,31 +947,40 @@ B<Example:>
 =cut
 
 sub saveas {
-    my ($self,$file)=@_;
-    if($self->{reopened}) {
-        $self->{pdf}->append_file;
-        CORE::open(OUTF,">$file");
-        binmode(OUTF,':raw');
-        print OUTF ${$self->{content_ref}};
-        CORE::close(OUTF);
-    } elsif($self->{' filed'}) {
-        $self->{pdf}->close_file;
-    } else {
-        $self->{pdf}->out_file($file);
+    my ($self, $file) = @_;
+
+    if ($self->{'reopened'}) {
+        $self->{'pdf'}->append_file();
+        my $fh;
+        CORE::open($fh, '>', $file);
+        binmode($fh, ':raw');
+        print $fh ${$self->{'content_ref'}};
+        CORE::close($fh);
     }
-    $self->end;
+    elsif ($self->{' filed'}) {
+        $self->{'pdf'}->close_file();
+    }
+    else {
+        $self->{'pdf'}->out_file($file);
+    }
+
+    $self->end();
 }
 
 sub save {
-    my ($self,$file)=@_;
-    if($self->{reopened}) {
-        die "invalid method invokation: use 'saveas' instead.";
-    } elsif($self->{' filed'}) {
-        $self->{pdf}->close_file;
-    } else {
-        die "invalid method invokation: use 'saveas' instead.";
+    my ($self, $file) = @_;
+
+    if ($self->{'reopened'}) {
+        die "invalid method invocation: use 'saveas' instead.";
     }
-    $self->end;
+    elsif ($self->{' filed'}) {
+        $self->{'pdf'}->close_file();
+    }
+    else {
+        die "invalid method invocation: use 'saveas' instead.";
+    }
+
+    $self->end();
 }
 
 =item $string = $pdf->stringify()
@@ -991,19 +1006,22 @@ B<Example:>
 # that use this module.
 
 sub stringify {
-    my ($self)=@_;
+    my $self = shift();
+
     my $str;
-    if((defined $self->{reopened}) && ($self->{reopened}==1)) {
-        $self->{pdf}->append_file;
-        $str=${$self->{content_ref}};
-    } else {
-        my $fh = FileHandle->new();
-        CORE::open($fh, ">", \$str) || die "Can't begin scalar IO";
-        $self->{pdf}->out_file($fh);
-        $fh->close;
+    if ((defined $self->{'reopened'}) and ($self->{'reopened'} == 1)) {
+        $self->{'pdf'}->append_file();
+        $str = ${$self->{'content_ref'}};
     }
-    $self->end;
-    return($str);
+    else {
+        my $fh = FileHandle->new();
+        CORE::open($fh, '>', \$str) || die "Can't begin scalar IO";
+        $self->{'pdf'}->out_file($fh);
+        $fh->close();
+    }
+    $self->end();
+
+    return $str;
 }
 
 sub release {
@@ -1066,26 +1084,29 @@ B<Example:>
 =cut
 
 sub page {
-    my $self=shift;
-    my $index=shift || 0;
+    my $self = shift();
+    my $index = shift() || 0;
     my $page;
-    if($index==0) {
-        $page=PDF::API2::Page->new($self->{pdf},$self->{pages});
-    } else {
-        $page=PDF::API2::Page->new($self->{pdf},$self->{pages},$index-1);
+    if ($index == 0) {
+        $page = PDF::API2::Page->new($self->{'pdf'}, $self->{'pages'});
     }
-    $page->{' apipdf'}=$self->{pdf};
-    $page->{' api'}=$self;
-    $self->{pdf}->out_obj($page);
-    $self->{pdf}->out_obj($self->{pages});
-    if($index==0) {
-        push(@{$self->{pagestack}},$page);
-    } elsif($index<0) {
-        splice(@{$self->{pagestack}},$index,0,$page);
-    } else {
-        splice(@{$self->{pagestack}},$index-1,0,$page);
+    else {
+        $page = PDF::API2::Page->new($self->{'pdf'}, $self->{'pages'}, $index - 1);
     }
- #   $page->{Resources}=$self->{pages}->{Resources};
+    $page->{' apipdf'} = $self->{'pdf'};
+    $page->{' api'} = $self;
+    $self->{'pdf'}->out_obj($page);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    if ($index == 0) {
+        push @{$self->{'pagestack'}}, $page;
+    }
+    elsif ($index < 0) {
+        splice @{$self->{'pagestack'}}, $index, 0, $page;
+    }
+    else {
+        splice @{$self->{'pagestack'}}, $index - 1, 0, $page;
+    }
+    # $page->{'Resources'} = $self->{'pages'}->{'Resources'};
     return $page;
 }
 
@@ -1114,7 +1135,7 @@ sub openpage {
     if ($index == 0) {
         $page = $self->{'pagestack'}->[-1];
     }
-    elsif ($index<0) {
+    elsif ($index < 0) {
         $page = $self->{'pagestack'}->[$index];
     }
     else {
@@ -1127,12 +1148,12 @@ sub openpage {
         $page->{' apipdf'} = $self->{'pdf'};
         $page->{' api'} = $self;
         $self->{'pdf'}->out_obj($page);
-        if (($rotate = $page->find_prop('Rotate')) && (!defined($page->{' fixed'}) || $page->{' fixed'} < 1)) {
+        if (($rotate = $page->find_prop('Rotate')) and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
             $rotate = ($rotate->val() + 360) % 360;
 
-            if ($rotate != 0 && !$self->default('nounrotate')) {
+            if ($rotate != 0 and not $self->default('nounrotate')) {
                 $page->{'Rotate'} = PDFNum(0);
-                foreach my $mediatype (qw( MediaBox CropBox BleedBox TrimBox ArtBox )) {
+                foreach my $mediatype (qw(MediaBox CropBox BleedBox TrimBox ArtBox)) {
                     if ($media = $page->find_prop($mediatype)) {
                         $media = [ map { $_->val() } $media->elementsof() ];
                     }
@@ -1162,7 +1183,7 @@ sub openpage {
             $trans = '';
         }
 
-        if (defined $page->{'Contents'} && (!defined($page->{' fixed'}) || $page->{' fixed'} < 1)) {
+        if (defined $page->{'Contents'} and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
             $page->fixcontents();
             my $uncontent = delete $page->{'Contents'};
             my $content = $page->gfx();
@@ -1179,12 +1200,12 @@ sub openpage {
                 $content->{' stream'} .= ' Q ';
             }
 
-            ## $content->{Length}=PDFNum(length($content->{' stream'}));
+            ## $content->{'Length'} = PDFNum(length($content->{' stream'}));
             # this will be fixed by the following code or content or filters
 
             ## if we like compress we will do it now to do quicker saves
             if ($self->{'forcecompress'} > 0) {
-                ## $content->compressFlate;
+                # $content->compressFlate();
                 $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
                 $content->{' nofilt'} = 1;
                 delete $content->{'-docompress'};
@@ -1211,11 +1232,11 @@ sub walk_obj {
     }
 
     return $object_cache->{scalar $source_object} if defined $object_cache->{scalar $source_object};
-####die "infinite loop while copying objects" if($source_object->{' copied'});
+    # die "infinite loop while copying objects" if $source_object->{' copied'};
 
     my $target_object = $source_object->copy($source_pdf); ## thanks to: yaheath // Fri, 17 Sep 2004
 
-####$source_object->{' copied'}=1;
+    # $source_object->{' copied'} = 1;
     $target_pdf->new_obj($target_object) if $source_object->is_obj($source_pdf);
 
     $object_cache->{scalar $source_object} = $target_object;
@@ -1247,6 +1268,7 @@ sub walk_obj {
     }
     delete $target_object->{' streamloc'};
     delete $target_object->{' streamsrc'};
+
     return $target_object;
 }
 
@@ -1284,77 +1306,79 @@ sub importPageIntoForm {
     $s_idx ||= 0;
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
-        die "Invalid usage: 1st argument must be PDF::API2 instance, not: " . ref($s_pdf);
+        die "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
     }
 
-    my ($s_page,$xo);
+    my ($s_page, $xo);
 
-    $xo=$self->xo_form;
+    $xo = $self->xo_form();
 
-    if(ref($s_idx) eq 'PDF::API2::Page') {
-        $s_page=$s_idx;
-    } else {
-        $s_page=$s_pdf->openpage($s_idx);
+    if (ref($s_idx) eq 'PDF::API2::Page') {
+        $s_page = $s_idx;
+    }
+    else {
+        $s_page = $s_pdf->openpage($s_idx);
     }
 
-    $self->{apiimportcache}||={};
-    $self->{apiimportcache}->{$s_pdf}||={};
+    $self->{'apiimportcache'} ||= {};
+    $self->{'apiimportcache'}->{$s_pdf} ||= {};
 
-    # Should never get past MediaBox, since it is a required object.
-    foreach my $k (qw( MediaBox ArtBox TrimBox BleedBox CropBox )) {
-        #next unless(defined $s_page->{$k});
-        #my $box = walk_obj($self->{apiimportcache}->{$s_pdf},$s_pdf->{pdf},$self->{pdf},$s_page->{$k});
-        next unless(defined $s_page->find_prop($k));
-        my $box = walk_obj($self->{apiimportcache}->{$s_pdf},$s_pdf->{pdf},$self->{pdf},$s_page->find_prop($k));
-        $xo->bbox(map { $_->val } $box->elementsof);
+    # This should never get past MediaBox, since it's a required object.
+    foreach my $k (qw(MediaBox ArtBox TrimBox BleedBox CropBox)) {
+        # next unless defined $s_page->{$k};
+        # my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
+        next unless defined $s_page->find_prop($k);
+        my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
+        $xo->bbox(map { $_->val() } $box->elementsof());
         last;
     }
-    $xo->bbox( 0, 0, 612, 792) unless(defined $xo->{BBox});
+    $xo->bbox(0, 0, 612, 792) unless defined $xo->{'BBox'};
 
-    foreach my $k (qw( Resources )) {
-        $s_page->{$k}=$s_page->find_prop($k);
-        next unless(defined $s_page->{$k});
-        $s_page->{$k}->realise if(ref($s_page->{$k})=~/Objind$/);
+    foreach my $k (qw(Resources)) {
+        $s_page->{$k} = $s_page->find_prop($k);
+        next unless defined $s_page->{$k};
+        $s_page->{$k}->realise() if ref($s_page->{$k}) =~ /Objind$/;
 
-        foreach my $sk (qw( XObject ExtGState Font ProcSet Properties ColorSpace Pattern Shading )) {
-            next unless(defined $s_page->{$k}->{$sk});
-            $s_page->{$k}->{$sk}->realise if(ref($s_page->{$k}->{$sk})=~/Objind$/);
+        foreach my $sk (qw(XObject ExtGState Font ProcSet Properties ColorSpace Pattern Shading)) {
+            next unless defined $s_page->{$k}->{$sk};
+            $s_page->{$k}->{$sk}->realise() if ref($s_page->{$k}->{$sk}) =~ /Objind$/;
             foreach my $ssk (keys %{$s_page->{$k}->{$sk}}) {
-                next if($ssk=~/^ /);
-                $xo->resource($sk,$ssk,walk_obj($self->{apiimportcache}->{$s_pdf},$s_pdf->{pdf},$self->{pdf},$s_page->{$k}->{$sk}->{$ssk}));
+                next if $ssk =~ /^ /;
+                $xo->resource($sk, $ssk, walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k}->{$sk}->{$ssk}));
             }
         }
     }
 
     # create a whole content stream
     ## technically it is possible to submit an unfinished
-    ## (eg. newly created) source-page, but thats non-sense,
+    ## (eg. newly created) source-page, but thats nonsense,
     ## so we expect a page fixed by openpage and die otherwise
-    die "page not processed via openpage ... " unless($s_page->{' fixed'}==1);
+    die "page not processed via openpage ..." unless $s_page->{' fixed'} == 1;
 
     # since the source page comes from openpage it may already
     # contain the required starting 'q' without the final 'Q'
     # if forcecompress is in effect
-    if(defined $s_page->{Contents}) {
-        $s_page->fixcontents;
+    if (defined $s_page->{'Contents'}) {
+        $s_page->fixcontents();
 
-        $xo->{' stream'}="";
+        $xo->{' stream'} = '';
         # openpage pages only contain one stream
-        my ($k)=$s_page->{Contents}->elementsof;
-        $k->realise;
-        if($k->{' nofilt'}) {
+        my ($k) = $s_page->{'Contents'}->elementsof();
+        $k->realise();
+        if ($k->{' nofilt'}) {
           # we have a finished stream here
           # so we unfilter
-          $xo->add('q',unfilter($k->{Filter}, $k->{' stream'}),'Q');
-        } else {
-          # stream is an unfinished/unfiltered content
-          # so we just copy it and add the required "qQ"
-            $xo->add('q',$k->{' stream'},'Q');
+          $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
         }
-        $xo->compressFlate if($self->{forcecompress}>0);
+        else {
+            # stream is an unfinished/unfiltered content
+            # so we just copy it and add the required "qQ"
+            $xo->add('q', $k->{' stream'}, 'Q');
+        }
+        $xo->compressFlate() if $self->{'forcecompress'} > 0;
     }
 
-    return($xo);
+    return $xo;
 }
 
 =item $page = $pdf->import_page($source_pdf, $source_page_number, $target_page_number)
@@ -1390,119 +1414,123 @@ sub import_page {
     my ($self, $s_pdf, $s_idx, $t_idx) = @_;
     $s_idx ||= 0;
     $t_idx ||= 0;
-    my ($s_page,$t_page);
+    my ($s_page, $t_page);
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
-        die "Invalid usage: 1st argument must be PDF::API2 instance, not: " . ref($s_pdf);
+        die "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
     }
 
-    if(ref($s_idx) eq 'PDF::API2::Page') {
-        $s_page=$s_idx;
-    } else {
-        $s_page=$s_pdf->openpage($s_idx);
+    if (ref($s_idx) eq 'PDF::API2::Page') {
+        $s_page = $s_idx;
+    }
+    else {
+        $s_page = $s_pdf->openpage($s_idx);
     }
 
-    if(ref($t_idx) eq 'PDF::API2::Page') {
-        $t_page=$t_idx;
-    } else {
-        if($self->pages<$t_idx) {
-            $t_page=$self->page;
-        } else {
-            $t_page=$self->page($t_idx);
+    if (ref($t_idx) eq 'PDF::API2::Page') {
+        $t_page = $t_idx;
+    }
+    else {
+        if ($self->pages() < $t_idx) {
+            $t_page = $self->page();
+        }
+        else {
+            $t_page = $self->page($t_idx);
         }
     }
 
-    $self->{apiimportcache}=$self->{apiimportcache}||{};
-    $self->{apiimportcache}->{$s_pdf}=$self->{apiimportcache}->{$s_pdf}||{};
+    $self->{'apiimportcache'} = $self->{'apiimportcache'} || {};
+    $self->{'apiimportcache'}->{$s_pdf} = $self->{'apiimportcache'}->{$s_pdf} || {};
 
     # we now import into a form to keep
     # all that nasty resources from polluting
     # our very own resource naming space.
-    my $xo = $self->importPageIntoForm($s_pdf,$s_page);
+    my $xo = $self->importPageIntoForm($s_pdf, $s_page);
 
     # copy all page dimensions
-    foreach my $k (qw( MediaBox ArtBox TrimBox BleedBox CropBox )) {
+    foreach my $k (qw(MediaBox ArtBox TrimBox BleedBox CropBox)) {
         my $prop = $s_page->find_prop($k);
         next unless defined $prop;
 
-        my $box = walk_obj({}, $s_pdf->{pdf}, $self->{pdf}, $prop);
-        my $method = lc($k);
+        my $box = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $prop);
+        my $method = lc $k;
 
-        $t_page->$method(map { $_->val } $box->elementsof);
+        $t_page->$method(map { $_->val() } $box->elementsof());
     }
 
-    $t_page->gfx->formimage($xo,0,0,1);
+    $t_page->gfx->formimage($xo, 0, 0, 1);
 
     # copy annotations and/or form elements as well
-    if (exists $s_page->{Annots} and $s_page->{Annots} and $self->{copyannots}) {
+    if (exists $s_page->{'Annots'} and $s_page->{'Annots'} and $self->{'copyannots'}) {
+        # first set up the AcroForm, if required
+        my $AcroForm;
+        if (my $a = $s_pdf->{'pdf'}->{'Root'}->realise->{'AcroForm'}) {
+            $a->realise();
 
-            # first set up the AcroForm, if required
-            my $AcroForm;
-            if (my $a = $s_pdf->{pdf}->{Root}->realise->{AcroForm}) {
-                    $a->realise;
+            $AcroForm = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $a, qw(NeedAppearances SigFlags CO DR DA Q));
+        }
+        my @Fields = ();
+        my @Annots = ();
+        foreach my $a ($s_page->{'Annots'}->elementsof()) {
+            $a->realise();
+            my $t_a = PDFDict();
+            $self->{'pdf'}->new_obj($t_a);
+            # these objects are likely to be both annotations and Acroform fields
+            # key names are copied from PDF Reference 1.4 (Tables)
+            my @k = (
+                qw( Type Subtype Contents P Rect NM M F BS Border AP AS C CA T Popup A AA StructParent Rotate
+                ),                                      # Annotations - Common (8.10)
+                qw( Subtype Contents Open Name ),       # Text Annotations (8.15)
+                qw( Subtype Contents Dest H PA ),       # Link Annotations (8.16)
+                qw( Subtype Contents DA Q ),            # Free Text Annotations (8.17)
+                qw( Subtype Contents L BS LE IC ) ,     # Line Annotations (8.18)
+                qw( Subtype Contents BS IC ),           # Square and Circle Annotations (8.20)
+                qw( Subtype Contents QuadPoints ),      # Markup Annotations (8.21)
+                qw( Subtype Contents Name ),            # Rubber Stamp Annotations (8.22)
+                qw( Subtype Contents InkList BS ),      # Ink Annotations (8.23)
+                qw( Subtype Contents Parent Open ),     # Popup Annotations (8.24)
+                qw( Subtype FS Contents Name ),         # File Attachment Annotations (8.25)
+                qw( Subtype Sound Contents Name ),      # Sound Annotations (8.26)
+                qw( Subtype Movie Contents A ),         # Movie Annotations (8.27)
+                qw( Subtype Contents H MK ),            # Widget Annotations (8.28)
+                                                        # Printers Mark Annotations (none)
+                                                        # Trap Network Annotations (none)
+            );
 
-                    $AcroForm = walk_obj({},$s_pdf->{pdf},$self->{pdf},$a,qw( NeedAppearances SigFlags CO DR DA Q ));
+            push @k, (
+                qw( Subtype FT Parent Kids T TU TM Ff V DV AA
+                ),                                      # Fields - Common (8.49)
+                qw( DR DA Q ),                          # Fields containing variable text (8.51)
+                qw( Opt ),                              # Checkbox field (8.54)
+                qw( Opt ),                              # Radio field (8.55)
+                qw( MaxLen ),                           # Text field (8.57)
+                qw( Opt TI I ),                         # Choice field (8.59)
+            ) if $AcroForm;
+
+            # sorting out dups
+            my %ky = map { $_ => 1 } @k;
+            # we do P separately, as it points to the page the Annotation is on
+            delete $ky{'P'};
+            # copy everything else
+            foreach my $k (keys %ky) {
+                next unless defined $a->{$k};
+                $a->{$k}->realise();
+                $t_a->{$k} = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $a->{$k});
             }
-            my @Fields = ();
-            my @Annots = ();
-            foreach my $a ($s_page->{Annots}->elementsof) {
-                    $a->realise;
-                    my $t_a = PDFDict();
-                    $self->{pdf}->new_obj($t_a);
-                    # these objects are likely to be both annotations and Acroform fields
-                    # key names are copied from PDF Reference 1.4 (Tables)
-                    my @k = (
-                            qw( Type Subtype Contents P Rect NM M F BS Border AP AS C CA T Popup A AA StructParent Rotate
-                            ),                                      # Annotations - Common (8.10)
-                            qw( Subtype Contents Open Name ),       # Text Annotations (8.15)
-                            qw( Subtype Contents Dest H PA ),       # Link Annotations (8.16)
-                            qw( Subtype Contents DA Q ),            # Free Text Annotations (8.17)
-                            qw( Subtype Contents L BS LE IC ) ,     # Line Annotations (8.18)
-                            qw( Subtype Contents BS IC ),           # Square and Circle Annotations (8.20)
-                            qw( Subtype Contents QuadPoints ),      # Markup Annotations (8.21)
-                            qw( Subtype Contents Name ),            # Rubber Stamp Annotations (8.22)
-                            qw( Subtype Contents InkList BS ),      # Ink Annotations (8.23)
-                            qw( Subtype Contents Parent Open ),     # Popup Annotations (8.24)
-                            qw( Subtype FS Contents Name ),         # File Attachment Annotations (8.25)
-                            qw( Subtype Sound Contents Name ),      # Sound Annotations (8.26)
-                            qw( Subtype Movie Contents A ),         # Movie Annotations (8.27)
-                            qw( Subtype Contents H MK ),            # Widget Annotations (8.28)
-                                                                    # Printers Mark Annotations (none)
-                                                                    # Trap Network Annotations (none)
-                    );
-                    push @k, (
-                            qw( Subtype FT Parent Kids T TU TM Ff V DV AA
-                            ),                                      # Fields - Common (8.49)
-                            qw( DR DA Q ),                          # Fields containing variable text (8.51)
-                            qw( Opt ),                              # Checkbox field (8.54)
-                            qw( Opt ),                              # Radio field (8.55)
-                            qw( MaxLen ),                           # Text field (8.57)
-                            qw( Opt TI I ),                         # Choice field (8.59)
-                    ) if $AcroForm;
-                    # sorting out dups
-                    my %ky=map { $_ => 1 } @k;
-                    # we do P separately, as it points to the page the Annotation is on
-                    delete $ky{P};
-                    # copy everything else
-                    foreach my $k (keys %ky) {
-                            next unless defined $a->{$k};
-                            $a->{$k}->realise;
-                            $t_a->{$k} = walk_obj({},$s_pdf->{pdf},$self->{pdf},$a->{$k});
-                    }
-                    $t_a->{P} = $t_page;
-                    push @Annots, $t_a;
-                    push @Fields, $t_a if ($AcroForm and $t_a->{Subtype}->val eq 'Widget');
-            }
-            $t_page->{Annots} = PDFArray(@Annots);
-            $AcroForm->{Fields} = PDFArray(@Fields) if $AcroForm;
-            $self->{pdf}->{Root}->{AcroForm} = $AcroForm;
+            $t_a->{'P'} = $t_page;
+            push @Annots, $t_a;
+            push @Fields, $t_a if ($AcroForm and $t_a->{'Subtype'}->val() eq 'Widget');
+        }
+        $t_page->{'Annots'} = PDFArray(@Annots);
+        $AcroForm->{'Fields'} = PDFArray(@Fields) if $AcroForm;
+        $self->{'pdf'}->{'Root'}->{'AcroForm'} = $AcroForm;
     }
     $t_page->{' imported'} = 1;
 
-    $self->{pdf}->out_obj($t_page);
-    $self->{pdf}->out_obj($self->{pages});
+    $self->{'pdf'}->out_obj($t_page);
+    $self->{'pdf'}->out_obj($self->{'pages'});
 
-    return($t_page);
+    return $t_page;
 }
 
 =item $count = $pdf->pages()
@@ -1513,7 +1541,7 @@ Returns the number of pages in the document.
 
 sub pages {
     my $self = shift();
-    return scalar @{$self->{pagestack}};
+    return scalar @{$self->{'pagestack'}};
 }
 
 =item $pdf->mediabox($name)
@@ -1544,9 +1572,9 @@ B<Example:>
 =cut
 
 sub mediabox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    $self->{pages}->{'MediaBox'}=PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1,$x2,$y2) );
-    $self;
+    my ($self, $x1, $y1, $x2, $y2) = @_;
+    $self->{'pages'}->{'MediaBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
+    return $self;
 }
 
 =item $pdf->cropbox($name)
@@ -1560,9 +1588,9 @@ Sets the global cropbox.
 =cut
 
 sub cropbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    $self->{pages}->{'CropBox'}=PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1,$x2,$y2) );
-    $self;
+    my ($self, $x1, $y1, $x2, $y2) = @_;
+    $self->{'pages'}->{'CropBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
+    return $self;
 }
 
 =item $pdf->bleedbox($name)
@@ -1576,9 +1604,9 @@ Sets the global bleedbox.
 =cut
 
 sub bleedbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    $self->{pages}->{'BleedBox'}=PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1,$x2,$y2) );
-    $self;
+    my ($self, $x1, $y1, $x2, $y2) = @_;
+    $self->{'pages'}->{'BleedBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
+    return $self;
 }
 
 =item $pdf->trimbox($name)
@@ -1592,9 +1620,9 @@ Sets the global trimbox.
 =cut
 
 sub trimbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    $self->{pages}->{'TrimBox'}=PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1,$x2,$y2) );
-    $self;
+    my ($self, $x1, $y1, $x2, $y2) = @_;
+    $self->{'pages'}->{'TrimBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
+    return $self;
 }
 
 =item $pdf->artbox($name)
@@ -1608,9 +1636,9 @@ Sets the global artbox.
 =cut
 
 sub artbox {
-    my ($self,$x1,$y1,$x2,$y2) = @_;
-    $self->{pages}->{'ArtBox'}=PDFArray( map { PDFNum(float($_)) } page_size($x1,$y1,$x2,$y2) );
-    $self;
+    my ($self, $x1, $y1, $x2, $y2) = @_;
+    $self->{'pages'}->{'ArtBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
+    return $self;
 }
 
 =back
@@ -1636,9 +1664,9 @@ sub addFontDirs {
 
 sub _findFont {
     my $font = shift();
-    my @fonts=($font,map { "$_/$font" } @FontDirs);
-    while((scalar @fonts > 0) && (! -f $fonts[0])) { shift @fonts; }
-    return($fonts[0]);
+    my @fonts = ($font, map { "$_/$font" } @FontDirs);
+    shift @fonts while scalar(@fonts) and not -f $fonts[0];
+    return $fonts[0];
 }
 
 =item $font = $pdf->corefont($fontname, [%options])
@@ -1671,12 +1699,12 @@ See Also: L<PDF::API2::Resource::Font::CoreFont>.
 =cut
 
 sub corefont {
-    my ($self,$name,%opts)=@_;
+    my ($self, $name, %opts) = @_;
     require PDF::API2::Resource::Font::CoreFont;
-    my $obj=PDF::API2::Resource::Font::CoreFont->new($self->{'pdf'},$name,%opts);
-    $self->{pdf}->out_obj($self->{pages});
-    $obj->tounicodemap if($opts{-unicodemap}==1);
-    return($obj);
+    my $obj = PDF::API2::Resource::Font::CoreFont->new($self->{'pdf'}, $name, %opts);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    return $obj;
 }
 
 =item $font = $pdf->psfont($ps_file, [%options])
@@ -1714,19 +1742,20 @@ Enables kerning if data is available.
 =cut
 
 sub psfont {
-    my ($self,$psf,%opts)=@_;
+    my ($self, $psf, %opts) = @_;
 
     foreach my $o (qw(-afmfile -pfmfile)) {
-        next unless(defined $opts{$o});
-        $opts{$o}=_findFont($opts{$o});
+        next unless defined $opts{$o};
+        $opts{$o} = _findFont($opts{$o});
     }
-    $psf=_findFont($psf);
+    $psf = _findFont($psf);
     require PDF::API2::Resource::Font::Postscript;
-    my $obj=PDF::API2::Resource::Font::Postscript->new($self->{'pdf'},$psf,%opts);
+    my $obj = PDF::API2::Resource::Font::Postscript->new($self->{'pdf'}, $psf, %opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    $obj->tounicodemap if($opts{-unicodemap}==1);
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+
+    return $obj;
 }
 
 =item $font = $pdf->ttfont($ttf_file, [%options])
@@ -1775,8 +1804,9 @@ sub ttfont {
     require PDF::API2::Resource::CIDFont::TrueType;
     my $obj = PDF::API2::Resource::CIDFont::TrueType->new($self->{'pdf'}, $file, %opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    $obj->tounicodemap if $opts{-unicodemap};
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $obj->tounicodemap() if $opts{-unicodemap};
+
     return $obj;
 }
 
@@ -1804,14 +1834,15 @@ See Also: L<PDF::API2::Resource::CIDFont::CJKFont>
 =cut
 
 sub cjkfont {
-    my ($self,$name,%opts)=@_;
+    my ($self, $name, %opts) = @_;
 
     require PDF::API2::Resource::CIDFont::CJKFont;
-    my $obj=PDF::API2::Resource::CIDFont::CJKFont->new($self->{'pdf'},$name,%opts);
+    my $obj = PDF::API2::Resource::CIDFont::CJKFont->new($self->{'pdf'}, $name, %opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    $obj->tounicodemap if($opts{-unicodemap}==1);
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+
+    return $obj;
 }
 
 =item $font = $pdf->synfont($basefont, [%options])
@@ -1852,14 +1883,15 @@ See Also: L<PDF::API2::Resource::Font::SynFont>
 =cut
 
 sub synfont {
-    my ($self,%opts)=@_;
+    my ($self, %opts) = @_;
 
     require PDF::API2::Resource::Font::SynFont;
-    my $obj=PDF::API2::Resource::Font::SynFont->new($self->{'pdf'},%opts);
+    my $obj = PDF::API2::Resource::Font::SynFont->new($self->{'pdf'}, %opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    $obj->tounicodemap if($opts{-unicodemap}==1);
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+
+    return $obj;
 }
 
 =item $font = $pdf->bdfont($bdf_file)
@@ -1871,14 +1903,15 @@ See Also: L<PDF::API2::Resource::Font::BdFont>
 =cut
 
 sub bdfont {
-    my ($self,@opts)=@_;
+    my ($self, @opts) = @_;
 
     require PDF::API2::Resource::Font::BdFont;
-    my $obj=PDF::API2::Resource::Font::BdFont->new($self->{'pdf'},@opts);
+    my $obj = PDF::API2::Resource::Font::BdFont->new($self->{'pdf'}, @opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    ## $obj->tounicodemap; # does not support unicode!
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    # $obj->tounicodemap(); # does not support Unicode
+
+    return $obj;
 }
 
 =item $font = $pdf->unifont(@fontspecs, %options)
@@ -1902,12 +1935,12 @@ Changes the encoding of the font from its default.
 =cut
 
 sub unifont {
-    my ($self,@opts)=@_;
+    my ($self, @opts) = @_;
 
     require PDF::API2::Resource::UniFont;
-    my $obj=PDF::API2::Resource::UniFont->new($self->{'pdf'},@opts);
+    my $obj = PDF::API2::Resource::UniFont->new($self->{'pdf'}, @opts);
 
-    return($obj);
+    return $obj;
 }
 
 =back
@@ -1923,13 +1956,14 @@ Imports and returns a new JPEG image object.  C<$file> may be either a filename 
 =cut
 
 sub image_jpeg {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
     require PDF::API2::Resource::XObject::Image::JPEG;
-    my $obj=PDF::API2::Resource::XObject::Image::JPEG->new($self->{'pdf'},$file);
+    my $obj = PDF::API2::Resource::XObject::Image::JPEG->new($self->{'pdf'}, $file);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $tiff = $pdf->image_tiff($file)
@@ -1939,13 +1973,14 @@ Imports and returns a new TIFF image object.  C<$file> may be either a filename 
 =cut
 
 sub image_tiff {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
     require PDF::API2::Resource::XObject::Image::TIFF;
-    my $obj=PDF::API2::Resource::XObject::Image::TIFF->new($self->{'pdf'},$file);
+    my $obj = PDF::API2::Resource::XObject::Image::TIFF->new($self->{'pdf'}, $file);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $pnm = $pdf->image_pnm($file)
@@ -1955,13 +1990,14 @@ Imports and returns a new PNM image object.  C<$file> may be either a filename o
 =cut
 
 sub image_pnm {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
     require PDF::API2::Resource::XObject::Image::PNM;
-    my $obj=PDF::API2::Resource::XObject::Image::PNM->new($self->{'pdf'},$file);
+    my $obj = PDF::API2::Resource::XObject::Image::PNM->new($self->{'pdf'}, $file);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $png = $pdf->image_png($file)
@@ -1971,13 +2007,14 @@ Imports and returns a new PNG image object.  C<$file> may be either a filename o
 =cut
 
 sub image_png {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
     require PDF::API2::Resource::XObject::Image::PNG;
-    my $obj=PDF::API2::Resource::XObject::Image::PNG->new($self->{'pdf'},$file);
+    my $obj = PDF::API2::Resource::XObject::Image::PNG->new($self->{'pdf'}, $file);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $gif = $pdf->image_gif($file)
@@ -1987,13 +2024,14 @@ Imports and returns a new GIF image object.  C<$file> may be either a filename o
 =cut
 
 sub image_gif {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
     require PDF::API2::Resource::XObject::Image::GIF;
-    my $obj=PDF::API2::Resource::XObject::Image::GIF->new($self->{'pdf'},$file);
+    my $obj = PDF::API2::Resource::XObject::Image::GIF->new($self->{'pdf'}, $file);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $gdf = $pdf->image_gd($gd_object, %options)
@@ -2005,13 +2043,14 @@ B<Options:> The only option currently supported is C<< -lossless => 1 >>.
 =cut
 
 sub image_gd {
-    my ($self,$gd,%opts)=@_;
+    my ($self, $gd, %opts) = @_;
 
     require PDF::API2::Resource::XObject::Image::GD;
-    my $obj=PDF::API2::Resource::XObject::Image::GD->new($self->{'pdf'},$gd,undef,%opts);
+    my $obj = PDF::API2::Resource::XObject::Image::GD->new($self->{'pdf'}, $gd, undef, %opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =back
@@ -2030,13 +2069,14 @@ reference to the file format's specification.
 =cut
 
 sub colorspace_act {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
     require PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
-    my $obj=PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new($self->{'pdf'},$file);
+    my $obj = PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new($self->{'pdf'}, $file);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $cs = $pdf->colorspace_web()
@@ -2046,13 +2086,14 @@ Returns a new colorspace-object based on the web color palette.
 =cut
 
 sub colorspace_web {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts) = @_;
 
     require PDF::API2::Resource::ColorSpace::Indexed::WebColor;
-    my $obj=PDF::API2::Resource::ColorSpace::Indexed::WebColor->new($self->{'pdf'});
+    my $obj = PDF::API2::Resource::ColorSpace::Indexed::WebColor->new($self->{'pdf'});
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $cs = $pdf->colorspace_hue()
@@ -2064,13 +2105,14 @@ See L<PDF::API2::Resource::ColorSpace::Indexed::Hue> for an explanation.
 =cut
 
 sub colorspace_hue {
-    my ($self,$file,%opts)=@_;
+    my ($self, $file, %opts)=@_;
 
     require PDF::API2::Resource::ColorSpace::Indexed::Hue;
-    my $obj=PDF::API2::Resource::ColorSpace::Indexed::Hue->new($self->{'pdf'});
+    my $obj = PDF::API2::Resource::ColorSpace::Indexed::Hue->new($self->{'pdf'});
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $cs = $pdf->colorspace_separation($tint, $color)
@@ -2090,13 +2132,14 @@ specified color.
 =cut
 
 sub colorspace_separation {
-    my ($self,$name,@clr)=@_;
+    my ($self, $name, @clr)=@_;
 
     require PDF::API2::Resource::ColorSpace::Separation;
-    my $obj=PDF::API2::Resource::ColorSpace::Separation->new($self->{'pdf'},$name,@clr);
+    my $obj = PDF::API2::Resource::ColorSpace::Separation->new($self->{'pdf'}, $name, @clr);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $cs = $pdf->colorspace_devicen(\@tintCSx, [$samples])
@@ -2120,14 +2163,15 @@ colorspace specified.
 =cut
 
 sub colorspace_devicen {
-    my ($self,$clrs,$samples)=@_;
-    $samples||=2;
+    my ($self, $clrs, $samples) = @_;
+    $samples ||= 2;
 
     require PDF::API2::Resource::ColorSpace::DeviceN;
-    my $obj=PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'},$clrs,$samples);
+    my $obj = PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'}, $clrs, $samples);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =back
@@ -2151,53 +2195,58 @@ Creates the specified barcode object as a form XObject.
 =cut
 
 sub xo_code128 {
-    my ($self,@opts)=@_;
+    my ($self, @opts) = @_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::code128;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::code128->new($self->{'pdf'},@opts);
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::code128->new($self->{'pdf'}, @opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 sub xo_codabar {
-    my ($self,@opts)=@_;
+    my ($self, @opts) = @_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::codabar;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::codabar->new($self->{'pdf'},@opts);
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::codabar->new($self->{'pdf'}, @opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 sub xo_2of5int {
-    my ($self,@opts)=@_;
+    my ($self, @opts) = @_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::int2of5;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::int2of5->new($self->{'pdf'},@opts);
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::int2of5->new($self->{'pdf'}, @opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 sub xo_3of9 {
-    my ($self,@opts)=@_;
+    my ($self, @opts) = @_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::code3of9;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::code3of9->new($self->{'pdf'},@opts);
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::code3of9->new($self->{'pdf'}, @opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 sub xo_ean13 {
-    my ($self,@opts)=@_;
+    my ($self, @opts) = @_;
 
     require PDF::API2::Resource::XObject::Form::BarCode::ean13;
-    my $obj=PDF::API2::Resource::XObject::Form::BarCode::ean13->new($self->{'pdf'},@opts);
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::ean13->new($self->{'pdf'}, @opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =back
@@ -2213,12 +2262,13 @@ Returns a new form XObject.
 =cut
 
 sub xo_form {
-    my ($self)=@_;
+    my $self = shift();
 
-    my $obj=PDF::API2::Resource::XObject::Form::Hybrid->new($self->{'pdf'});
+    my $obj = PDF::API2::Resource::XObject::Form::Hybrid->new($self->{'pdf'});
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $egs = $pdf->egstate()
@@ -2228,12 +2278,13 @@ Returns a new extended graphics state object.
 =cut
 
 sub egstate {
-    my ($self)=@_;
+    my $self = shift();
 
-    my $obj=PDF::API2::Resource::ExtGState->new($self->{'pdf'},pdfkey());
+    my $obj = PDF::API2::Resource::ExtGState->new($self->{'pdf'}, pdfkey());
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $obj = $pdf->pattern()
@@ -2243,12 +2294,13 @@ Returns a new pattern object.
 =cut
 
 sub pattern {
-    my ($self,%opts)=@_;
+    my ($self, %opts) = @_;
 
-    my $obj=PDF::API2::Resource::Pattern->new($self->{'pdf'},undef,%opts);
+    my $obj = PDF::API2::Resource::Pattern->new($self->{'pdf'}, undef, %opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $obj = $pdf->shading()
@@ -2258,12 +2310,13 @@ Returns a new shading object.
 =cut
 
 sub shading {
-    my ($self,%opts)=@_;
+    my ($self, %opts) = @_;
 
-    my $obj=PDF::API2::Resource::Shading->new($self->{'pdf'},undef,%opts);
+    my $obj = PDF::API2::Resource::Shading->new($self->{'pdf'}, undef, %opts);
 
-    $self->{pdf}->out_obj($self->{pages});
-    return($obj);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
 }
 
 =item $otls = $pdf->outlines()
@@ -2276,49 +2329,47 @@ sub outlines {
     my $self = shift();
 
     require PDF::API2::Outlines;
-    $self->{pdf}->{Root}->{Outlines} ||= PDF::API2::Outlines->new($self);
+    $self->{'pdf'}->{'Root'}->{'Outlines'} ||= PDF::API2::Outlines->new($self);
 
-    my $obj = $self->{pdf}->{Root}->{Outlines};
+    my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
 
-    $self->{pdf}->new_obj($obj) unless $obj->is_obj($self->{pdf});
-    $self->{pdf}->out_obj($obj);
-    $self->{pdf}->out_obj($self->{pdf}->{Root});
+    $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
+    $self->{'pdf'}->out_obj($obj);
+    $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
 
     return $obj;
-
 }
 
-sub named_destination
-{
-    my ($self,$cat,$name,$obj)=@_;
-    my $root=$self->{catalog};
+sub named_destination {
+    my ($self, $cat, $name, $obj) = @_;
+    my $root = $self->{'catalog'};
 
-    $root->{Names}||=PDFDict();
-    $root->{Names}->{$cat}||=PDFDict();
-    $root->{Names}->{$cat}->{-vals}||={};
-    $root->{Names}->{$cat}->{Limits}||=PDFArray();
-    $root->{Names}->{$cat}->{Names}||=PDFArray();
+    $root->{'Names'} ||= PDFDict();
+    $root->{'Names'}->{$cat} ||= PDFDict();
+    $root->{'Names'}->{$cat}->{'-vals'}  ||= {};
+    $root->{'Names'}->{$cat}->{'Limits'} ||= PDFArray();
+    $root->{'Names'}->{$cat}->{'Names'}  ||= PDFArray();
 
-    unless(defined $obj)
-    {
-        $obj=PDF::API2::NamedDestination->new($self->{'pdf'});
+    unless (defined $obj) {
+        $obj = PDF::API2::NamedDestination->new($self->{'pdf'});
     }
-    $root->{Names}->{$cat}->{-vals}->{$name}=$obj;
+    $root->{'Names'}->{$cat}->{'-vals'}->{$name} = $obj;
 
-    my @names=sort {$a cmp $b} keys %{$root->{Names}->{$cat}->{-vals}};
+    my @names = sort {$a cmp $b} keys %{$root->{'Names'}->{$cat}->{'-vals'}};
 
-    $root->{Names}->{$cat}->{Limits}->{' val'}->[0]=PDFStr($names[0]);
-    $root->{Names}->{$cat}->{Limits}->{' val'}->[1]=PDFStr($names[-1]);
+    $root->{'Names'}->{$cat}->{'Limits'}->{' val'}->[0] = PDFStr($names[0]);
+    $root->{'Names'}->{$cat}->{'Limits'}->{' val'}->[1] = PDFStr($names[-1]);
 
-    @{$root->{Names}->{$cat}->{Names}->{' val'}}=();
+    @{$root->{'Names'}->{$cat}->{'Names'}->{' val'}} = ();
 
-    foreach my $k (@names)
-    {
-        push @{$root->{Names}->{$cat}->{Names}->{' val'}},
-            PDFStr($k),$root->{Names}->{$cat}->{-vals}->{$k};
+    foreach my $k (@names) {
+        push @{$root->{'Names'}->{$cat}->{'Names'}->{' val'}}, (
+            PDFStr($k),
+            $root->{'Names'}->{$cat}->{'-vals'}->{$k}
+        );
     }
 
-    return($obj);
+    return $obj;
 }
 
 1;
