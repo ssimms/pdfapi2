@@ -645,21 +645,21 @@ sub readval {
     }
 
     # Boolean
-    elsif ($str =~ m/^(true|false)$irreg_char/) {
+    elsif ($str =~ m/^(true|false)($irreg_char|$)/) {
         $value = $1;
         $str =~ s/^(?:true|false)//;
         $result = PDF::API2::Basic::PDF::Bool->from_pdf($value);
     }
 
     # Number
-    elsif ($str =~ m/^([+-.0-9]+)$irreg_char/) {
+    elsif ($str =~ m/^([+-.0-9]+)($irreg_char|$)/) {
         $value = $1;
         $str =~ s/^([+-.0-9]+)//;
         $result = PDF::API2::Basic::PDF::Number->from_pdf($value);
     }
 
     # Null
-    elsif ($str =~ m/^null$irreg_char/) {
+    elsif ($str =~ m/^null($irreg_char|$)/) {
         $str =~ s/^null//;
         $result = PDF::API2::Basic::PDF::Null->new;
     }

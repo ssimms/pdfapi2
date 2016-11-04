@@ -6,6 +6,9 @@
       chunk of a stream increased to 16kB or more after being
       decompressed.
 
+    - Numbers, booleans, and null values can now be read from object
+      streams.
+
     - Update to [RT #113290]: Objects inside a large object stream are
       now read without loading the entire object stream into memory.
 

@@ -1,4 +1,4 @@
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use warnings;
 use strict;
@@ -19,3 +19,8 @@ ok($object,
 my ($key) = grep { $_ =~ /^Helv/ } keys %$object;
 ok($key,
    q{The compressed object contains an expected key});
+
+$object = $pdf->{'pdf'}->read_objnum(11, 0);
+
+ok($object,
+   q{Read a number from an object stream});
