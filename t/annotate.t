@@ -27,7 +27,7 @@ $pdf = PDF::API2->new();
 $pdf->{'forcecompress'} = 0;
 $page = $pdf->page();
 
-my $annotation = $page->annotation();
+$annotation = $page->annotation();
 $annotation->file_attachment('t/resources/sample.pdf', -type => 'application/pdf', -rect => [ 72, 144, 172, 244 ]);
 
 $string = $pdf->stringify();
