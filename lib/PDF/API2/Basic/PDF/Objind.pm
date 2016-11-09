@@ -154,7 +154,7 @@ Makes sure that the object is fully read in, etc.
 =cut
 
 sub realise {
-    $_[0]->{' realised'} ? $_[0] : $_[0]->{' parent'}->read_obj(@_);
+    $_[0]->{' realised'} ? $_[0] : $_[0]->{' objnum'} ? $_[0]->{' parent'}->read_obj(@_) : $_[0];
 }
 
 =head2 $r->outobjdeep($fh, $pdf)
