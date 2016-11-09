@@ -1232,7 +1232,7 @@ sub readxrtr {
 
     $tdict->{' loc'} = $xpos;
     $tdict->{' xref'} = $xlist;
-    $self->{' maxobj'} = $xmin if $xmin > $self->{' maxobj'};
+    $self->{' maxobj'} = $xmin + 1 if $xmin + 1 > $self->{' maxobj'};
     $tdict->{' prev'} = $self->readxrtr($tdict->{'Prev'}->val)
         if (defined $tdict->{'Prev'} and $tdict->{'Prev'}->val != 0);
     delete $tdict->{' prev'} unless defined $tdict->{' prev'};
