@@ -18,7 +18,5 @@ ok($object,
 
 $object = $pdf->{'pdf'}->read_objnum(12, 0);
 
-diag($object);
-
 ok($object,
    q{Read the low object from an indexed object stream});
