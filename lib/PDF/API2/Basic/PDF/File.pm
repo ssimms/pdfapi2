@@ -157,6 +157,7 @@ $cr = '\s*(?:\015|\012|(?:\015\012))';
 
 my $readDebug = 0;
 
+use Carp;
 use IO::File;
 
 # Now for the basic PDF types
@@ -697,6 +698,10 @@ Returns a fully read object of given number and generation in this file
 
 sub read_objnum {
     my ($self, $num, $gen, %opts) = @_;
+    croak 'Undefined object number in call to read_objnum($num, $gen)' unless defined $num;
+    croak 'Undefined object generation in call to read_objnum($num, $gen)' unless defined $gen;
+    croak "Invalid object number '$num' in call to read_objnum" unless $num =~ /^[0-9]+$/;
+    croak "Invalid object generation '$gen' in call to read_objnum" unless $gen =~ /^[0-9]+$/;
 
     my $object_location = $self->locate_obj($num, $gen) || return;
     my $object;
