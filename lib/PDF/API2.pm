@@ -2135,7 +2135,7 @@ sub colorspace_separation {
     my ($self, $name, @clr)=@_;
 
     require PDF::API2::Resource::ColorSpace::Separation;
-    my $obj = PDF::API2::Resource::ColorSpace::Separation->new($self->{'pdf'}, $name, @clr);
+    my $obj = PDF::API2::Resource::ColorSpace::Separation->new($self->{'pdf'}, pdfkey(), $name, @clr);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
 
@@ -2167,7 +2167,7 @@ sub colorspace_devicen {
     $samples ||= 2;
 
     require PDF::API2::Resource::ColorSpace::DeviceN;
-    my $obj = PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'}, $clrs, $samples);
+    my $obj = PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'}, pdfkey(), $clrs, $samples);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
 
