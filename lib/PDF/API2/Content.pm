@@ -1122,57 +1122,58 @@ C<%F000> or C<%FFFF000000000000>.
 #
 
 sub _makecolor {
-    my ($self,$sf,@clr)=@_;
-    if ($clr[0]=~/^[a-z\#\!]+/) {
+    my ($self, $sf, @clr) = @_;
+
+    if ($clr[0] =~ /^[a-z\#\!]+/) {
         # colorname or #! specifier
         # with rgb target colorspace
         # namecolor returns always a RGB
-        return(namecolor($clr[0]),($sf?'rg':'RG'));
+        return namecolor($clr[0]), ($sf ? 'rg' : 'RG');
     }
-    elsif($clr[0]=~/^[\%]+/) {
+    elsif ($clr[0] =~ /^[\%]+/) {
         # % specifier
         # with cmyk target colorspace
-        return(namecolor_cmyk($clr[0]),($sf?'k':'K'));
+        return namecolor_cmyk($clr[0]), ($sf ? 'k' : 'K');
     }
-    elsif($clr[0]=~/^[\$\&]/) {
+    elsif ($clr[0] =~ /^[\$\&]/) {
         # &$ specifier
         # with L*a*b target colorspace
-        if (!defined $self->resource('ColorSpace','LabS')) {
-            my $dc=PDFDict();
-            my $cs=PDFArray(PDFName('Lab'),$dc);
-            $dc->{WhitePoint}=PDFArray(map { PDFNum($_) } qw(1 1 1));
-            $dc->{Range}=PDFArray(map { PDFNum($_) } qw(-128 127 -128 127));
-            $dc->{Gamma}=PDFArray(map { PDFNum($_) } qw(2.2 2.2 2.2));
-            $self->resource('ColorSpace','LabS',$cs);
+        if (!defined $self->resource('ColorSpace', 'LabS')) {
+            my $dc = PDFDict();
+            my $cs = PDFArray(PDFName('Lab'), $dc);
+            $dc->{'WhitePoint'} = PDFArray(map { PDFNum($_) } qw(1 1 1));
+            $dc->{'Range'} = PDFArray(map { PDFNum($_) } qw(-128 127 -128 127));
+            $dc->{'Gamma'} = PDFArray(map { PDFNum($_) } qw(2.2 2.2 2.2));
+            $self->resource('ColorSpace', 'LabS', $cs);
         }
-        return('/LabS',($sf?'cs':'CS'),namecolor_lab($clr[0]),($sf?'sc':'SC'));
+        return '/LabS', ($sf ? 'cs' : 'CS'), namecolor_lab($clr[0]), ($sf ? 'sc' : 'SC');
     }
-    elsif((scalar @clr == 1) && ref($clr[0])) {
+    elsif (scalar @clr == 1 and ref($clr[0])) {
         # pattern or shading space
-        return('/Pattern',($sf?'cs':'CS'),'/'.($clr[0]->name),($sf?'scn':'SCN'));
+        return '/Pattern', ($sf ? 'cs' : 'CS'), '/' . ($clr[0]->name()), ($sf ? 'scn' : 'SCN');
     }
-    elsif(scalar @clr == 1) {
+    elsif (scalar @clr == 1) {
         # grey color spec.
-        return($clr[0],($sf?'g':'G'));
+        return $clr[0], $sf ? 'g' : 'G';
     }
-    elsif(scalar @clr > 1 && ref($clr[0])) {
+    elsif (scalar @clr > 1 and ref($clr[0])) {
         # indexed colorspace plus color-index
         # or custom colorspace plus param
-        my $cs=shift @clr;
-        return('/'.($cs->name),($sf?'cs':'CS'),$cs->param(@clr),($sf?'sc':'SC'));
+        my $cs = shift(@clr);
+        return '/' . $cs->name(), ($sf ? 'cs' : 'CS'), $cs->param(@clr), ($sf ? 'sc' : 'SC');
     }
-    elsif(scalar @clr == 2) {
+    elsif (scalar @clr == 2) {
         # indexed colorspace plus color-index
         # or custom colorspace plus param
-        return('/'.($clr[0]->name),($sf?'cs':'CS'),$clr[0]->param($clr[1]),($sf?'sc':'SC'));
+        return '/' . $clr[0]->name(), ($sf ? 'cs' : 'CS'), $clr[0]->param($clr[1]), ($sf ? 'sc' : 'SC');
     }
-    elsif(scalar @clr == 3) {
+    elsif (scalar @clr == 3) {
         # legacy rgb color-spec (0 <= x <= 1)
-        return(floats($clr[0],$clr[1],$clr[2]),($sf?'rg':'RG'));
+        return floats($clr[0], $clr[1], $clr[2]), ($sf ? 'rg' : 'RG');
     }
-    elsif(scalar @clr == 4) {
+    elsif (scalar @clr == 4) {
         # legacy cmyk color-spec (0 <= x <= 1)
-        return(floats($clr[0],$clr[1],$clr[2],$clr[3]),($sf?'k':'K'));
+        return floats($clr[0], $clr[1], $clr[2], $clr[3]), ($sf ? 'k' : 'K');
     }
     else {
         die 'invalid color specification.';
