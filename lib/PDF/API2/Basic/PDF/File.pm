@@ -1019,7 +1019,7 @@ sub locate_obj {
 
             if ($ref->[1] == $gen) {
                 return $ref->[0] if $ref->[2] eq 'n';
-                return         # if $ref->[2] eq 'f';
+                return;        # if $ref->[2] eq 'f';
             }
         }
         $tdict = $tdict->{' prev'};
