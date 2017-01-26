@@ -2388,4 +2388,8 @@ PDF::API2 was originally written by Alfred Reibenschuh.
 
 It is currently being maintained by Steve Simms.
 
+=head1 LICENSE
+
+The GNU Lesser General Public License, version 2.1 or later.
+
 =cut
