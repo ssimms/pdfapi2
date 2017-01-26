@@ -163,7 +163,7 @@ sub handle_lzw {
     my $imageWidth = $tif->{'imageWidth'};
     my $mod = $imageWidth % 8;
     if ($mod > 0) {
-        $imageWidth += 8 - $mod
+        $imageWidth += 8 - $mod;
     }
     my $max_raw_strip = $imageWidth * $tif->{'bitsPerSample'} * $tif->{'RowsPerStrip'} / 8;
 
@@ -176,7 +176,7 @@ sub handle_lzw {
             $tif->{'fh'}->read($buf, shift(@{$tif->{'imageLength'}}));
             $buf = deLZW(9, $buf);
             if (length($buf) > $max_raw_strip) {
-                $buf = substr($buf, 0, $max_raw_strip)
+                $buf = substr($buf, 0, $max_raw_strip);
             }
             $self->{' stream'} .= $buf;
         }
