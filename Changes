@@ -20,6 +20,9 @@
       that has an existing annotations array stored as an indirect
       object (reported by Johan Vromans).
 
+    - [RT #118717] Die with an informative error if a file can't be
+      opened during open() or saveas() (reported by Johan Vromans).
+
 
 2.030     2016-10-13
 

@@ -147,7 +147,7 @@ sub open {
     binmode $scalar_fh, ':raw';
 
     my $disk_fh = FileHandle->new();
-    CORE::open($disk_fh, '<', $file);
+    CORE::open($disk_fh, '<', $file) or die "Can't open $file for reading: $!";
     binmode $disk_fh, ':raw';
     $disk_fh->seek(0, 0);
     my $data;
@@ -952,7 +952,7 @@ sub saveas {
     if ($self->{'reopened'}) {
         $self->{'pdf'}->append_file();
         my $fh;
-        CORE::open($fh, '>', $file);
+        CORE::open($fh, '>', $file) or die "Unable to open $file for writing: $!";
         binmode($fh, ':raw');
         print $fh ${$self->{'content_ref'}};
         CORE::close($fh);
