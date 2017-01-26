@@ -20,9 +20,6 @@
       that has an existing annotations array stored as an indirect
       object (reported by Johan Vromans).
 
-    - [RT #117942] Add support for file attachment annotations (patch
-      by Johan Vromans).
-
 
 2.030     2016-10-13
 

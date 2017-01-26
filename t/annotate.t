@@ -1,4 +1,4 @@
-use Test::More tests => 3;
+use Test::More tests => 2;
 
 use strict;
 use warnings;
@@ -20,22 +20,6 @@ my $string = $pdf->stringify();
 like($string,
      qr{/Annot /Subtype /Text /Border \[ 0 0 0 \] /Contents <FEFF005400680069007300200069007300200061006E00200061006E006E006F0074006100740069006F006E> /Rect \[ 72 144 172 244 \]},
      q{Text Annotation in a rectangle});
-
-# File Attachment annotation
-
-$pdf = PDF::API2->new();
-$pdf->{'forcecompress'} = 0;
-$page = $pdf->page();
-
-$annotation = $page->annotation();
-$annotation->file_attachment('t/resources/sample.pdf', -type => 'application/pdf', -rect => [ 72, 144, 172, 244 ]);
-
-$string = $pdf->stringify();
-like($string,
-     qr{/Type /EmbeddedFile},
-     q{File Attachment Annotation});
-
-
 
 # [RT #118352] Crash if $page->annotation is called on a page with an
 # existing Annots array stored in an indirect object
