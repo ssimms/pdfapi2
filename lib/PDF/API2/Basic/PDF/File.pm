@@ -723,7 +723,7 @@ sub read_objnum {
             $pairs = substr($object_stream->{' stream'}, 0, $object_stream->{'First'}->val);
         }
         else {
-            open $fh, '<', $object_stream->{' streamfile'};
+            CORE::open $fh, '<', $object_stream->{' streamfile'};
             read($fh, $pairs, $object_stream->{'First'}->val());
         }
         my @map = split /\s+/, $pairs;
