@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - [RT #120756] Eliminate a warning for an ambiguous call to
+      CORE::open (first reported by Abdelbaki Brahmia).
+
+
+2.031     2017-01-26
+
     - Fix use of cache files when reading streams: temp files will now
       be used any time a stream is larger than 16MB (by default).
       Formerly, due to a bug, they would only be created when a 4kB
