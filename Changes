@@ -3,6 +3,10 @@
     - [RT #120756] Eliminate a warning for an ambiguous call to
       CORE::open (first reported by Abdelbaki Brahmia).
 
+    - $text->text_justified() and $text->text_fill_justified() now
+      adjust the space between words rather than stretching individual
+      characters in order to get the text to fit.
+
 
 2.031     2017-01-26
 

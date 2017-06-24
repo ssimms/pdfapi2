@@ -1865,10 +1865,12 @@ sub advancewidth {
 
 sub text_justified {
     my ($self,$text,$width,%opts) = @_;
-    my $hs = $self->hscale();
-    $self->hscale($hs*($width/$self->advancewidth($text)));
+    my $initial_width = $self->advancewidth($text);
+    my $space_count = scalar split /\s/, $text;
+    my $ws = $self->wordspace();
+    $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
     $self->text($text,%opts);
-    $self->hscale($hs);
+    $self->wordspace($ws);
     return $width;
 }
 
@@ -1918,13 +1920,14 @@ sub text_fill_justified {
     my ($self,$text,$width,%opts) = @_;
     my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
     my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
-    my $hs=$self->hscale();
+    my $ws=$self->wordspace();
     my $w=$self->advancewidth($line);
-    if ($ret||$w>=$width) {
-        $self->hscale($hs*($width/$w));
+    my $space_count = scalar split /\s/, $line;
+    if (($ret||$w>=$width) and $space_count) {
+        $self->wordspace(($width - $w) / $space_count);
     }
     $width=$self->text($line,%opts);
-    $self->hscale($hs);
+    $self->wordspace($ws);
     return($width,$ret);
 }
 
