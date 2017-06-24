@@ -64,7 +64,15 @@ is(ref($result), 'PDF::API2::Basic::PDF::Dict',
 
 ($result, $remainder) = readval("1\n", '0 R');
 is(ref($result), 'PDF::API2::Basic::PDF::Objind',
-   q{Indirect reference on multiple lines with only the first line read});
+   q{Indirect reference on multiple lines with only the first line read 1/3});
+
+($result, $remainder) = readval("1 0\n", 'R');
+is(ref($result), 'PDF::API2::Basic::PDF::Objind',
+   q{Indirect reference on multiple lines with only the first line read 2/3});
+
+($result, $remainder) = readval("1 0%comment\n", 'R');
+is(ref($result), 'PDF::API2::Basic::PDF::Objind',
+   q{Indirect reference on multiple lines with only the first line read 3/3});
 
 ($result, $remainder) = readval("1\n", '0 obj << >> endobj');
 is(ref($result), 'PDF::API2::Basic::PDF::Dict',

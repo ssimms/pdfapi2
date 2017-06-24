@@ -151,6 +151,7 @@ $irreg_char = '[][<>{}()/% \t\r\n\f\0]';
 $cr = '\s*(?:\015|\012|(?:\015\012))';
 
 my $re_comment = qr/(?:\%[^\r\n]*)/;
+my $re_whitespace = qr/(?:[ \t\r\n\f\0]|$re_comment)/;
 
 %types = (
     'Page'  => 'PDF::API2::Basic::PDF::Page',
@@ -661,10 +662,12 @@ sub readval {
         $str =~ s/^([+-.0-9]+)//;
 
         # If $str only consists of whitespace (or is empty), call update to
-        # see if this is the beginning of a direct or indirect object
-        if ($str =~ /^$ws_char*$/ and $update) {
+        # see if this is the beginning of an indirect object or reference
+        if ($update and ($str =~ /^$re_whitespace*$/s or $str =~ /^$re_whitespace+[0-9]+$re_whitespace*$/s)) {
+            $str =~ s/^$re_whitespace+/ /s;
+            $str =~ s/$re_whitespace+$/ /s;
             $str = update($fh, $str);
-            if ($str =~ m/^([0-9]+)($ws_char|$re_comment)+(?:R|obj)/s) {
+            if ($str =~ m/^$re_whitespace*([0-9]+)$re_whitespace+(?:R|obj)/s) {
                 return $self->readval("$value $str", %opts);
             }
         }
