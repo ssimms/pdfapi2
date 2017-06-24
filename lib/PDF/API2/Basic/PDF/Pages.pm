@@ -23,6 +23,8 @@ use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;
 
+use Scalar::Util qw(weaken);
+
 our %inst = map {$_ => 1} qw(Parent Type);
 
 =head1 NAME
@@ -61,6 +63,9 @@ sub new
     $self->{' outto'} = ref $pdfs eq 'ARRAY' ? $pdfs : [$pdfs];
     $self->out_obj(1);
 
+    weaken $_ for @{$self->{' outto'}};
+    weaken $self->{'Parent'} if defined $parent;
+
     $self;
 }
 
@@ -69,6 +74,7 @@ sub init
 {
     my ($self, $pdf) = @_;
     $self->{' outto'} = [$pdf];
+    weaken $self->{' outto'}->[0] if defined $pdf;
     $self;
 }
 
@@ -222,6 +228,7 @@ sub add_page_recurse
     else
     { splice (@{$newpages->{'Kids'}{' val'}}, $index, 0, $page); }
     $page->{'Parent'} = $newpages;
+    weaken $page->{'Parent'};
 }
 
 
@@ -396,7 +403,11 @@ sub empty
     my $parent = $self->{'Parent'};
 
     $self->SUPER::empty;
-    $self->{'Parent'} = $parent if defined $parent;
+    if (defined $parent) {
+        $self->{'Parent'} = $parent;
+        weaken $self->{'Parent'};
+    }
+
     $self;
 }
 

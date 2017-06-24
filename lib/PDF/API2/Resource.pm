@@ -10,6 +10,8 @@ use warnings;
 use PDF::API2::Util qw(pdfkey);
 use PDF::API2::Basic::PDF::Utils; # PDFName
 
+use Scalar::Util qw(weaken);
+
 =head1 NAME
 
 PDF::API2::Resource - Base class for PDF resources
@@ -35,6 +37,7 @@ sub new {
     $self->name($name or pdfkey());
 
     $self->{' apipdf'} = $pdf;
+    weaken $self->{' apipdf'};
 
     return $self;
 }

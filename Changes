@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - PDF::API2 has many circular references, and the end() method
+      doesn't clear them all, so memory is leaked.  This release uses
+      Scalar::Util's weaken() function to improve garbage collection.
+      A significant number of circular references have been weakened,
+      though many likely still remain.
+
     - [RT #120756] Eliminate a warning for an ambiguous call to
       CORE::open (first reported by Abdelbaki Brahmia).
 

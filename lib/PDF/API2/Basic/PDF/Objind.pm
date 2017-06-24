@@ -60,7 +60,7 @@ Holds a direct reference to the next free object in the free list.
 
 =cut
 
-use Scalar::Util qw(blessed reftype);
+use Scalar::Util qw(blessed reftype weaken);
 
 use vars qw($uidc @inst %inst);
 $uidc = "pdfuid000";
@@ -239,7 +239,12 @@ sub merge {
     my ($self, $other) = @_;
 
     for my $k (keys %$other) {
-        $self->{$k} = $other->{$k} unless $inst{$k};
+        next if $inst{$k};
+        $self->{$k} = $other->{$k};
+
+        # This doesn't seem like the right place to do this, but I haven't
+        # yet found all of the places where Parent is being set
+        weaken $self->{$k} if $k eq 'Parent';
     }
     $self->{' realised'} = 1;
     bless $self, ref($other);

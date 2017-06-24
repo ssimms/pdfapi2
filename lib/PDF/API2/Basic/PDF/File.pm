@@ -140,7 +140,7 @@ is in PDF which contains the location of the previous cross-reference table.
 
 =cut
 
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed weaken);
 
 use vars qw($cr $irreg_char $reg_char $ws_char $delim_char %types);
 
@@ -536,6 +536,7 @@ sub readval {
             $self->add_obj($result, $num, $value);
         }
         $result->{' parent'} = $self;
+        weaken $result->{' parent'};
         $result->{' realised'} = 0;
         # gdj: FIXME: if any of the ws chars were crs, then the whole
         # string might not have been read.
@@ -852,6 +853,7 @@ sub out_obj {
     # in the hash) (which is super-fast).
     unless (exists $self->{' outlist_cache'}{$obj}) {
         push @{$self->{' outlist'}}, $obj;
+        weaken $self->{' outlist'}->[-1];
         $self->{' outlist_cache'}{$obj} = 1;
     }
     return $obj;
@@ -976,6 +978,7 @@ sub copy {
                 $obj->{' objgen'} = $ng;
                 $self->add_obj($obj, $i, $ng);
                 $obj->{' parent'} = $self;
+                weaken $obj->{' parent'};
                 $obj->{' realised'} = 0;
             }
             $obj->realise;
@@ -1089,6 +1092,7 @@ sub add_obj {
 
     $self->{' objcache'}{$num, $gen} = $obj;
     $self->{' objects'}{$obj->uid()} = [$num, $gen];
+    weaken $self->{' objcache'}{$num, $gen};
     return $obj;
 }
 

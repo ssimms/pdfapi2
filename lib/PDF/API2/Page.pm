@@ -15,6 +15,8 @@ use PDF::API2::Content::Text;
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
 
+use Scalar::Util qw(weaken);
+
 =head1 NAME
 
 PDF::API2::Page - Methods to interact with individual pages
@@ -54,6 +56,7 @@ sub coerce {
     my $self = $page;
     bless($self,$class);
     $self->{' apipdf'}=$pdf;
+    weaken $self->{' apipdf'};
     return($self);
 }
 
@@ -268,6 +271,11 @@ sub content {
     $obj->{' apipdf'}=$self->{' apipdf'};
     $obj->{' api'}=$self->{' api'};
     $obj->{' apipage'}=$self;
+
+    weaken $obj->{' apipdf'};
+    weaken $obj->{' api'};
+    weaken $obj->{' apipage'};
+
     return($obj);
 }
 
