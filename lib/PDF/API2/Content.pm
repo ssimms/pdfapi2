@@ -1357,6 +1357,12 @@ sub charspace {
 Sets the spacing between words.  This is initially zero (or, in other
 words, just the width of the space).
 
+Word spacing might only affect simple fonts and composite fonts where
+the space character is a single-byte code.  This is a limitation of
+the PDF specification at least as of version 1.7 (see section 9.3.3).
+It's possible that a later version of the specification will support
+word spacing in fonts that use multi-byte codes.
+
 =cut
 
 sub _wordspace {
