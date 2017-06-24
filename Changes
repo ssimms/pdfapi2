@@ -13,6 +13,11 @@
       adjust the space between words rather than stretching individual
       characters in order to get the text to fit.
 
+    - [RT #120397] Indirect references and indirect objects can have
+      comments embedded in their whitespace, and their object number
+      and generation may be split across multiple lines, which may not
+      all be buffered (reported by SPROUT).
+
 
 2.031     2017-01-26
 

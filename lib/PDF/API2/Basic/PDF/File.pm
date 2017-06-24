@@ -150,6 +150,8 @@ $reg_char = '[^][<>{}()/% \t\r\n\f\0]';
 $irreg_char = '[][<>{}()/% \t\r\n\f\0]';
 $cr = '\s*(?:\015|\012|(?:\015\012))';
 
+my $re_comment = qr/(?:\%[^\r\n]*)/;
+
 %types = (
     'Page'  => 'PDF::API2::Basic::PDF::Page',
     'Pages' => 'PDF::API2::Basic::PDF::Pages',
@@ -525,10 +527,10 @@ sub readval {
     }
 
     # Indirect Object
-    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+R/s) {
+    elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R/s) {
         my $num = $1;
         $value = $2;
-        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+R//s;
+        $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R//s;
         unless ($result = $self->test_obj($num, $value)) {
             $result = PDF::API2::Basic::PDF::Objind->new();
             $result->{' objnum'} = $num;
@@ -543,11 +545,11 @@ sub readval {
     }
 
     # Object
-    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj/s) {
+    elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj/s) {
         my $obj;
         my $num = $1;
         $value = $2;
-        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj//s;
+        $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj//s;
         ($obj, $str) = $self->readval($str, %opts);
         if ($result = $self->test_obj($num, $value)) {
             $result->merge($obj);
@@ -657,6 +659,16 @@ sub readval {
     elsif ($str =~ m/^([+-.0-9]+)($irreg_char|$)/) {
         $value = $1;
         $str =~ s/^([+-.0-9]+)//;
+
+        # If $str only consists of whitespace (or is empty), call update to
+        # see if this is the beginning of a direct or indirect object
+        if ($str =~ /^$ws_char*$/ and $update) {
+            $str = update($fh, $str);
+            if ($str =~ m/^([0-9]+)($ws_char|$re_comment)+(?:R|obj)/s) {
+                return $self->readval("$value $str", %opts);
+            }
+        }
+
         $result = PDF::API2::Basic::PDF::Number->from_pdf($value);
     }
 
