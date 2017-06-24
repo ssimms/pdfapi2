@@ -18,6 +18,9 @@
       and generation may be split across multiple lines, which may not
       all be buffered (reported by SPROUT).
 
+    - [RT #120450] Fix PDF::API2->open($filename)->stringify()
+      (reported by SPROUT).
+
 
 2.031     2017-01-26
 

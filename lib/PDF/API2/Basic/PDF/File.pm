@@ -1289,7 +1289,7 @@ sub out_trailer {
     my $tloc = $fh->tell();
     $fh->print("xref\n");
 
-    my @xreflist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } (@{$self->{' printed'}}, @{$self->{' free'}});
+    my @xreflist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } (@{$self->{' printed'} || []}, @{$self->{' free'} || []});
 
     my ($i, $j, $k);
     unless ($update) {
@@ -1310,7 +1310,7 @@ sub out_trailer {
         }
     }
 
-    my @freelist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } @{$self->{' free'}};
+    my @freelist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } @{$self->{' free'} || []};
 
     $j = 0; my $first = -1; $k = 0;
     for ($i = 0; $i <= $#xreflist + 1; $i++) {
