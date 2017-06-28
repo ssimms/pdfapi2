@@ -1841,6 +1841,7 @@ attributes.  These can optionally be overridden.
 
 sub advancewidth {
     my ($self,$text,@opts) = @_;
+    return 0 unless defined($text) and length($text);
     if(scalar @opts > 1) {
         my %opts=@opts;
         foreach my $k (qw[ font fontsize wordspace charspace hscale]) {
@@ -1850,7 +1851,7 @@ sub advancewidth {
         my $num_space = $text =~ y/\x20/\x20/;
         my $num_char = length($text);
         my $word_spaces = $opts{wordspace}*$num_space;
-        my $char_spaces = $opts{charspace}*$num_char;
+        my $char_spaces = $opts{charspace}*($num_char - 1);
         my $advance = ($glyph_width+$word_spaces+$char_spaces)*$opts{hscale}/100;
         return $advance;
     }
@@ -1859,7 +1860,7 @@ sub advancewidth {
         my $num_space = $text =~ y/\x20/\x20/;
         my $num_char = length($text);
         my $word_spaces = $self->wordspace*$num_space;
-        my $char_spaces = $self->charspace*$num_char;
+        my $char_spaces = $self->charspace*($num_char - 1);
         my $advance = ($glyph_width+$word_spaces+$char_spaces)*$self->hscale()/100;
         return $advance;
     }
