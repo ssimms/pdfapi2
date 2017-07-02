@@ -252,60 +252,63 @@ sub new {
 }
 
 sub PaethPredictor {
-    my ($a, $b, $c)=@_;
+    my ($a, $b, $c) = @_;
     my $p = $a + $b - $c;
     my $pa = abs($p - $a);
     my $pb = abs($p - $b);
     my $pc = abs($p - $c);
-    if(($pa <= $pb) && ($pa <= $pc)) {
+    if (($pa <= $pb) && ($pa <= $pc)) {
         return $a;
-    } elsif($pb <= $pc) {
+    }
+    elsif ($pb <= $pc) {
         return $b;
-    } else {
+    }
+    else {
         return $c;
     }
 }
 
 sub unprocess {
-    my ($bpc,$bpp,$comp,$width,$height,$scanline,$sstream)=@_;
-    my $stream=uncompress($$sstream);
-    my $prev='';
-    my $clearstream='';
-    foreach my $n (0..$height-1) {
+    my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream) = @_;
+    my $stream = uncompress($$sstream);
+    my $prev = '';
+    my $clearstream = '';
+    foreach my $n (0 .. $height - 1) {
         # print STDERR "line $n:";
-        my $line=substr($stream,$n*$scanline,$scanline);
-        my $filter=vec($line,0,8);
-        my $clear='';
-        $line=substr($line,1);
+        my $line = substr($stream, $n * $scanline, $scanline);
+        my $filter = vec($line, 0, 8);
+        my $clear = '';
+        $line = substr($line, 1);
         # print STDERR " filter=$filter";
-        if($filter==0) {
-            $clear=$line;
-        } elsif($filter==1) {
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+vec($clear,$x-$bpp,8))%256;
-            }
-        } elsif($filter==2) {
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+vec($prev,$x,8))%256;
-            }
-        } elsif($filter==3) {
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+floor((vec($clear,$x-$bpp,8)+vec($prev,$x,8))/2))%256;
-            }
-        } elsif($filter==4) {
-            # die "paeth/png filter not supported.";
-            foreach my $x (0..length($line)-1) {
-                vec($clear,$x,8)=(vec($line,$x,8)+PaethPredictor(vec($clear,$x-$bpp,8),vec($prev,$x,8),vec($prev,$x-$bpp,8)))%256;
+        if ($filter == 0) {
+            $clear = $line;
+        }
+        elsif ($filter == 1) {
+            foreach my $x (0 .. length($line) - 1) {
+                vec($clear, $x, 8) = (vec($line, $x, 8) + vec($clear, $x - $bpp, 8)) % 256;
             }
         }
-        $prev=$clear;
-        foreach my $x (0..($width*$comp)-1) {
-            vec($clearstream,($n*$width*$comp)+$x,$bpc)=vec($clear,$x,$bpc);
-        #    print STDERR "".vec($clear,$x,$bpc).",";
+        elsif ($filter == 2) {
+            foreach my $x (0 .. length($line) - 1) {
+                vec($clear, $x, 8) = (vec($line, $x, 8) + vec($prev, $x, 8)) % 256;
+            }
         }
-        # print STDERR "\n";
+        elsif ($filter == 3) {
+            foreach my $x (0 .. length($line) - 1) {
+                vec($clear, $x, 8) = (vec($line, $x, 8) + floor((vec($clear, $x - $bpp, 8) + vec($prev, $x, 8)) / 2)) % 256;
+            }
+        }
+        elsif ($filter == 4) {
+            foreach my $x (0 .. length($line) - 1) {
+                vec($clear,$x,8) = (vec($line, $x, 8) + PaethPredictor(vec($clear, $x - $bpp, 8), vec($prev, $x, 8), vec($prev, $x - $bpp, 8))) % 256;
+            }
+        }
+        $prev = $clear;
+        foreach my $x (0 .. ($width * $comp) - 1) {
+            vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
+        }
     }
-    return($clearstream);
+    return $clearstream;
 }
 
 1;
