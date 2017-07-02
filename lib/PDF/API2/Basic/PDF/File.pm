@@ -1185,15 +1185,13 @@ sub readxrtr {
 
         ($tdict, $buf) = $self->readval($buf);
     }
-    elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i)
-    {
+    elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i) {
         my ($xref_obj, $xref_gen) = ($1, $2);
 
         # XRef streams.
         ($tdict, $buf) = $self->readval($buf);
 
-        unless ($tdict->{' stream'})
-        {
+        unless ($tdict->{' stream'}) {
             die "Malformed XRefStm at $xref_obj $xref_gen obj in PDF file $self->{' fname'}";
         }
         $tdict->read_stream(1);
@@ -1205,12 +1203,10 @@ sub readxrtr {
         my $last;
 
         my @index;
-        if (defined $tdict->{Index})
-        {
+        if (defined $tdict->{Index}) {
             @index = map { $_->val() } @{$tdict->{Index}->val};
         }
-        else
-        {
+        else {
             @index = (0, $tdict->{Size}->val);
         }
 
@@ -1218,16 +1214,14 @@ sub readxrtr {
             $start = shift(@index);
             $last = $start + shift(@index) - 1;
 
-            for my $i ($start...$last)
-            {
+            for my $i ($start...$last) {
                 # Replaced "for $xmin" because it creates a loop-specific local variable, and we
                 # need $xmin to be correct for maxobj below.
                 $xmin = $i;
 
                 my @cols;
 
-                for my $w (@widths)
-                {
+                for my $w (@widths) {
                     my $data;
                     $data = $self->_unpack_xref_stream($w, substr($stream, 0, $w, '')) if $w;
 
@@ -1248,8 +1242,7 @@ sub readxrtr {
             }
         }
     }
-    else
-    {
+    else {
         die "Malformed xref in PDF file $self->{' fname'}";
     }
 
