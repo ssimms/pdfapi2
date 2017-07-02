@@ -1898,13 +1898,19 @@ See Also: L<PDF::API2::Resource::Font::SynFont>
 =cut
 
 sub synfont {
-    my ($self, %opts) = @_;
+    my ($self, $font, %opts) = @_;
+
+    # PDF::API2 doesn't set BaseEncoding for TrueType fonts, so text
+    # isn't searchable unless a ToUnicode CMap is included.  Include
+    # the ToUnicode CMap by default, but allow it to be disabled (for
+    # performance and file size reasons) by setting -unicodemap to 0.
+    $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
 
     require PDF::API2::Resource::Font::SynFont;
-    my $obj = PDF::API2::Resource::Font::SynFont->new($self->{'pdf'}, %opts);
+    my $obj = PDF::API2::Resource::Font::SynFont->new($self->{'pdf'}, $font, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
 
     return $obj;
 }

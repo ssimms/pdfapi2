@@ -24,6 +24,9 @@
     - Fix an off-by-one error when calculating text width while
       charspace is non-zero.
 
+    - [RT #120048] Fix PDF::API2->synfont() (broken in 2.029, fixed by Vadim
+      Repin) and add basic testing.
+
 
 2.031     2017-01-26
 
