@@ -336,6 +336,8 @@ sub annotation {
     $self->{' apipdf'}->new_obj($ant);
     $ant->{' apipdf'} = $self->{' apipdf'};
     $ant->{' apipage'} = $self;
+    weaken $ant->{' apipdf'};
+    weaken $ant->{' apipage'};
 
     if ($self->{'Annots'}->is_obj($self->{' apipdf'})) {
         $self->{' apipdf'}->out_obj($self->{'Annots'});

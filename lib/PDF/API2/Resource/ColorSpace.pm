@@ -9,6 +9,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -32,6 +33,7 @@ sub new {
     $pdf->new_obj($self) unless($self->is_obj($pdf));
     $self->name($key || pdfkey());
     $self->{' apipdf'}=$pdf;
+    weaken $self->{' apipdf'};
 
     return($self);
 }

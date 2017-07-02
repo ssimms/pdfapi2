@@ -14,6 +14,7 @@ use Compress::Zlib;
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Resource::XObject::Image::TIFF::File;
 use PDF::API2::Util;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -44,6 +45,7 @@ sub new {
     $pdf->new_obj($self) unless $self->is_obj($pdf);
 
     $self->{' apipdf'} = $pdf;
+    weaken $self->{' apipdf'};
 
     $self->read_tiff($pdf, $tif);
 

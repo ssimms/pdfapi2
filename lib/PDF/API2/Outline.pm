@@ -9,6 +9,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -29,6 +30,8 @@ sub new {
     my $self = $class->SUPER::new;
     $self->{' apipdf'}=$api->{pdf};
     $self->{' api'}=$api;
+    weaken $self->{' apipdf'};
+    weaken $self->{' api'};
     $self->{Parent}=$parent if(defined $parent);
     $self->{Prev}=$prev if(defined $prev);
     return($self);

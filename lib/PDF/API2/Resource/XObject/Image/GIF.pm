@@ -10,6 +10,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
+use Scalar::Util qw(weaken);
 
 # added from PDF::Create:
 # PDF::Image::GIFImage - GIF image support
@@ -120,6 +121,7 @@ sub new {
     $pdf->new_obj($self) unless($self->is_obj($pdf));
 
     $self->{' apipdf'}=$pdf;
+    weaken $self->{' apipdf'};
 
     my $fh = IO::File->new;
     if (ref($file)) {

@@ -9,6 +9,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -36,6 +37,7 @@ sub new {
     my $self=$class->SUPER::new($pdf,pdfkey());
     $pdf->new_obj($self) unless($self->is_obj($pdf));
     $self->{' apipdf'}=$pdf;
+    weaken $self->{' apipdf'};
     my $csd=PDFDict();
     $pdf->new_obj($csd);
     $csd->{Filter}=PDFArray(PDFName('FlateDecode'));
