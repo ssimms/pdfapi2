@@ -828,7 +828,6 @@ sub new_obj {
                 }
                 else {
                     $res = $self->test_obj($i, $ng) || $self->add_obj(PDF::API2::Basic::PDF::Objind->new(), $i, $ng);
-                    $tdict->{' xref'}{$i}[0] = $tdict->{' xref'}{$i}[0];
                     $self->out_obj($res);
                     return $res;
                 }
