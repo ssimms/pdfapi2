@@ -3,7 +3,7 @@ package PDF::API2::Resource::XObject::Image::PNG;
 use base 'PDF::API2::Resource::XObject::Image';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
 # VERSION
 
