@@ -867,7 +867,7 @@ sub out_obj {
     # in the hash) (which is super-fast).
     unless (exists $self->{' outlist_cache'}{$obj}) {
         push @{$self->{' outlist'}}, $obj;
-        weaken $self->{' outlist'}->[-1];
+        # weaken $self->{' outlist'}->[-1];
         $self->{' outlist_cache'}{$obj} = 1;
     }
     return $obj;
@@ -1106,7 +1106,7 @@ sub add_obj {
 
     $self->{' objcache'}{$num, $gen} = $obj;
     $self->{' objects'}{$obj->uid()} = [$num, $gen];
-    weaken $self->{' objcache'}{$num, $gen};
+    # weaken $self->{' objcache'}{$num, $gen};
     return $obj;
 }
 

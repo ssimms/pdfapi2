@@ -1,4 +1,5 @@
 use Test::More;
+use Test::Exception;
 
 use strict;
 use warnings;
@@ -28,5 +29,13 @@ ok(isweak($pdf->{'pagestack'}->[0]),
 $page = $pdf->page(1);
 ok(isweak($pdf->{'pagestack'}->[1]),
    q{A spliced page is marked as weakened in the page stack});
+
+# Font out of scope
+
+{
+    $pdf->corefont('Helvetica');
+}
+
+lives_ok(sub { $pdf->stringify() }, 'Font added inside a black is still present on save');
 
 done_testing();

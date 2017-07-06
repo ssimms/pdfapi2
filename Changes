@@ -1,7 +1,10 @@
 {{$NEXT}}
 
-    - [RT #122372] Fix weakening when a page is added to the end of a multiple
-      page document (reported by Phil Perry).
+    - [RT #122371] Remove a couple of improperly-placed weaken
+      statements (reported by Phil Perry).
+
+    - [RT #122372] Fix weakening when a page is added to the end of a
+      multiple page document (reported by Phil Perry).
 
     - Fix Bank Gothic core font (reported by Phil Perry).
 
