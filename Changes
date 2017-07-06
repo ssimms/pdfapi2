@@ -1,39 +1,38 @@
 {{$NEXT}}
 
-    - [RT #122371] Remove a couple of improperly-placed weaken
-      statements (reported by Phil Perry).
+    - [RT #122371] Remove a couple of improperly-placed weaken statements
+      (reported by Phil Perry).
 
-    - [RT #122372] Fix weakening when a page is added to the end of a
-      multiple page document (reported by Phil Perry).
+    - [RT #122372] Fix weakening when a page is added to the end of a multiple
+      page document (reported by Phil Perry).
 
     - Fix Bank Gothic core font (reported by Phil Perry).
 
 
 2.032     2017-07-02
 
-    - PDF::API2 has many circular references, and the end() method
-      doesn't clear them all, so memory is leaked.  This release uses
-      Scalar::Util's weaken() function to improve garbage collection.
-      A significant number of circular references have been weakened,
-      though many likely still remain.
+    - PDF::API2 has many circular references, and the end() method doesn't clear
+      them all, so memory is leaked.  This release uses Scalar::Util's weaken()
+      function to improve garbage collection.  A significant number of circular
+      references have been weakened, though many likely still remain.
 
-    - [RT #120756] Eliminate a warning for an ambiguous call to
-      CORE::open (first reported by Abdelbaki Brahmia).
+    - [RT #120756] Eliminate a warning for an ambiguous call to CORE::open
+      (first reported by Abdelbaki Brahmia).
 
-    - $text->text_justified() and $text->text_fill_justified() now
-      adjust the space between words rather than stretching individual
-      characters in order to get the text to fit.
+    - $text->text_justified() and $text->text_fill_justified() now adjust the
+      space between words rather than stretching individual characters in order
+      to get the text to fit.
 
-    - [RT #120397] Indirect references and indirect objects can have
-      comments embedded in their whitespace, and their object number
-      and generation may be split across multiple lines, which may not
-      all be buffered (reported by SPROUT).
+    - [RT #120397] Indirect references and indirect objects can have comments
+      embedded in their whitespace, and their object number and generation may
+      be split across multiple lines, which may not all be buffered (reported by
+      SPROUT).
 
-    - [RT #120450] Fix PDF::API2->open($filename)->stringify()
-      (reported by SPROUT).
+    - [RT #120450] Fix PDF::API2->open($filename)->stringify() (reported by
+      SPROUT).
 
-    - Fix an off-by-one error when calculating text width while
-      charspace is non-zero.
+    - Fix an off-by-one error when calculating text width while charspace is
+      non-zero.
 
     - [RT #120048] Fix PDF::API2->synfont() (broken in 2.029, fixed by Vadim
       Repin) and add basic testing.
@@ -41,105 +40,98 @@
 
 2.031     2017-01-26
 
-    - Fix use of cache files when reading streams: temp files will now
-      be used any time a stream is larger than 16MB (by default).
-      Formerly, due to a bug, they would only be created when a 4kB
-      chunk of a stream increased to 16kB or more after being
-      decompressed.
+    - Fix use of cache files when reading streams: temp files will now be used
+      any time a stream is larger than 16MB (by default).  Formerly, due to a
+      bug, they would only be created when a 4kB chunk of a stream increased to
+      16kB or more after being decompressed.
 
-    - Numbers, booleans, and null values can now be read from object
-      streams.
+    - Numbers, booleans, and null values can now be read from object streams.
 
-    - Update to [RT #113290]: Objects inside a large object stream are
-      now read without loading the entire object stream into memory.
+    - Update to [RT #113290]: Objects inside a large object stream are now read
+      without loading the entire object stream into memory.
 
-    - DEPRECATION: The low-level new_api methods have been deprecated
-      in favor of calling new directly.  If your code uses
-      new_api($api2, ...), replace it with new($api2->{'pdf'}, ...).
+    - DEPRECATION: The low-level new_api methods have been deprecated in favor
+      of calling new directly.  If your code uses new_api($api2, ...), replace
+      it with new($api2->{'pdf'}, ...).
 
-    - [RT #118352] Don't crash when adding an annotation to a page
-      that has an existing annotations array stored as an indirect
-      object (reported by Johan Vromans).
+    - [RT #118352] Don't crash when adding an annotation to a page that has an
+      existing annotations array stored as an indirect object (reported by Johan
+      Vromans).
 
-    - [RT #118717] Die with an informative error if a file can't be
-      opened during open() or saveas() (reported by Johan Vromans).
+    - [RT #118717] Die with an informative error if a file can't be opened
+      during open() or saveas() (reported by Johan Vromans).
 
 
 2.030     2016-10-13
 
-    - Fix a font naming issue introduced while satisfying
-      Perl::Critic.
+    - Fix a font naming issue introduced while satisfying Perl::Critic.
 
 
 2.029     2016-10-10
 
-    - [RT #113293] Files with cross-reference streams weren't
-      correctly setting the max object number (report and
-      troubleshooting by Marco Pessotto).
+    - [RT #113293] Files with cross-reference streams weren't correctly setting
+      the max object number (report and troubleshooting by Marco Pessotto).
 
-    - Handle TIFF images with strips that are wider than the image
-      (report and patch by Jeffrey Ratcliffe).
+    - Handle TIFF images with strips that are wider than the image (report and
+      patch by Jeffrey Ratcliffe).
 
-    - [RT #98574] Increase test coverage of PDF::API2::Content (tests
-      by Phil Perry).
+    - [RT #98574] Increase test coverage of PDF::API2::Content (tests by Phil
+      Perry).
 
-    - A bunch of code cleanup and documentation updates by Paul
-      Cochrane.
+    - A bunch of code cleanup and documentation updates by Paul Cochrane.
 
     - Add a missing prereq on Win32 systems (patch by Michiel Beijen).
 
-    - [RT #113514, #98552] Fix the dash() and renderingintent()
-      methods in ExtGState (reported by Vadim Repin and Phil Perry).
+    - [RT #113514, #98552] Fix the dash() and renderingintent() methods in
+      ExtGState (reported by Vadim Repin and Phil Perry).
 
     - Satisfy all Perl::Critic severity 5 policies.
 
-    - [RT #117940] Allow PNG, GIF, and PNM files to be opened from
-      filehandles in addition to filenames (patch by Johan Vromans).
+    - [RT #117940] Allow PNG, GIF, and PNM files to be opened from filehandles
+      in addition to filenames (patch by Johan Vromans).
 
-    - [RT #33970] Fail fast when a referenced file can't be opened
-      (requested by Barrie Slaymaker a mere 8.5 years ago).
+    - [RT #33970] Fail fast when a referenced file can't be opened (requested by
+      Barrie Slaymaker a mere 8.5 years ago).
 
-    - Add -simplex, -duplexfliplongedge and -duplexflipshortedge as
-      options to $pdf->preferences() (requested by Doug Poulin).
+    - Add -simplex, -duplexfliplongedge and -duplexflipshortedge as options to
+      $pdf->preferences() (requested by Doug Poulin).
 
 
 2.028     2016-06-08
 
-    - [RT #113290] Fix for reading objects inside an object stream in
-      a large PDF (patch by Marco Pessotto).
+    - [RT #113290] Fix for reading objects inside an object stream in a large
+      PDF (patch by Marco Pessotto).
 
     - Eliminate an infinite loop when reading a corrupt dictionary.
 
 
 2.027     2016-03-11
 
-    - This release contains seven fixes for parsing PDFs.  They mostly
-      affect files using cross-reference streams, which were first
-      supported in the previous release.  Thanks to Marco Pessotto and
-      Stuart Henderson for their help identifying and troubleshooting
-      bugs.
+    - This release contains seven fixes for parsing PDFs.  They mostly affect
+      files using cross-reference streams, which were first supported in the
+      previous release.  Thanks to Marco Pessotto and Stuart Henderson for their
+      help identifying and troubleshooting bugs.
 
-    - Added contrib/pdf-debug.pl to help track down issues related to
-      opening and parsing PDFs.
+    - Added contrib/pdf-debug.pl to help track down issues related to opening
+      and parsing PDFs.
 
 
 2.026     2016-02-24
 
-    - [RT #48683] Add support for PDFs with cross-reference streams
-      and object streams (patch by Don Huettl of Grant Street Group).
+    - [RT #48683] Add support for PDFs with cross-reference streams and object
+      streams (patch by Don Huettl of Grant Street Group).
 
-    - [RT #107333] Accept an empty string as a valid Name, per PDF
-      spec 1.7 section 7.3.5 (patch by Mark Balitsky).
+    - [RT #107333] Accept an empty string as a valid Name, per PDF spec 1.7
+      section 7.3.5 (patch by Mark Balitsky).
 
-    - [RT #98551] Rename aliases 2A, 4A, 2B, and 4B to 2A0, 4A0, 2B0,
-      and 4B0.  The old names will continue to work, but are now
-      undocumented (patch by Phil Perry).
+    - [RT #98551] Rename aliases 2A, 4A, 2B, and 4B to 2A0, 4A0, 2B0, and 4B0.
+      The old names will continue to work, but are now undocumented (patch by
+      Phil Perry).
 
-    - Add -mils and -color as options for barcodes.  Reset linedash so
-      that barcodes are always solid lines (patch by Erelen).
+    - Add -mils and -color as options for barcodes.  Reset linedash so that
+      barcodes are always solid lines (patch by Erelen).
 
-    - [RT #98549] Rename meterlimit to miterlimit (patch by Phil
-      Perry).
+    - [RT #98549] Rename meterlimit to miterlimit (patch by Phil Perry).
 
     - [RT #98534] Rename hspace to hscale (patch by Phil Perry).
 
@@ -155,42 +147,40 @@
 
 2.025     2015-09-23
 
-    - The previous release included a patch that broke compatibility
-      with Perl 5.8.x.  The minimum supported version is now Perl
-      5.8.5, and there is a .perl-version file to facilitate testing
-      using plenv.
+    - The previous release included a patch that broke compatibility with Perl
+      5.8.x.  The minimum supported version is now Perl 5.8.5, and there is a
+      .perl-version file to facilitate testing using plenv.
 
 
 2.024     2015-09-18
 
-    - [RT #104133] Include all bounding boxes when importing a page
-      (patch by Don Huettl of Grant Street Group).
-
-    - [RT #104133] When retrieving bounding boxes for a page, fall
-      back according to the defaults listed in the PDF spec (patch by
+    - [RT #104133] Include all bounding boxes when importing a page (patch by
       Don Huettl of Grant Street Group).
 
-    - Barcodes now take an optional -caption argument that will be
-      printed beneath the barcode.  This can replace or be used in
-      conjunction with the text representation of the barcode
-      (requested by Gareth Tunley).
+    - [RT #104133] When retrieving bounding boxes for a page, fall back
+      according to the defaults listed in the PDF spec (patch by Don Huettl of
+      Grant Street Group).
 
-    - [RT #105581] Calls to width() in BaseFont are now significantly
-      faster (patch by Dmitri Tikhonov).
+    - Barcodes now take an optional -caption argument that will be printed
+      beneath the barcode.  This can replace or be used in conjunction with the
+      text representation of the barcode (requested by Gareth Tunley).
+
+    - [RT #105581] Calls to width() in BaseFont are now significantly faster
+      (patch by Dmitri Tikhonov).
 
 
 2.023     2014-09-12
 
-    - The fix for [RT #69503] broke a previously-working case where a
-      page object could be passed (and was expected).  The -firstpage
-      option now accepts a page object or a page number.  Thanks to
-      Marco Pessotto for the bug report and test.
+    - The fix for [RT #69503] broke a previously-working case where a page
+      object could be passed (and was expected).  The -firstpage option now
+      accepts a page object or a page number.  Thanks to Marco Pessotto for the
+      bug report and test.
 
 
 2.022     2014-07-04
 
-    - Added $pdf->version() get/set method.  When opening an existing
-      PDF, the existing version number will now be retained.
+    - Added $pdf->version() get/set method.  When opening an existing PDF, the
+      existing version number will now be retained.
 
     - Renamed the following in PDF::API2:
         - importpage to import_page
@@ -198,165 +188,155 @@
 
       The old names are deprecated.
 
-    - [RT #69503] Fix the -firstpage option to $pdf->preferences() so
-      that it doesn't always lead to a crash (reported by Dietrich
-      Streifert).
+    - [RT #69503] Fix the -firstpage option to $pdf->preferences() so that it
+      doesn't always lead to a crash (reported by Dietrich Streifert).
 
-    - [RT #47974] Accept malformed xref subsections (with a warning)
-      that have extraneous spaces on the first line (reported by
-      Abhinav Kaushik).
+    - [RT #47974] Accept malformed xref subsections (with a warning) that have
+      extraneous spaces on the first line (reported by Abhinav Kaushik).
 
-    - [RT #94505] For Code128 barcodes, the initial character set is
-      now optional (defaults to B or C depending on the content to be
-      encoded).  The initial character set can be passed as a capital
-      letter, and the program will die if an invalid character set is
-      requested (requested by Andrea Nall).
+    - [RT #94505] For Code128 barcodes, the initial character set is now
+      optional (defaults to B or C depending on the content to be encoded).  The
+      initial character set can be passed as a capital letter, and the program
+      will die if an invalid character set is requested (requested by Andrea
+      Nall).
 
-    - Interleaved 2 of 5 barcodes now prepend a zero when an odd
-      number of digits is specified, which is standard behavior.
-      Previously, a zero was appended instead.
+    - Interleaved 2 of 5 barcodes now prepend a zero when an odd number of
+      digits is specified, which is standard behavior.  Previously, a zero was
+      appended instead.
 
-    - $page->rotate(0) now sets rotation to 0 degrees rather than
-      deleting an existing page rotation command.  Page rotation is
-      inherited, so this is necessary to undo any inherited page
-      rotation.
+    - $page->rotate(0) now sets rotation to 0 degrees rather than deleting an
+      existing page rotation command.  Page rotation is inherited, so this is
+      necessary to undo any inherited page rotation.
 
     - Fix: Attempts to use EAN-128 barcodes resulted in an error.
 
-    - Add a more informative error when text() is called without first
-      setting a font(), and when font() is called without including a
-      font size.
+    - Add a more informative error when text() is called without first setting a
+      font(), and when font() is called without including a font size.
 
 
 2.021     2014-02-20
 
-    - Fixed numerous bugs in the string parsing code, including the
-      one reported in [RT #63918] by Frank Doepper.
+    - Fixed numerous bugs in the string parsing code, including the one reported
+      in [RT #63918] by Frank Doepper.
 
-    - [RT #41049] Rewrote literal string parsing to prevent a stack
-      overflow due to an inefficient regex (reported by Sergei
-      Fetisov).
+    - [RT #41049] Rewrote literal string parsing to prevent a stack overflow due
+      to an inefficient regex (reported by Sergei Fetisov).
 
-    - [RT #91822] Fix compression of GIF images to ensure that output
-      codes don't exceed 12 bits (reported by Vadim Repin).
+    - [RT #91822] Fix compression of GIF images to ensure that output codes
+      don't exceed 12 bits (reported by Vadim Repin).
 
-    - The RunLengthDecode filter didn't actually work.  Its code has
-      been rewritten and now passes basic encoding and decoding tests.
+    - The RunLengthDecode filter didn't actually work.  Its code has been
+      rewritten and now passes basic encoding and decoding tests.
 
-    - Fix Code128 barcode switching from Code C to Code B in certain
-      cases (reported by Doru Petrescu).
+    - Fix Code128 barcode switching from Code C to Code B in certain cases
+      (reported by Doru Petrescu).
 
 
 2.020     2013-01-20
 
     - Give a more informative error message when a PDF file using a
-      cross-reference stream is encountered.  The Known Issues section
-      of the documentation includes pointers on how to add support in
-      case someone else can get to this before I do.
+      cross-reference stream is encountered.  The Known Issues section of the
+      documentation includes pointers on how to add support in case someone else
+      can get to this before I do.
 
-    - Text using TrueType fonts is now searchable again.  In version
-      0.61, an undocumented -unicodemap option was added to nearly all
-      of the font resource methods, which only included a ToUnicode
-      CMap if it was set (and it's required in order for PDF readers
-      to be able to identify individual characters if BaseEncoding
-      isn't present, which it isn't for TrueType fonts).
+    - Text using TrueType fonts is now searchable again.  In version 0.61, an
+      undocumented -unicodemap option was added to nearly all of the font
+      resource methods, which only included a ToUnicode CMap if it was set (and
+      it's required in order for PDF readers to be able to identify individual
+      characters if BaseEncoding isn't present, which it isn't for TrueType
+      fonts).
 
-      I've left the -unicodemap option in place, and it's still
-      undocumented (except here), but it's now on by default.  Call
-      $pdf->ttfont($fontfile, -unicodemap => 0) if you want to disable
-      it for performance or file size reasons.
+      I've left the -unicodemap option in place, and it's still undocumented
+      (except here), but it's now on by default.  Call $pdf->ttfont($fontfile,
+      -unicodemap => 0) if you want to disable it for performance or file size
+      reasons.
 
-    - Add a note to the stringify method's documentation saying that
-      it's a destructive operation.
+    - Add a note to the stringify method's documentation saying that it's a
+      destructive operation.
 
     - The various filter types have their own classes in the
-      PDF::API2::Basic::PDF::Filter namespace now, rather than having
-      all of the packages in Filter.pm.
+      PDF::API2::Basic::PDF::Filter namespace now, rather than having all of the
+      packages in Filter.pm.
 
-    - To facilitate testing and ensure that identically-generated PDFs
-      have identical output in Perl 5.17.5 or later, PDF dictionary
-      keys are now sorted during output.
+    - To facilitate testing and ensure that identically-generated PDFs have
+      identical output in Perl 5.17.5 or later, PDF dictionary keys are now
+      sorted during output.
 
 
 2.019     2011-03-10
 
-    - [RT #66167] Fix a typo in the require statement for code128
-      barcodes (TC Kuan).
+    - [RT #66167] Fix a typo in the require statement for code128 barcodes (TC
+      Kuan).
 
-    - Numerous modules are now only loaded when they're needed, which
-      should help speed up the load time and reduce the memory
-      footprint.
+    - Numerous modules are now only loaded when they're needed, which should
+      help speed up the load time and reduce the memory footprint.
 
     - Test coverage is up to about 45% of the codebase.
 
 
 2.018     2011-02-23
 
-    - The tests in 2.017 exposed a floating point issue where some
-      computers give more trailing zeros than others.  It doesn't
-      affect the output, but it does break the tests on those
-      computers, since the PDFs are slightly different.  This version
-      modifies the float() method to remove trailing zeros, which
-      should fix the test breakage and give consistent PDFs.
+    - The tests in 2.017 exposed a floating point issue where some computers
+      give more trailing zeros than others.  It doesn't affect the output, but
+      it does break the tests on those computers, since the PDFs are slightly
+      different.  This version modifies the float() method to remove trailing
+      zeros, which should fix the test breakage and give consistent PDFs.
 
 
 2.017     2011-02-22
 
-    - The DejaVu fonts have been removed from the distribution, since
-      they were only used by one example script.  If you need them for
-      your project, you can download them from http://dejavu-fonts.org
+    - The DejaVu fonts have been removed from the distribution, since they were
+      only used by one example script.  If you need them for your project, you
+      can download them from http://dejavu-fonts.org
 
-    - Fix: Content->bogen() didn't behave as documented if $move was
-      set (it started drawing from the center of the circle rather
-      than [x1, y1]).
+    - Fix: Content->bogen() didn't behave as documented if $move was set (it
+      started drawing from the center of the circle rather than [x1, y1]).
 
-    - The undocumented nettfont method has been removed, along with
-      the supporting PDF::API2::Resource::Font::neTrueType module.
+    - The undocumented nettfont method has been removed, along with the
+      supporting PDF::API2::Resource::Font::neTrueType module.
 
-    - The undocumented save_xml method has been removed, along with
-      the supporting functions in PDF::API2::Basic::*.
+    - The undocumented save_xml method has been removed, along with the
+      supporting functions in PDF::API2::Basic::*.
 
     - The undocumented textstate2 method has been removed from
       PDF::API2::Content.
 
     - [RT #58386] Fix create_egs call in Lite.pm (J Greely)
 
-    - [RT #62922] Fix string interpolation in pdf-merge.pl
-      (Guillaume Rousse and Jerome Quelin)
+    - [RT #62922] Fix string interpolation in pdf-merge.pl (Guillaume Rousse and
+      Jerome Quelin)
 
     - [RT #65458] Fix an error in the synopsis (Frank Ammeter)
 
     - [RT #66054] Fix rename of .cmap files so that they actually work
       now. (cnhacktnt)
 
-    - The test suite has grown to nearly 200 tests, covering about 40%
-      of the codebase.  There's still plenty of room for improvement.
+    - The test suite has grown to nearly 200 tests, covering about 40% of the
+      codebase.  There's still plenty of room for improvement.
 
 
 2.016     2011-01-24
 
     - New Maintainer: Steve Simms (http://deefs.net)
 
-    - This release jumps from version 0.73 to 2.016 in order to
-      provide a consistent version number across all modules in the
-      distribution without breaking any existing code or going
-      backwards.
+    - This release jumps from version 0.73 to 2.016 in order to provide a
+      consistent version number across all modules in the distribution without
+      breaking any existing code or going backwards.
 
-    - Lots of updates to the documentation, particularly in
-      PDF::API2::Content, which was almost completely rewritten and
-      reorganized.
+    - Lots of updates to the documentation, particularly in PDF::API2::Content,
+      which was almost completely rewritten and reorganized.
 
-    - Font::TTF has been added as a dependency instead of being
-      embedded in the distribution.
+    - Font::TTF has been added as a dependency instead of being embedded in the
+      distribution.
 
-    - Everything that worked in 0.73 should work unmodified in 2.016,
-      at least if it used the published documentation, and most
-      everything should still work even if it didn't.
+    - Everything that worked in 0.73 should work unmodified in 2.016, at least
+      if it used the published documentation, and most everything should still
+      work even if it didn't.
 
-    - PDF::API2 used to read and parse three text files, one of which
-      was over 500kB, on every load.  These files have been turned
-      into modules, and while I haven't done any performance testing,
-      I'd have a hard time believing that it isn't faster now.
+    - PDF::API2 used to read and parse three text files, one of which was over
+      500kB, on every load.  These files have been turned into modules, and
+      while I haven't done any performance testing, I'd have a hard time
+      believing that it isn't faster now.
 
     - There are now a few tests forming the beginning of a test suite.
       Contributions of tests would be most welcome!
