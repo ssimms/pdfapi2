@@ -5,7 +5,7 @@ use warnings;
 
 # VERSION
 
-sub fontdata { return {
+sub data { return {
     'fontname' => 'BankGothicMediumBT',
     'type' => 'TrueType',
     'apiname' => 'BaGo',

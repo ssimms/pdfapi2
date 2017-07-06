@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+    - Fix Bank Gothic core font (reported by Phil Perry).
+
+
+2.032     2017-07-02
+
     - PDF::API2 has many circular references, and the end() method
       doesn't clear them all, so memory is leaked.  This release uses
       Scalar::Util's weaken() function to improve garbage collection.
