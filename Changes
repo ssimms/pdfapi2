@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - [RT #122372] Fix weakening when a page is added to the end of a multiple
+      page document (reported by Phil Perry).
+
     - Fix Bank Gothic core font (reported by Phil Perry).
 
 
