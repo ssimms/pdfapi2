@@ -1,4 +1,5 @@
 use Test::More;
+use Test::Exception;
 
 use strict;
 use warnings;
@@ -15,9 +16,7 @@ foreach my $font (qw(bankgothic courier courierbold courierboldoblique
                      trebuchetbolditalic trebuchetitalic verdana verdanabold
                      verdanabolditalic verdanaitalic webdings wingdings
                      zapfdingbats)) {
-    my $font = $pdf->corefont($font);
+    lives_ok(sub { $pdf->corefont($font) }, "Load font $font");
 }
-
-ok(1, 'All core fonts loaded successfully');
 
 done_testing();
