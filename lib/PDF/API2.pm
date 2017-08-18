@@ -210,7 +210,7 @@ sub open_scalar {
     weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     weaken $self->{'catalog'};
-    $self->{'reopened'} = 1;
+    $self->{'opened_scalar'} = 1;
     $self->{'forcecompress'} = 1;
     $self->{'fonts'} = {};
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
@@ -881,7 +881,7 @@ B<Example:>
 sub finishobjects {
     my ($self, @objs) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         die "invalid method invocation: no file, use 'saveas' instead.";
     }
     elsif ($self->{' filed'}) {
@@ -955,7 +955,7 @@ B<Example:>
 sub saveas {
     my ($self, $file) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         my $fh;
         CORE::open($fh, '>', $file) or die "Unable to open $file for writing: $!";
@@ -976,7 +976,7 @@ sub saveas {
 sub save {
     my ($self, $file) = @_;
 
-    if ($self->{'reopened'}) {
+    if ($self->{'opened_scalar'}) {
         die "invalid method invocation: use 'saveas' instead.";
     }
     elsif ($self->{' filed'}) {
@@ -1015,7 +1015,7 @@ sub stringify {
     my $self = shift();
 
     my $str;
-    if ((defined $self->{'reopened'}) and ($self->{'reopened'} == 1)) {
+    if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         $str = ${$self->{'content_ref'}};
     }
