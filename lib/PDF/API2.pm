@@ -115,7 +115,7 @@ sub new {
         $self->{' filed'} = $options{'-file'};
         $self->{'pdf'}->create_file($options{'-file'});
     }
-    $self->{'infoMeta'}=[qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
+    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
     my $version = eval { $PDF::API2::VERSION } || '(Unreleased Version)';
     $self->info('Producer' => "PDF::API2 $version [$^O]");
