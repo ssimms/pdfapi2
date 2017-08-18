@@ -112,8 +112,8 @@ sub new {
     $self->{'forcecompress'} = 1;
     $self->preferences(%options);
     if ($options{'-file'}) {
-        $self->{' filed'} = $options{'-file'};
         $self->{'pdf'}->create_file($options{'-file'});
+        $self->{'partial_save'} = 1;
     }
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
@@ -884,7 +884,7 @@ sub finishobjects {
     if ($self->{'opened_scalar'}) {
         die "invalid method invocation: no file, use 'saveas' instead.";
     }
-    elsif ($self->{' filed'}) {
+    elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->ship_out(@objs);
     }
     else {
@@ -963,7 +963,7 @@ sub saveas {
         print $fh ${$self->{'content_ref'}};
         CORE::close($fh);
     }
-    elsif ($self->{' filed'}) {
+    elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->close_file();
     }
     else {
@@ -979,7 +979,7 @@ sub save {
     if ($self->{'opened_scalar'}) {
         die "invalid method invocation: use 'saveas' instead.";
     }
-    elsif ($self->{' filed'}) {
+    elsif ($self->{'partial_save'}) {
         $self->{'pdf'}->close_file();
     }
     else {
