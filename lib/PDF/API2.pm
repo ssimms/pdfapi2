@@ -2404,8 +2404,20 @@ This module does not work with perl's -l command-line switch.
 
 =head1 AUTHOR
 
-PDF::API2 was originally written by Alfred Reibenschuh.
+PDF::API2 was originally written by Alfred Reibenschuh, extending code written
+by Martin Hosken.
 
-It is currently being maintained by Steve Simms.
+It is currently being maintained and developed by Steve Simms.
+
+=head1 LICENSE
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, either version 2.1 of the License, or (at your option) any
+later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
 
 =cut
