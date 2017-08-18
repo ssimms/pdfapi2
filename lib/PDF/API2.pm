@@ -1234,7 +1234,6 @@ sub openpage {
     $page->{' api'} = $self;
     weaken $page->{' apipdf'};
     weaken $page->{' api'};
-    $page->{' reopened'} = 1;
     return $page;
 }
 
