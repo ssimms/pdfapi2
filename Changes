@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+    - Add support for cross-reference streams using 64-bit field widths.
+
+
+2.033     2017-07-06
+
     - [RT #122371] Remove a couple of improperly-placed weaken statements
       (reported by Phil Perry).
 

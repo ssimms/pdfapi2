@@ -1134,6 +1134,7 @@ sub _unpack_xref_stream {
     return unpack('n', $data)       if $width == 2;
     return unpack('N', "\x00$data") if $width == 3;
     return unpack('N', $data)       if $width == 4;
+    return unpack('Q', $data)       if $width == 8;
 
     die "Invalid column width: $width";
 }
