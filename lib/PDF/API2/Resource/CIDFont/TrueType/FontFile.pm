@@ -7,6 +7,7 @@ no warnings qw[ recursion uninitialized ];
 
 # VERSION
 
+use Carp;
 use Encode qw(:all);
 use Font::TTF::Font;
 use POSIX qw(ceil floor);
@@ -423,7 +424,7 @@ sub new {
     my ($class,$pdf,$file,%opts)=@_;
     my $data={};
 
-    die "cannot find font '$file' ..." unless(-f $file);
+    confess "cannot find font '$file'" unless -f $file;
     my $font=Font::TTF::Font->open($file);
     $data->{obj}=$font;
 
