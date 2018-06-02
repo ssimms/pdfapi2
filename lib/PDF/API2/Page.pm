@@ -3,19 +3,17 @@ package PDF::API2::Page;
 use base 'PDF::API2::Basic::PDF::Pages';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
 # VERSION
 
 use POSIX qw(floor);
-
-use PDF::API2::Content;
-use PDF::API2::Content::Text;
+use Scalar::Util qw(weaken);
 
 use PDF::API2::Basic::PDF::Utils;
+use PDF::API2::Content;
+use PDF::API2::Content::Text;
 use PDF::API2::Util;
-
-use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -33,9 +31,9 @@ Returns a page object (called from $pdf->page).
 
 sub new {
     my ($class, $pdf, $parent, $index) = @_;
-    my ($self) = {};
+    my $self = {};
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     $self = $class->SUPER::new($pdf, $parent);
     $self->{'Type'} = PDFName('Page');
     $self->proc_set(qw( PDF Text ImageB ImageC ImageI ));
@@ -54,10 +52,10 @@ Returns a page object converted from $pdfpage (called from $pdf->openpage).
 sub coerce {
     my ($class, $pdf, $page) = @_;
     my $self = $page;
-    bless($self,$class);
-    $self->{' apipdf'}=$pdf;
+    bless $self, $class;
+    $self->{' apipdf'} = $pdf;
     weaken $self->{' apipdf'};
-    return($self);
+    return $self;
 }
 
 =item $page->update
@@ -101,14 +99,13 @@ sub _get_bbox {
     foreach my $mediatype (@{$box_order}) {
         my $mediaobj = $self->find_prop($mediatype);
         if ($mediaobj) {
-            @media = map { $_->val } $mediaobj->elementsof;
+            @media = map { $_->val() } $mediaobj->elementsof();
             last;
         }
     }
 
     return @media;
 }
-
 
 sub mediabox {
     return _set_bbox('MediaBox', @_);
@@ -250,55 +247,56 @@ will be prepended to the page description.
 =cut
 
 sub fixcontents {
-    my ($self) = @_;
+    my $self = shift();
     $self->{'Contents'} = $self->{'Contents'} || PDFArray();
-    if(ref($self->{'Contents'})=~/Objind$/) {
-        $self->{'Contents'}->realise;
+    if (ref($self->{'Contents'}) =~ /Objind$/) {
+        $self->{'Contents'}->realise();
     }
-    if(ref($self->{'Contents'})!~/Array$/) {
+    if (ref($self->{'Contents'}) !~ /Array$/) {
         $self->{'Contents'} = PDFArray($self->{'Contents'});
     }
     return;
 }
 
 sub content {
-    my ($self,$obj,$dir) = @_;
-    if(defined($dir) && $dir>0) {
+    my ($self, $obj, $dir) = @_;
+    if (defined($dir) and $dir > 0) {
         $self->precontent($obj);
-    } else {
+    }
+    else {
         $self->addcontent($obj);
     }
-    $self->{' apipdf'}->new_obj($obj) unless($obj->is_obj($self->{' apipdf'}));
-    $obj->{' apipdf'}=$self->{' apipdf'};
-    $obj->{' api'}=$self->{' api'};
-    $obj->{' apipage'}=$self;
+    $self->{' apipdf'}->new_obj($obj) unless $obj->is_obj($self->{' apipdf'});
+    $obj->{' apipdf'} = $self->{' apipdf'};
+    $obj->{' api'} = $self->{' api'};
+    $obj->{' apipage'} = $self;
 
     weaken $obj->{' apipdf'};
     weaken $obj->{' api'};
     weaken $obj->{' apipage'};
 
-    return($obj);
+    return $obj;
 }
 
 sub addcontent {
-    my ($self,@objs) = @_;
-    $self->fixcontents;
+    my ($self, @objs) = @_;
+    $self->fixcontents();
     $self->{'Contents'}->add_elements(@objs);
     return;
 }
 sub precontent {
-    my ($self,@objs) = @_;
-    $self->fixcontents;
-    unshift(@{$self->{'Contents'}->val},@objs);
+    my ($self, @objs) = @_;
+    $self->fixcontents();
+    unshift @{$self->{'Contents'}->val()}, @objs;
     return;
 }
 
 sub gfx {
-    my ($self,$dir) = @_;
+    my ($self, $dir) = @_;
     my $gfx=PDF::API2::Content->new();
     $self->content($gfx,$dir);
-    $gfx->compressFlate() if($self->{' api'}->{forcecompress});
-    return($gfx);
+    $gfx->compressFlate() if $self->{' api'}->{'forcecompress'};
+    return $gfx;
 }
 
 =item $txt = $page->text $prepend
@@ -309,11 +307,11 @@ will be prepended to the page description.
 =cut
 
 sub text {
-    my ($self,$dir) = @_;
-    my $text=PDF::API2::Content::Text->new();
-    $self->content($text,$dir);
-    $text->compressFlate() if($self->{' api'}->{forcecompress});
-    return($text);
+    my ($self, $dir) = @_;
+    my $text = PDF::API2::Content::Text->new();
+    $self->content($text, $dir);
+    $text->compressFlate() if $self->{' api'}->{'forcecompress'};
+    return $text;
 }
 
 =item $ant = $page->annotation
@@ -368,47 +366,49 @@ methods.
 
 sub resource {
     my ($self, $type, $key, $obj, $force) = @_;
-    my ($dict) = $self->find_prop('Resources');
+    my $dict = $self->find_prop('Resources');
 
-    $dict = $dict || $self->{Resources} || PDFDict();
+    $dict = $dict || $self->{'Resources'} || PDFDict();
 
-    $dict->realise if(ref($dict)=~/Objind$/);
+    $dict->realise() if ref($dict) =~ /Objind$/;
 
     $dict->{$type} = $dict->{$type} || PDFDict();
-    $dict->{$type}->realise if(ref($dict->{$type})=~/Objind$/);
+    $dict->{$type}->realise if ref($dict->{$type}) =~ /Objind$/;
 
-    unless(defined $obj) {
-        return($dict->{$type}->{$key} || undef);
-    } else {
-        if($force) {
+    unless (defined $obj) {
+        return $dict->{$type}->{$key} || undef;
+    }
+    else {
+        if ($force) {
             $dict->{$type}->{$key} = $obj;
-        } else {
+        }
+        else {
             $dict->{$type}->{$key} = $dict->{$type}->{$key} || $obj;
         }
 
-        $self->{' apipdf'}->out_obj($dict) if($dict->is_obj($self->{' apipdf'}));
-        $self->{' apipdf'}->out_obj($dict->{$type}) if($dict->{$type}->is_obj($self->{' apipdf'}));
-        $self->{' apipdf'}->out_obj($obj) if($obj->is_obj($self->{' apipdf'}));
+        $self->{' apipdf'}->out_obj($dict)          if $dict->is_obj($self->{' apipdf'});
+        $self->{' apipdf'}->out_obj($dict->{$type}) if $dict->{$type}->is_obj($self->{' apipdf'});
+        $self->{' apipdf'}->out_obj($obj)           if $obj->is_obj($self->{' apipdf'});
         $self->{' apipdf'}->out_obj($self);
 
-        return($dict);
+        return $dict;
     }
 }
 
-sub ship_out
-{
+sub ship_out {
     my ($self, $pdf) = @_;
 
     $pdf->ship_out($self);
-    if (defined $self->{'Contents'})
-    { $pdf->ship_out($self->{'Contents'}->elementsof); }
+    if (defined $self->{'Contents'}) {
+        $pdf->ship_out($self->{'Contents'}->elementsof);
+    }
     return $self;
 }
 
 sub outobjdeep {
     my ($self, @opts) = @_;
-    foreach my $k (qw/ api apipdf /) {
-        $self->{" $k"}=undef;
+    foreach my $k (qw(api apipdf)) {
+        $self->{" $k"} = undef;
         delete($self->{" $k"});
     }
     return $self->SUPER::outobjdeep(@opts);
