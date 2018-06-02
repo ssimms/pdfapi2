@@ -847,10 +847,15 @@ sub pageLabel {
         $nums->add_elements(PDFNum($index));
 
         my $d = PDFDict();
-        $d->{'S'} = PDFName($opts->{'-style'} eq 'Roman' ? 'R' :
-                            $opts->{'-style'} eq 'roman' ? 'r' :
-                            $opts->{'-style'} eq 'Alpha' ? 'A' :
-                            $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
+        if (defined $opts->{'-style'}) {
+            $d->{'S'} = PDFName($opts->{'-style'} eq 'Roman' ? 'R' :
+                                $opts->{'-style'} eq 'roman' ? 'r' :
+                                $opts->{'-style'} eq 'Alpha' ? 'A' :
+                                $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
+        }
+        else {
+            $d->{'S'} = PDFName('D');
+        }
 
         if (defined $opts->{'-prefix'}) {
             $d->{'P'} = PDFStr($opts->{'-prefix'});
@@ -862,6 +867,8 @@ sub pageLabel {
 
         $nums->add_elements($d);
     }
+
+    return;
 }
 
 =item $pdf->finishobjects(@objects)
@@ -890,6 +897,8 @@ sub finishobjects {
     else {
         die "invalid method invocation: no file, use 'saveas' instead.";
     }
+
+    return;
 }
 
 sub proc_pages {
@@ -938,6 +947,7 @@ B<Example:>
 sub update {
     my $self = shift();
     $self->saveas($self->{'pdf'}->{' fname'});
+    return;
 }
 
 =item $pdf->saveas($file)
@@ -971,6 +981,7 @@ sub saveas {
     }
 
     $self->end();
+    return;
 }
 
 sub save {
@@ -987,6 +998,7 @@ sub save {
     }
 
     $self->end();
+    return;
 }
 
 =item $string = $pdf->stringify()
@@ -1014,7 +1026,7 @@ B<Example:>
 sub stringify {
     my $self = shift();
 
-    my $str;
+    my $str = '';
     if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         $str = ${$self->{'content_ref'}};
@@ -1717,7 +1729,7 @@ sub corefont {
     require PDF::API2::Resource::Font::CoreFont;
     my $obj = PDF::API2::Resource::Font::CoreFont->new($self->{'pdf'}, $name, %opts);
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
     return $obj;
 }
 
@@ -1767,7 +1779,7 @@ sub psfont {
     my $obj = PDF::API2::Resource::Font::Postscript->new($self->{'pdf'}, $psf, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
 
     return $obj;
 }
@@ -1854,7 +1866,7 @@ sub cjkfont {
     my $obj = PDF::API2::Resource::CIDFont::CJKFont->new($self->{'pdf'}, $name, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
 
     return $obj;
 }

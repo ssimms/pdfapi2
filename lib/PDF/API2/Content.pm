@@ -73,7 +73,7 @@ sub outobjdeep {
         $self->{" $k"}=undef;
         delete($self->{" $k"});
     }
-    if ($self->{-docompress}==1 && $self->{Filter}) {
+    if ($self->{-docompress} && $self->{Filter}) {
         $self->{' stream'}=Compress::Zlib::compress($self->{' stream'});
         $self->{' nofilt'}=1;
         delete $self->{-docompress};
@@ -850,19 +850,19 @@ sub bogen {
 
     my $alpha=rad2deg($alpha_rad);
     # use the complement angle for span
-    $alpha -= 180 if($spf>0);
+    $alpha -= 180 if ($spf and $spf > 0);
 
     my $d=2*$r;
     my ($beta,$beta_rad,@points);
 
     $beta=rad2deg(2*asin($z/$d));
-    $beta=360-$beta if($larc>0);
+    $beta=360-$beta if ($larc and $larc > 0);
 
     $beta_rad=deg2rad($beta);
 
     @points=arctocurve($r,$r,90+$alpha+$beta/2,90+$alpha-$beta/2);
 
-    if ($spf>0) {
+    if ($spf and $spf > 0) {
         my @pts=@points;
         @points=();
         while ($y=pop @pts) {
@@ -1558,7 +1558,7 @@ Sets the font and font size.
 
 sub _font {
     my ($font, $size) = @_;
-    if ($font->isvirtual == 1) {
+    if ($font->isvirtual()) {
         return('/'.$font->fontlist->[0]->name.' '.float($size).' Tf');
     }
     else {
@@ -1582,7 +1582,7 @@ sub fontset {
     $self->{' fontsize'}=$size;
     $self->{' fontset'}=0;
 
-    if ($font->isvirtual == 1) {
+    if ($font->isvirtual()) {
         foreach my $f (@{$font->fontlist}) {
             $self->resource('Font', $f->name, $f);
         }
@@ -2135,7 +2135,7 @@ sub add {
 # (i.e. between BT and ET).  See textstart and textend.
 sub _in_text_object {
     my $self = shift();
-    return defined($self->{' apiistext'}) && $self->{' apiistext'} == 1;
+    return defined($self->{' apiistext'}) && $self->{' apiistext'};
 }
 
 =item $content->compressFlate

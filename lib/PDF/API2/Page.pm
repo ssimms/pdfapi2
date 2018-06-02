@@ -42,7 +42,7 @@ sub new {
     delete $self->{'Count'};
     delete $self->{'Kids'};
     $parent->add_page($self, $index);
-    $self;
+    return $self;
 }
 
 =item $page = PDF::API2::Page->coerce $pdf, $pdfpage
@@ -69,7 +69,7 @@ Marks a page to be updated (by $pdf->update).
 sub update {
     my ($self) = @_;
     $self->{' apipdf'}->out_obj($self);
-    $self;
+    return $self;
 }
 
 =item $page->mediabox $w, $h
@@ -258,6 +258,7 @@ sub fixcontents {
     if(ref($self->{'Contents'})!~/Array$/) {
         $self->{'Contents'} = PDFArray($self->{'Contents'});
     }
+    return;
 }
 
 sub content {
@@ -283,11 +284,13 @@ sub addcontent {
     my ($self,@objs) = @_;
     $self->fixcontents;
     $self->{'Contents'}->add_elements(@objs);
+    return;
 }
 sub precontent {
     my ($self,@objs) = @_;
     $self->fixcontents;
     unshift(@{$self->{'Contents'}->val},@objs);
+    return;
 }
 
 sub gfx {
@@ -399,7 +402,7 @@ sub ship_out
     $pdf->ship_out($self);
     if (defined $self->{'Contents'})
     { $pdf->ship_out($self->{'Contents'}->elementsof); }
-    $self;
+    return $self;
 }
 
 sub outobjdeep {
@@ -408,7 +411,7 @@ sub outobjdeep {
         $self->{" $k"}=undef;
         delete($self->{" $k"});
     }
-    $self->SUPER::outobjdeep(@opts);
+    return $self->SUPER::outobjdeep(@opts);
 }
 
 =back
