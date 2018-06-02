@@ -2398,6 +2398,19 @@ __END__
 
 =back
 
+=head1 SUPPORTED PERL VERSIONS
+
+PDF::API2 will aim to support all major Perl versions that were released in the
+past six years, plus one, in order to continue working for the life of most
+long-term-stable (LTS) server distributions.
+
+For example, a version of PDF::API2 released on 2018-01-01 would support the
+last major version of Perl released before 2012-01-01, which happens to be 5.14.
+
+If you need to use this module on a server with an extremely out-of-date version
+of Perl, consider using either plenv or Perlbrew to run a newer version of Perl
+without needing admin privileges.
+
 =head1 KNOWN ISSUES
 
 This module does not work with perl's -l command-line switch.

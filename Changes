@@ -1,5 +1,15 @@
 {{$NEXT}}
 
+    - SUPPORTED PERL VERSIONS: Starting with this release, PDF::API2 will
+      support major Perl versions released in the past six years, plus the major
+      release before that one.  This should provide backward compatibility for
+      the life of most LTS server distributions, while eliminating the need to
+      troubleshoot warnings and bugs that only show up in increasingly-ancient
+      versions of Perl.
+
+      For this release, it means that the minimum supported Perl is 5.16, which
+      was first released on 2012-05-20.
+
     - Add support for cross-reference streams using 64-bit field widths.
 
 
