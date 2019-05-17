@@ -213,7 +213,7 @@ Outputs the string in PDF format, complete with necessary conversions
 =cut
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     $fh->print($self->as_pdf($pdf));
 }

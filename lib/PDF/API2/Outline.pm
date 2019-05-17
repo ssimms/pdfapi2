@@ -327,18 +327,9 @@ sub out_obj {
 }
 
 sub outobjdeep {
-    my ($self,@param)=@_;
-    $self->fix_outline;
-    foreach my $k (qw/ api apipdf apipage /) {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
-    }
-    my @ret=$self->SUPER::outobjdeep(@param);
-    foreach my $k (qw/ First Parent Next Last Prev /) {
-        $self->{$k}=undef;
-        delete($self->{$k});
-    }
-    return @ret;
+    my $self = shift();
+    $self->fix_outline();
+    return $self->SUPER::outobjdeep(@_);
 }
 
 =back

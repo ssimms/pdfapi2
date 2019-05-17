@@ -645,7 +645,7 @@ sub subvec {
 sub glyphNum { return ( $_[0]->font->{'maxp'}->read->{'numGlyphs'} ); }
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     my $f = $self->font;
 
@@ -674,7 +674,7 @@ sub outobjdeep {
 		}
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    $self->SUPER::outobjdeep($fh, $pdf);
 }
 
 

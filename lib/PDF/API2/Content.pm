@@ -64,15 +64,8 @@ sub new {
 }
 
 sub outobjdeep {
-    my $self = shift @_;
+    my $self = shift();
     $self->textend;
-    foreach my $k (qw[ api apipdf apiistext apipage font fontset fontsize
-                       charspace hscale wordspace lead rise render matrix
-                       textmatrix textlinematrix fillcolor strokecolor
-                       translate scale skew rotate ]) {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
-    }
     if ($self->{-docompress} && $self->{Filter}) {
         $self->{' stream'}=Compress::Zlib::compress($self->{' stream'});
         $self->{' nofilt'}=1;

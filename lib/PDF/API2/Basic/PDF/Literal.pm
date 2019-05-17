@@ -35,7 +35,7 @@ sub new
 
 sub outobjdeep
 {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
     if($self->{-isdict})
     {
         if(defined $self->{' stream'})
@@ -61,7 +61,7 @@ sub outobjdeep
             }
             elsif(blessed($self->{$k}) and $self->{$k}->can('outobj'))
             {
-                $self->{$k}->outobj($fh, $pdf, %opts);
+                $self->{$k}->outobj($fh, $pdf);
                 $fh->print("\n");
             }
             else

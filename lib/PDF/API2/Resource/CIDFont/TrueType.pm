@@ -132,7 +132,7 @@ sub glyphNum { return ( $_[0]->fontfile->glyphNum ); }
 
 sub outobjdeep
 {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     my $notdefbefore=1;
 
@@ -174,7 +174,7 @@ sub outobjdeep
         #}
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    $self->SUPER::outobjdeep($fh, $pdf);
 }
 
 =back

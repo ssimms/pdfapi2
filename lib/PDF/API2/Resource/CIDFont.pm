@@ -334,13 +334,6 @@ sub glyphNum
     return ( scalar @{$self->data->{wx}} );
 }
 
-sub outobjdeep
-{
-    my ($self, $fh, $pdf, %opts) = @_;
-
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
-}
-
 =back
 
 =cut

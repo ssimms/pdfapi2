@@ -67,14 +67,6 @@ sub name {
     return $self->{'Name'}->val();
 }
 
-sub outobjdeep {
-    my ($self, $fh, $pdf, %options) = @_;
-
-    delete $self->{' api'};
-    delete $self->{' apipdf'};
-    $self->SUPER::outobjdeep($fh, $pdf, %options);
-}
-
 =back
 
 =cut

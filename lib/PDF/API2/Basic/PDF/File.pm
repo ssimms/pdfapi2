@@ -947,7 +947,7 @@ sub ship_out {
         $self->{' locs'}{$objind->uid()} = $fh->tell();
         my ($objnum, $objgen) = @{$self->{' objects'}{$objind->uid()}}[0..1];
         $fh->printf('%d %d obj ', $objnum, $objgen);
-        $objind->outobjdeep($fh, $self, 'objnum' => $objnum, 'objgen' => $objgen);
+        $objind->outobjdeep($fh, $self);
         $fh->print(" endobj\n");
 
         # Note that we've output this obj, not forgetting to update

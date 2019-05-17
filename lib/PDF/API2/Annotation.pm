@@ -35,17 +35,6 @@ sub new
     return($self);
 }
 
-sub outobjdeep
-{
-    my ($self, @opts) = @_;
-    foreach my $k (qw[ api apipdf apipage ])
-    {
-        $self->{" $k"}=undef;
-        delete($self->{" $k"});
-    }
-    $self->SUPER::outobjdeep(@opts);
-}
-
 =item $ant->link $page, %opts
 
 Defines the annotation as launch-page with page $page and

@@ -166,7 +166,7 @@ sub glyphByCId
 }
 
 sub outobjdeep {
-    my ($self, $fh, $pdf, %opts) = @_;
+    my ($self, $fh, $pdf) = @_;
 
     my $notdefbefore=1;
 
@@ -217,7 +217,7 @@ sub outobjdeep {
         }
     }
 
-    $self->SUPER::outobjdeep($fh, $pdf, %opts);
+    $self->SUPER::outobjdeep($fh, $pdf);
 }
 
 BEGIN {
