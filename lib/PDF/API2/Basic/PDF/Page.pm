@@ -78,40 +78,6 @@ sub new {
     return $self;
 }
 
-
-=head2 $p->add($str)
-
-Adds the string to the currently active stream for this page. If no stream
-exists, then one is created and added to the list of streams for this page.
-
-The slightly cryptic name is an aim to keep it short given the number of times
-people are likely to have to type it.
-
-=cut
-
-sub add {
-    my ($self, $string) = @_;
-    my $dict = $self->{' curstrm'};
-
-    unless (defined $dict) {
-        $dict = PDF::API2::Basic::PDF::Dict->new();
-        foreach my $pdf (@{$self->{' destination_pdfs'}}) {
-            $pdf->new_obj($dict);
-        }
-        $self->{'Contents'} = PDFArray() unless defined $self->{'Contents'};
-        unless (ref($self->{'Contents'}) eq 'PDF::API2::Basic::PDF::Array') {
-            $self->{'Contents'} = PDFArray($self->{'Contents'});
-        }
-        $self->{'Contents'}->add_elements($dict);
-        $self->{' curstrm'} = $dict;
-    }
-
-    $dict->{' stream'} .= $string;
-
-    return $self;
-}
-
-
 =head2 $p->ship_out($pdf)
 
 Ships the page out to the given output file context
