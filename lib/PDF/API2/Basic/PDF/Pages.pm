@@ -38,72 +38,52 @@ themselves.
 
 =head1 METHODS
 
-=head2 PDF::API2::Basic::PDF::Pages->new($pdfs, $parent)
+=head2 PDF::API2::Basic::PDF::Pages->new($pdf, $parent)
 
-This creates a new Pages object in one or more PDFs. Notice that
-$parent here is not the file context for the object but the parent
-pages object for this pages. If we are using this class to create a
-root node, then $parent should point to the file context, which is
-identified by not having a Type of Pages.  $pdfs is the file object
-(or a reference to an array of file objects) in which to create the
-new Pages object.
+This creates a new Pages object in a PDF. Notice that $parent here is
+not the file context for the object but the parent pages object for
+this pages. If we are using this class to create a root node, then
+$parent should point to the file context, which is identified by not
+having a Type of Pages.  $pdf is the file object (or a reference to an
+array of file objects) in which to create the new Pages object.
 
 =cut
 
 sub new {
-    my ($class, $pdfs, $parent) = @_;
+    my ($class, $pdf, $parent) = @_;
+    $pdf //= $class->get_top->{' parent'} if ref($class);
+
+    # Prior to 2.034, $pdf could be an array of PDFs
+    if (ref($pdf) eq 'ARRAY') {
+        die 'Only one PDF is supported as of version 2.034' if scalar(@$pdf) > 1;
+        ($pdf) = @$pdf;
+    }
 
     $class = ref($class) if ref($class);
-    my $self = $class->SUPER::new($pdfs, $parent);
+    my $self = $class->SUPER::new($pdf, $parent);
 
     $self->{'Type'} = PDFName('Pages');
     $self->{'Parent'} = $parent if defined $parent;
     $self->{'Count'} = PDFNum(0);
-    $self->{'Kids'} = PDF::API2::Basic::PDF::Array->new;
-    $self->{' destination_pdfs'} = ref($pdfs) eq 'ARRAY' ? $pdfs : [$pdfs];
-    $self->out_obj(1);
+    $self->{'Kids'} = PDF::API2::Basic::PDF::Array->new();
 
-    weaken $_ for @{$self->{' destination_pdfs'}};
+    $pdf->new_obj($self);
+    unless (defined $self->{'Parent'}) {
+        $pdf->{'Root'}->{'Pages'} = $self;
+        $pdf->out_obj($pdf->{'Root'});
+
+        $self->{' parent'} = $pdf;
+        weaken $self->{' parent'};
+    }
+
     weaken $self->{'Parent'} if defined $parent;
 
     return $self;
 }
 
-sub init {
-    my ($self, $pdf) = @_;
-    $self->{' destination_pdfs'} = [$pdf];
-    weaken $self->{' destination_pdfs'}->[0] if defined $pdf;
-    return $self;
-}
-
-=head2 $p->out_obj($is_new)
-
-Tells all the files that this thing is destined for that they should output this
-object come time to output. If this object has no parent, then it must be the
-root. So set as the root for the files in question and tell it to be output too.
-If $is_new is set, then call new_obj rather than out_obj to create as a new
-object in the file.
-
-=cut
-
-sub out_obj {
-    my ($self, $is_new) = @_;
-
-    foreach my $pdf (@{$self->{' destination_pdfs'}}) {
-        if ($is_new) {
-            $pdf->new_obj($self);
-        }
-        else {
-            $pdf->out_obj($self);
-        }
-
-        unless (defined $self->{'Parent'}) {
-            $pdf->{'Root'}{'Pages'} = $self;
-            $pdf->out_obj($pdf->{'Root'});
-        }
-    }
-
-    return $self;
+sub _pdf {
+    my $self = shift();
+    return $self->get_top->{' parent'};
 }
 
 =head2 $p->find_page($page_number)
@@ -190,9 +170,11 @@ sub add_page {
 
     $parent->add_page_recurse($page->realise(), $page_index);
     for ($parent = $page->{'Parent'}; defined $parent->{'Parent'}; $parent = $parent->{'Parent'}->realise()) {
-        $parent->out_obj->{'Count'}->realise->{'val'}++;
+        $parent->set_modified();
+        $parent->{'Count'}->realise->{'val'}++;
     }
-    $parent->out_obj->{'Count'}->realise->{'val'}++;
+    $parent->set_modified();
+    $parent->{'Count'}->realise->{'val'}++;
 
     return $page;
 }
@@ -200,23 +182,23 @@ sub add_page {
 sub add_page_recurse {
     my ($self, $page, $page_index) = @_;
 
-    my $parent;
+    my $parent = $self;
     my $max_kids_per_parent = 8; # Why?
-    if (scalar $self->{'Kids'}->elements() >= $max_kids_per_parent and $self->{'Parent'} and $page_index < 1) {
-        my $full_parent = $self->{'Parent'}->realise();
-        $parent = $self->new($self->{' destination_pdfs'}, $full_parent);
-        if ($full_parent) {
-            my $full_parent_kid_count = scalar $full_parent->{'Kids'}->realise->elements();
-            my $new_parent_index;
-            for ($new_parent_index = 0; $new_parent_index < $full_parent_kid_count; $new_parent_index++) {
-                last if ($full_parent->{'Kids'}{' val'}[$new_parent_index] eq $self);
-            }
-            $new_parent_index = -1 if $new_parent_index == $full_parent_kid_count;
-            $full_parent->add_page_recurse($parent, $new_parent_index);
+    if (scalar $parent->{'Kids'}->elements() >= $max_kids_per_parent and $parent->{'Parent'} and $page_index < 1) {
+        my $grandparent = $parent->{'Parent'}->realise();
+        $parent = $parent->new($parent->_pdf(), $grandparent);
+
+        my $grandparent_kid_count = scalar $grandparent->{'Kids'}->realise->elements();
+        my $new_parent_index;
+        for ($new_parent_index = 0; $new_parent_index < $grandparent_kid_count; $new_parent_index++) {
+            last if $grandparent->{'Kids'}{' val'}[$new_parent_index] eq $self;
         }
+        $new_parent_index++;
+        $new_parent_index = -1 if $new_parent_index > $grandparent_kid_count;
+        $grandparent->add_page_recurse($parent, $new_parent_index);
     }
     else {
-        $parent = $self->out_obj();
+        $parent->set_modified();
     }
 
     if ($page_index < 0) {
@@ -227,6 +209,11 @@ sub add_page_recurse {
     }
     $page->{'Parent'} = $parent;
     weaken $page->{'Parent'};
+}
+
+sub set_modified {
+    my $self = shift();
+    $self->_pdf->out_obj($self);
 }
 
 # Previously documented but not implemented
@@ -366,6 +353,7 @@ listed. If necessary it creates a local resource dictionary to achieve this.
 sub proc_set {
     my ($self, @entries) = @_;
 
+    # Maintainer's note: Shouldn't this be Resources (plural)?
     my $dict = $self->find_prop('Resource');
     if ($dict and defined $dict->{'ProcSet'}) {
         my @missing = @entries;
@@ -377,6 +365,9 @@ sub proc_set {
     }
 
     unless (defined $self->{'Resources'}) {
+        # Maintainer's note: copy requires a $pdf, which hasn't been provided.
+        # However, copy() isn't currently being called because of the Resources
+        # typo above.
         $self->{'Resources'} = $dict ? $dict->copy() : PDFDict();
     }
 
