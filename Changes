@@ -12,6 +12,9 @@
 
     - Add support for cross-reference streams using 64-bit field widths.
 
+    - [RT #126274] Fix alignment when using UniFont with text_center or
+      text_right when all characters are in the same block.
+
 
 2.033     2017-07-06
 

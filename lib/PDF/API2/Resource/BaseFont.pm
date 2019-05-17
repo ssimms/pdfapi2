@@ -740,6 +740,10 @@ sub textByStrKern
     }
 }
 
+# Maintainer's note: $size doesn't mean font size here.  If present, the text is
+# rendered using the TJ operator (which allows for positioning of individual
+# glyphs).  If absent, the text is returned as a fragment that's placed but not
+# shown unless a Tj operator is added later.
 sub text
 {
     my ($self,$text,$size,$ident)=@_;
