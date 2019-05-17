@@ -5,6 +5,7 @@ use warnings;
 
 # VERSION
 
+use Carp;
 use Encode qw(:all);
 
 =head1 NAME
@@ -173,7 +174,7 @@ sub width {
 sub text {
     my ($self, $text, $size, $indent) = @_;
     $text = decode($self->{'encode'}, $text) unless is_utf8($text);
-    die 'textsize not specified' unless defined $size;
+    croak 'Font size not specified' unless defined $size;
 
     my $value = '';
     my $lastfont = -1;
