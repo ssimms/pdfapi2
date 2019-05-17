@@ -15,7 +15,7 @@ package PDF::API2::Basic::PDF::Page;
 use base 'PDF::API2::Basic::PDF::Pages';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
 # VERSION
 
@@ -64,18 +64,18 @@ should be inserted (so that new pages need not be appended)
 
 =cut
 
-sub new
-{
+sub new {
     my ($class, $pdf, $parent, $index) = @_;
-    my ($self) = {};
+    my $self = {};
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     $self = $class->SUPER::new($pdf, $parent);
     $self->{'Type'} = PDFName('Page');
     delete $self->{'Count'};
     delete $self->{'Kids'};
     $parent->add_page($self, $index);
-    $self;
+
+    return $self;
 }
 
 
@@ -89,25 +89,26 @@ people are likely to have to type it.
 
 =cut
 
-sub add
-{
-    my ($self, $str) = @_;
-    my ($strm) = $self->{' curstrm'};
+sub add {
+    my ($self, $string) = @_;
+    my $dict = $self->{' curstrm'};
 
-    if (!defined $strm)
-    {
-        $strm = PDF::API2::Basic::PDF::Dict->new;
-        foreach (@{$self->{' outto'}})
-        { $_->new_obj($strm); }
+    unless (defined $dict) {
+        $dict = PDF::API2::Basic::PDF::Dict->new();
+        foreach my $pdf (@{$self->{' destination_pdfs'}}) {
+            $pdf->new_obj($dict);
+        }
         $self->{'Contents'} = PDFArray() unless defined $self->{'Contents'};
-        unless (ref $self->{'Contents'} eq "PDF::API2::Basic::PDF::Array")
-        { $self->{'Contents'} = PDFArray($self->{'Contents'}); }
-        $self->{'Contents'}->add_elements($strm);
-        $self->{' curstrm'} = $strm;
+        unless (ref($self->{'Contents'}) eq 'PDF::API2::Basic::PDF::Array') {
+            $self->{'Contents'} = PDFArray($self->{'Contents'});
+        }
+        $self->{'Contents'}->add_elements($dict);
+        $self->{' curstrm'} = $dict;
     }
 
-    $strm->{' stream'} .= $str;
-    $self;
+    $dict->{' stream'} .= $string;
+
+    return $self;
 }
 
 
@@ -117,8 +118,7 @@ Ships the page out to the given output file context
 
 =cut
 
-sub ship_out
-{
+sub ship_out {
     my ($self, $pdf) = @_;
 
     $pdf->ship_out($self);
