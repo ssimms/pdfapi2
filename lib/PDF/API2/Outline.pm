@@ -320,12 +320,6 @@ sub pdfile {
     return($self);
 }
 
-sub out_obj {
-    my ($self,@param)=@_;
-    $self->fix_outline;
-    return $self->SUPER::out_obj(@param);
-}
-
 sub outobjdeep {
     my $self = shift();
     $self->fix_outline();
