@@ -122,9 +122,11 @@ sub ship_out
     my ($self, $pdf) = @_;
 
     $pdf->ship_out($self);
-    if (defined $self->{'Contents'})
-    { $pdf->ship_out($self->{'Contents'}->elementsof); }
-    $self;
+    if (defined $self->{'Contents'}) {
+        $pdf->ship_out($self->{'Contents'}->elements());
+    }
+
+    return $self;
 }
 
 1;

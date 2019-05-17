@@ -191,21 +191,23 @@ sub outobj {
     }
 }
 
-=head2 $r->elementsof
+=head2 $r->elements
 
 Abstract superclass function filler. Returns self here but should return
 something more useful if an array.
 
 =cut
 
-sub elementsof {
+sub elementsof { return elements(@_) }
+
+sub elements {
     my ($self) = @_;
 
     if ($self->{' realised'}) {
         return $self;
     }
     else {
-        return $self->{' parent'}->read_obj($self)->elementsof;
+        return $self->{' parent'}->read_obj($self)->elements();
     }
 }
 

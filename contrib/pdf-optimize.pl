@@ -26,7 +26,7 @@ sub walk_obj {
 
     if(ref($obj)=~/Array$/ || (blessed($obj) && $obj->isa('PDF::API2::Basic::PDF::Array'))) {
         $tobj->{' val'}=[];
-        foreach my $k ($obj->elementsof) {
+        foreach my $k ($obj->elements()) {
             $k->realise if(ref($k)=~/Objind$/);
             $tobj->add_elements(walk_obj($objs,$spdf,$tpdf,$k));
         }

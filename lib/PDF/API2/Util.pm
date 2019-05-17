@@ -573,7 +573,7 @@ sub unfilter {
         my ($hasflate) = -1;
         my ($temp, $i, $temp1);
 
-        @filts = map { ("PDF::API2::Basic::PDF::Filter::" . $_->val())->new() } $filter->elementsof();
+        @filts = map { ("PDF::API2::Basic::PDF::Filter::" . $_->val())->new() } $filter->elements();
 
         foreach my $f (@filts) {
             $stream = $f->infilt($stream, 1);
@@ -596,7 +596,7 @@ sub dofilter {
         my $hasflate = -1;
         my ($temp, $i, $temp1);
 
-        @filts = map { ("PDF::API2::Basic::PDF::Filter::" . $_->val())->new() } $filter->elementsof();
+        @filts = map { ("PDF::API2::Basic::PDF::Filter::" . $_->val())->new() } $filter->elements();
 
         foreach my $f (@filts) {
             $stream = $f->outfilt($stream, 1);

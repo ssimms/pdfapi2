@@ -99,7 +99,7 @@ sub _get_bbox {
     foreach my $mediatype (@{$box_order}) {
         my $mediaobj = $self->find_prop($mediatype);
         if ($mediaobj) {
-            @media = map { $_->val() } $mediaobj->elementsof();
+            @media = map { $_->val() } $mediaobj->elements();
             last;
         }
     }
@@ -400,7 +400,7 @@ sub ship_out {
 
     $pdf->ship_out($self);
     if (defined $self->{'Contents'}) {
-        $pdf->ship_out($self->{'Contents'}->elementsof);
+        $pdf->ship_out($self->{'Contents'}->elements());
     }
     return $self;
 }

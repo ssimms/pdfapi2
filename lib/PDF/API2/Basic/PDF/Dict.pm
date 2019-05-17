@@ -251,7 +251,7 @@ sub read_stream {
     my @filters;
     if (defined $self->{'Filter'}) {
         my $i = 0;
-        foreach my $filter ($self->{'Filter'}->elementsof()) {
+        foreach my $filter ($self->{'Filter'}->elements()) {
             my $filter_class = "PDF::API2::Basic::PDF::Filter::" . $filter->val();
             unless ($self->{'DecodeParms'}) {
                 push(@filters, $filter_class->new());

@@ -27,7 +27,7 @@ sub walk_obj {
 
     if(ref($obj)=~/Array$/ || (blessed($obj) && $obj->isa('PDF::API2::Basic::PDF::Array'))) {
         $tobj->{' val'}=[];
-        foreach my $k ($obj->elementsof) {
+        foreach my $k ($obj->elements()) {
             $k->realise if(ref($k)=~/Objind$/);
             $tobj->add_elements(walk_obj($objs,$spdf,$tpdf,$k));
         }
@@ -42,8 +42,8 @@ sub walk_obj {
             if($tobj->{Filter} && !$tobj->{DecodeParms}) {
                 my $f=$tobj->{Filter};
                 $f=PDFArray($f) unless(ref($f)=~/Array/);
-                if(scalar($f->elementsof) == 1) {
-                    my ($t)=$f->elementsof;
+                if(scalar($f->elements()) == 1) {
+                    my ($t)=$f->elements();
                     if($t->val eq 'FlateDecode') {
                         $tobj->{' stream'}=uncompress($obj->{' stream'});
                         delete $tobj->{Filter};

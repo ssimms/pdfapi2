@@ -136,7 +136,7 @@ sub find_page_recurse
         return;
     }
 
-    foreach my $k ($self->{'Kids'}->realise->elementsof)
+    foreach my $k ($self->{'Kids'}->realise->elements())
     {
         if ($k->{'Type'}->realise->val eq 'Page')
         {
@@ -183,7 +183,7 @@ sub add_page
     else
     { $ppages = $self; }
 
-    $ppnum = scalar $ppages->{'Kids'}->realise->elementsof;
+    $ppnum = scalar $ppages->{'Kids'}->realise->elements();
 
     if ($pnum == -1)
     { $pindex = -1; }
@@ -207,13 +207,13 @@ sub add_page_recurse
     my ($self, $page, $index) = @_;
     my ($newpages, $ppages, $pindex, $ppnum);
 
-    if (scalar $self->{'Kids'}->elementsof >= 8 && $self->{'Parent'} && $index < 1)
+    if (scalar $self->{'Kids'}->elements() >= 8 && $self->{'Parent'} && $index < 1)
     {
         $ppages = $self->{'Parent'}->realise;
         $newpages = $self->new($self->{' outto'}, $ppages);
         if ($ppages)
         {
-            $ppnum = scalar $ppages->{'Kids'}->realise->elementsof;
+            $ppnum = scalar $ppages->{'Kids'}->realise->elements();
             for ($pindex = 0; $pindex < $ppnum; $pindex++)
             { last if ($ppages->{'Kids'}{' val'}[$pindex] eq $self); }
             $pindex = -1 if ($pindex == $ppnum);
@@ -268,7 +268,7 @@ sub get_kids
     my ($self) = @_;
     my @pglist;
 
-    foreach my $pgref ($self->{'Kids'}->elementsof)
+    foreach my $pgref ($self->{'Kids'}->elements())
     {
         $pgref->realise;
         if ($pgref->{'Type'}->val =~ m/^Pages$/oi)
@@ -352,7 +352,7 @@ sub bbox
     if ($inh ne "")
     {
         $test = 1; $i = 0;
-        foreach my $e ($inh->elementsof)
+        foreach my $e ($inh->elements())
         { $test &= $e->val == $bbox[$i++]; }
         return $self if $test && $i == 4;
     }
@@ -381,7 +381,7 @@ sub proc_set
     $dict = $self->find_prop('Resource');
     if ($dict ne "" && defined $dict->{'ProcSet'})
     {
-        foreach my $e ($dict->{'ProcSet'}->elementsof)
+        foreach my $e ($dict->{'ProcSet'}->elements())
         { @temp = grep($_ ne $e, @temp); }
         return $self if (scalar @temp == 0);
         @entries = @temp if defined $self->{'Resources'};

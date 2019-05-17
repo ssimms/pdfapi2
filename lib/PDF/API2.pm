@@ -912,7 +912,7 @@ sub proc_pages {
 
     my @pages;
     $pdf->{' apipagecount'} ||= 0;
-    foreach my $page ($object->{'Kids'}->elementsof()) {
+    foreach my $page ($object->{'Kids'}->elements()) {
         $page->realise();
         if ($page->{'Type'}->val() eq 'Pages') {
             push @pages, proc_pages($pdf, $page);
@@ -1180,7 +1180,7 @@ sub openpage {
                 $page->{'Rotate'} = PDFNum(0);
                 foreach my $mediatype (qw(MediaBox CropBox BleedBox TrimBox ArtBox)) {
                     if ($media = $page->find_prop($mediatype)) {
-                        $media = [ map { $_->val() } $media->elementsof() ];
+                        $media = [ map { $_->val() } $media->elements() ];
                     }
                     else {
                         $media = [0, 0, 612, 792];
@@ -1217,7 +1217,7 @@ sub openpage {
             if ($self->default('pageencaps')) {
                 $content->{' stream'} .= ' q ';
             }
-            foreach my $k ($uncontent->elementsof()) {
+            foreach my $k ($uncontent->elements()) {
                 $k->realise();
                 $content->{' stream'} .= ' ' . unfilter($k->{'Filter'}, $k->{' stream'}) . ' ';
             }
@@ -1269,7 +1269,7 @@ sub walk_obj {
 
     if (ref($source_object) =~ /Array$/) {
         $target_object->{' val'} = [];
-        foreach my $k ($source_object->elementsof()) {
+        foreach my $k ($source_object->elements()) {
             $k->realise() if ref($k) =~ /Objind$/;
             $target_object->add_elements(walk_obj($object_cache, $source_pdf, $target_pdf, $k));
         }
@@ -1355,7 +1355,7 @@ sub importPageIntoForm {
         # my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
         next unless defined $s_page->find_prop($k);
         my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
-        $xo->bbox(map { $_->val() } $box->elementsof());
+        $xo->bbox(map { $_->val() } $box->elements());
         last;
     }
     $xo->bbox(0, 0, 612, 792) unless defined $xo->{'BBox'};
@@ -1389,7 +1389,7 @@ sub importPageIntoForm {
 
         $xo->{' stream'} = '';
         # openpage pages only contain one stream
-        my ($k) = $s_page->{'Contents'}->elementsof();
+        my ($k) = $s_page->{'Contents'}->elements();
         $k->realise();
         if ($k->{' nofilt'}) {
           # we have a finished stream here
@@ -1481,7 +1481,7 @@ sub import_page {
         my $box = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $prop);
         my $method = lc $k;
 
-        $t_page->$method(map { $_->val() } $box->elementsof());
+        $t_page->$method(map { $_->val() } $box->elements());
     }
 
     $t_page->gfx->formimage($xo, 0, 0, 1);
@@ -1497,7 +1497,7 @@ sub import_page {
         }
         my @Fields = ();
         my @Annots = ();
-        foreach my $a ($s_page->{'Annots'}->elementsof()) {
+        foreach my $a ($s_page->{'Annots'}->elements()) {
             $a->realise();
             my $t_a = PDFDict();
             $self->{'pdf'}->new_obj($t_a);

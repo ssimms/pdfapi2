@@ -64,8 +64,6 @@ sub outobjdeep {
 
 Returns the contents of the array.
 
-Formerly C<elementsof>.
-
 =cut
 
 sub elementsof { return elements(@_) }
