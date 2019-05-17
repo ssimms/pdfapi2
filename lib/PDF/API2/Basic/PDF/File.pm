@@ -540,7 +540,10 @@ sub readval {
         }
         $result->{' parent'} = $self;
         weaken $result->{' parent'};
-        $result->{' realised'} = 0;
+
+        # Removed to address changes being lost when an indirect object is realised twice
+        # $result->{' realised'} = 0;
+
         # gdj: FIXME: if any of the ws chars were crs, then the whole
         # string might not have been read.
     }
