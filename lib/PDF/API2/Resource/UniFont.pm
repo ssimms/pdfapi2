@@ -35,15 +35,15 @@ B<FONTSPECS:> fonts can be registered using the following hash-ref:
 B<BLOCKSPECS:>
 
     [
-        $block1, $block3,    # register font for block 1 + 3
-        [$blockA, $blockZ],  # register font for blocks A .. Z
+        1, 3,    # register font for blocks 1 and 3
+        [1, 3],  # register font for blocks 1 .. 3
     ]
 
 B<CODESPECS:>
 
     [
-        $cp1, $cp3,          # register font for codepoint 1 + 3
-        [$cpA,$cpZ],         # register font for codepoints A .. Z
+        1, 3,    # register font for codepoints 1 and 3
+        [1, 3],  # register font for codepoints 1 .. 3
     ]
 
 B<NOTE:> if you want to register a font for the entire unicode space
@@ -57,34 +57,36 @@ Valid %options are:
 =cut
 
 sub new {
-    my ($class, $pdf, @fonts) = @_;
-
+    my $class = shift();
     $class = ref($class) if ref($class);
     my $self = {
         fonts => [],
         block => {},
-        code => {},
+        code  => {},
+        pdf   => shift(),
     };
     bless $self, $class;
 
-    $self->{'pdf'} = $pdf;
+    my @fonts;
+    push @fonts, shift() while ref($_[0]);
 
-    # look at all fonts
-    my $fn = 0;
-    while (ref($fonts[0])) {
-        my $font = shift @fonts;
+    my %options = @_;
+    $self->{'encode'} = $options{'-encode'} if defined $options{'-encode'};
+
+    my $font_number = 0;
+    foreach my $font (@fonts) {
         if (ref($font) eq 'ARRAY') {
-            push @{$self->{'fonts'}}, $font->[0];
-            shift @$font;
+            push @{$self->{'fonts'}}, shift(@$font);
+
             while (defined $font->[0]) {
-                my $r0 = shift @$font;
-                if (ref($r0)) {
-                    foreach my $b ($r0->[0] .. $r0->[-1]) {
-                        $self->{'block'}->{$b} = $fn;
+                my $blockspec = shift @$font;
+                if (ref($blockspec)) {
+                    foreach my $block ($blockspec->[0] .. $blockspec->[-1]) {
+                        $self->{'block'}->{$block} = $font_number;
                     }
                 }
                 else {
-                    $self->{'block'}->{$r0} = $fn;
+                    $self->{'block'}->{$blockspec} = $font_number;
                 }
             }
         }
@@ -92,43 +94,39 @@ sub new {
             push @{$self->{'fonts'}}, $font->{'font'};
 
             if (defined($font->{'blocks'}) and ref($font->{'blocks'}) eq 'ARRAY') {
-                foreach my $r0 (@{$font->{'blocks'}}) {
-                    if (ref($r0)) {
-                        foreach my $b ($r0->[0] .. $r0->[-1]) {
-                            $self->{'block'}->{$b} = $fn;
+                foreach my $blockspec (@{$font->{'blocks'}}) {
+                    if (ref($blockspec)) {
+                        foreach my $block ($blockspec->[0] .. $blockspec->[-1]) {
+                            $self->{'block'}->{$block} = $font_number;
                         }
                     }
                     else {
-                        $self->{'block'}->{$r0} = $fn;
+                        $self->{'block'}->{$blockspec} = $font_number;
                     }
                 }
             }
 
             if (defined($font->{'codes'}) and ref($font->{'codes'}) eq 'ARRAY') {
-                foreach my $r0 (@{$font->{'codes'}}) {
-                    if (ref($r0)) {
-                        foreach my $b ($r0->[0] .. $r0->[-1]) {
-                            $self->{'code'}->{$b} = $fn;
+                foreach my $codespec (@{$font->{'codes'}}) {
+                    if (ref($codespec)) {
+                        foreach my $code ($codespec->[0] .. $codespec->[-1]) {
+                            $self->{'code'}->{$code} = $font_number;
                         }
                     }
                     else {
-                        $self->{'code'}->{$r0} = $fn;
+                        $self->{'code'}->{$codespec} = $font_number;
                     }
                 }
             }
         }
         else {
             push @{$self->{'fonts'}}, $font;
-            foreach my $b (0 .. 255) {
-                $self->{'block'}->{$b} = $fn;
+            foreach my $block (0 .. 255) {
+                $self->{'block'}->{$block} = $font_number;
             }
         }
-        $fn++;
+        $font_number++;
     }
-
-    my %opts = @fonts;
-
-    $self->{'encode'} = $opts{'-encode'} if defined $opts{'-encode'};
 
     return $self;
 }
@@ -145,27 +143,30 @@ sub width {
     $text = decode($self->{'encode'}, $text) unless is_utf8($text);
     my $width = 0;
 
-    my @blks = ();
+    my @blocks = ();
     foreach my $u (unpack('U*', $text)) {
-        my $fn = 0;
-        if (defined $self->{code}->{$u}) {
-            $fn = $self->{'code'}->{$u};
+        my $font_number = 0;
+        if (defined $self->{'code'}->{$u}) {
+            $font_number = $self->{'code'}->{$u};
         }
         elsif (defined $self->{'block'}->{$u >> 8}) {
-            $fn = $self->{'block'}->{$u >> 8};
+            $font_number = $self->{'block'}->{$u >> 8};
         }
         else {
-            $fn = 0;
+            $font_number = 0;
         }
-        if (scalar @blks == 0 || $blks[-1]->[0] != $fn) {
-            push @blks, [$fn, pack('U', $u)];
+
+        if (scalar @blocks == 0 or $blocks[-1]->[0] != $font_number) {
+            push @blocks, [$font_number, pack('U', $u)];
         }
         else {
-            $blks[-1]->[1] .= pack('U', $u);
+            $blocks[-1]->[1] .= pack('U', $u);
         }
     }
-    foreach my $blk (@blks) {
-        $width += $self->fontlist->[$blk->[0]]->width($blk->[1]);
+
+    foreach my $block (@blocks) {
+        my ($font_number, $string) = @$block;
+        $width += $self->fontlist->[$font_number]->width($string);
     }
 
     return $width;
@@ -177,20 +178,20 @@ sub text {
     croak 'Font size not specified' unless defined $size;
 
     my $value = '';
-    my $lastfont = -1;
+    my $last_font_number;
     my @codes;
 
     foreach my $u (unpack('U*', $text)) {
-        my $thisfont = 0;
+        my $font_number = 0;
         if (defined $self->{'code'}->{$u}) {
-            $thisfont = $self->{'code'}->{$u};
+            $font_number = $self->{'code'}->{$u};
         }
         elsif (defined $self->{'block'}->{$u >> 8}) {
-            $thisfont = $self->{'block'}->{$u >> 8};
+            $font_number = $self->{'block'}->{$u >> 8};
         }
 
-        if ($thisfont != $lastfont and $lastfont != -1) {
-            my $font = $self->fontlist->[$lastfont];
+        if (defined $last_font_number and $font_number != $last_font_number) {
+            my $font = $self->fontlist->[$last_font_number];
             $value .= '/' . $font->name() . ' ' . $size . ' Tf ';
             if (defined($indent) and $indent != 0) {
                 $value .= '[' . $indent . ' ' . $font->text(pack('U*', @codes)) . '] TJ ';
@@ -203,11 +204,11 @@ sub text {
         }
 
         push @codes, $u;
-        $lastfont = $thisfont;
+        $last_font_number = $font_number;
     }
 
     if (scalar @codes > 0) {
-        my $font = $self->fontlist->[$lastfont];
+        my $font = $self->fontlist->[$last_font_number];
         $value .= '/' . $font->name() . ' ' . $size . ' Tf ';
         if (defined($indent) and $indent != 0) {
             $value .= '[' . $indent . ' ' . $font->text(pack('U*', @codes)) . '] TJ';
