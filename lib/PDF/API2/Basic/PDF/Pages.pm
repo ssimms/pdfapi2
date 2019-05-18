@@ -353,8 +353,7 @@ listed. If necessary it creates a local resource dictionary to achieve this.
 sub proc_set {
     my ($self, @entries) = @_;
 
-    # Maintainer's note: Shouldn't this be Resources (plural)?
-    my $dict = $self->find_prop('Resource');
+    my $dict = $self->find_prop('Resources');
     if ($dict and defined $dict->{'ProcSet'}) {
         my @missing = @entries;
         foreach my $element ($dict->{'ProcSet'}->elements()) {
@@ -365,10 +364,7 @@ sub proc_set {
     }
 
     unless (defined $self->{'Resources'}) {
-        # Maintainer's note: copy requires a $pdf, which hasn't been provided.
-        # However, copy() isn't currently being called because of the Resources
-        # typo above.
-        $self->{'Resources'} = $dict ? $dict->copy() : PDFDict();
+        $self->{'Resources'} = $dict ? $dict->copy($self->_pdf()) : PDFDict();
     }
 
     $self->{'Resources'}{'ProcSet'} = PDFArray() unless defined $self->{'ProcSet'};
