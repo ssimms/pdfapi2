@@ -7,13 +7,18 @@
       troubleshoot warnings and bugs that only show up in increasingly-ancient
       versions of Perl.
 
-      For this release, it means that the minimum supported Perl is 5.16, which
-      was first released on 2012-05-20.
+      For this release, it means that the minimum supported Perl is 5.18, which
+      was first released on 2013-05-18.
 
     - Add support for cross-reference streams using 64-bit field widths.
 
     - [RT #126274] Fix alignment when using UniFont with text_center or
       text_right when all characters are in the same block.
+
+    - [RT #121911] Fix adding pages to a document structure with nested Pages
+      elements.  This included a fairly substantial rewrite of the relevant
+      code, so please report any new bugs related to adding pages (report and
+      troubleshooting by Vadim Repin).
 
 
 2.033     2017-07-06
