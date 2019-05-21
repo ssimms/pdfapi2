@@ -1,7 +1,8 @@
-use Test::More tests => 40;
+use Test::More tests => 41;
 
 use strict;
 use warnings;
+use utf8;
 
 use PDF::API2::Basic::PDF::String;
 
@@ -186,6 +187,13 @@ $string = PDF::API2::Basic::PDF::String->from_pdf("(\\5)");
 is($string->val(),
    "\x05",
    q{Escape Character: 1-digit octal});
+
+
+use PDF::API2::Basic::PDF::Utils;
+$string = PDFStr('ΠΔΦ');
+is($string->as_pdf(),
+   '<FEFF03A0039403A6>',
+   q{A string with the utf8 flag set is automatically encoded as UCS-16BE});
 
 
 # RT 63918

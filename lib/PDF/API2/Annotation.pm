@@ -232,14 +232,7 @@ sub content
 {
     my ($self,@t)=@_;
     my $t=join("\n",@t);
-    if(is_utf8($t) || utf8::valid($t))
-    {
-        $self->{Contents}=PDFUtf($t);
-    }
-    else
-    {
-        $self->{Contents}=PDFStr($t);
-    }
+    $self->{Contents}=PDFStr($t);
     return($self);
 }
 

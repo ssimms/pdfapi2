@@ -113,6 +113,9 @@ sub PDFStr {
     return PDF::API2::Basic::PDF::String->new(@_);
 }
 
+# Deprecated
+sub PDFUtf { return PDFStr(@_) }
+
 =head2 PDFStrHex
 
 Creates a hex-string via PDF::API2::Basic::PDF::String->new
@@ -122,18 +125,6 @@ Creates a hex-string via PDF::API2::Basic::PDF::String->new
 sub PDFStrHex {
     my $string = PDF::API2::Basic::PDF::String->new(@_);
     $string->{' ishex'} = 1;
-    return $string;
-}
-
-=head2 PDFUtf
-
-Creates a utf8-string via PDF::API2::Basic::PDF::String->new
-
-=cut
-
-sub PDFUtf {
-    my $string = PDF::API2::Basic::PDF::String->new(@_);
-    $string->{' isutf'} = 1;
     return $string;
 }
 

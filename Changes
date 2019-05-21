@@ -12,6 +12,11 @@
 
     - Add support for cross-reference streams using 64-bit field widths.
 
+    - When the utf8 flag is set for a PDF string, automatically encode it as
+      UCS-16BE instead of requiring a separate flag to be set in the PDF object.
+      This resolves [RT #33497] and [RT #117031] in addition to making the code
+      easier to maintain.
+
     - [RT #126274] Fix alignment when using UniFont with text_center or
       text_right when all characters are in the same block.
 

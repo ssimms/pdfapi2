@@ -186,13 +186,13 @@ sub as_pdf {
     my ($self) = @_;
     my $str = $self->{'val'};
 
-    if ($self->{' isutf'}) {
-        $str = join('', map { sprintf('%04X' , $_) } unpack('U*', $str) );
-        return "<FEFF$str>";
-    }
-    elsif ($self->{' ishex'}) { # imported as hex ?
+    if ($self->{' ishex'}) { # imported as hex ?
         $str = unpack('H*', $str);
         return "<$str>";
+    }
+    elsif ($self->{' isutf'} or (utf8::is_utf8($str) and $str =~ /[^[:ascii:]]/)) {
+        $str = join('', map { sprintf('%04X' , $_) } unpack('U*', $str) );
+        return "<FEFF$str>";
     }
     else {
         if ($str =~ m/[^\n\r\t\b\f\040-\176\200-\377]/oi) {

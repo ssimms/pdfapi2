@@ -635,15 +635,7 @@ sub info {
     if (scalar @_) {
         foreach my $k (@{$self->{'infoMeta'}}) {
             next unless defined $opt{$k};
-            if (is_utf8($opt{$k})) {
-                $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
-            }
-            #elsif (is_utf8($opt{$k}) || utf8::valid($opt{$k})) {
-            #    $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
-            #}
-            else {
-                $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
-            }
+            $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
         }
         $self->{'pdf'}->out_obj($self->{'pdf'}->{'Info'});
     }
