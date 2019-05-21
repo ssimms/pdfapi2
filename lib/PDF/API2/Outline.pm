@@ -3,321 +3,310 @@ package PDF::API2::Outline;
 use base 'PDF::API2::Basic::PDF::Dict';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
 # VERSION
 
+use Carp qw(croak);
 use PDF::API2::Basic::PDF::Utils;
-use PDF::API2::Util;
 use Scalar::Util qw(weaken);
 
 =head1 NAME
 
-PDF::API2::Outline - Manage PDF outlines (aka bookmarks)
+PDF::API2::Outline - Manage PDF outlines (a.k.a. bookmarks)
 
 =head1 METHODS
 
 =over
 
-=item $otl = PDF::API2::Outline->new $api,$parent,$prev
+=item $outline = PDF::API2::Outline->new($api, $parent, $prev)
 
-Returns a new outline object (called from $otls->outline).
+Returns a new outline object (called from $outlines->outline()).
 
 =cut
 
 sub new {
-    my ($class,$api,$parent,$prev)=@_;
-    my $self = $class->SUPER::new;
-    $self->{' apipdf'}=$api->{pdf};
-    $self->{' api'}=$api;
-    weaken $self->{' apipdf'};
+    my ($class, $api, $parent, $prev) = @_;
+    my $self = $class->SUPER::new();
+    $self->{'Parent'}  = $parent if defined $parent;
+    $self->{'Prev'}    = $prev   if defined $prev;
+    $self->{' api'}    = $api;
     weaken $self->{' api'};
-    $self->{Parent}=$parent if(defined $parent);
-    $self->{Prev}=$prev if(defined $prev);
-    return($self);
+    return $self;
 }
 
 sub parent {
-    my $self=shift @_;
-    if(defined $_[0]) {
-        $self->{Parent}=shift @_;
-    }
-    return $self->{Parent};
+    my $self = shift();
+    $self->{'Parent'} = shift() if defined $_[0];
+    return $self->{'Parent'};
 }
 
 sub prev {
-    my $self=shift @_;
-    if(defined $_[0]) {
-        $self->{Prev}=shift @_;
-    }
-    return $self->{Prev};
+    my $self = shift();
+    $self->{'Prev'} = shift() if defined $_[0];
+    return $self->{'Prev'};
 }
 
 sub next {
-    my $self=shift @_;
-    if(defined $_[0]) {
-        $self->{Next}=shift @_;
-    }
-    return $self->{Next};
+    my $self = shift();
+    $self->{'Next'} = shift() if defined $_[0];
+    return $self->{'Next'};
 }
 
 sub first {
-    my $self=shift @_;
-    $self->{First}=$self->{' childs'}->[0] if(defined $self->{' childs'} && defined $self->{' childs'}->[0]);
-    return $self->{First} ;
+    my $self = shift();
+    $self->{'First'} = $self->{' children'}->[0] if defined $self->{' children'} and defined $self->{' children'}->[0];
+    return $self->{'First'};
 }
 
 sub last {
-    my $self=shift @_;
-    $self->{Last}=$self->{' childs'}->[-1] if(defined $self->{' childs'} && defined $self->{' childs'}->[-1]);
-    return $self->{Last};
+    my $self = shift();
+    $self->{'Last'} = $self->{' children'}->[-1] if defined $self->{' children'} and defined $self->{' children'}->[-1];
+    return $self->{'Last'};
 }
 
 sub count {
-    my $self=shift @_;
-    my $cnt=scalar @{$self->{' childs'}||[]};
-    map { $cnt+=$_->count();} @{$self->{' childs'}};
-    $self->{Count}=PDFNum($self->{' closed'} ? -$cnt : $cnt) if($cnt>0);
-    return $cnt;
+    my $self  = shift();
+    my $count = scalar @{$self->{' children'} || []};
+    $count += $_->count() for @{$self->{' children'}};
+    $self->{'Count'} = PDFNum($self->{' closed'} ? -$count : $count) if $count > 0;
+    return $count;
 }
 
 sub fix_outline {
-    my ($self)=@_;
-    $self->first;
-    $self->last;
-    $self->count;
+    my $self = shift();
+    $self->first();
+    $self->last();
+    $self->count();
 }
 
-=item $otl->title $text
+=item $outline->title($text)
 
 Set the title of the outline.
 
 =cut
 
 sub title {
-    my ($self,$txt)=@_;
-    $self->{Title}=PDFStr($txt);
-    return($self);
+    my ($self, $text) = @_;
+    $self->{'Title'} = PDFStr($text);
+    return $self;
 }
 
-=item $otl->closed
+=item $outline->closed()
 
-Set the status of the outline to closed.
+Set the status of the outline to closed (i.e. collapsed).
 
 =cut
 
 sub closed {
-    my $self=shift @_;
-    $self->{' closed'}=1;
+    my $self = shift();
+    $self->{' closed'} = 1;
     return $self;
 }
 
-=item $otl->open
+=item $outline->open()
 
-Set the status of the outline to open.
+Set the status of the outline to open (i.e. expanded).
 
 =cut
 
 sub open {
-    my $self=shift @_;
+    my $self = shift();
     delete $self->{' closed'};
     return $self;
 }
 
-=item $sotl=$otl->outline
+=item $child_outline = $parent_outline->outline()
 
-Returns a new sub-outline.
+Returns a nested outline.
 
 =cut
 
 sub outline {
-    my $self=shift @_;
-    my $obj=PDF::API2::Outline->new($self->{' api'},$self);
-    $obj->prev($self->{' childs'}->[-1]) if(defined $self->{' childs'});
-    $self->{' childs'}->[-1]->next($obj) if(defined $self->{' childs'});
-    push(@{$self->{' childs'}},$obj);
-    $self->{' api'}->{pdf}->new_obj($obj) if(!$obj->is_obj($self->{' api'}->{pdf}));
-    return $obj;
+    my $self = shift();
+
+    my $child = PDF::API2::Outline->new($self->{' api'}, $self);
+    $child->prev($self->{' children'}->[-1]) if defined $self->{' children'};
+    $self->{' children'}->[-1]->next($child) if defined $self->{' children'};
+    push @{$self->{' children'}}, $child;
+    $self->{' api'}->{'pdf'}->new_obj($child) unless $child->is_obj($self->{' api'}->{'pdf'});
+
+    return $child;
 }
 
-=item $otl->dest $pageobj [, %opts]
+=item $outline->dest($page_object, %position)
 
-Sets the destination page of the outline.
+Sets the destination page and optional position of the outline.
 
-=item $otl->dest( $page, -fit => 1 )
+%position can be any of the following:
+
+=over
+
+=item -fit => 1
 
 Display the page designated by page, with its contents magnified just enough to
 fit the entire page within the window both horizontally and vertically. If the
 required horizontal and vertical magnification factors are different, use the
 smaller of the two, centering the page within the window in the other dimension.
 
-=item $otl->dest( $page, -fith => $top )
+=item -fith => $top
 
-Display the page designated by page, with the vertical coordinate top positioned
-at the top edge of the window and the contents of the page magnified just enough
-to fit the entire width of the page within the window.
+Display the page designated by page, with the vertical coordinate $top
+positioned at the top edge of the window and the contents of the page magnified
+just enough to fit the entire width of the page within the window.
 
-=item $otl->dest( $page, -fitv => $left )
+=item -fitv => $left
 
-Display the page designated by page, with the horizontal coordinate left positioned
-at the left edge of the window and the contents of the page magnified just enough
-to fit the entire height of the page within the window.
+Display the page designated by page, with the horizontal coordinate $left
+positioned at the left edge of the window and the contents of the page magnified
+just enough to fit the entire height of the page within the window.
 
-=item $otl->dest( $page, -fitr => [ $left, $bottom, $right, $top ] )
+=item -fitr => [$left, $bottom, $right, $top]
 
 Display the page designated by page, with its contents magnified just enough to
-fit the rectangle specified by the coordinates left, bottom, right, and top
+fit the rectangle specified by the coordinates $left, $bottom, $right, and $top
 entirely within the window both horizontally and vertically. If the required
 horizontal and vertical magnification factors are different, use the smaller of
 the two, centering the rectangle within the window in the other dimension.
 
-=item $otl->dest( $page, -fitb => 1 )
+=item -fitb => 1
 
-Display the page designated by page, with its contents magnified just
-enough to fit its bounding box entirely within the window both horizontally and
+Display the page designated by page, with its contents magnified just enough to
+fit its bounding box entirely within the window both horizontally and
 vertically. If the required horizontal and vertical magnification factors are
 different, use the smaller of the two, centering the bounding box within the
 window in the other dimension.
 
-=item $otl->dest( $page, -fitbh => $top )
+=item -fitbh => $top
 
-Display the page designated by page, with the vertical coordinate top
+Display the page designated by page, with the vertical coordinate $top
 positioned at the top edge of the window and the contents of the page magnified
 just enough to fit the entire width of its bounding box within the window.
 
-=item $otl->dest( $page, -fitbv => $left )
+=item -fitbv => $left
 
-Display the page designated by page, with the horizontal coordinate
-left positioned at the left edge of the window and the contents of the page
-magnified just enough to fit the entire height of its bounding box within the
-window.
+Display the page designated by page, with the horizontal coordinate $left
+positioned at the left edge of the window and the contents of the page magnified
+just enough to fit the entire height of its bounding box within the window.
 
-=item $otl->dest( $page, -xyz => [ $left, $top, $zoom ] )
+=item -xyz => [$left, $top, $zoom]
 
-Display the page designated by page, with the coordinates (left, top) positioned
-at the top-left corner of the window and the contents of the page magnified by
-the factor zoom. A zero (0) value for any of the parameters left, top, or zoom
-specifies that the current value of that parameter is to be retained unchanged.
+Display the page designated by page, with the coordinates ($left, $top)
+positioned at the top-left corner of the window and the contents of the page
+magnified by the factor $zoom. A zero (0) value for any of the parameters $left,
+$top, or $zoom specifies that the current value of that parameter is to be
+retained unchanged.
 
-=item $otl->dest( $name )
+=back
 
-(PDF 1.2) Connect the Outline to a "Named Destination" defined elsewhere.
+=item $outline->dest($name)
+
+Connect the outline to a "Named Destination" defined elsewhere.
 
 =cut
 
-sub dest
-{
-    my ($self,$page,%opts)=@_;
+sub dest {
+    my ($self, $page, %options) = @_;
+    delete $self->{'A'};
 
-    if(ref $page)
-    {
-        $opts{-xyz}=[undef,undef,undef] if(scalar(keys %opts)<1);
+    if (ref($page)) {
+        $options{'-xyz'} = [undef, undef, undef] unless scalar keys %options;
+        $self->{'Dest'} = _fit($page, %options);
+    }
+    else {
+        $self->{'Dest'} = PDFStr($page);
+    }
 
-        if(defined $opts{-fit})
-        {
-            $self->{Dest}=PDFArray($page,PDFName('Fit'));
-        }
-        elsif(defined $opts{-fith})
-        {
-            $self->{Dest}=PDFArray($page,PDFName('FitH'),PDFNum($opts{-fith}));
-        }
-        elsif(defined $opts{-fitb})
-        {
-            $self->{Dest}=PDFArray($page,PDFName('FitB'));
-        }
-        elsif(defined $opts{-fitbh})
-        {
-            $self->{Dest}=PDFArray($page,PDFName('FitBH'),PDFNum($opts{-fitbh}));
-        }
-        elsif(defined $opts{-fitv})
-        {
-            $self->{Dest}=PDFArray($page,PDFName('FitV'),PDFNum($opts{-fitv}));
-        }
-        elsif(defined $opts{-fitbv})
-        {
-            $self->{Dest}=PDFArray($page,PDFName('FitBV'),PDFNum($opts{-fitbv}));
-        }
-        elsif(defined $opts{-fitr})
-        {
-            die "insufficient parameters to ->dest( page, -fitr => [] ) " unless(scalar @{$opts{-fitr}} == 4);
-            $self->{Dest}=PDFArray($page,PDFName('FitR'),map {PDFNum($_)} @{$opts{-fitr}});
-        }
-        elsif(defined $opts{-xyz})
-        {
-            die "insufficient parameters to ->dest( page, -xyz => [] ) " unless(scalar @{$opts{-xyz}} == 3);
-            $self->{Dest}=PDFArray($page,PDFName('XYZ'),map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{-xyz}});
-        }
-    }
-    else
-    {
-        $self->{Dest}=PDFStr($page);
-    }
-    return($self);
+    return $self;
 }
 
-=item $otl->url $url, %opts
+=item $outline->url($url)
 
-Defines the outline as launch-url with url $url.
+Launch $url when the outline item is activated.
 
 =cut
 
 sub url {
-    my ($self,$url,%opts)=@_;
-    delete $self->{Dest};
-    $self->{A}=PDFDict();
-    $self->{A}->{S}=PDFName('URI');
-    $self->{A}->{URI}=PDFStr($url);
-    return($self);
+    my ($self, $url) = @_;
+    delete $self->{'Dest'};
+
+    $self->{'A'}          = PDFDict();
+    $self->{'A'}->{'S'}   = PDFName('URI');
+    $self->{'A'}->{'URI'} = PDFStr($url);
+
+    return $self;
 }
 
-=item $otl->file $file, %opts
+=item $outline->file($filename)
 
-Defines the outline as launch-file with filepath $file.
+Launch an application or file when the outline item is activated
 
 =cut
 
 sub file {
-    my ($self,$file,%opts)=@_;
-    delete $self->{Dest};
-    $self->{A}=PDFDict();
-    $self->{A}->{S}=PDFName('Launch');
-    $self->{A}->{F}=PDFStr($file);
-    return($self);
+    my ($self, $file) = @_;
+    delete $self->{'Dest'};
+
+    $self->{'A'}        = PDFDict();
+    $self->{'A'}->{'S'} = PDFName('Launch');
+    $self->{'A'}->{'F'} = PDFStr($file);
+
+    return $self;
 }
 
-=item $otl->pdfile $pdfile, $pagenum, %opts
+=item $outline->pdf_file($filename, $page_number, %position)
 
-Defines the destination of the outline as pdf-file with filepath $pdfile, $pagenum
-and options %opts (same as dest).
+Open a PDF file to a particular page number (first page is zero, which is also
+the default).  The page can optionally be positioned at a particular place in
+the viewport (see dest for details).
 
 =cut
 
-sub pdfile {
-    my ($self,$file,$pnum,%opts)=@_;
-    delete $self->{Dest};
-    $self->{A}=PDFDict();
-    $self->{A}->{S}=PDFName('GoToR');
-    $self->{A}->{F}=PDFStr($file);
-    if(defined $opts{-fit}) {
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('Fit'));
-    } elsif(defined $opts{-fith}) {
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('FitH'),PDFNum($opts{-fith}));
-    } elsif(defined $opts{-fitb}) {
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('FitB'));
-    } elsif(defined $opts{-fitbh}) {
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('FitBH'),PDFNum($opts{-fitbh}));
-    } elsif(defined $opts{-fitv}) {
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('FitV'),PDFNum($opts{-fitv}));
-    } elsif(defined $opts{-fitbv}) {
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('FitBV'),PDFNum($opts{-fitbv}));
-    } elsif(defined $opts{-fitr}) {
-        die "insufficient parameters to ->dest( page, -fitr => [] ) " unless(scalar @{$opts{-fitr}} == 4);
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('FitR'),map {PDFNum($_)} @{$opts{-fitr}});
-    } elsif(defined $opts{-xyz}) {
-        die "insufficient parameters to dest( page, -xyz => [] ) " unless(scalar @{$opts{-fitr}} == 3);
-        $self->{A}->{D}=PDFArray(PDFNum($pnum),PDFName('XYZ'),map {PDFNum($_)} @{$opts{-xyz}});
+# Deprecated
+sub pdfile { return pdf_file(@_) }
+
+sub pdf_file {
+    my ($self, $file, $page_number, %options) = @_;
+    delete $self->{'Dest'};
+
+    $self->{'A'}        = PDFDict();
+    $self->{'A'}->{'S'} = PDFName('GoToR');
+    $self->{'A'}->{'F'} = PDFStr($file);
+    $self->{'A'}->{'D'} = _fit(PDFNum($page_number // 0), %options);
+
+    return $self;
+}
+
+sub _fit {
+    my ($destination, %options) = @_;
+    if (defined $options{'-fit'}) {
+        return PDFArray($destination, PDFName('Fit'));
     }
-    return($self);
+    elsif (defined $options{'-fith'}) {
+        return PDFArray($destination, PDFName('FitH'), PDFNum($options{'-fith'}));
+    }
+    elsif (defined $options{'-fitb'}) {
+        return PDFArray($destination, PDFName('FitB'));
+    }
+    elsif (defined $options{'-fitbh'}) {
+        return PDFArray($destination, PDFName('FitBH'), PDFNum($options{'-fitbh'}));
+    }
+    elsif (defined $options{'-fitv'}) {
+        return PDFArray($destination, PDFName('FitV'), PDFNum($options{'-fitv'}));
+    }
+    elsif (defined $options{'-fitbv'}) {
+        return PDFArray($destination, PDFName('FitBV'), PDFNum($options{'-fitbv'}));
+    }
+    elsif (defined $options{'-fitr'}) {
+        croak "Incorrect number of parameters (expected four) to -fitr" unless scalar @{$options{'-fitr'}} == 4;
+        return PDFArray($destination, PDFName('FitR'), map { PDFNum($_) } @{$options{'-fitr'}});
+    }
+    elsif (defined $options{'-xyz'}) {
+        croak "Incorrect number parameters (expected three) to -xyz" unless scalar @{$options{'-xyz'}} == 3;
+        return PDFArray($destination, PDFName('XYZ'), map { defined $_ ? PDFNum($_) : PDFNull() } @{$options{'-xyz'}});
+    }
+
+    return;
 }
 
 sub outobjdeep {
