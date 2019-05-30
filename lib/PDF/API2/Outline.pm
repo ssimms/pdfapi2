@@ -302,7 +302,7 @@ sub _fit {
         return PDFArray($destination, PDFName('FitR'), map { PDFNum($_) } @{$options{'-fitr'}});
     }
     elsif (defined $options{'-xyz'}) {
-        croak "Incorrect number parameters (expected three) to -xyz" unless scalar @{$options{'-xyz'}} == 3;
+        croak "Incorrect number of parameters (expected three) to -xyz" unless scalar @{$options{'-xyz'}} == 3;
         return PDFArray($destination, PDFName('XYZ'), map { defined $_ ? PDFNum($_) : PDFNull() } @{$options{'-xyz'}});
     }
 
