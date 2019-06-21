@@ -25,6 +25,9 @@
       code, so please report any new bugs related to adding pages (report and
       troubleshooting by Vadim Repin).
 
+    - Renamed pdfile() to pdf_file() in PDF::API2::Annotation and
+      PDF::API2::Outline.  The old name continues to work, but is deprecated.
+
 
 2.033     2017-07-06
 
