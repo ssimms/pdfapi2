@@ -688,7 +688,7 @@ sub text {
     }
     elsif (defined $size) {
         return "[ $indent ($text) ] TJ" if $indent;
-        return "[ ($text) ] TJ";
+        return "($text) Tj";
     }
     else {
         return "($text)";

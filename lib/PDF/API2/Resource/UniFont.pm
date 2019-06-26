@@ -193,13 +193,8 @@ sub text {
         if (defined $last_font_number and $font_number != $last_font_number) {
             my $font = $self->fontlist->[$last_font_number];
             $value .= '/' . $font->name() . ' ' . $size . ' Tf ';
-            if (defined($indent) and $indent != 0) {
-                $value .= '[' . $indent . ' ' . $font->text(pack('U*', @codes)) . '] TJ ';
-                $indent = undef;
-            }
-            else {
-                $value .= $font->text(pack('U*', @codes)) . ' Tj ';
-            }
+            $value .= $font->text(pack('U*', @codes), $size, $indent) . ' ';
+            $indent = undef;
             @codes = ();
         }
 
@@ -210,12 +205,7 @@ sub text {
     if (scalar @codes > 0) {
         my $font = $self->fontlist->[$last_font_number];
         $value .= '/' . $font->name() . ' ' . $size . ' Tf ';
-        if (defined($indent) and $indent != 0) {
-            $value .= '[' . $indent . ' ' . $font->text(pack('U*', @codes)) . '] TJ';
-        }
-        else {
-            $value .= $font->text(pack('U*', @codes)) . ' Tj';
-        }
+        $value .= $font->text(pack('U*', @codes), $size, $indent);
     }
 
     return $value;

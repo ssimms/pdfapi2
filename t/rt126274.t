@@ -18,14 +18,14 @@ my $reset = $text->{' stream'};
 $text->transform(-translate => [100, 100]);
 $text->text_center("test");
 my $value = $text->{' stream'};
-like($value, qr/\[\d+ \(test\)\] TJ/,
+like($value, qr/\[ \d+ \(test\) \] TJ/,
      q{Centered text is offset when it doesn't contain any special characters});
 
 $text->{' stream'} = $reset;
 $text->transform(-translate => [100, 100]);
 $text->text_center("test\x{151}");
 $value = $text->{' stream'};
-like($value, qr/\[\d+ \(test\)\] TJ \/\S+ \d+ Tf \(Q\) Tj/,
+like($value, qr/\[ \d+ \(test\) \] TJ \/\S+ \d+ Tf \(Q\) Tj/,
      q{Centered text is offset when it contains special characters});
 
 done_testing();
