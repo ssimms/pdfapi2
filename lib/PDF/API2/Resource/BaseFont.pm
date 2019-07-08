@@ -498,7 +498,7 @@ Return the glyph's width.
 sub wxByGlyph {
     my $self  = shift();
     my $glyph = shift();
-    my $width = undef;
+    my $width;
     if (ref($self->data->{'wx'}) eq 'HASH') {
         $width   = $self->data->{'wx'}->{$glyph};
         $width //= $self->missingwidth();
@@ -506,7 +506,7 @@ sub wxByGlyph {
     }
     else {
         my $cid = $self->cidByUni(uniByName($glyph));
-        $width   = $self->data->{'wx'}->[$cid];
+        $width   = $self->data->{'wx'}->[$cid] if defined $cid;
         $width //= $self->missingwidth();
         $width //= 300;
     }
@@ -523,7 +523,8 @@ sub wxByUni {
     my $self  = shift();
     my $val   = shift();
     my $gid   = $self->glyphByUni($val);
-    my $width = $self->data->{'wx'}->{$gid};
+    my $width;
+    $width   = $self->data->{'wx'}->{$gid} if defined $gid;
     $width //= $self->missingwidth();
     $width //= 300;
     return $width;
@@ -538,7 +539,8 @@ Return the character's width based on the current encoding.
 sub wxByEnc {
     my ($self, $e) = @_;
     my $glyph = $self->glyphByEnc($e);
-    my $width = $self->data->{'wx'}->{$glyph};
+    my $width;
+    $width   = $self->data->{'wx'}->{$glyph} if defined $glyph;
     $width //= $self->missingwidth();
     $width //= 300;
     return $width;
@@ -553,7 +555,8 @@ Return the character's width based on the font's default encoding.
 sub wxByMap {
     my ($self, $map) = @_;
     my $glyph = $self->glyphByMap($map);
-    my $width = $self->data->{'wx'}->{$glyph};
+    my $width;
+    $width = $self->data->{'wx'}->{$glyph} if defined $glyph;
     $width //= $self->missingwidth();
     $width //= 300;
     return $width;
