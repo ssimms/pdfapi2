@@ -132,19 +132,19 @@ sub _cidsByStr
 sub cidsByStr
 {
     my ($self,$text)=@_;
-    if(is_utf8($text) && defined $self->data->{decode} && $self->data->{decode} ne 'ident')
+    if(utf8::is_utf8($text) && defined $self->data->{decode} && $self->data->{decode} ne 'ident')
     {
         $text=encode($self->data->{decode},$text);
     }
-    elsif(is_utf8($text) && $self->data->{decode} eq 'ident')
+    elsif(utf8::is_utf8($text) && $self->data->{decode} eq 'ident')
     {
         $text=$self->cidsByUtf($text);
     }
-    elsif(!is_utf8($text) && defined $self->data->{encode} && $self->data->{decode} eq 'ident')
+    elsif(!utf8::is_utf8($text) && defined $self->data->{encode} && $self->data->{decode} eq 'ident')
     {
         $text=$self->cidsByUtf(decode($self->data->{encode},$text));
     }
-    elsif(!is_utf8($text) && $self->can('issymbol') && $self->issymbol && $self->data->{decode} eq 'ident')
+    elsif(!utf8::is_utf8($text) && $self->can('issymbol') && $self->issymbol && $self->data->{decode} eq 'ident')
     {
         $text=pack('U*',(map { $_+0xf000 } unpack('C*',$text)));
         $text=$self->cidsByUtf($text);

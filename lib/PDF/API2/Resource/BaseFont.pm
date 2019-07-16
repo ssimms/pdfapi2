@@ -570,7 +570,7 @@ Return the width of $text as if it were at size 1.
 
 sub width {
     my ($self, $text) = @_;
-    $text = $self->strByUtf($text) if is_utf8($text);
+    $text = $self->strByUtf($text) if utf8::is_utf8($text);
 
     my @cache;
     my $width      = 0;
@@ -596,7 +596,7 @@ Return the widths of the words in $text as if they were at size 1.
 
 sub width_array {
     my ($self, $text) = @_;
-    $text = $self->utfByStr($text) unless is_utf8($text);
+    $text = $self->utfByStr($text) unless utf8::is_utf8($text);
     my @widths = map { $self->width($_) } split(/\s+/, $text);
     return @widths;
 }
@@ -641,7 +641,7 @@ Return a properly formatted representation of $text for use in the PDF.
 
 sub textByStr {
     my ($self, $string) = @_;
-    $string = $self->strByUtf($string) if is_utf8($string);
+    $string = $self->strByUtf($string) if utf8::is_utf8($string);
 
     my $text = $string;
     $text =~ s/\\/\\\\/go;
@@ -654,7 +654,7 @@ sub textByStrKern {
     my ($self, $string) = @_;
     return '(' . $self->textByStr($string) . ')' unless $self->{'-dokern'} and ref($self->data->{'kern'});
 
-    $string = $self->strByUtf($string) if is_utf8($string);
+    $string = $self->strByUtf($string) if utf8::is_utf8($string);
 
     my $text       = ' ';
     my $tBefore    = 0;

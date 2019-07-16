@@ -140,7 +140,7 @@ sub fontlist {
 
 sub width {
     my ($self, $text) = @_;
-    $text = decode($self->{'encode'}, $text) unless is_utf8($text);
+    $text = decode($self->{'encode'}, $text) unless utf8::is_utf8($text);
     my $width = 0;
 
     my @blocks = ();
@@ -174,7 +174,7 @@ sub width {
 
 sub text {
     my ($self, $text, $size, $indent) = @_;
-    $text = decode($self->{'encode'}, $text) unless is_utf8($text);
+    $text = decode($self->{'encode'}, $text) unless utf8::is_utf8($text);
     croak 'Font size not specified' unless defined $size;
 
     my $value = '';
