@@ -70,13 +70,15 @@ sub update {
     return $self;
 }
 
-=item $page->mediabox $w, $h
+=item ($llx, $lly, $urx, $ury) = $page->mediabox()
 
-=item $page->mediabox $llx, $lly, $urx, $ury
+=item $page->mediabox($w, $h)
 
-=item $page->mediabox $alias
+=item $page->mediabox($llx, $lly, $urx, $ury)
 
-Sets the mediabox.  This method supports the following aliases:
+=item $page->mediabox($alias)
+
+Get or set the mediabox.  This method supports the following aliases:
 '4A0', '2A0', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6',
 '4B0', '2B0', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6',
 'LETTER', 'BROADSHEET', 'LEDGER', 'TABLOID', 'LEGAL',
@@ -84,140 +86,137 @@ Sets the mediabox.  This method supports the following aliases:
 
 =cut
 
-sub _set_bbox {
-    my ($box, $self, @values) = @_;
-    $self->{$box} = PDFArray( map { PDFNum(float($_)) } page_size(@values) );
+sub _bounding_box {
+    my $self = shift();
+    my $type = shift();
+
+    # Get
+    unless (scalar @_) {
+        my $box = $self->find_prop($type);
+        unless ($box) {
+            # Default to letter (for historical PDF::API2 reasons, not per the
+            # PDF specification)
+            return (0, 0, 612, 792) if $type eq 'MediaBox';
+
+            # Use defaults per PDF 1.7 section 14.11.2 Page Boundaries
+            return $self->_bounding_box('MediaBox') if $type eq 'CropBox';
+            return $self->_bounding_box('CropBox');
+        }
+        return map { $_->val() } $box->elements();
+    }
+
+    # Set
+    $self->{$type} = PDFArray(map { PDFNum(float($_)) } page_size(@_));
     return $self;
 }
 
-sub _get_bbox {
-    my ($self, $box_order) = @_;
-
-    # Default to letter
-    my @media = (0, 0, 612, 792);
-
-    foreach my $mediatype (@{$box_order}) {
-        my $mediaobj = $self->find_prop($mediatype);
-        if ($mediaobj) {
-            @media = map { $_->val() } $mediaobj->elements();
-            last;
-        }
-    }
-
-    return @media;
-}
-
 sub mediabox {
-    return _set_bbox('MediaBox', @_);
+    my $self = shift();
+    return $self->_bounding_box('MediaBox', @_);
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->get_mediabox
-
-Gets the mediabox based on best estimates or the default.
-
-=cut
-
+# Deprecated
 sub get_mediabox {
     my $self = shift();
-    return _get_bbox($self, [qw(MediaBox CropBox BleedBox TrimBox ArtBox)]);
+    return $self->_bounding_box('MediaBox');
 }
 
-=item $page->cropbox $w, $h
+=item ($llx, $lly, $urx, $ury) = $page->cropbox()
 
-=item $page->cropbox $llx, $lly, $urx, $ury
+=item $page->cropbox($w, $h)
 
-=item $page->cropbox $alias
+=item $page->cropbox($llx, $lly, $urx, $ury)
 
-Sets the cropbox.  This method supports the same aliases as mediabox.
+=item $page->cropbox($alias)
+
+Get or set the cropbox.  This method supports the same aliases as mediabox.
+
+The cropbox defaults to the mediabox.
 
 =cut
 
 sub cropbox {
-    return _set_bbox('CropBox', @_);
+    my $self = shift();
+    return $self->_bounding_box('CropBox', @_);
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->get_cropbox
-
-Gets the cropbox based on best estimates or the default.
-
-=cut
-
+# Deprecated
 sub get_cropbox {
     my $self = shift();
-    return _get_bbox($self, [qw(CropBox MediaBox BleedBox TrimBox ArtBox)]);
+    return $self->_bounding_box('CropBox');
 }
 
-=item $page->bleedbox $w, $h
+=item ($llx, $lly, $urx, $ury) = $page->bleedbox()
 
-=item $page->bleedbox $llx, $lly, $urx, $ury
+=item $page->bleedbox($w, $h)
 
-=item $page->bleedbox $alias
+=item $page->bleedbox($llx, $lly, $urx, $ury)
 
-Sets the bleedbox.  This method supports the same aliases as mediabox.
+=item $page->bleedbox($alias)
+
+Get or set the bleedbox.  This method supports the same aliases as mediabox.
+
+The bleedbox defaults to the cropbox.
 
 =cut
 
 sub bleedbox {
-    return _set_bbox('BleedBox', @_);
+    my $self = shift();
+    return $self->_bounding_box('BleedBox', @_);
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->get_bleedbox
-
-Gets the bleedbox based on best estimates or the default.
-
-=cut
-
+# Deprecated
 sub get_bleedbox {
     my $self = shift();
-    return _get_bbox($self, [qw(BleedBox CropBox MediaBox TrimBox ArtBox)]);
+    return $self->_bounding_box('BleedBox');
 }
 
-=item $page->trimbox $w, $h
+=item ($llx, $lly, $urx, $ury) = $page->trimbox()
 
-=item $page->trimbox $llx, $lly, $urx, $ury
+=item $page->trimbox($w, $h)
 
-Sets the trimbox.  This method supports the same aliases as mediabox.
+=item $page->trimbox($llx, $lly, $urx, $ury)
+
+Get or set the trimbox.  This method supports the same aliases as mediabox.
+
+The trimbox defaults to the cropbox.
 
 =cut
 
 sub trimbox {
-    return _set_bbox('TrimBox', @_);
+    my $self = shift();
+    return $self->_bounding_box('TrimBox', @_);
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->get_trimbox
-
-Gets the trimbox based on best estimates or the default.
-
-=cut
-
+# Deprecated
 sub get_trimbox {
     my $self = shift();
-    return _get_bbox($self, [qw(TrimBox CropBox MediaBox ArtBox BleedBox)]);
+    return $self->_bounding_box('TrimBox');
 }
 
-=item $page->artbox $w, $h
+=item ($llx, $lly, $urx, $ury) = $page->artbox()
 
-=item $page->artbox $llx, $lly, $urx, $ury
+=item $page->artbox($w, $h)
 
-=item $page->artbox $alias
+=item $page->artbox($llx, $lly, $urx, $ury)
 
-Sets the artbox.  This method supports the same aliases as mediabox.
+=item $page->artbox($alias)
+
+Get or set the artbox.  This method supports the same aliases as mediabox.
+
+The rtbox defaults to the cropbox.
 
 =cut
 
 sub artbox {
-    return _set_bbox('ArtBox', @_);
+    my $self = shift();
+    return $self->_bounding_box('ArtBox', @_);
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->get_artbox
-
-Gets the artbox based on best estimates or the default.
-
-=cut
-
+# Deprecated
 sub get_artbox {
     my $self = shift();
-    return _get_bbox($self, [qw(ArtBox CropBox MediaBox TrimBox BleedBox)]);
+    return $self->_bounding_box('ArtBox');
 }
 
 =item $page->rotate $deg

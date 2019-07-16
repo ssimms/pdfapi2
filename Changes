@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - The bounding box methods (mediabox, cropbox, bleedbox, trimbox, and
+      artbox) now return their values when called without arguments.
+
+    - The get_[media|crop|bleed|trim|art]box page methods have been deprecated
+      since they're now redundant, but they continue to work.
+
     - [RT #130074] Remove unneeded (and newly-broken) calls to is_utf8 in
       Annotation.pm and NamedDestination.pm (reported by Mathieu Arnold).
 

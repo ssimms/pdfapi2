@@ -1562,13 +1562,15 @@ sub pages {
     return scalar @{$self->{'pagestack'}};
 }
 
+=item ($llx, $lly, $urx, $ury) = $pdf->mediabox()
+
 =item $pdf->mediabox($name)
 
 =item $pdf->mediabox($w, $h)
 
 =item $pdf->mediabox($llx, $lly, $urx, $ury)
 
-Sets the global mediabox.
+Get or set the global mediabox.
 
 B<Example:>
 
@@ -1589,11 +1591,33 @@ B<Example:>
 
 =cut
 
-sub mediabox {
-    my ($self, $x1, $y1, $x2, $y2) = @_;
-    $self->{'pages'}->{'MediaBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
+sub _bounding_box {
+    my $self = shift();
+    my $type = shift();
+
+    # Get
+    unless (scalar @_) {
+        unless ($self->{'pages'}->{$type}) {
+            return if $type eq 'MediaBox';
+
+            # Use defaults per PDF 1.7 section 14.11.2 Page Boundaries
+            return $self->_bounding_box('MediaBox') if $type eq 'CropBox';
+            return $self->_bounding_box('CropBox');
+        }
+        return map { $_->val() } $self->{'pages'}->{$type}->elements();
+    }
+
+    # Set
+    $self->{'pages'}->{$type} = PDFArray(map { PDFNum(float($_)) } page_size(@_));
     return $self;
 }
+
+sub mediabox {
+    my $self = shift();
+    return $self->_bounding_box('MediaBox', @_);
+}
+
+=item ($llx, $lly, $urx, $ury) = $pdf->cropbox()
 
 =item $pdf->cropbox($name)
 
@@ -1601,15 +1625,18 @@ sub mediabox {
 
 =item $pdf->cropbox($llx, $lly, $urx, $ury)
 
-Sets the global cropbox.
+Get or set the global cropbox.
+
+The cropbox defaults to the mediabox.
 
 =cut
 
 sub cropbox {
-    my ($self, $x1, $y1, $x2, $y2) = @_;
-    $self->{'pages'}->{'CropBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
-    return $self;
+    my $self = shift();
+    return $self->_bounding_box('CropBox', @_);
 }
+
+=item ($llx, $lly, $urx, $ury) = $pdf->bleedbox()
 
 =item $pdf->bleedbox($name)
 
@@ -1617,15 +1644,18 @@ sub cropbox {
 
 =item $pdf->bleedbox($llx, $lly, $urx, $ury)
 
-Sets the global bleedbox.
+Get or set the global bleedbox.
+
+The bleedbox defaults to the cropbox.
 
 =cut
 
 sub bleedbox {
-    my ($self, $x1, $y1, $x2, $y2) = @_;
-    $self->{'pages'}->{'BleedBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
-    return $self;
+    my $self = shift();
+    return $self->_bounding_box('BleedBox', @_);
 }
+
+=item ($llx, $lly, $urx, $ury) = $pdf->trimbox()
 
 =item $pdf->trimbox($name)
 
@@ -1633,15 +1663,18 @@ sub bleedbox {
 
 =item $pdf->trimbox($llx, $lly, $urx, $ury)
 
-Sets the global trimbox.
+Get or set the global trimbox.
+
+The trimbox defaults to the cropbox.
 
 =cut
 
 sub trimbox {
-    my ($self, $x1, $y1, $x2, $y2) = @_;
-    $self->{'pages'}->{'TrimBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
-    return $self;
+    my $self = shift();
+    return $self->_bounding_box('TrimBox', @_);
 }
+
+=item ($llx, $lly, $urx, $ury) = $pdf->artbox()
 
 =item $pdf->artbox($name)
 
@@ -1649,14 +1682,15 @@ sub trimbox {
 
 =item $pdf->artbox($llx, $lly, $urx, $ury)
 
-Sets the global artbox.
+Get or sets the global artbox.
+
+The artbox defaults to the cropbox.
 
 =cut
 
 sub artbox {
-    my ($self, $x1, $y1, $x2, $y2) = @_;
-    $self->{'pages'}->{'ArtBox'} = PDFArray(map { PDFNum(float($_)) } page_size($x1, $y1, $x2, $y2));
-    return $self;
+    my $self = shift();
+    return $self->_bounding_box('ArtBox', @_);
 }
 
 =back
