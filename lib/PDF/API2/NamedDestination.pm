@@ -75,20 +75,8 @@ sub url
     my ($self,$url,%opts)=@_;
 
     $self->{S}=PDFName('URI');
-    if(is_utf8($url))
-    {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
     $self->{URI}=PDFStr($url);
 
-    # this will come again -- since the utf8 urls are coming !
-    # -- fredo
-    #if(is_utf8($url) || utf8::valid($url)) {
-    #    $self->{URI}=PDFUtf($url);
-    #} else {
-    #    $self->{URI}=PDFStr($url);
-    #}
     return($self);
 }
 
@@ -104,20 +92,8 @@ sub file
     my ($self,$url,%opts)=@_;
 
     $self->{S}=PDFName('Launch');
-    if(is_utf8($url))
-    {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
     $self->{F}=PDFStr($url);
 
-    # this will come again -- since the utf8 urls are coming !
-    # -- fredo
-    #if(is_utf8($url) || utf8::valid($url)) {
-    #    $self->{F}=PDFUtf($url);
-    #} else {
-    #    $self->{F}=PDFStr($url);
-    #}
     return($self);
 }
 
@@ -133,20 +109,7 @@ sub pdfile
     my ($self,$url,$pnum,%opts)=@_;
 
     $self->{S}=PDFName('GoToR');
-    if(is_utf8($url))
-    {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
     $self->{F}=PDFStr($url);
-
-    # this will come again -- since the utf8 urls are coming !
-    # -- fredo
-    #if(is_utf8($url) || utf8::valid($url)) {
-    #    $self->{F}=PDFUtf($url);
-    #} else {
-    #    $self->{F}=PDFStr($url);
-    #}
 
     $self->dest(PDFNum($pnum),%opts);
 

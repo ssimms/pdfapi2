@@ -65,10 +65,6 @@ sub url {
     $self->{'Subtype'}  = PDFName('Link');
     $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('URI');
-    if (is_utf8($url)) {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
     $self->{'A'}->{'URI'} = PDFStr($url);
     $self->rect(@{$options{'-rect'}})     if defined $options{'-rect'};
     $self->border(@{$options{'-border'}}) if defined $options{'-border'};
@@ -88,10 +84,6 @@ sub file {
     $self->{'Subtype'}  = PDFName('Link');
     $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('Launch');
-    if (is_utf8($url)) {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
     $self->{'A'}->{'F'} = PDFStr($url);
     $self->rect(@{$options{'-rect'}})     if defined $options{'-rect'};
     $self->border(@{$options{'-border'}}) if defined $options{'-border'};
@@ -114,10 +106,6 @@ sub pdf_file {
     $self->{'Subtype'}  = PDFName('Link');
     $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('GoToR');
-    if (is_utf8($url)) {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
     $self->{'A'}->{'F'} = PDFStr($url);
     $self->dest(PDFNum($page_number), %options);
     $self->rect(@{$options{'-rect'}})     if defined $options{'-rect'};

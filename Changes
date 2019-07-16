@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - [RT #130074] Remove unneeded (and newly-broken) calls to is_utf8 in
+      Annotation.pm and NamedDestination.pm (reported by Mathieu Arnold).
+
     - Eliminate some uninitialized value warnings in BaseFont.pm.
 
 
