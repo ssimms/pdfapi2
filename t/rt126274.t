@@ -3,7 +3,7 @@ use Test::More;
 use PDF::API2;
 
 my $pdf = PDF::API2->new();
-my $corefont = $pdf->corefont('Helvetica', -encode => 'latin1')->tounicodemap();
+my $corefont = $pdf->corefont('Helvetica', -encode => 'iso-8859-1')->tounicodemap();
 my $block1   = $pdf->corefont('Helvetica', -encode => 'uni1');
 my $unifont  = $pdf->unifont($corefont, [$block1, [1]], -encode => 'utf-8');
 
