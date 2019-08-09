@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.035     2019-08-09
+
     - The bounding box methods (mediabox, cropbox, bleedbox, trimbox, and
       artbox) now return their values when called without arguments.
 
