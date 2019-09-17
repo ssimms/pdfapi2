@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+2.036     2019-09-17
+
+    - Eliminate another uninitialized value warning in BaseFont.pm.
+
+
 2.035     2019-08-09
 
     - The bounding box methods (mediabox, cropbox, bleedbox, trimbox, and
