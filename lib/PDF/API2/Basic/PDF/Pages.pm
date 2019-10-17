@@ -268,7 +268,9 @@ sub find_prop {
         }
     }
     elsif (defined $self->{'Parent'}) {
-        return $self->{'Parent'}->find_prop($prop);
+        if( $self->{'Parent'}->can('find_prop') ){
+            return $self->{'Parent'}->find_prop($prop);
+        }
     }
 
     return;
