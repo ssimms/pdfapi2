@@ -241,7 +241,7 @@ sub open {
     binmode $fh, ':raw';
     $fh->seek(0, 0);            # go to start of file
     $fh->read($buffer, 255);
-    unless ($buffer =~ m/^\%PDF\-1\.(\d)+\s*$cr/mo) {
+    unless ($buffer =~ m/^\%PDF\-1\.(\d)+.*$cr/mo) {
         die "$filename not a PDF file version 1.x";
     }
     $self->{' version'} = $1;
