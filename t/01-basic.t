@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use warnings;
 use strict;
@@ -48,3 +48,11 @@ $pdf = PDF::API2->open('t/resources/sample.pdf');
 isa_ok($pdf,
        'PDF::API2',
        q{PDF::API2->open() returns a PDF::API2 object});
+
+# Open a PDF with extra text in the header
+
+$pdf = PDF::API2->open('t/resources/sample-header.pdf');
+
+isa_ok($pdf,
+       'PDF::API2',
+       q{PDF::API2->open() returns a PDF::API2 object when header contains extra text});       
