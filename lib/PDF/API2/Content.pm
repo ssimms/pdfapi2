@@ -1866,7 +1866,7 @@ sub advancewidth {
 sub text_justified {
     my ($self,$text,$width,%opts) = @_;
     my $initial_width = $self->advancewidth($text);
-    my $space_count = scalar split /\s/, $text;
+    my $space_count = () = split /\s/, $text, -1;
     my $ws = $self->wordspace();
     $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
     $self->text($text,%opts);
@@ -1922,7 +1922,7 @@ sub text_fill_justified {
     my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
     my $ws=$self->wordspace();
     my $w=$self->advancewidth($line);
-    my $space_count = scalar split /\s/, $line;
+    my $space_count = () = split /\s/, $line, -1;
     if (($ret||$w>=$width) and $space_count) {
         $self->wordspace(($width - $w) / $space_count);
     }
