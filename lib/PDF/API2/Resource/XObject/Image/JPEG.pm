@@ -81,13 +81,13 @@ sub read_jpeg {
     $self->height($h);
     $self->bpc($p);
 
-    if ($c == 3) {
+    if (defined($c) and $c == 3) {
         $self->colorspace('DeviceRGB');
     }
-    elsif ($c == 4) {
+    elsif (defined($c) and $c == 4) {
         $self->colorspace('DeviceCMYK');
     }
-    elsif ($c == 1) {
+    elsif (defined($c) and $c == 1) {
         $self->colorspace('DeviceGray');
     }
 
