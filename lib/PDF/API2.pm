@@ -100,7 +100,7 @@ sub new {
     bless $self, $class;
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->new();
 
-    $self->{'pdf'}->{' version'} = 4;
+    $self->{'pdf'}->{' version'} = '1.4';
     $self->{'pages'} = PDF::API2::Basic::PDF::Pages->new($self->{'pdf'});
     $self->{'pages'}->proc_set(qw(PDF Text ImageB ImageC ImageI));
     $self->{'pages'}->{'Resources'} ||= PDFDict();
@@ -204,7 +204,7 @@ sub open_scalar {
     $self->{'pdf'}->{'Root'}->realise();
     $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
     weaken $self->{'pages'};
-    $self->{'pdf'}->{' version'} ||= 3;
+    $self->{'pdf'}->{' version'} ||= '1.3';
     my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
     $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
     weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
@@ -582,10 +582,10 @@ sub version {
     my $self = shift();
     if (scalar @_) {
         my $version = shift();
-        croak "Invalid version $version" unless $version =~ /^(?:1\.)?([0-9]+)$/;
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
         $self->{'pdf'}->{' version'} = $1;
     }
-    return '1.' . $self->{'pdf'}->{' version'};
+    return $self->{'pdf'}->{' version'};
 }
 
 =item $bool = $pdf->isEncrypted()

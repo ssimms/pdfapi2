@@ -86,7 +86,7 @@ sub string_to_name {
     my ($string, $pdf) = @_;
 
     # PDF 1.0 and 1.1 didn't treat the # symbol as an escape character
-    unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 2) {
+    unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 1.2) {
         $string =~ s|([\x00-\x20\x7f-\xff%()\[\]{}<>#/])|'#' . sprintf('%02X', ord($1))|oge;
     }
 
@@ -106,7 +106,7 @@ sub name_to_string {
     $string =~ s|^/||o;
 
     # PDF 1.0 and 1.1 didn't treat the # symbol as an escape character
-    unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 2) {
+    unless ($pdf and $pdf->{' version'} and $pdf->{' version'} < 1.2) {
         $string =~ s/#([0-9a-f]{2})/chr(hex($1))/oige;
     }
 
