@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.037     2020-02-05
+
     - Allow PDF 2.0 files to be opened.
 
     - [RT #131147] Ignore dictionary entries with null values (reported by Klaus
