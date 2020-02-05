@@ -477,17 +477,23 @@ sub readval {
             if ($str =~ s|^/($reg_char+)||) {
                 my $key = PDF::API2::Basic::PDF::Name::name_to_string($1, $self);
                 ($value, $str) = $self->readval($str, %opts);
-                $result->{$key} = $value;
+                unless ((ref($value) // '') eq 'PDF::API2::Basic::PDF::Null') {
+                    $result->{$key} = $value;
+                }
             }
             elsif ($str =~ s|^/$ws_char+||) {
                 # fixes a broken key problem of acrobat. -- fredo
                 ($value, $str) = $self->readval($str, %opts);
-                $result->{'null'} = $value;
+                unless ((ref($value) // '') eq 'PDF::API2::Basic::PDF::Null') {
+                    $result->{'null'} = $value;
+                }
             }
             elsif ($str =~ s|^//|/|) {
                 # fixes again a broken key problem of illustrator/enfocus. -- fredo
                 ($value, $str) = $self->readval($str, %opts);
-                $result->{'null'} = $value;
+                unless ((ref($value) // '') eq 'PDF::API2::Basic::PDF::Null') {
+                    $result->{'null'} = $value;
+                }
             }
             else {
                 die "Invalid dictionary key";
