@@ -207,7 +207,8 @@ sub new {
             my $bpp = ceil($bpc * 2 / 8);
             my $clearstream = unprocess($bpc, $bpp, 2, $w, $h, $scanline, \$self->{' stream'});
             delete $self->{' nofilt'};
-            delete $self->{' stream'};
+            $self->{' stream'} = '';
+            $dict->{' stream'} = '';
             foreach my $n (0 .. ($h * $w) - 1) {
                 vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, ($n * 2) + 1, $bpc);
                 vec($self->{' stream'}, $n, $bpc) = vec($clearstream, $n * 2, $bpc);
@@ -245,7 +246,8 @@ sub new {
             my $bpp = ceil($bpc * 4 / 8);
             my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'});
             delete $self->{' nofilt'};
-            delete $self->{' stream'};
+            $self->{' stream'} = '';
+            $dict->{' stream'} = '';
             foreach my $n (0 .. ($h * $w) - 1) {
                 vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, ($n * 4) + 3, $bpc);
                 vec($self->{' stream'}, ($n * 3), $bpc) = vec($clearstream, ($n * 4), $bpc);
