@@ -73,7 +73,7 @@ sub new {
         read($fh, $buf, 4);
         $crc = $buf;
     }
-    close $fh;
+    close $fh unless ref($file);
 
     $self->width($w);
     $self->height($h);
@@ -169,7 +169,7 @@ sub new {
                 $self->{'SMask'} = $dict;
                 my $scanline = 1 + ceil($bpc * $w / 8);
                 my $bpp = ceil($bpc / 8);
-                my $clearstream = unprocess($bpc, $bpp, 1, $w, $h, $scanline, \$self->{' stream'});
+                my $clearstream = unprocess($bpc, $bpp, 1, $w, $h, $scanline, \$self->{' stream'}, $file);
                 foreach my $n (0 .. ($h * $w) - 1) {
                     vec($dict->{' stream'}, $n, 8) = vec($trns, vec($clearstream, $n, $bpc), 8);
                 }
@@ -205,7 +205,7 @@ sub new {
             }
             my $scanline = 1 + ceil($bpc * 2 * $w / 8);
             my $bpp = ceil($bpc * 2 / 8);
-            my $clearstream = unprocess($bpc, $bpp, 2, $w, $h, $scanline, \$self->{' stream'});
+            my $clearstream = unprocess($bpc, $bpp, 2, $w, $h, $scanline, \$self->{' stream'}, $file);
             delete $self->{' nofilt'};
             delete $self->{' stream'};
             foreach my $n (0 .. ($h * $w) - 1) {
@@ -243,7 +243,7 @@ sub new {
             }
             my $scanline = 1 + ceil($bpc * 4 * $w / 8);
             my $bpp = ceil($bpc * 4 / 8);
-            my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'});
+            my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'}, $file);
             delete $self->{' nofilt'};
             delete $self->{' stream'};
             foreach my $n (0 .. ($h * $w) - 1) {
@@ -279,7 +279,21 @@ sub PaethPredictor {
 }
 
 sub unprocess {
-    my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream) = @_;
+    my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file) = @_;
+
+    # If Image::PNG::Libpng is available, use it to uncompress and unfilter the
+    # image data much more quickly.
+    if ($file and not $ENV{'PDFAPI2_PNG_PP'}) {
+        eval 'require Image::PNG::Libpng';
+        unless ($@) {
+            my $libpng;
+            eval {
+                $libpng = Image::PNG::Libpng::read_png_file($file);
+            };
+            return join('', @{$libpng->get_rows()}) if $libpng;
+        }
+    }
+
     my $stream = uncompress($$sstream);
     my $prev = '';
     my $clearstream = '';

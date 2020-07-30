@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+    - Use Image::PNG::Libpng, if it's available, to speed up inclusion of PNG
+      files with an alpha channel by an order of magnitude.
+
+
 2.037     2020-02-05
 
     - Allow PDF 2.0 files to be opened.
