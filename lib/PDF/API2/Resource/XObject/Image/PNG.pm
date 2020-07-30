@@ -36,7 +36,7 @@ sub new {
     }
     binmode $fh, ':raw';
 
-    my ($buf, $l, $crc, $w, $h, $bpc, $cs, $cm, $fm, $im, $palete, $trns);
+    my ($buf, $l, $crc, $w, $h, $bpc, $cs, $cm, $fm, $im, $palette, $trns);
     seek($fh, 8, 0);
     $self->{' stream'} = '';
     $self->{' nofilt'} = 1;
@@ -53,7 +53,7 @@ sub new {
         }
         elsif ($buf eq 'PLTE') {
             read($fh, $buf, $l);
-            $palete = $buf;
+            $palette = $buf;
         }
         elsif($buf eq 'IDAT') {
             read($fh, $buf, $l);
@@ -144,8 +144,8 @@ sub new {
             my $dict = PDFDict();
             $pdf->new_obj($dict);
             $dict->{'Filter'} = PDFArray(PDFName('FlateDecode'));
-            $dict->{' stream'} = $palete;
-            $palete = '';
+            $dict->{' stream'} = $palette;
+            $palette = '';
             $self->filters('FlateDecode');
             $self->colorspace(PDFArray(PDFName('Indexed'), PDFName('DeviceRGB'), PDFNum(int(length($dict->{' stream'}) / 3) - 1), $dict));
             $self->bpc($bpc);
