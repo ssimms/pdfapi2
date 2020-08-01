@@ -5,7 +5,7 @@ WriteMakefile(
   PREREQ_PM      => { 'ExtUtils::MakeMaker' => '7.12' },
   AUTHOR         => 'Rob Scovell',
   CCFLAGS        => '-Wall -std=c99',
-  OPTIMIZE       => '-O3',
+  OPTIMIZE       => '-Ofast',
   LICENSE        => 'freebsd',
   XSMULTI        => 1,
 );
