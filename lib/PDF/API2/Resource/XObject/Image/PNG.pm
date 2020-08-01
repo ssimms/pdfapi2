@@ -9,11 +9,14 @@ use warnings;
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
+use Encode qw(decode encode);
 
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
+use PDF::API2::XS::PaethPredictor qw(pp);
+use PDF::API2::XS::PNGRGBA qw(process);
 
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
@@ -248,14 +251,21 @@ sub new {
         my $scanline = 1 + ceil($bpc * 4 * $w / 8);
         my $bpp = ceil($bpc * 4 / 8);
         my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'}, $file);
+        warn length($clearstream);
         delete $self->{' nofilt'};
         delete $self->{' stream'};
-        foreach my $n (0 .. ($h * $w) - 1) {
-            vec($self->{' stream'}, $n * 3,     $bpc) = vec($clearstream, ($n * 4),     $bpc);
-            vec($self->{' stream'}, $n * 3 + 1, $bpc) = vec($clearstream, ($n * 4) + 1, $bpc);
-            vec($self->{' stream'}, $n * 3 + 2, $bpc) = vec($clearstream, ($n * 4) + 2, $bpc);
-            vec($dict->{' stream'}, $n,         $bpc) = vec($clearstream, ($n * 4) + 3, $bpc);
-        }
+        my @stream = unpack("(A)*", $clearstream);
+        my $outstream_array = PDF::API2::XS::PNGRGBA::process(\@stream, $w, $h);
+        warn scalar($outstream_array->@*);
+        my $outstream = pack("C*", $outstream_array->@*);
+        warn length($outstream);
+        $self->{' stream'} = $outstream;
+        # foreach my $n (0 .. ($h * $w) - 1) {
+        #            vec($self->{' stream'}, $n * 3,     $bpc) = vec($clearstream, ($n * 4),     $bpc);
+        #            vec($self->{' stream'}, $n * 3 + 1, $bpc) = vec($clearstream, ($n * 4) + 1, $bpc);
+        #            vec($self->{' stream'}, $n * 3 + 2, $bpc) = vec($clearstream, ($n * 4) + 2, $bpc);
+        #            vec($dict->{' stream'}, $n,         $bpc) = vec($clearstream, ($n * 4) + 3, $bpc);
+        #        }
     }
 
     # Unknown/Unsupported
@@ -264,23 +274,6 @@ sub new {
     }
 
     return $self;
-}
-
-sub PaethPredictor {
-    my ($a, $b, $c) = @_;
-    my $p = $a + $b - $c;
-    my $pa = abs($p - $a);
-    my $pb = abs($p - $b);
-    my $pc = abs($p - $c);
-    if (($pa <= $pb) && ($pa <= $pc)) {
-        return $a;
-    }
-    elsif ($pb <= $pc) {
-        return $b;
-    }
-    else {
-        return $c;
-    }
 }
 
 sub unprocess {
@@ -329,7 +322,7 @@ sub unprocess {
         }
         elsif ($filter == 4) {
             foreach my $x (0 .. length($line) - 1) {
-                vec($clear,$x,8) = (vec($line, $x, 8) + PaethPredictor(vec($clear, $x - $bpp, 8), vec($prev, $x, 8), vec($prev, $x - $bpp, 8))) % 256;
+                vec($clear,$x,8) = (vec($line, $x, 8) + PDF::API2::XS::PaethPredictor::pp(vec($clear, $x - $bpp, 8), vec($prev, $x, 8), vec($prev, $x - $bpp, 8))) % 256;
             }
         }
 
