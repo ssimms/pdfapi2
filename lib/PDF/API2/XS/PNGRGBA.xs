@@ -13,8 +13,10 @@ PROTOTYPES: ENABLE
 AV*
 process (AV * stream, int w, int h)
   CODE:
-    // The image is passed as a Perl AV (Array Variable)
-    // First we need to turn it into a C array of bytes
+    // The image is passed as a Perl AV (Array Variable).
+    // First we need to turn it into a C array of bytes.
+    // av_len, av_fetch and SvPV_nolen are XS macros.
+    // See documentation here: https://perldoc.perl.org/perlguts.html
     uint8_t * in_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
     for (int i=0; i < av_len(stream); i++) {
       SV** elem = av_fetch(stream, i, 0);
