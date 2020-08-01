@@ -2,10 +2,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
  
 MODULE = PDF::API2::XS::PNGRGBA  PACKAGE = PDF::API2::XS::PNGRGBA
 PROTOTYPES: ENABLE
