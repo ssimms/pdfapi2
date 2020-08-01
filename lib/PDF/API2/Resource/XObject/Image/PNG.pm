@@ -9,7 +9,6 @@ use warnings;
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
-use Encode qw(decode encode);
 
 use IO::File;
 use PDF::API2::Util;
