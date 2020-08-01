@@ -251,21 +251,12 @@ sub new {
         my $scanline = 1 + ceil($bpc * 4 * $w / 8);
         my $bpp = ceil($bpc * 4 / 8);
         my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'}, $file);
-        warn length($clearstream);
         delete $self->{' nofilt'};
         delete $self->{' stream'};
-        my @stream = unpack("(A)*", $clearstream);
+        my @stream = split '', $clearstream;
         my $outstream_array = PDF::API2::XS::PNGRGBA::process(\@stream, $w, $h);
-        warn scalar($outstream_array->@*);
         my $outstream = pack("C*", $outstream_array->@*);
-        warn length($outstream);
         $self->{' stream'} = $outstream;
-        # foreach my $n (0 .. ($h * $w) - 1) {
-        #            vec($self->{' stream'}, $n * 3,     $bpc) = vec($clearstream, ($n * 4),     $bpc);
-        #            vec($self->{' stream'}, $n * 3 + 1, $bpc) = vec($clearstream, ($n * 4) + 1, $bpc);
-        #            vec($self->{' stream'}, $n * 3 + 2, $bpc) = vec($clearstream, ($n * 4) + 2, $bpc);
-        #            vec($dict->{' stream'}, $n,         $bpc) = vec($clearstream, ($n * 4) + 3, $bpc);
-        #        }
     }
 
     # Unknown/Unsupported
