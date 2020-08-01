@@ -13,10 +13,17 @@ PROTOTYPES: ENABLE
 AV*
 process (AV * stream, int w, int h)
   CODE:
+    //
     // The image is passed as a Perl AV (Array Variable).
+    //
+    // It cannot be passed in as a regular C char string
+    // or converted to a regular C char string because
+    // it gets truncated at the first zero byte.
+    //
     // First we need to turn it into a C array of bytes.
     // av_len, av_fetch and SvPV_nolen are XS macros.
     // See documentation here: https://perldoc.perl.org/perlguts.html
+    //
     uint8_t * in_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
     for (int i=0; i < av_len(stream); i++) {
       SV** elem = av_fetch(stream, i, 0);
@@ -25,7 +32,7 @@ process (AV * stream, int w, int h)
       *(in_array + i) = byte;
     }
 
-    // Now we can do the transformation into a C array of bytes
+    // Transform the image into a new C array of bytes.
     uint8_t * out_array = (uint8_t *)malloc((w * h * 3) * sizeof(uint8_t));
     for (int i = 0; i < w * h; i++) {
       *(out_array + (i * 3) + 0 ) = *(in_array + (i * 4) + 0 );
@@ -34,14 +41,14 @@ process (AV * stream, int w, int h)
       *(out_array + (i * 0) + 0 ) = *(in_array + (i * 4) + 3 );
     }
 
-    // Put the results back into a Perl AV
+    // Put the results back into a new Perl AV.
     AV * outstream = newAV();
     for (int i = 0; i < (w * h * 3); i++) {
       SV* this_sv = newSVuv(*(out_array + i));
       av_push(outstream, this_sv);
     }
 
-    // Send it back to Perl
+    // Send the transformed image back to Perl in the new AV.
     RETVAL = outstream;
   OUTPUT:
     RETVAL
