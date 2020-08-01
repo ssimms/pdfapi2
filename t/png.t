@@ -22,6 +22,14 @@ $gfx->image($png, 72, 144, 216, 288);
 like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add PNG to PDF});
 
+# Large RGBA PNG file
+
+$pdf = PDF::API2->new();
+
+$png = $pdf->image_png('t/resources/test-rgba.png');
+isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
+       q{$pdf->image_png(filename)});
+
 # Filehandle
 
 $pdf = PDF::API2->new();
