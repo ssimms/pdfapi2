@@ -257,7 +257,7 @@ sub new {
         my $outstream = pack("C*", $outstream_array->@*);
         $self->{' stream'} = $outstream;
         my $dictstream_array = PDF::API2::XS::PNGRGBA::dictstream(\@stream, $w, $h);
-        my $dictstream = pack("C*", $dictstream_array>@*);
+        my $dictstream = pack("C*", $dictstream_array->@*);
         $dict->{' stream'} = $dictstream;
     }
 
