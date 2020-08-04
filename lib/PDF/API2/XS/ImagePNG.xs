@@ -2,8 +2,10 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include <stdlib.h>
+#include <stdint.h>
  
-MODULE = PDF::API2::XS::PNGRGBA  PACKAGE = PDF::API2::XS::PNGRGBA
+MODULE = PDF::API2::XS::ImagePNG  PACKAGE = PDF::API2::XS::ImagePNG
 PROTOTYPES: ENABLE
  
 AV*
@@ -60,3 +62,24 @@ outstream (AV * stream, int w, int h)
   OUTPUT:
     RETVAL
 
+int
+paeth_predictor (a, b, c)
+  int a
+  int b
+  int c
+  CODE:
+    int p = a + b - c;
+    int pa = abs(p - a);
+    int pb = abs(p - b);
+    int pc = abs(p - c);
+    if ((pa <= pb ) && (pa <= pc)) {
+        RETVAL = a;
+    }
+    else if (pb <= pc) {
+        RETVAL = b;
+    }
+    else {
+        RETVAL = c;
+    }
+  OUTPUT:
+    RETVAL

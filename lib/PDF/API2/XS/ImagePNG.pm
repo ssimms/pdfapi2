@@ -1,4 +1,4 @@
-package PDF::API2::XS::PNGRGBA;
+package PDF::API2::XS::ImagePNG;
 require XSLoader;
  
 XSLoader::load();
