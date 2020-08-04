@@ -9,7 +9,7 @@ MODULE = PDF::API2::XS::ImagePNG  PACKAGE = PDF::API2::XS::ImagePNG
 PROTOTYPES: ENABLE
  
 AV*
-outstream (AV * stream, int w, int h)
+split_channels (AV * stream, int w, int h)
   CODE:
     //
     // The image is passed as a Perl AV (Array Variable).

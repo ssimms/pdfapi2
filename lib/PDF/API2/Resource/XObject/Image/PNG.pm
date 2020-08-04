@@ -14,7 +14,7 @@ use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
-use PDF::API2::XS::ImagePNG qw(outstream_av paeth_predictor);
+use PDF::API2::XS::ImagePNG qw(split_channels paeth_predictor);
 
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
@@ -252,7 +252,7 @@ sub new {
         delete $self->{' nofilt'};
         delete $self->{' stream'};
         my @stream = split '', $clearstream;
-        my $outstream_array = PDF::API2::XS::ImagePNG::outstream(\@stream, $w, $h);
+        my $outstream_array = PDF::API2::XS::ImagePNG::split_channels(\@stream, $w, $h);
         my $outstream = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
         $self->{' stream'} = $outstream;
         my $dictstream = pack("C*", $outstream_array->@*);
