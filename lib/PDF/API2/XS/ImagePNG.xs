@@ -23,6 +23,11 @@ outstream (AV * stream, int w, int h)
     // See documentation here: https://perldoc.perl.org/perlguts.html
     //
     uint8_t * in_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
+    uint8_t * out_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
+    uint8_t * dict_array = (uint8_t *)malloc((w * h) * sizeof(uint8_t));
+
+    if (in_array == NULL || out_array == NULL || dict_array == NULL) { return; }
+
     for (int i=0; i < av_len(stream); i++) {
       SV** elem = av_fetch(stream, i, 0);
       char * ptr = SvPV_nolen(*elem);
@@ -31,8 +36,6 @@ outstream (AV * stream, int w, int h)
     }
 
     // Transform the image into a new C array of bytes.
-    uint8_t * out_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
-    uint8_t * dict_array = (uint8_t *)malloc((w * h) * sizeof(uint8_t));
     for (int i = 0; i < w * h; i++) {
       *(out_array + (i * 3) + 0 ) = *(in_array + (i * 4) + 0 );
       *(out_array + (i * 3) + 1 ) = *(in_array + (i * 4) + 1 );
