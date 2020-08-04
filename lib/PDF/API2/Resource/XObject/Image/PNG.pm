@@ -258,7 +258,6 @@ sub new {
         $self->{' stream'} = $outstream;
         my $dictstream = pack("C*", $outstream_array->@*);
         $dict->{' stream'} = $dictstream;
-        warn $dictstream;
     }
 
     # Unknown/Unsupported
