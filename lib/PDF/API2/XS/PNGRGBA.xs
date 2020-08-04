@@ -50,3 +50,34 @@ outstream (AV * stream, int w, int h)
     RETVAL = outstream_av;
   OUTPUT:
     RETVAL
+
+AV*
+dictstream (AV * stream, int w, int h)
+  CODE:
+    uint8_t * in_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
+    for (int i=0; i < av_len(stream); i++) {
+      SV** elem = av_fetch(stream, i, 0);
+      char * ptr = SvPV_nolen(*elem);
+      uint8_t byte = (uint8_t) *ptr;
+      *(in_array + i) = byte;
+    }
+
+    uint8_t * dict_array = (uint8_t *)malloc((w * h) * sizeof(uint8_t));
+    for (int i = 0; i < w * h; i++) {
+      *(dict_array + i) = *(in_array + (i * 4) + 3 );
+    }
+
+    // Put the results back into a new Perl AV.
+    AV * dictstream_av = newAV();
+    for (int i = 0; i < (w * h * 3); i++) {
+      SV* this_sv = newSVuv(*(dict_array + i));
+      av_push(dictstream_av, this_sv);
+    }
+
+    free(in_array);
+    free(dict_array);
+
+    // Send the transformed image back to Perl in the new AV.
+    RETVAL = dictstream_av;
+  OUTPUT:
+    RETVAL
