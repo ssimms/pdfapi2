@@ -254,10 +254,9 @@ sub new {
         delete $self->{' stream'};
         my @stream = split '', $clearstream;
         my $outstream_array = PDF::API2::XS::PNGRGBA::outstream(\@stream, $w, $h);
-        my $outstream = pack("C*", $outstream_array->@*);
+        my $outstream = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
         $self->{' stream'} = $outstream;
-        my $dictstream_array = PDF::API2::XS::PNGRGBA::dictstream(\@stream, $w, $h);
-        my $dictstream = pack("C*", $dictstream_array->@*);
+        my $dictstream = pack("C*", $outstream_array->@*);
         $dict->{' stream'} = $dictstream;
     }
 

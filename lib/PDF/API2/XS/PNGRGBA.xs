@@ -29,17 +29,25 @@ outstream (AV * stream, int w, int h)
     }
 
     // Transform the image into a new C array of bytes.
-    uint8_t * out_array = (uint8_t *)malloc((w * h * 3) * sizeof(uint8_t));
+    uint8_t * out_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
+    uint8_t * dict_array = (uint8_t *)malloc((w * h) * sizeof(uint8_t));
     for (int i = 0; i < w * h; i++) {
       *(out_array + (i * 3) + 0 ) = *(in_array + (i * 4) + 0 );
       *(out_array + (i * 3) + 1 ) = *(in_array + (i * 4) + 1 );
       *(out_array + (i * 3) + 2 ) = *(in_array + (i * 4) + 2 );
+
+      *(dict_array + i) = *(in_array + (i * 4) + 3 );
     }
 
     // Put the results back into a new Perl AV.
     AV * outstream_av = newAV();
     for (int i = 0; i < (w * h * 3); i++) {
       SV* this_sv = newSVuv(*(out_array + i));
+      av_push(outstream_av, this_sv);
+    }
+
+    for (int i = 0; i < (w * h * 3); i++) {
+      SV* this_sv = newSVuv(*(dict_array + i));
       av_push(outstream_av, this_sv);
     }
 
