@@ -53,6 +53,7 @@ outstream (AV * stream, int w, int h)
 
     free(in_array);
     free(out_array);
+    free(dict_array);
 
     // Send the transformed image back to Perl in the new AV.
     RETVAL = outstream_av;
