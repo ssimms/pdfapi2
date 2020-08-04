@@ -7,7 +7,7 @@ MODULE = PDF::API2::XS::PNGRGBA  PACKAGE = PDF::API2::XS::PNGRGBA
 PROTOTYPES: ENABLE
  
 AV*
-process (AV * stream, int w, int h)
+outstream (AV * stream, int w, int h)
   CODE:
     //
     // The image is passed as a Perl AV (Array Variable).
@@ -34,17 +34,19 @@ process (AV * stream, int w, int h)
       *(out_array + (i * 3) + 0 ) = *(in_array + (i * 4) + 0 );
       *(out_array + (i * 3) + 1 ) = *(in_array + (i * 4) + 1 );
       *(out_array + (i * 3) + 2 ) = *(in_array + (i * 4) + 2 );
-      *(out_array + (i * 0) + 0 ) = *(in_array + (i * 4) + 3 );
     }
 
     // Put the results back into a new Perl AV.
-    AV * outstream = newAV();
+    AV * outstream_av = newAV();
     for (int i = 0; i < (w * h * 3); i++) {
       SV* this_sv = newSVuv(*(out_array + i));
-      av_push(outstream, this_sv);
+      av_push(outstream_av, this_sv);
     }
 
+    free(in_array);
+    free(out_array);
+
     // Send the transformed image back to Perl in the new AV.
-    RETVAL = outstream;
+    RETVAL = outstream_av;
   OUTPUT:
     RETVAL

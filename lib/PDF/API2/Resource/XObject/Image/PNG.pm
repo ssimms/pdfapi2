@@ -15,7 +15,7 @@ use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
 use PDF::API2::XS::PaethPredictor qw(pp);
-use PDF::API2::XS::PNGRGBA qw(process);
+use PDF::API2::XS::PNGRGBA qw(outstream_av);
 
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
@@ -253,7 +253,7 @@ sub new {
         delete $self->{' nofilt'};
         delete $self->{' stream'};
         my @stream = split '', $clearstream;
-        my $outstream_array = PDF::API2::XS::PNGRGBA::process(\@stream, $w, $h);
+        my $outstream_array = PDF::API2::XS::PNGRGBA::outstream(\@stream, $w, $h);
         my $outstream = pack("C*", $outstream_array->@*);
         $self->{' stream'} = $outstream;
     }
