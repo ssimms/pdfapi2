@@ -19,6 +19,7 @@ use PDF::API2::XS::ImagePNG qw(split_channels paeth_predictor);
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
     my $self;
+    warn "Local";
 
     $class = ref($class) if ref($class);
 
@@ -270,19 +271,6 @@ sub new {
 sub unprocess {
     my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file) = @_;
 
-    # If Image::PNG::Libpng is available, use it to uncompress and unfilter the
-    # image data much more quickly.
-    if ($file and not $ENV{'PDFAPI2_PNG_PP'}) {
-        eval 'require Image::PNG::Libpng';
-        unless ($@) {
-            my $libpng;
-            eval {
-                $libpng = Image::PNG::Libpng::read_png_file($file);
-            };
-            return join('', @{$libpng->get_rows()}) if $libpng;
-        }
-    }
-
     my $stream = uncompress($$sstream);
     my $prev = '';
     my $clearstream = '';
@@ -296,27 +284,12 @@ sub unprocess {
         if ($filter == 0) {
             $clear = $line;
         }
-        elsif ($filter == 1) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear, $x, 8) = (vec($line, $x, 8) + vec($clear, $x - $bpp, 8)) % 256;
-            }
+        else {
+            my @in_line = split '', $line;
+            my @prev_line = split '', $prev;
+            my $clear_array = PDF::API2::XS::ImagePNG::unfilter(\@in_line, \@prev_line, $filter, $bpp);
+            $clear = pack("C*", $clear_array->@*);
         }
-        elsif ($filter == 2) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear, $x, 8) = (vec($line, $x, 8) + vec($prev, $x, 8)) % 256;
-            }
-        }
-        elsif ($filter == 3) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear, $x, 8) = (vec($line, $x, 8) + floor((vec($clear, $x - $bpp, 8) + vec($prev, $x, 8)) / 2)) % 256;
-            }
-        }
-        elsif ($filter == 4) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear,$x,8) = (vec($line, $x, 8) + PDF::API2::XS::ImagePNG::paeth_predictor(vec($clear, $x - $bpp, 8), vec($prev, $x, 8), vec($prev, $x - $bpp, 8))) % 256;
-            }
-        }
-
         $prev = $clear;
         foreach my $x (0 .. ($width * $comp) - 1) {
             vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
