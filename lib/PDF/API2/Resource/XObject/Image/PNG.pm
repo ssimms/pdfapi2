@@ -253,10 +253,8 @@ sub new {
         delete $self->{' nofilt'};
         delete $self->{' stream'};
         my $outstream_array = PDF::API2::XS::ImagePNG::split_channels(\@stream, $w, $h);
-        my $outstream = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
-        $self->{' stream'} = $outstream;
-        my $dictstream = pack("C*", $outstream_array->@*);
-        $dict->{' stream'} = $dictstream;
+        $self->{' stream'} = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
+        $dict->{' stream'} = pack("C*", $outstream_array->@*);
     }
 
     # Unknown/Unsupported
@@ -269,6 +267,19 @@ sub new {
 
 sub unprocess {
     my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file, $as_reference) = @_;
+
+    # If Image::PNG::Libpng is available, use it to uncompress and unfilter the
+    # image data much more quickly.
+    if ($file and not $ENV{'PDFAPI2_PNG_PP'}) {
+        eval 'require Image::PNG::Libpng';
+        unless ($@) {
+            my $libpng;
+            eval {
+                $libpng = Image::PNG::Libpng::read_png_file($file);
+            };
+            return join('', @{$libpng->get_rows()}) if $libpng;
+        }
+    }
 
     my $stream = uncompress($$sstream);
     my $prev = '';

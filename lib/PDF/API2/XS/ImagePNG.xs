@@ -32,7 +32,7 @@ unfilter (AV * line, AV * prev, int filter, int bpp)
     uint8_t * prev_array = (uint8_t *)malloc((line_length) * sizeof(uint8_t));
     uint8_t * out_array  = (uint8_t *)malloc((line_length) * sizeof(uint8_t));
     if (in_array == NULL || out_array == NULL || prev_array == NULL) { 
-      printf("Null pointer from memory allocation in ImagePNG.xs");
+      croak("Null pointer from memory allocation in ImagePNG.xs");
       return;
     }
 
@@ -145,7 +145,10 @@ split_channels (AV * stream, int w, int h)
     uint8_t * out_array = (uint8_t *)malloc((w * h * 4) * sizeof(uint8_t));
     uint8_t * dict_array = (uint8_t *)malloc((w * h) * sizeof(uint8_t));
 
-    if (in_array == NULL || out_array == NULL || dict_array == NULL) { return; }
+    if (in_array == NULL || out_array == NULL || dict_array == NULL) {
+      croak("Null pointer from memory allocation in ImagePNG.xs");
+      return;
+    }
 
     for (int i = 0; i < av_len(stream); i++) {
       SV** elem = av_fetch(stream, i, 0);
