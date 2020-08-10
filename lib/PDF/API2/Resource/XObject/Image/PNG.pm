@@ -266,7 +266,7 @@ sub new {
 }
 
 sub unprocess {
-    my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file, $as_reference) = @_;
+    my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file) = @_;
 
     # If Image::PNG::Libpng is available, use it to uncompress and unfilter the
     # image data much more quickly.
