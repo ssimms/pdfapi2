@@ -277,7 +277,6 @@ sub unprocess {
     foreach my $n (0 .. $height - 1) {
         my $line = substr($stream, $n * $scanline, $scanline);
         my $filter = vec($line, 0, 8);
-        my $clear = '';
         $line = substr($line, 1);
 
         # See "Filter Algorithms" in the documentation below for definitions.
