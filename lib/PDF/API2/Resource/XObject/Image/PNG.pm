@@ -17,7 +17,6 @@ use Scalar::Util qw(weaken);
 use PDF::API2::XS::ImagePNG qw(split_channels paeth_predictor unfilter);
 
 sub new {
-    warn "Local";
     my ($class, $pdf, $file, $name, %opts) = @_;
     my $self;
 
@@ -285,14 +284,13 @@ sub unprocess {
         my @in_line = split '', $line;
         my @prev_line = split '', $prev;
         my $clear_array = PDF::API2::XS::ImagePNG::unfilter(\@in_line, \@prev_line, $filter, $bpp);
-        $clear = pack("C*", $clear_array->@*);
-        $prev = $clear;
+        $prev = pack("C*", $clear_array->@*);
         foreach my $x (0 .. ($width * $comp) - 1) {
             if ($bpc == 8) {
                 $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x]; 
             }
             else {
-                vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
+                vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($prev, $x, $bpc);
             }
         }
     }
