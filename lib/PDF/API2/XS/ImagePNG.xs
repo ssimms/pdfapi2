@@ -115,7 +115,7 @@ unfilter (AV * line, AV * prev, int filter, int bpp)
     // Put the results back into a new Perl AV.
     AV * clearstream_av = newAV();
     for (int i = 0; i < (line_length); i++) {
-      SV* this_sv = newSVuv(*(out_array + i));
+      SV * this_sv = newSVuv(*(out_array + i));
       av_push(clearstream_av, this_sv);
     }
 
@@ -169,12 +169,12 @@ split_channels (AV * stream, int w, int h)
     // Put the results back into a new Perl AV.
     AV * outstream_av = newAV();
     for (int i = 0; i < (w * h * 3); i++) {
-      SV* this_sv = newSVuv(*(out_array + i));
+      SV * this_sv = newSVuv(*(out_array + i));
       av_push(outstream_av, this_sv);
     }
 
     for (int i = 0; i < (w * h * 3); i++) {
-      SV* this_sv = newSVuv(*(dict_array + i));
+      SV * this_sv = newSVuv(*(dict_array + i));
       av_push(outstream_av, this_sv);
     }
 
