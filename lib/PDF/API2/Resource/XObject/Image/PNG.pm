@@ -19,7 +19,6 @@ use PDF::API2::XS::ImagePNG qw(split_channels paeth_predictor);
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
     my $self;
-    warn "Local";
 
     $class = ref($class) if ref($class);
 
@@ -295,7 +294,6 @@ sub unprocess {
             vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
         }
     }
-
     return $clearstream;
 }
 
