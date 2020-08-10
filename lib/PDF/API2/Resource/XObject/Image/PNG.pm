@@ -250,9 +250,9 @@ sub new {
         my $scanline = 1 + ceil($bpc * 4 * $w / 8);
         my $bpp = ceil($bpc * 4 / 8);
         my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'}, $file);
+        my @stream = split '', $clearstream;
         delete $self->{' nofilt'};
         delete $self->{' stream'};
-        my @stream = split '', $clearstream;
         my $outstream_array = PDF::API2::XS::ImagePNG::split_channels(\@stream, $w, $h);
         my $outstream = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
         $self->{' stream'} = $outstream;
@@ -274,7 +274,7 @@ sub unprocess {
     my $stream = uncompress($$sstream);
     my $prev = '';
     my $clearstream = '';
-    my @clearstream_array;
+    my $clearstream_array = [];
     foreach my $n (0 .. $height - 1) {
         my $line = substr($stream, $n * $scanline, $scanline);
         my $filter = vec($line, 0, 8);
@@ -289,16 +289,18 @@ sub unprocess {
         $prev = $clear;
         foreach my $x (0 .. ($width * $comp) - 1) {
             if ($bpc == 8) {
-                $clearstream_array[($n * $width * $comp) + $x] = $clear_array->[$x]; 
+                $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x]; 
             }
             else {
                 vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
             }
         }
     }
+    no warnings;
     if ($bpc == 8) {
-        $clearstream = pack("C*", @clearstream_array);
+        $clearstream = pack("C*", $clearstream_array->@*);
     }
+    use warnings;
     return $clearstream;
 }
 
