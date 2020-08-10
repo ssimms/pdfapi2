@@ -14,7 +14,7 @@ use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
-use PDF::API2::XS::ImagePNG qw(split_channels paeth_predictor unfilter);
+use PDF::API2::XS::ImagePNG;
 
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
@@ -252,7 +252,7 @@ sub new {
         my @stream = split '', $clearstream;
         delete $self->{' nofilt'};
         delete $self->{' stream'};
-        my $outstream_array = PDF::API2::XS::ImagePNG::split_channels(\@stream, $w, $h);
+        my $outstream_array = split_channels(\@stream, $w, $h);
         $self->{' stream'} = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
         $dict->{' stream'} = pack("C*", $outstream_array->@*);
     }
@@ -268,18 +268,6 @@ sub new {
 sub unprocess {
     my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file, $as_reference) = @_;
 
-    # If Image::PNG::Libpng is available, use it to uncompress and unfilter the
-    # image data much more quickly.
-    if ($file and not $ENV{'PDFAPI2_PNG_PP'}) {
-        eval 'require Image::PNG::Libpng';
-        unless ($@) {
-            my $libpng;
-            eval {
-                $libpng = Image::PNG::Libpng::read_png_file($file);
-            };
-            return join('', @{$libpng->get_rows()}) if $libpng;
-        }
-    }
 
     my $stream = uncompress($$sstream);
     my $prev = '';
@@ -293,7 +281,7 @@ sub unprocess {
         # See "Filter Algorithms" in the documentation below for definitions.
         my @in_line = split '', $line;
         my @prev_line = split '', $prev;
-        my $clear_array = PDF::API2::XS::ImagePNG::unfilter(\@in_line, \@prev_line, $filter, $bpp);
+        my $clear_array = unfilter(\@in_line, \@prev_line, $filter, $bpp);
         $prev = pack("C*", $clear_array->@*);
         foreach my $x (0 .. ($width * $comp) - 1) {
             if ($bpc == 8) {

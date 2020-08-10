@@ -22,7 +22,7 @@ int paeth_predictor (int a, int b, int c) {
 }
 
 MODULE = PDF::API2::XS::ImagePNG  PACKAGE = PDF::API2::XS::ImagePNG
-PROTOTYPES: ENABLE
+PROTOTYPES: DISABLE
 
 AV*
 unfilter (AV * line, AV * prev, int filter, int bpp)
