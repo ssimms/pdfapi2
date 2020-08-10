@@ -57,6 +57,12 @@ unfilter (AV * line, AV * prev, int filter, int bpp)
     }
 
     switch (filter) {
+      case 0 :
+        for (int i = 0; i < line_length; i++) {
+          *(out_array + i) = *(in_array + i);
+        }
+        break;
+
       case 1 :
         for (int i = 0; i < line_length; i++) {
           uint8_t sub;

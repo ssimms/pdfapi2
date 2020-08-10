@@ -14,9 +14,10 @@ use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
-use PDF::API2::XS::ImagePNG qw(split_channels paeth_predictor);
+use PDF::API2::XS::ImagePNG qw(split_channels paeth_predictor unfilter);
 
 sub new {
+    warn "Local";
     my ($class, $pdf, $file, $name, %opts) = @_;
     my $self;
 
@@ -268,11 +269,12 @@ sub new {
 }
 
 sub unprocess {
-    my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file) = @_;
+    my ($bpc, $bpp, $comp, $width, $height, $scanline, $sstream, $file, $as_reference) = @_;
 
     my $stream = uncompress($$sstream);
     my $prev = '';
     my $clearstream = '';
+    my @clearstream_array;
     foreach my $n (0 .. $height - 1) {
         my $line = substr($stream, $n * $scanline, $scanline);
         my $filter = vec($line, 0, 8);
@@ -280,19 +282,22 @@ sub unprocess {
         $line = substr($line, 1);
 
         # See "Filter Algorithms" in the documentation below for definitions.
-        if ($filter == 0) {
-            $clear = $line;
-        }
-        else {
-            my @in_line = split '', $line;
-            my @prev_line = split '', $prev;
-            my $clear_array = PDF::API2::XS::ImagePNG::unfilter(\@in_line, \@prev_line, $filter, $bpp);
-            $clear = pack("C*", $clear_array->@*);
-        }
+        my @in_line = split '', $line;
+        my @prev_line = split '', $prev;
+        my $clear_array = PDF::API2::XS::ImagePNG::unfilter(\@in_line, \@prev_line, $filter, $bpp);
+        $clear = pack("C*", $clear_array->@*);
         $prev = $clear;
         foreach my $x (0 .. ($width * $comp) - 1) {
-            vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
+            if ($bpc == 8) {
+                $clearstream_array[($n * $width * $comp) + $x] = $clear_array->[$x]; 
+            }
+            else {
+                vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
+            }
         }
+    }
+    if ($bpc == 8) {
+        $clearstream = pack("C*", @clearstream_array);
     }
     return $clearstream;
 }
