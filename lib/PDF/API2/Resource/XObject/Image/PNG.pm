@@ -290,7 +290,6 @@ sub unprocess {
         my $filter = vec($line, 0, 8);
         $line = substr($line, 1);
 
-        # See "Filter Algorithms" in the documentation below for definitions.
         my @in_line = split '', $line;
         my @prev_line = split '', $prev;
         my $clear_array = unfilter(\@in_line, \@prev_line, $filter, $bpp);
