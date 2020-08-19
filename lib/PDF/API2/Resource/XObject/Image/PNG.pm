@@ -258,7 +258,7 @@ sub new {
         # high cost of the vec operations below.
         # In order to use XS, the stream must be converted to a Perl array, which maps to
         # an AV type in XS C. We cannot simply pass a string or byte sequence to XS because the first 0
-        # terminates the the sequence. 
+        # terminates the sequence. 
         # The overhead of the conversion to an AV type is outweighed by the performance gain
         # obtained by dropping into XS.
 
