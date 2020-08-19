@@ -333,20 +333,20 @@ sub unprocess {
             my @prev_line = split '', $prev;
             my $clear_array = unfilter(\@in_line, \@prev_line, $filter, $bpp);
             $prev = pack("C*", $clear_array->@*);
-            foreach my $x (0 .. ($width * $comp) - 1) {
-                if ($bpc == 8) {
+            if ($bpc == 8) {
+                foreach my $x (0 .. ($width * $comp) - 1) {
                     $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x]; 
                 }
-                else {
+                no warnings;
+                $clearstream = pack("C*", $clearstream_array->@*);
+                use warnings;
+            }
+            else {
+                foreach my $x (0 .. ($width * $comp) - 1) {
                     vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($prev, $x, $bpc);
                 }
             }
         }
-        no warnings;
-        if ($bpc == 8) {
-            $clearstream = pack("C*", $clearstream_array->@*);
-        }
-        use warnings;
     }
     else {
         foreach my $n (0 .. $height - 1) {
