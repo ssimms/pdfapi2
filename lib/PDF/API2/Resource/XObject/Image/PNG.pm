@@ -262,7 +262,7 @@ sub new {
         # The overhead of the conversion to an AV type is outweighed by the performance gain
         # obtained by dropping into XS.
 
-        if ($use_xs and not $ENV{'PDFAPI2_PNG_PP'}) {
+        if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
             my @stream = split '', $clearstream;
             my $outstream_array = split_channels(\@stream, $w, $h);
             $self->{' stream'} = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
