@@ -322,6 +322,8 @@ sub unprocess {
     my $stream = uncompress($$sstream);
     my $prev = '';
     my $clearstream = '';
+
+    # The XS code uses a uint8 array so can only handle bpc = 8
     if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
         my $clearstream_array = [];
         foreach my $n (0 .. $height - 1) {
