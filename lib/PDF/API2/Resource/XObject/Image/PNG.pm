@@ -251,10 +251,17 @@ sub new {
         my $scanline = 1 + ceil($bpc * 4 * $w / 8);
         my $bpp = ceil($bpc * 4 / 8);
         my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'}, $file);
-        my @stream = split '', $clearstream;
         delete $self->{' nofilt'};
         delete $self->{' stream'};
+
+        # The motivation behind the use of XS for this particular case (8 bit RGBA) is the
+        # high cost of the vec operations below.
+        # In order to use XS, the stream must be converted to a Perl array, which maps to
+        # an AV type in XS C. We cannot simply pass a string or byte sequence to XS because the first 0
+        # terminates the the sequence. 
+
         if ($use_xs and not $ENV{'PDFAPI2_PNG_PP'}) {
+            my @stream = split '', $clearstream;
             my $outstream_array = split_channels(\@stream, $w, $h);
             $self->{' stream'} = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
             $dict->{' stream'} = pack("C*", $outstream_array->@*);
