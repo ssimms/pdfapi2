@@ -322,7 +322,7 @@ sub unprocess {
     my $stream = uncompress($$sstream);
     my $prev = '';
     my $clearstream = '';
-    if ($use_xs and not $ENV{'PDFAPI2_PNG_PP'}) {
+    if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
         my $clearstream_array = [];
         foreach my $n (0 .. $height - 1) {
             my $line = substr($stream, $n * $scanline, $scanline);
@@ -333,19 +333,12 @@ sub unprocess {
             my @prev_line = split '', $prev;
             my $clear_array = unfilter(\@in_line, \@prev_line, $filter, $bpp);
             $prev = pack("C*", $clear_array->@*);
-            if ($bpc == 8) {
-                foreach my $x (0 .. ($width * $comp) - 1) {
-                    $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x]; 
-                }
-                no warnings;
-                $clearstream = pack("C*", $clearstream_array->@*);
-                use warnings;
+            foreach my $x (0 .. ($width * $comp) - 1) {
+                $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x]; 
             }
-            else {
-                foreach my $x (0 .. ($width * $comp) - 1) {
-                    vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($prev, $x, $bpc);
-                }
-            }
+            no warnings;
+            $clearstream = pack("C*", $clearstream_array->@*);
+            use warnings;
         }
     }
     else {
