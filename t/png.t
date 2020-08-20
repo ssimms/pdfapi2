@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 use warnings;
 use strict;
@@ -21,6 +21,23 @@ my $gfx = $pdf->page->gfx();
 $gfx->image($png, 72, 144, 216, 288);
 like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add PNG to PDF});
+
+# Large RGBA PNG file
+
+$pdf = PDF::API2->new();
+
+$png = $pdf->image_png('t/resources/test-rgba.png');
+isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
+       q{$pdf->image_png(filename)});
+
+# Large RGBA PNG file Pure Perl
+
+$ENV{'PDFAPI2_PNG_PP'} = 1;
+$png = $pdf->image_png('t/resources/test-rgba.png');
+isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
+       q{$pdf->image_png(filename)});
+
+delete $ENV{'PDFAPI2_PNG_PP'};
 
 # Filehandle
 
