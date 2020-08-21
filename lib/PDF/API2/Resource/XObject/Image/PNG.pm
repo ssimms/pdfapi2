@@ -263,12 +263,14 @@ sub new {
         # obtained by dropping into XS.
 
         if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
+            warn "Using XS";
             my @stream = split '', $clearstream;
             my $outstream_array = split_channels(\@stream, $w, $h);
             $self->{' stream'} = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
             $dict->{' stream'} = pack("C*", $outstream_array->@*);
         }
         else {
+            warn "NOT Using XS";
             foreach my $n (0 .. ($h * $w) - 1) {
                 vec($self->{' stream'}, $n * 3,     $bpc) = vec($clearstream, ($n * 4),     $bpc);
                 vec($self->{' stream'}, $n * 3 + 1, $bpc) = vec($clearstream, ($n * 4) + 1, $bpc);

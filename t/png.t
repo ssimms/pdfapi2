@@ -30,13 +30,17 @@ $png = $pdf->image_png('t/resources/test-rgba.png');
 isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
        q{$pdf->image_png(filename)});
 
+$pdf->saveas('t/resources/test-rgba.pdf'); 
+
 # Large RGBA PNG file Pure Perl
 
 $ENV{'PDFAPI2_PNG_PP'} = 1;
+$pdf = PDF::API2->new();
 $png = $pdf->image_png('t/resources/test-rgba.png');
 isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
        q{$pdf->image_png(filename)});
 
+$pdf->saveas('t/resources/test-rgba-pure-perl.pdf'); 
 delete $ENV{'PDFAPI2_PNG_PP'};
 
 # Filehandle
