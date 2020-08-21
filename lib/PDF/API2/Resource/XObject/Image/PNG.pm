@@ -334,12 +334,12 @@ sub unprocess {
             my @in_line = split '', $line;
             my @prev_line = split '', $prev;
             my $clear_array = unfilter(\@in_line, \@prev_line, $filter, $bpp);
-            $prev = pack("C*", $clear_array->@*);
+            $prev = pack("C*", @{$clear_array});
             foreach my $x (0 .. ($width * $comp) - 1) {
                 $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x]; 
             }
             no warnings 'uninitialized'; # We need to ignore undefined array elements
-            $clearstream = pack("C*", $clearstream_array->@*);
+            $clearstream = pack("C*", @{$clearstream_array});
         }
     }
     else {
