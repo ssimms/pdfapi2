@@ -264,9 +264,9 @@ sub new {
 
         if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
             my @stream = split '', $clearstream;
-            my $outstream_array = split_channels(\@stream, $w, $h);
-            $self->{' stream'} = pack("C*", splice $outstream_array->@*, 0, ($w * $h * 3));
-            $dict->{' stream'} = pack("C*", $outstream_array->@*);
+            my @outstream_array = @{split_channels(\@stream, $w, $h)};
+            $self->{' stream'} = pack("C*", splice @outstream_array, 0, ($w * $h * 3));
+            $dict->{' stream'} = pack("C*", splice @outstream_array, 0, ($w * $h));
         }
         else {
             foreach my $n (0 .. ($h * $w) - 1) {
@@ -334,13 +334,12 @@ sub unprocess {
             my @in_line = split '', $line;
             my @prev_line = split '', $prev;
             my $clear_array = unfilter(\@in_line, \@prev_line, $filter, $bpp);
-            $prev = pack("C*", $clear_array->@*);
+            $prev = pack("C*", @{$clear_array});
             foreach my $x (0 .. ($width * $comp) - 1) {
                 $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x];
             }
-            no warnings;
-            $clearstream = pack("C*", $clearstream_array->@*);
-            use warnings;
+            no warnings 'uninitialized'; # We need to ignore undefined array elements
+            $clearstream = pack("C*", @{$clearstream_array});
         }
     }
     else {
