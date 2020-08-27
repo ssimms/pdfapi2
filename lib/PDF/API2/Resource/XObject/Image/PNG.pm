@@ -254,15 +254,11 @@ sub new {
         delete $self->{' nofilt'};
         delete $self->{' stream'};
 
-        # The motivation behind the use of XS for this particular case (8 bit RGBA) is the
-        # high cost of the vec operations below.
-        # In order to use XS, the stream must be converted to a Perl array, which maps to
-        # an AV type in XS C. We cannot simply pass a string or byte sequence to XS because the first 0
-        # terminates the sequence.
-        # The overhead of the conversion to an AV type is outweighed by the performance gain
-        # obtained by dropping into XS.
-
+        # If possible, use XS to split the Alpha channel from the RGB channels,
+        # which is much faster than doing so in Perl.
         if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
+            # Convert the stream to an array before passing it to XS.
+            # Otherwise, a 0 byte in the stream would terminate the string.
             my @stream = split '', $clearstream;
             my @outstream_array = @{split_channels(\@stream, $w, $h)};
             $self->{' stream'} = pack("C*", splice @outstream_array, 0, ($w * $h * 3));
@@ -338,7 +334,7 @@ sub unprocess {
             foreach my $x (0 .. ($width * $comp) - 1) {
                 $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x];
             }
-            no warnings 'uninitialized'; # We need to ignore undefined array elements
+            no warnings 'uninitialized'; # ignore undefined array elements
             $clearstream = pack("C*", @{$clearstream_array});
         }
     }
