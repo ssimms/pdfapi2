@@ -15,6 +15,9 @@ use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
 
+eval 'use PDF::API2::XS::ImagePNG';
+my $use_xs = $@ ? 0 : 1;
+
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
     my $self;
@@ -250,11 +253,24 @@ sub new {
         my $clearstream = unprocess($bpc, $bpp, 4, $w, $h, $scanline, \$self->{' stream'}, $file);
         delete $self->{' nofilt'};
         delete $self->{' stream'};
-        foreach my $n (0 .. ($h * $w) - 1) {
-            vec($self->{' stream'}, $n * 3,     $bpc) = vec($clearstream, ($n * 4),     $bpc);
-            vec($self->{' stream'}, $n * 3 + 1, $bpc) = vec($clearstream, ($n * 4) + 1, $bpc);
-            vec($self->{' stream'}, $n * 3 + 2, $bpc) = vec($clearstream, ($n * 4) + 2, $bpc);
-            vec($dict->{' stream'}, $n,         $bpc) = vec($clearstream, ($n * 4) + 3, $bpc);
+
+        # If possible, use XS to split the Alpha channel from the RGB channels,
+        # which is much faster than doing so in Perl.
+        if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
+            # Convert the stream to an array before passing it to XS.
+            # Otherwise, a 0 byte in the stream would terminate the string.
+            my @stream = split '', $clearstream;
+            my @outstream_array = @{split_channels(\@stream, $w, $h)};
+            $self->{' stream'} = pack("C*", splice @outstream_array, 0, ($w * $h * 3));
+            $dict->{' stream'} = pack("C*", splice @outstream_array, 0, ($w * $h));
+        }
+        else {
+            foreach my $n (0 .. ($h * $w) - 1) {
+                vec($self->{' stream'}, $n * 3,     $bpc) = vec($clearstream, ($n * 4),     $bpc);
+                vec($self->{' stream'}, $n * 3 + 1, $bpc) = vec($clearstream, ($n * 4) + 1, $bpc);
+                vec($self->{' stream'}, $n * 3 + 2, $bpc) = vec($clearstream, ($n * 4) + 2, $bpc);
+                vec($dict->{' stream'}, $n,         $bpc) = vec($clearstream, ($n * 4) + 3, $bpc);
+            }
         }
     }
 
@@ -302,43 +318,64 @@ sub unprocess {
     my $stream = uncompress($$sstream);
     my $prev = '';
     my $clearstream = '';
-    foreach my $n (0 .. $height - 1) {
-        my $line = substr($stream, $n * $scanline, $scanline);
-        my $filter = vec($line, 0, 8);
-        my $clear = '';
-        $line = substr($line, 1);
 
-        # See "Filter Algorithms" in the documentation below for definitions.
-        if ($filter == 0) {
-            $clear = $line;
-        }
-        elsif ($filter == 1) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear, $x, 8) = (vec($line, $x, 8) + vec($clear, $x - $bpp, 8)) % 256;
-            }
-        }
-        elsif ($filter == 2) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear, $x, 8) = (vec($line, $x, 8) + vec($prev, $x, 8)) % 256;
-            }
-        }
-        elsif ($filter == 3) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear, $x, 8) = (vec($line, $x, 8) + floor((vec($clear, $x - $bpp, 8) + vec($prev, $x, 8)) / 2)) % 256;
-            }
-        }
-        elsif ($filter == 4) {
-            foreach my $x (0 .. length($line) - 1) {
-                vec($clear,$x,8) = (vec($line, $x, 8) + PaethPredictor(vec($clear, $x - $bpp, 8), vec($prev, $x, 8), vec($prev, $x - $bpp, 8))) % 256;
-            }
-        }
+    # The XS code uses a uint8 array so can only handle bpc = 8
+    if ($use_xs and $bpc == 8 and not $ENV{'PDFAPI2_PNG_PP'}) {
+        my $clearstream_array = [];
+        foreach my $n (0 .. $height - 1) {
+            my $line = substr($stream, $n * $scanline, $scanline);
+            my $filter = vec($line, 0, 8);
+            $line = substr($line, 1);
 
-        $prev = $clear;
-        foreach my $x (0 .. ($width * $comp) - 1) {
-            vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
+            my @in_line = split '', $line;
+            my @prev_line = split '', $prev;
+            my $clear_array = unfilter(\@in_line, \@prev_line, $filter, $bpp);
+            $prev = pack("C*", @{$clear_array});
+            foreach my $x (0 .. ($width * $comp) - 1) {
+                $clearstream_array->[($n * $width * $comp) + $x] = $clear_array->[$x];
+            }
+            no warnings 'uninitialized'; # ignore undefined array elements
+            $clearstream = pack("C*", @{$clearstream_array});
         }
     }
+    else {
+        foreach my $n (0 .. $height - 1) {
+            my $line = substr($stream, $n * $scanline, $scanline);
+            my $filter = vec($line, 0, 8);
+            my $clear = '';
+            $line = substr($line, 1);
 
+            # See "Filter Algorithms" in the documentation below for definitions.
+            if ($filter == 0) {
+                $clear = $line;
+            }
+            elsif ($filter == 1) {
+                foreach my $x (0 .. length($line) - 1) {
+                    vec($clear, $x, 8) = (vec($line, $x, 8) + vec($clear, $x - $bpp, 8)) % 256;
+                }
+            }
+            elsif ($filter == 2) {
+                foreach my $x (0 .. length($line) - 1) {
+                    vec($clear, $x, 8) = (vec($line, $x, 8) + vec($prev, $x, 8)) % 256;
+                }
+            }
+            elsif ($filter == 3) {
+                foreach my $x (0 .. length($line) - 1) {
+                    vec($clear, $x, 8) = (vec($line, $x, 8) + floor((vec($clear, $x - $bpp, 8) + vec($prev, $x, 8)) / 2)) % 256;
+                }
+            }
+            elsif ($filter == 4) {
+                foreach my $x (0 .. length($line) - 1) {
+                    vec($clear,$x,8) = (vec($line, $x, 8) + PaethPredictor(vec($clear, $x - $bpp, 8), vec($prev, $x, 8), vec($prev, $x - $bpp, 8))) % 256;
+                }
+            }
+
+            $prev = $clear;
+            foreach my $x (0 .. ($width * $comp) - 1) {
+                vec($clearstream, ($n * $width * $comp) + $x, $bpc) = vec($clear, $x, $bpc);
+            }
+        }
+    }
     return $clearstream;
 }
 

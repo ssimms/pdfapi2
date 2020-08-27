@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 use warnings;
 use strict;
@@ -22,6 +22,38 @@ $gfx->image($png, 72, 144, 216, 288);
 like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add PNG to PDF});
 
+# RGBA PNG file
+
+$pdf = PDF::API2->new();
+
+$png = $pdf->image_png('t/resources/test-rgba.png');
+isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
+       q{$pdf->image_png(filename)});
+
+my $page = $pdf->page();
+$page->mediabox(840,600);
+$gfx=$page->gfx;
+$gfx->image($png,134,106,510,281);
+my $rgba1_pdf_string = $pdf->stringify();
+
+# RGBA PNG file Pure Perl
+
+$ENV{'PDFAPI2_PNG_PP'} = 1;
+$pdf = PDF::API2->new();
+my $png2 = $pdf->image_png('t/resources/test-rgba.png');
+isa_ok($png2, 'PDF::API2::Resource::XObject::Image::PNG',
+       q{$pdf->image_png(filename)});
+
+my $page2 = $pdf->page();
+$page2->mediabox(840,600);
+my $gfx2=$page2->gfx;
+$gfx2->image($png2,134,106,510,281);
+my $rgba2_pdf_string = $pdf->stringify();
+delete $ENV{'PDFAPI2_PNG_PP'};
+
+is(substr($rgba1_pdf_string, 0, 512), substr($rgba2_pdf_string, 0, 512),
+     q{XS and pure perl PDFs are the same});
+
 # Filehandle
 
 $pdf = PDF::API2->new();
@@ -40,3 +72,5 @@ close $fh;
 $pdf = PDF::API2->new();
 eval { $pdf->image_png('t/resources/this.file.does.not.exist') };
 ok($@, q{Fail fast if the requested file doesn't exist});
+
+$pdf->end();
