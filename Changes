@@ -1,7 +1,8 @@
 {{$NEXT}}
 
-    - Use Image::PNG::Libpng, if it's available, to speed up inclusion of PNG
-      files with an alpha channel by an order of magnitude.
+    - Use PDF::API2::XS or Image::PNG::Libpng, if either is installed, to speed
+      up inclusion of PNG files with an alpha channel by an order of magnitude
+      (written by Rob Scovell, sponsored by prayerletters.com).
 
 
 2.037     2020-02-05
