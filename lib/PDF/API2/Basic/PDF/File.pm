@@ -331,13 +331,6 @@ sub append_file {
 
     my $fh = $self->{' INFILE'};
 
-    # hack to upgrade pdf-version number to support
-    # requested features in higher versions than
-    # the pdf was originally created.
-    my $version = $self->{' version'} || '1.4';
-    $fh->seek(0, 0);
-    $fh->print("%PDF-$version\n");
-
     my $tdict = PDFDict();
     $tdict->{'Prev'} = PDFNum($self->{' loc'});
     $tdict->{'Info'} = $self->{'Info'};
@@ -405,6 +398,39 @@ sub create_file {
     return $self;
 }
 
+
+=head2 $p->clone_file($fname)
+
+Creates a copy of the input file at the specified filename and sets it as the
+output file for future writes.  A file handle may be passed instead of a
+filename.
+
+=cut
+
+sub clone_file {
+    my ($self, $filename) = @_;
+    my $fh;
+
+    $self->{' fname'} = $filename;
+    if (ref $filename) {
+        $fh = $filename;
+    }
+    else {
+        $fh = IO::File->new(">$filename") || die "Unable to open $filename for writing";
+        binmode($fh,':raw');
+    }
+
+    $self->{' OUTFILE'} = $fh;
+
+    my $in = $self->{' INFILE'};
+    $in->seek(0, 0);
+    my $data;
+    while (not $in->eof()) {
+        $in->read($data, 1024 * 1024);
+        $fh->print($data);
+    }
+    return $self;
+}
 
 =head2 $p->close_file
 

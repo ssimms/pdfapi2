@@ -144,26 +144,37 @@ sub open {
     croak "File '$file' does not exist" unless -f $file;
     croak "File '$file' is not readable" unless -r $file;
 
-    my $content;
-    my $scalar_fh = FileHandle->new();
-    CORE::open($scalar_fh, '+<', \$content) or die "Can't begin scalar IO";
-    binmode $scalar_fh, ':raw';
-
-    my $disk_fh = FileHandle->new();
-    CORE::open($disk_fh, '<', $file) or die "Can't open $file for reading: $!";
-    binmode $disk_fh, ':raw';
-    $disk_fh->seek(0, 0);
-    my $data;
-    while (not $disk_fh->eof()) {
-        $disk_fh->read($data, 512);
-        $scalar_fh->print($data);
+    my $self = {};
+    bless $self, $class;
+    foreach my $parameter (keys %options) {
+        $self->default($parameter, $options{$parameter});
     }
-    $disk_fh->close();
-    $scalar_fh->seek(0, 0);
 
-    my $self = $class->open_scalar($content, %options);
+    $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($file, 1);
+    _open_common($self);
     $self->{'pdf'}->{' fname'} = $file;
 
+    return $self;
+}
+
+sub _open_common {
+    my $self = shift();
+
+    $self->{'pdf'}->{'Root'}->realise();
+    $self->{'pdf'}->{' version'} ||= '1.3';
+
+    $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
+    weaken $self->{'pages'};
+    my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
+    $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
+    weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
+
+    $self->{'catalog'} = $self->{'pdf'}->{'Root'};
+    weaken $self->{'catalog'};
+
+    $self->{'forcecompress'} = 1;
+    $self->{'fonts'} = {};
+    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
     return $self;
 }
 
@@ -201,19 +212,8 @@ sub open_scalar {
     CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
 
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($fh, 1);
-    $self->{'pdf'}->{'Root'}->realise();
-    $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
-    weaken $self->{'pages'};
-    $self->{'pdf'}->{' version'} ||= '1.3';
-    my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
-    $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
-    weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
-    $self->{'catalog'} = $self->{'pdf'}->{'Root'};
-    weaken $self->{'catalog'};
+    _open_common($self);
     $self->{'opened_scalar'} = 1;
-    $self->{'forcecompress'} = 1;
-    $self->{'fonts'} = {};
-    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
     return $self;
 }
@@ -938,7 +938,7 @@ B<Example:>
 
 sub update {
     my $self = shift();
-    $self->saveas($self->{'pdf'}->{' fname'});
+    $self->{'pdf'}->close_file();
     return;
 }
 
@@ -969,7 +969,13 @@ sub saveas {
         $self->{'pdf'}->close_file();
     }
     else {
-        $self->{'pdf'}->out_file($file);
+        unless ($self->{'pdf'}->{' fname'}) {
+            $self->{'pdf'}->out_file($file);
+        }
+        else {
+            $self->{'pdf'}->clone_file($file);
+            $self->{'pdf'}->close_file();
+        }
     }
 
     $self->end();

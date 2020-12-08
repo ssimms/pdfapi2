@@ -1,5 +1,14 @@
 {{$NEXT}}
 
+    - PDF::API2->open($filename) no longer reads the entire file into memory
+      before working on it, instead reading from the file as needed.  This
+      results in a substantial reduction in memory usage and start-up time for
+      large PDF files, particularly in cases where the calling script doesn't
+      need to access all of the contents of the PDF.
+
+
+2.038     2020-08-31
+
     - Use PDF::API2::XS or Image::PNG::Libpng, if either is installed, to speed
       up inclusion of PNG files with an alpha channel by an order of magnitude
       (written by Rob Scovell, sponsored by prayerletters.com).
