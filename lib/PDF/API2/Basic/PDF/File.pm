@@ -451,7 +451,7 @@ sub close_file {
     $tdict->{'Size'} = $self->{'Size'} || PDFNum(1);
     $tdict->{'Prev'} = PDFNum($self->{' loc'}) if $self->{' loc'};
     if ($self->{' update'}) {
-        foreach my $key (grep ($_ !~ m/^[\s\-]/, keys %$self)) {
+        foreach my $key (grep { $_ !~ m/^[\s\-]/ } keys %$self) {
             $tdict->{$key} = $self->{$key} unless defined $tdict->{$key};
         }
 
@@ -937,8 +937,8 @@ sub remove_obj {
     delete $self->{' objects'}{$objind->uid()};
     delete $self->{' outlist_cache'}{$objind};
     delete $self->{' printed_cache'}{$objind};
-    @{$self->{' outlist'}} = grep($_ ne $objind, @{$self->{' outlist'}});
-    @{$self->{' printed'}} = grep($_ ne $objind, @{$self->{' printed'}});
+    @{$self->{' outlist'}} = grep { $_ ne $objind } @{$self->{' outlist'}};
+    @{$self->{' printed'}} = grep { $_ ne $objind } @{$self->{' printed'}};
     $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} = undef
         if $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} eq $objind;
     return $self;
