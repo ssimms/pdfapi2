@@ -1222,7 +1222,7 @@ sub shade {
     my @tm = (
         $cord[2]-$cord[0] , 0,
         0                 , $cord[3]-$cord[1],
-        $cord[0]          , $cord[1]
+        $cord[0]          , $cord[1],
     );
     $self->save;
     $self->matrix(@tm);
