@@ -1931,6 +1931,18 @@ sub text_fill_justified {
     return($width,$ret);
 }
 
+=item $txt->glyphByCId($cid)
+
+Adds a single glyph specified by its CId.
+
+=cut
+
+sub PDF::API2::Content::glyphByCId {
+    my ( $self, $cid ) = @_;
+    $self->add( sprintf("<%04x> Tj", $cid ) );
+    $self->{' font'}->fontfile->subsetByCId($cid);
+}
+
 # =item $overflow_text = $txt->paragraph $text, $width, $height, %options
 #
 # ** DEVELOPER METHOD **
