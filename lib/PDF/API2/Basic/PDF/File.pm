@@ -229,8 +229,13 @@ sub open {
         $fh = $filename;
     }
     else {
-        die "File '$filename' does not exist !" unless -f $filename;
-        $fh = IO::File->new(($update ? '+' : '') . "<$filename") || return;
+        die "File '$filename' does not exist"  unless -f $filename;
+        die "File '$filename' is not readable" unless -r $filename;
+        if ($update) {
+            die "File '$filename' is not writable" unless -w $filename;
+        }
+        $fh = IO::File->new(($update ? '+' : '') . "<$filename")
+            || die "Error opening '$filename': $!";
         $self->{' INFILE'} = $fh;
         if ($update) {
             $self->{' update'} = 1;
@@ -959,7 +964,7 @@ that it will not cause the data already output to be changed.
 sub ship_out {
     my ($self, @objs) = @_;
 
-    return unless defined $self->{' OUTFILE'};
+    die "No output file specified" unless defined $self->{' OUTFILE'};
     my $fh = $self->{' OUTFILE'};
     seek($fh, 0, 2); # go to the end of the file
 

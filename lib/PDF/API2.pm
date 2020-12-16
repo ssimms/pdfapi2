@@ -150,9 +150,11 @@ sub open {
         $self->default($parameter, $options{$parameter});
     }
 
-    $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($file, 1);
+    my $is_writable = -w $file;
+    $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($file, $is_writable);
     _open_common($self);
     $self->{'pdf'}->{' fname'} = $file;
+    $self->{'opened_readonly'} = 1 unless $is_writable;
 
     return $self;
 }
@@ -938,6 +940,7 @@ B<Example:>
 
 sub update {
     my $self = shift();
+    croak "File is read-only" if $self->{'opened_readonly'};
     $self->{'pdf'}->close_file();
     return;
 }
