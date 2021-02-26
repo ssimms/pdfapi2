@@ -6,6 +6,9 @@
       large PDF files, particularly in cases where the calling script doesn't
       need to access all of the contents of the PDF.
 
+    - PDF files containing cross-reference streams can now be modified and saved
+      normally.  Previously, they were read-only.
+
     - Code in the PDF::API2::Basic::PDF namespace was originally licensed under
       the Perl Artistic License, which has been determined to not be
       (L)GPL-compatible.  Martin Hosken has graciously granted an MIT license
