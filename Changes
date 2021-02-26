@@ -6,6 +6,14 @@
       large PDF files, particularly in cases where the calling script doesn't
       need to access all of the contents of the PDF.
 
+    - Code in the PDF::API2::Basic::PDF namespace was originally licensed under
+      the Perl Artistic License, which has been determined to not be
+      (L)GPL-compatible.  Martin Hosken has graciously granted an MIT license
+      for use of his code contained in PDF::API2, so the distribution may now be
+      used solely under the terms of the LGPL rather than requiring both
+      licenses simultaneously.  Many thanks to Petr Pisar for his help in
+      working through the licensing issues.
+
 
 2.038     2020-08-31
 

@@ -7,7 +7,7 @@
 #   No warranty or expression of effectiveness, least of all regarding
 #   anyone's safety, is implied in this software or documentation.
 #
-#   This specific module is licensed under the Perl Artistic License.
+#   This specific module is licensed under the MIT License.
 #
 #=======================================================================
 package PDF::API2::Basic::PDF::Array;
