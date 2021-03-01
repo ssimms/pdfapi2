@@ -1808,9 +1808,9 @@ As C<text>, but centered on the current point.
 =cut
 
 sub text_center {
-    my ($self,$text,@opts)=@_;
-    my $width=$self->advancewidth($text);
-    return $self->text($text,-indent=>-($width/2),@opts);
+    my ($self, $text, @opts) = @_;
+    my $width = $self->advancewidth($text);
+    return $self->text($text, -indent => -($width / 2), @opts);
 }
 
 =item $txt->text_right $text, %options
@@ -1820,43 +1820,31 @@ As C<text>, but right-aligned to the current point.
 =cut
 
 sub text_right {
-    my ($self,$text,@opts) = @_;
+    my ($self, $text, @opts) = @_;
     my $width=$self->advancewidth($text);
-    return $self->text($text,-indent=>-$width,@opts);
+    return $self->text($text, -indent => -$width, @opts);
 }
 
 =item $width = $txt->advancewidth($string, %text_state)
 
-Returns the width of the string based on all currently set text-state
+Returns the width of the string based on all currently set text state
 attributes.  These can optionally be overridden.
 
 =cut
 
 sub advancewidth {
-    my ($self,$text,@opts) = @_;
+    my ($self, $text, %opts) = @_;
     return 0 unless defined($text) and length($text);
-    if(scalar @opts > 1) {
-        my %opts=@opts;
-        foreach my $k (qw[ font fontsize wordspace charspace hscale]) {
-            $opts{$k}=$self->{" $k"} unless(defined $opts{$k});
-        }
-        my $glyph_width = $opts{font}->width($text)*$opts{fontsize};
-        my $num_space = $text =~ y/\x20/\x20/;
-        my $num_char = length($text);
-        my $word_spaces = $opts{wordspace}*$num_space;
-        my $char_spaces = $opts{charspace}*($num_char - 1);
-        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$opts{hscale}/100;
-        return $advance;
+    foreach my $k (qw(font fontsize wordspace charspace hscale)) {
+        $opts{$k} = $self->{" $k"} unless defined $opts{$k};
     }
-    else {
-        my $glyph_width = $self->{' font'}->width($text)*$self->{' fontsize'};
-        my $num_space = $text =~ y/\x20/\x20/;
-        my $num_char = length($text);
-        my $word_spaces = $self->wordspace*$num_space;
-        my $char_spaces = $self->charspace*($num_char - 1);
-        my $advance = ($glyph_width+$word_spaces+$char_spaces)*$self->hscale()/100;
-        return $advance;
-    }
+    my $glyph_width = $opts{'font'}->width($text) * $opts{'fontsize'};
+    my $num_space = $text =~ y/\x20/\x20/;
+    my $num_char = length($text);
+    my $word_spaces = $opts{'wordspace'} * $num_space;
+    my $char_spaces = $opts{'charspace'} * ($num_char - 1);
+    my $advance = ($glyph_width + $word_spaces + $char_spaces) * $opts{'hscale'} / 100;
+    return $advance;
 }
 
 =back
@@ -1864,71 +1852,70 @@ sub advancewidth {
 =cut
 
 sub text_justified {
-    my ($self,$text,$width,%opts) = @_;
+    my ($self, $text, $width, %opts) = @_;
     my $initial_width = $self->advancewidth($text);
     my $space_count = scalar split /\s/, $text;
     my $ws = $self->wordspace();
     $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
-    $self->text($text,%opts);
+    $self->text($text, %opts);
     $self->wordspace($ws);
     return $width;
 }
 
 sub _text_fill_line {
-    my ($self,$text,$width,$over) = @_;
-    my @txt = split(/\x20/,$text);
+    my ($self, $text, $width, $over) = @_;
+    my @txt = split(/\x20/, $text);
     my @line = ();
-    local $";
-    $"=' ';
+    local $" = ' ';
     while (@txt) {
-         push @line,(shift @txt);
-         last if($self->advancewidth("@line")>$width);
+         push @line, (shift @txt);
+         last if $self->advancewidth("@line") > $width;
     }
-    if (!$over && (scalar @line > 1) && ($self->advancewidth("@line") > $width)) {
-        unshift @txt,pop @line;
+    if (!$over and (scalar @line > 1) and ($self->advancewidth("@line") > $width)) {
+        unshift @txt, pop @line;
     }
     my $ret = "@txt";
     my $line = "@line";
-    return ($line,$ret);
+    return $line, $ret;
 }
 
 sub text_fill_left {
-    my ($self,$text,$width,%opts) = @_;
-    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
-    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
-    $width=$self->text($line,%opts);
-    return ($width,$ret);
+    my ($self, $text, $width, %opts) = @_;
+    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    $width = $self->text($line, %opts);
+    return $width, $ret;
 }
 
 sub text_fill_center {
-    my ($self,$text,$width,%opts) = @_;
-    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
-    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
-    $width=$self->text_center($line,%opts);
-    return ($width,$ret);
+    my ($self, $text, $width, %opts) = @_;
+    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    $width = $self->text_center($line, %opts);
+    return $width, $ret;
 }
 
 sub text_fill_right {
-    my ($self,$text,$width,%opts) = @_;
-    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
-    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
-    $width=$self->text_right($line,%opts);
-    return ($width,$ret);
+    my ($self, $text, $width, %opts) = @_;
+    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    $width = $self->text_right($line, %opts);
+    return $width, $ret;
 }
 
 sub text_fill_justified {
-    my ($self,$text,$width,%opts) = @_;
-    my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
-    my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
-    my $ws=$self->wordspace();
-    my $w=$self->advancewidth($line);
+    my ($self, $text, $width, %opts) = @_;
+    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    my $ws = $self->wordspace();
+    my $w = $self->advancewidth($line);
     my $space_count = scalar split /\s/, $line;
-    if (($ret||$w>=$width) and $space_count) {
+    if (($ret || $w >= $width) and $space_count) {
         $self->wordspace(($width - $w) / $space_count);
     }
-    $width=$self->text($line,%opts);
+    $width = $self->text($line, %opts);
     $self->wordspace($ws);
-    return($width,$ret);
+    return $width, $ret;
 }
 
 # =item $overflow_text = $txt->paragraph $text, $width, $height, %options
@@ -1974,29 +1961,29 @@ sub text_fill_justified {
 # =cut
 
 sub paragraph {
-    my ($self,$text,$width,$height,%opts) = @_;
-    my @line=();
-    my $nwidth=0;
-    my $lead=$self->lead();
-    while (length($text)>0) {
-        last if ($height -= $lead) < 0;
-        if ($opts{-align}=~/^j/i) {
-            ($nwidth,$text)=$self->text_fill_justified($text,$width,%opts);
+    my ($self, $text, $width, $height, %opts) = @_;
+    my @line;
+    my $w;
+    my $lead = $self->lead();
+    while (length($text) > 0) {
+        $height -= $lead;
+        last if $height < 0;
+
+        if ($opts{'-align'} =~ /^j/i) {
+            ($w, $text) = $self->text_fill_justified($text, $width, %opts);
         }
-        elsif ($opts{-align}=~/^r/i) {
-            ($nwidth,$text)=$self->text_fill_right($text,$width,%opts);
+        elsif ($opts{'-align'}=~ /^r/i) {
+            ($w, $text) = $self->text_fill_right($text, $width, %opts);
         }
-        elsif ($opts{-align}=~/^c/i) {
-            ($nwidth,$text)=$self->text_fill_center($text,$width,%opts);
+        elsif ($opts{'-align'} =~ /^c/i) {
+            ($w, $text) = $self->text_fill_center($text, $width, %opts);
         }
         else {
-            ($nwidth,$text)=$self->text_fill_left($text,$width,%opts);
+            ($w, $text) = $self->text_fill_left($text, $width, %opts);
         }
-        $self->nl;
+        $self->nl();
     }
-    if (wantarray) {
-        return ($text,$height);
-    }
+    return ($text, $height) if wantarray();
     return $text;
 }
 
@@ -2011,19 +1998,19 @@ sub paragraph {
 # =cut
 
 sub section {
-    my ($self,$text,$width,$height,%opts)=@_;
+    my ($self, $text, $width, $height, %opts) = @_;
     my $overflow = '';
 
-    foreach my $para (split(/\n/,$text)) {
-        if(length($overflow) > 0) {
+    foreach my $para (split(/\n/, $text)) {
+        if (length($overflow) > 0) {
             $overflow .= "\n" . $para;
             next;
         }
-        ($para,$height) = $self->paragraph($para,$width,$height,%opts);
+        ($para, $height) = $self->paragraph($para, $width, $height, %opts);
         $overflow .= $para if (length($para) > 0);
     }
     if (wantarray) {
-        return ($overflow,$height);
+        return ($overflow, $height);
     }
     return $overflow;
 }
