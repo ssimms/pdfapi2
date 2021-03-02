@@ -1693,6 +1693,8 @@ sub textpos2 {
 
 Adds text to the page.
 
+Returns the width of the text in points.
+
 Options:
 
 =over
@@ -1765,43 +1767,40 @@ sub _text_underline {
 }
 
 sub text {
-    my ($self, $text, %opt) = @_;
-    my $wd = 0;
-    if ($self->{' fontset'}==0) {
+    my ($self, $text, %opts) = @_;
+    if ($self->{' fontset'} == 0) {
         unless (defined $self->{' font'} and $self->{' fontsize'}) {
             croak q{Can't add text without first setting a font and font size};
         }
-        $self->font($self->{' font'},$self->{' fontsize'});
-        $self->{' fontset'}=1;
+        $self->font($self->{' font'}, $self->{' fontsize'});
+        $self->{' fontset'} = 1;
     }
-    if (defined $opt{-indent}) {
-        $wd+=$opt{-indent};
-        $self->matrix_update($wd,0);
+    if (defined $opts{'-indent'}) {
+        $self->matrix_update($opts{'-indent'}, 0);
     }
-    my $ulxy1=[$self->textpos2];
+    my $ulxy1 = [$self->textpos2()];
 
-    if (defined $opt{-indent}) {
-    # changed fot acrobat 8 and possible others
-    #    $self->add('[',(-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hscale())),']','TJ');
-        $self->add($self->{' font'}->text($text, $self->{' fontsize'}, (-$opt{-indent}*(1000/$self->{' fontsize'})*(100/$self->hscale()))));
+    if (defined $opts{'-indent'}) {
+        my $indent = -$opts{'-indent'} * (1000 / $self->{' fontsize'}) * (100 / $self->hscale());
+        $self->add($self->{' font'}->text($text, $self->{' fontsize'}, $indent));
     }
     else {
-        $self->add($self->{' font'}->text($text,$self->{' fontsize'}));
+        $self->add($self->{' font'}->text($text, $self->{' fontsize'}));
     }
 
-    $wd = $self->advancewidth($text);
-    $self->matrix_update($wd,0);
+    my $width = $self->advancewidth($text);
+    $self->matrix_update($width, 0);
 
-    my $ulxy2 = [$self->textpos2];
+    my $ulxy2 = [$self->textpos2()];
 
-    if (defined $opt{-underline}) {
-        $self->_text_underline($ulxy1,$ulxy2,$opt{-underline},$opt{-strokecolor});
+    if (defined $opts{'-underline'}) {
+        $self->_text_underline($ulxy1, $ulxy2, $opts{'-underline'}, $opts{'-strokecolor'});
     }
 
-    return $wd;
+    return $width;
 }
 
-=item $content->text_center($text)
+=item $width = $content->text_center($text, %options)
 
 As C<text>, but centered on the current point.
 
@@ -1813,7 +1812,7 @@ sub text_center {
     return $self->text($text, -indent => -($width / 2), @opts);
 }
 
-=item $txt->text_right $text, %options
+=item $width = $content->text_right($text, %options)
 
 As C<text>, but right-aligned to the current point.
 
@@ -1823,6 +1822,23 @@ sub text_right {
     my ($self, $text, @opts) = @_;
     my $width=$self->advancewidth($text);
     return $self->text($text, -indent => -$width, @opts);
+}
+
+=item $width = $content->text_justified($text, $width, %options)
+
+As C<text>, filling the specified width by adjusting the space between words.
+
+=cut
+
+sub text_justified {
+    my ($self, $text, $width, %opts) = @_;
+    my $initial_width = $self->advancewidth($text);
+    my $space_count = scalar split /\s/, $text;
+    my $ws = $self->wordspace();
+    $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
+    $self->text($text, %opts);
+    $self->wordspace($ws);
+    return $width;
 }
 
 =item $width = $txt->advancewidth($string, %text_state)
@@ -1850,17 +1866,6 @@ sub advancewidth {
 =back
 
 =cut
-
-sub text_justified {
-    my ($self, $text, $width, %opts) = @_;
-    my $initial_width = $self->advancewidth($text);
-    my $space_count = scalar split /\s/, $text;
-    my $ws = $self->wordspace();
-    $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
-    $self->text($text, %opts);
-    $self->wordspace($ws);
-    return $width;
-}
 
 sub _text_fill_line {
     my ($self, $text, $width, $over) = @_;

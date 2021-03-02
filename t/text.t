@@ -1,9 +1,11 @@
-use Test::More tests => 9;
+use Test::More tests => 13;
 
 use warnings;
 use strict;
 
 use PDF::API2;
+
+# advancewidth
 
 my $pdf = PDF::API2->new();
 my $page = $pdf->page();
@@ -47,3 +49,31 @@ $text = $page->text();
          qr{A font size is required},
          q{Call to text without a set font size returns an informative error});
 }
+
+# text
+
+$pdf = PDF::API2->new();
+$pdf->{forcecompress} = 0;
+$text = $pdf->page->text();
+$font = $pdf->corefont('Helvetica');
+$text->font($font, 12);
+
+$width = $text->text('Test Text');
+like($pdf->stringify(), qr/\(Test Text\) Tj/,
+     q{Basic text call});
+is($width, '50.016',
+   q{Basic text call has expected width});
+
+# text with indent
+
+$pdf = PDF::API2->new();
+$pdf->{forcecompress} = 0;
+$text = $pdf->page->text();
+$font = $pdf->corefont('Helvetica');
+$text->font($font, 12);
+
+$width = $text->text('Test Text', -indent => 72);
+like($pdf->stringify(), qr/\[ -6000 \(Test Text\) \] TJ/,
+     q{text with indent});
+is($width, '50.016',
+   q{text with indent has expected width});
