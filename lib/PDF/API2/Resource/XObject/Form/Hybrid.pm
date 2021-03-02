@@ -21,7 +21,7 @@ sub new {
     $self->{' charspace'} = 0;
     $self->{' hscale'} = 100;
     $self->{' wordspace'} = 0;
-    $self->{' lead'} = 0;
+    $self->{' leading'} = 0;
     $self->{' rise'} = 0;
     $self->{' render'} = 0;
     $self->{' matrix'} = [1, 0, 0, 1, 0, 0];

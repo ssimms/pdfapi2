@@ -47,7 +47,7 @@ sub new {
     $self->{' charspace'}=0;
     $self->{' hscale'}=100;
     $self->{' wordspace'}=0;
-    $self->{' lead'}=0;
+    $self->{' leading'}=0;
     $self->{' rise'}=0;
     $self->{' render'}=0;
     $self->{' matrix'}=[1,0,0,1,0,0];
@@ -1398,7 +1398,7 @@ sub hscale {
 sub  hspace { return  hscale(@_) }
 sub _hspace { return _hscale(@_) }
 
-=item $leading = $content->lead($leading)
+=item $leading = $content->leading($leading)
 
 Sets the text leading, which is the distance between baselines.  This
 is initially zero (i.e. the lines will be printed on top of each
@@ -1406,17 +1406,21 @@ other).
 
 =cut
 
-sub _lead {
+# Deprecated: leading is the correct name for this operator
+sub _lead { return _leading(@_) }
+sub  lead { return  leading(@_) }
+
+sub _leading {
     my ($para) = @_;
     return float($para) . ' TL';
 }
-sub lead {
+sub leading {
     my ($self,$para) = @_;
     if (defined ($para)) {
-        $self->{' lead'} = $para;
-        $self->add(_lead($para));
+        $self->{' leading'} = $para;
+        $self->add(_leading($para));
     }
-    return $self->{' lead'};
+    return $self->{' leading'};
 }
 
 =item $mode = $content->render($mode)
@@ -1499,7 +1503,7 @@ sub textstate {
     my %state;
     if (scalar @_) {
         %state = @_;
-        foreach my $k (qw( charspace hscale wordspace lead rise render )) {
+        foreach my $k (qw( charspace hscale wordspace leading rise render )) {
             next unless($state{$k});
             $self->can($k)->($self, $state{$k});
         }
@@ -1522,7 +1526,7 @@ sub textstate {
         %state = ();
     }
     else {
-        foreach my $k (qw( font fontsize charspace hscale wordspace lead rise render )) {
+        foreach my $k (qw( font fontsize charspace hscale wordspace leading rise render )) {
             $state{$k}=$self->{" $k"};
         }
         $state{matrix}=[@{$self->{" matrix"}}];
@@ -1635,7 +1639,7 @@ sub cr {
     }
     else {
         $self->add('T*');
-        $self->matrix_update(0, $self->lead() * -1);
+        $self->matrix_update(0, $self->leading() * -1);
     }
     $self->{' textlinematrix'}->[0] = 0;
 }
@@ -1649,7 +1653,7 @@ Moves to the start of the next line.
 sub nl {
     my $self = shift();
     $self->add('T*');
-    $self->matrix_update(0, $self->lead() * -1);
+    $self->matrix_update(0, $self->leading() * -1);
     $self->{' textlinematrix'}->[0] = 0;
 }
 
@@ -1948,7 +1952,7 @@ sub text_fill_justified {
 
 Fill the rectangle with as much of the provided text as will fit.
 
-Line spacing is set using the C<lead> call.
+Line spacing is set using the C<leading> call.
 
 In array context, returns the remaining text (if any) of the positioned text and
 the remaining (unused) height.  In scalar context, returns the remaining text
@@ -1983,12 +1987,12 @@ sub paragraph {
     my ($self, $text, $width, $height, %opts) = @_;
     my @line;
     my $w;
-    my $lead = $self->lead();
-    unless ($lead) {
+    my $leading = $self->leading();
+    unless ($leading) {
         carp "Leading is unset; paragraph lines will be placed on top of each other";
     }
     while (length($text) > 0) {
-        $height -= $lead;
+        $height -= $leading;
         last if $height < 0;
 
         if ($opts{'-align'} eq 'justified') {
@@ -2032,7 +2036,7 @@ sub paragraphs {
         # Place a blank line if there are consecutive newlines.
         unless (length($para)) {
             $self->nl();
-            $height -= $self->lead();
+            $height -= $self->leading();
             next;
         }
 
@@ -2179,7 +2183,7 @@ sub textstart {
         $self->{' charspace'}=0;
         $self->{' hscale'}=100;
         $self->{' wordspace'}=0;
-        $self->{' lead'}=0;
+        $self->{' leading'}=0;
         $self->{' rise'}=0;
         $self->{' render'}=0;
         @{$self->{' matrix'}}=(1,0,0,1,0,0);

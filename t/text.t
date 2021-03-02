@@ -121,7 +121,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 my $leftover = $text->paragraph(('aaa ' x 30), 144, 72);
 like($pdf->stringify(), qr/15 TL (\((aaa ){5}aaa\) Tj T\* ){4}\s*ET/,
@@ -136,7 +136,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'right');
 like($pdf->stringify(),
@@ -150,7 +150,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'center');
 like($pdf->stringify(),
@@ -164,7 +164,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified');
 like($pdf->stringify(),
@@ -178,7 +178,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified',
                  '-align-last' => 'right');
@@ -193,7 +193,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified',
                  '-align-last' => 'center');
@@ -208,7 +208,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified',
                  '-align-last' => 'justified');
@@ -223,7 +223,7 @@ $pdf->{forcecompress} = 0;
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
-$text->lead(15);
+$text->leading(15);
 
 my $input = 'aaa ' x 10 . "\n\n" . 'bbb ' x 10;
 $leftover = $text->paragraphs($input, 144, 72);

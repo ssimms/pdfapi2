@@ -40,7 +40,7 @@ my $layout;           	# portrait or landscape; default = portrait
 my $landscape;          # landscape cmd line flag
 my $fontsize;           # font size; default = 7.25
 my $bold;             	# set to 1 for bold on; default = 0;
-my $spacing;          	# text spacing ($pdf->textlead); default = 8
+my $spacing;          	# text spacing ($pdf->textleading); default = 8
 
 # other variables
 my @FILES;            	# list of input files, in case of glob
@@ -210,7 +210,7 @@ sub newpage() {
   	else {$font = $pdf->corefont('Courier');}
 
   	$pdf->textstart;
-  	$pdf->textlead($spacing);
+  	$pdf->textleading($spacing);
   	$pdf->transform(-translate => [$left,$top]);
   	$pdf->textfont($font,$fontsize);
   	$linecount = 1;

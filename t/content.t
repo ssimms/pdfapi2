@@ -1,4 +1,4 @@
-use Test::More tests => 58;
+use Test::More tests => 59;
 
 use warnings;
 use strict;
@@ -558,8 +558,17 @@ $pdf = PDF::API2->new();
 $pdf->{forcecompress} = 0;
 $gfx = $pdf->page->gfx();
 
+$gfx->leading(14);
+like($pdf->stringify, qr/14 TL/, q{leading(14)});
+
+# Text Leading (deprecated name)
+
+$pdf = PDF::API2->new();
+$pdf->{forcecompress} = 0;
+$gfx = $pdf->page->gfx();
+
 $gfx->lead(14);
-like($pdf->stringify, qr/14 TL/, q{lead(14)});
+like($pdf->stringify, qr/14 TL/, q{lead(14) (deprecated)});
 
 # Text Rendering Mode
 

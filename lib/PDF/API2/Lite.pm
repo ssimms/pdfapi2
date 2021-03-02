@@ -559,13 +559,16 @@ sub textfont {
     return($self);
 }
 
-=item $txt->textlead $leading
+=item $txt->textleading $leading
 
 =cut
 
-sub textlead {
+# Deprecated: leading is the correct term for this operator
+sub textlead { return textleading(@_) }
+
+sub textleading {
     my $self=shift @_;
-    $self->{gfx}->lead(@_);
+    $self->{gfx}->leading(@_);
     return($self);
 }
 
