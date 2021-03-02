@@ -1867,10 +1867,6 @@ sub advancewidth {
     return $advance;
 }
 
-=back
-
-=cut
-
 sub _text_fill_line {
     my ($self, $text, $width) = @_;
     my @words = split(/\x20/, $text);
@@ -2016,6 +2012,8 @@ sub paragraph {
 =item $overflow_text = $content->paragraphs($text, $width, $height, %options)
 
 As C<paragraph>, but start a new line after every newline character.
+
+=back
 
 =cut
 
