@@ -9,6 +9,16 @@
     - PDF files containing cross-reference streams can now be modified and saved
       normally.  Previously, they were read-only.
 
+    - $text->paragraph(...) and $text->paragraphs(...) (formerly "section") are
+      no longer undocumented and experimental.  If you were previously using
+      them at your own risk, note that "-spillover" is no longer an option (text
+      will always wrap inside the specified width if possible).  In addition,
+      paragraphs(...) no longer collapses consecutive newlines.
+
+    - [RT #98546] There is now an -align-last option for justified text to
+      specify how the final line should be justified.  Left is still the
+      default.
+
     - Code in the PDF::API2::Basic::PDF namespace was originally licensed under
       the Perl Artistic License, which has been determined to not be
       (L)GPL-compatible.  Martin Hosken has graciously granted an MIT license

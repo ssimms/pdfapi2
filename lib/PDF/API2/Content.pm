@@ -1868,119 +1868,136 @@ sub advancewidth {
 =cut
 
 sub _text_fill_line {
-    my ($self, $text, $width, $over) = @_;
-    my @txt = split(/\x20/, $text);
+    my ($self, $text, $width) = @_;
+    my @words = split(/\x20/, $text);
     my @line = ();
     local $" = ' ';
-    while (@txt) {
-         push @line, (shift @txt);
+    while (@words) {
+         push @line, (shift @words);
          last if $self->advancewidth("@line") > $width;
     }
-    if (!$over and (scalar @line > 1) and ($self->advancewidth("@line") > $width)) {
-        unshift @txt, pop @line;
+    if ((scalar @line > 1) and ($self->advancewidth("@line") > $width)) {
+        unshift @words, pop @line;
     }
-    my $ret = "@txt";
+    my $ret = "@words";
     my $line = "@line";
     return $line, $ret;
 }
 
 sub text_fill_left {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
-    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    my ($line, $ret) = $self->_text_fill_line($text, $width);
     $width = $self->text($line, %opts);
     return $width, $ret;
 }
 
 sub text_fill_center {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
-    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    my ($line, $ret) = $self->_text_fill_line($text, $width);
     $width = $self->text_center($line, %opts);
     return $width, $ret;
 }
 
 sub text_fill_right {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
-    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    my ($line, $ret) = $self->_text_fill_line($text, $width);
     $width = $self->text_right($line, %opts);
     return $width, $ret;
 }
 
 sub text_fill_justified {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
-    my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
+    my ($line, $ret) = $self->_text_fill_line($text, $width);
     my $ws = $self->wordspace();
     my $w = $self->advancewidth($line);
     my $space_count = scalar split /\s/, $line;
-    if (($ret || $w >= $width) and $space_count) {
-        $self->wordspace(($width - $w) / $space_count);
+
+    # Normal Line
+    if ($ret) {
+        $self->wordspace(($width - $w) / $space_count) if $space_count;
+        $width = $self->text($line, %opts);
+        $self->wordspace($ws);
+        return $width, $ret;
     }
-    $width = $self->text($line, %opts);
-    $self->wordspace($ws);
+
+    # Last Line
+    if ($opts{'-align-last'}) {
+        unless ($opts{'-align-last'} =~ /^(left|center|right|justified)$/) {
+            croak 'Invalid -align-last (must be left, center, right, or justified)';
+        }
+    }
+    my $align_last = $opts{'-align-last'} // 'left';
+    if ($align_last eq 'left') {
+        $self->text($line, %opts);
+    }
+    elsif ($align_last eq 'center') {
+        $self->text_center($line, %opts);
+    }
+    elsif ($align_last eq 'right') {
+        $self->text_right($line, %opts);
+    }
+    else {
+        $self->wordspace(($width - $w) / $space_count) if $space_count;
+        $width = $self->text($line, %opts);
+        $self->wordspace($ws);
+    }
     return $width, $ret;
 }
 
-# =item $overflow_text = $txt->paragraph $text, $width, $height, %options
-#
-# ** DEVELOPER METHOD **
-#
-# Apply the text within the rectangle and return any leftover text.
-#
-# B<Options>
-#
-# =over 4
-#
-# =item -align => $choice
-#
-# Choice is 'justified', 'right', 'center', 'left'
-# Default is 'left'
-#
-# =item -underline => $distance
-#
-# =item -underline => [ $distance, $thickness, ... ]
-#
-# If a scalar, distance below baseline,
-# else array reference with pairs of distance and line thickness.
-#
-# =item -spillover => $over
-#
-# Controls if words in a line which exceed the given width should be "spilled over" the bounds or if a new line should be used for this word.
-#
-# Over is 1 or 0
-# Default is 1
-#
-# =back
-#
-# B<Example:>
-#
-#     $txt->font($font,$fontsize);
-#     $txt->lead($lead);
-#     $txt->translate($x,$y);
-#     $overflow = $txt->paragraph( 'long paragraph here ...',
-#                                  $width,
-#                                  $y+$lead-$bottom_margin );
-#
-# =cut
+=item $overflow_text = $content->paragraph($text, $width, $height, %options)
+
+Fill the rectangle with as much of the provided text as will fit.
+
+Line spacing is set using the C<lead> call.
+
+In array context, returns the remaining text (if any) of the positioned text and
+the remaining (unused) height.  In scalar context, returns the remaining text
+(if any).
+
+B<Options>
+
+=over 4
+
+=item -align => $alignment
+
+Specifies the alignment for each line of text.  May be set to left, center,
+right, or justified.  Default is left.
+
+=item -align-last => $alignment
+
+Specifies the alignment for the last line of justified text.  May be set to
+left, center, right, or justified.  Default is left.
+
+=item -underline => $distance
+
+=item -underline => [ $distance, $thickness, ... ]
+
+If a scalar, distance below baseline, else array reference with pairs of
+distance and line thickness.
+
+=back
+
+=cut
 
 sub paragraph {
     my ($self, $text, $width, $height, %opts) = @_;
     my @line;
     my $w;
     my $lead = $self->lead();
+    unless ($lead) {
+        carp "Leading is unset; paragraph lines will be placed on top of each other";
+    }
     while (length($text) > 0) {
         $height -= $lead;
         last if $height < 0;
 
-        if ($opts{'-align'} =~ /^j/i) {
+        if ($opts{'-align'} eq 'justified') {
             ($w, $text) = $self->text_fill_justified($text, $width, %opts);
         }
-        elsif ($opts{'-align'}=~ /^r/i) {
+        elsif ($opts{'-align'} eq 'right') {
             ($w, $text) = $self->text_fill_right($text, $width, %opts);
         }
-        elsif ($opts{'-align'} =~ /^c/i) {
+        elsif ($opts{'-align'} eq 'center') {
             ($w, $text) = $self->text_fill_center($text, $width, %opts);
         }
         else {
@@ -1992,31 +2009,38 @@ sub paragraph {
     return $text;
 }
 
-# =item $overflow_text = $txt->section $text, $width, $height, %options
-#
-# ** DEVELOPER METHOD **
-#
-# Split paragraphs by newline and loop over them, reassemble leftovers
-# when box is full and apply the text within the rectangle and return
-# any leftover text.
-#
-# =cut
+=item $overflow_text = $content->paragraphs($text, $width, $height, %options)
 
-sub section {
+As C<paragraph>, but start a new line after every newline character.
+
+=cut
+
+# Deprecated former name
+sub section { return paragraphs(@_) }
+
+sub paragraphs {
     my ($self, $text, $width, $height, %opts) = @_;
     my $overflow = '';
 
     foreach my $para (split(/\n/, $text)) {
+        # If there's overflow, no more text can be placed.
         if (length($overflow) > 0) {
             $overflow .= "\n" . $para;
             next;
         }
+
+        # Place a blank line if there are consecutive newlines.
+        unless (length($para)) {
+            $self->nl();
+            $height -= $self->lead();
+            next;
+        }
+
         ($para, $height) = $self->paragraph($para, $width, $height, %opts);
-        $overflow .= $para if (length($para) > 0);
+        $overflow .= $para if length($para) > 0;
     }
-    if (wantarray) {
-        return ($overflow, $height);
-    }
+
+    return ($overflow, $height) if wantarray();
     return $overflow;
 }
 
