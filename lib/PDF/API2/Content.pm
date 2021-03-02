@@ -1886,7 +1886,7 @@ sub _text_fill_line {
 
 sub text_fill_left {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
     $width = $self->text($line, %opts);
     return $width, $ret;
@@ -1894,7 +1894,7 @@ sub text_fill_left {
 
 sub text_fill_center {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
     $width = $self->text_center($line, %opts);
     return $width, $ret;
@@ -1902,7 +1902,7 @@ sub text_fill_center {
 
 sub text_fill_right {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
     $width = $self->text_right($line, %opts);
     return $width, $ret;
@@ -1910,7 +1910,7 @@ sub text_fill_right {
 
 sub text_fill_justified {
     my ($self, $text, $width, %opts) = @_;
-    my $over = defined($opts{'-spillover'}) ? not $opts{'-spillover'} : 1;
+    my $over = defined($opts{'-spillover'}) ? $opts{'-spillover'} : 1;
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over);
     my $ws = $self->wordspace();
     my $w = $self->advancewidth($line);
