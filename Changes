@@ -29,8 +29,8 @@
 
     - Renamed $text->lead(...) to $text->leading(...).  The old name is
       deprecated but will continue to work.  If you're modifying PDF::API2
-      objects directly instead of using these accessors, you'll need to update
-      your code.
+      objects by editing their hash values instead of using these accessors,
+      you'll need to update your code.
 
 
 2.038     2020-08-31
