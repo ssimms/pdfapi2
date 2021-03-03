@@ -8,7 +8,7 @@ no warnings qw( deprecated recursion uninitialized );
 # VERSION
 
 use Carp;
-use Compress::Zlib qw();
+use Compress::Zlib ();
 use Encode;
 use Math::Trig;
 use PDF::API2::Matrix;
@@ -37,54 +37,59 @@ PDF::API2::Content - Methods for adding graphics and text to a PDF
 =cut
 
 sub new {
-    my ($class)=@_;
+    my $class = $_[0];
     my $self = $class->SUPER::new(@_);
-    $self->{' stream'}='';
-    $self->{' poststream'}='';
-    $self->{' font'}=undef;
-    $self->{' fontset'}=0;
-    $self->{' fontsize'}=0;
-    $self->{' charspace'}=0;
-    $self->{' hscale'}=100;
-    $self->{' wordspace'}=0;
-    $self->{' leading'}=0;
-    $self->{' rise'}=0;
-    $self->{' render'}=0;
-    $self->{' matrix'}=[1,0,0,1,0,0];
-    $self->{' textmatrix'}=[1,0,0,1,0,0];
-    $self->{' textlinematrix'}=[0,0];
-    $self->{' fillcolor'}=[0];
-    $self->{' strokecolor'}=[0];
-    $self->{' translate'}=[0,0];
-    $self->{' scale'}=[1,1];
-    $self->{' skew'}=[0,0];
-    $self->{' rotate'}=0;
-    $self->{' apiistext'}=0;
+    $self->{' stream'} = '';
+    $self->{' poststream'} = '';
+    $self->{' font'} = undef;
+    $self->{' fontset'} = 0;
+    $self->{' fontsize'} = 0;
+    $self->{' charspace'} = 0;
+    $self->{' hscale'} = 100;
+    $self->{' wordspace'} = 0;
+    $self->{' leading'} = 0;
+    $self->{' rise'} = 0;
+    $self->{' render'} = 0;
+    $self->{' matrix'} = [1, 0, 0, 1, 0, 0];
+    $self->{' textmatrix'} = [1, 0, 0, 1, 0, 0];
+    $self->{' textlinematrix'} = [0, 0];
+    $self->{' fillcolor'} = [0];
+    $self->{' strokecolor'} = [0];
+    $self->{' translate'} = [0, 0];
+    $self->{' scale'} = [1, 1];
+    $self->{' skew'} = [0, 0];
+    $self->{' rotate'} = 0;
+    $self->{' apiistext'} = 0;
     return $self;
 }
 
 sub outobjdeep {
     my $self = shift();
-    $self->textend;
-    if ($self->{-docompress} && $self->{Filter}) {
-        $self->{' stream'}=Compress::Zlib::compress($self->{' stream'});
-        $self->{' nofilt'}=1;
-        delete $self->{-docompress};
+    $self->textend();
+    if ($self->{'-docompress'} and $self->{'Filter'}) {
+        $self->{' stream'} = Compress::Zlib::compress($self->{' stream'});
+        $self->{' nofilt'} = 1;
+        delete $self->{'-docompress'};
     }
     $self->SUPER::outobjdeep(@_);
 }
 
 =head2 Coordinate Transformations
 
-The methods in this section change the coordinate system for the
-current content object relative to the rest of the document.
+The methods in this section change the coordinate system for the current content
+object relative to the rest of the document.
 
-If you call more than one of these methods, the PDF specification
-recommends calling them in the following order: translate, rotate,
-scale, skew.  Each change builds on the last, and you can get
-unexpected results when calling them in a different order.
+If you call more than one of these methods, the PDF specification recommends
+calling them in the following order: translate, rotate, scale, skew.  Each
+change builds on the last, and you can get unexpected results when calling them
+in a different order.
 
 =over
+
+=cut
+
+# The following transformations are described in the PDF 1.7 specification,
+# section 8.3.3: Common Transformations.
 
 =item $content->translate($x, $y)
 
@@ -93,13 +98,13 @@ Moves the origin along the x and y axes.
 =cut
 
 sub _translate {
-    my ($x,$y)=@_;
-    return(1,0,0,1,$x,$y);
+    my ($x, $y) = @_;
+    return (1, 0, 0, 1, $x, $y);
 }
 
 sub translate {
-    my ($self,$x,$y)=@_;
-    $self->transform(-translate=>[$x,$y]);
+    my ($self, $x, $y) = @_;
+    $self->transform(-translate => [$x, $y]);
 }
 
 =item $content->rotate($degrees)
@@ -111,13 +116,13 @@ Use a negative argument to rotate clockwise.
 =cut
 
 sub _rotate {
-    my ($a)=@_;
-    return (cos(deg2rad($a)), sin(deg2rad($a)),-sin(deg2rad($a)), cos(deg2rad($a)),0,0);
+    my $a = deg2rad(shift());
+    return (cos($a), sin($a), -sin($a), cos($a), 0, 0);
 }
 
 sub rotate {
-    my ($self,$a)=@_;
-    $self->transform(-rotate=>$a);
+    my ($self, $a) = @_;
+    $self->transform(-rotate => $a);
 }
 
 =item $content->scale($sx, $sy)
@@ -127,13 +132,13 @@ Scales (stretches) the coordinate systems along the x and y axes.
 =cut
 
 sub _scale {
-    my ($x,$y)=@_;
-    return ($x,0,0,$y,0,0);
+    my ($x, $y) = @_;
+    return ($x, 0, 0, $y, 0, 0);
 }
 
 sub scale {
-    my ($self,$sx,$sy)=@_;
-    $self->transform(-scale=>[$sx,$sy]);
+    my ($self, $sx, $sy) = @_;
+    $self->transform(-scale => [$sx, $sy]);
 }
 
 =item $content->skew($sa, $sb)
@@ -144,13 +149,14 @@ the x axis and C<$sb> degrees (clockwise) from the y axis.
 =cut
 
 sub _skew {
-    my ($a,$b)=@_;
-    return (1, tan(deg2rad($a)),tan(deg2rad($b)),1,0,0);
+    my $a = deg2rad(shift());
+    my $b = deg2rad(shift());
+    return (1, tan($a), tan($b), 1, 0, 0);
 }
 
 sub skew {
-    my ($self,$a,$b)=@_;
-    $self->transform(-skew=>[$a,$b]);
+    my ($self, $a, $b) = @_;
+    $self->transform(-skew => [$a, $b]);
 }
 
 =item $content->transform(%options)
@@ -170,91 +176,59 @@ This is equivalent to making each transformation separately.
 
 =cut
 
+sub _to_matrix {
+    my @array = @_;
+    return PDF::API2::Matrix->new([$array[0], $array[1], 0],
+                                  [$array[2], $array[3], 0],
+                                  [$array[4], $array[5], 1]);
+}
+
 sub _transform {
-    my (%opt)=@_;
-    my $mtx=PDF::API2::Matrix->new([1,0,0],[0,1,0],[0,0,1]);
-    foreach my $o (qw( -matrix -skew -scale -rotate -translate )) {
-        next unless(defined($opt{$o}));
-        if ($o eq '-translate') {
-            my @mx=_translate(@{$opt{$o}});
-            $mtx=$mtx->multiply(PDF::API2::Matrix->new(
-                [$mx[0],$mx[1],0],
-                [$mx[2],$mx[3],0],
-                [$mx[4],$mx[5],1]
-            ));
-        }
-        elsif ($o eq '-rotate') {
-            my @mx=_rotate($opt{$o});
-            $mtx=$mtx->multiply(PDF::API2::Matrix->new(
-                [$mx[0],$mx[1],0],
-                [$mx[2],$mx[3],0],
-                [$mx[4],$mx[5],1]
-            ));
-        }
-        elsif ($o eq '-scale') {
-            my @mx=_scale(@{$opt{$o}});
-            $mtx=$mtx->multiply(PDF::API2::Matrix->new(
-                [$mx[0],$mx[1],0],
-                [$mx[2],$mx[3],0],
-                [$mx[4],$mx[5],1]
-            ));
-        }
-        elsif ($o eq '-skew') {
-            my @mx=_skew(@{$opt{$o}});
-            $mtx=$mtx->multiply(PDF::API2::Matrix->new(
-                [$mx[0],$mx[1],0],
-                [$mx[2],$mx[3],0],
-                [$mx[4],$mx[5],1]
-            ));
-        }
-        elsif ($o eq '-matrix') {
-            my @mx=@{$opt{$o}};
-            $mtx=$mtx->multiply(PDF::API2::Matrix->new(
-                [$mx[0],$mx[1],0],
-                [$mx[2],$mx[3],0],
-                [$mx[4],$mx[5],1]
-            ));
-        }
+    my %opts = @_;
+    my $m = PDF::API2::Matrix->new([1, 0, 0], [0, 1, 0], [0, 0, 1]);
+
+    # Undocumented; only used by textpos()
+    if (defined $opts{'-matrix'}) {
+        $m = $m->multiply(_to_matrix(@{$opts{'-matrix'}}));
     }
-    if ($opt{-point}) {
-        my $mp=PDF::API2::Matrix->new([$opt{-point}->[0],$opt{-point}->[1],1]);
-        $mp=$mp->multiply($mtx);
-        return($mp->[0][0],$mp->[0][1]);
+
+    # Note that the transformations are applied in reverse order.  See PDF 1.7
+    # specification section 8.3.4: Transformation Matrices.
+    if (defined $opts{'-skew'}) {
+        $m = $m->multiply(_to_matrix(_skew(@{$opts{'-skew'}})));
     }
+    if (defined $opts{'-scale'}) {
+        $m = $m->multiply(_to_matrix(_scale(@{$opts{'-scale'}})));
+    }
+    if (defined $opts{'-rotate'}) {
+        $m = $m->multiply(_to_matrix(_rotate($opts{'-rotate'})));
+    }
+    if (defined $opts{'-translate'}) {
+        $m = $m->multiply(_to_matrix(_translate(@{$opts{'-translate'}})));
+    }
+
+    # Undocumented; only used by textpos()
+    if ($opts{'-point'}) {
+        my $mp = PDF::API2::Matrix->new([$opts{'-point'}->[0],
+                                         $opts{'-point'}->[1], 1]);
+        $mp = $mp->multiply($m);
+        return ($mp->[0][0], $mp->[0][1]);
+    }
+
     return (
-        $mtx->[0][0],$mtx->[0][1],
-        $mtx->[1][0],$mtx->[1][1],
-        $mtx->[2][0],$mtx->[2][1]
+        $m->[0][0], $m->[0][1],
+        $m->[1][0], $m->[1][1],
+        $m->[2][0], $m->[2][1]
     );
 }
 
 sub transform {
-    my ($self,%opt)=@_;
-    $self->matrix(_transform(%opt));
-    if ($opt{-translate}) {
-        @{$self->{' translate'}}=@{$opt{-translate}};
-    }
-    else {
-        @{$self->{' translate'}}=(0,0);
-    }
-    if ($opt{-rotate}) {
-        $self->{' rotate'}=$opt{-rotate};
-    }
-    else {
-        $self->{' rotate'}=0;
-    }
-    if ($opt{-scale}) {
-        @{$self->{' scale'}}=@{$opt{-scale}};
-    }
-    else {
-        @{$self->{' scale'}}=(1,1);
-    }
-    if ($opt{-skew}) {
-        @{$self->{' skew'}}=@{$opt{-skew}};
-    }
-    else {
-        @{$self->{' skew'}}=(0,0);
-    }
+    my ($self, %opts) = @_;
+    $self->matrix(_transform(%opts));
+    $self->{' translate'} = $opts{'-translate'} // [0, 0];
+    $self->{' rotate'}    = $opts{'-rotate'}    // 0;
+    $self->{' scale'}     = $opts{'-scale'}     // [1, 1];
+    $self->{' skew'}      = $opts{'-skew'}      // [0, 0];
     return $self;
 }
 
@@ -266,59 +240,61 @@ to the previously set values.
 =cut
 
 sub transform_rel {
-    my ($self,%opt)=@_;
-    my ($sa1,$sb1)=@{$opt{-skew} ? $opt{-skew} : [0,0]};
-    my ($sa0,$sb0)=@{$self->{" skew"}};
+    my ($self, %opt) = @_;
 
-    my ($sx1,$sy1)=@{$opt{-scale} ? $opt{-scale} : [1,1]};
-    my ($sx0,$sy0)=@{$self->{" scale"}};
+    my ($sa1, $sb1) = @{$opt{'-skew'} ? $opt{'-skew'} : [0, 0]};
+    my ($sa0, $sb0) = @{$self->{' skew'}};
 
-    my $rot1=$opt{"-rotate"} || 0;
-    my $rot0=$self->{" rotate"};
+    my ($sx1, $sy1) = @{$opt{'-scale'} ? $opt{'-scale'} : [1, 1]};
+    my ($sx0, $sy0) = @{$self->{' scale'}};
 
-    my ($tx1,$ty1)=@{$opt{-translate} ? $opt{-translate} : [0,0]};
-    my ($tx0,$ty0)=@{$self->{" translate"}};
+    my $r1 = $opt{'-rotate'} // 0;
+    my $r0 = $self->{' rotate'};
+
+    my ($tx1, $ty1) = @{$opt{'-translate'} ? $opt{'-translate'} : [0, 0]};
+    my ($tx0, $ty0) = @{$self->{' translate'}};
 
     $self->transform(
-        -skew=>[$sa0+$sa1,$sb0+$sb1],
-        -scale=>[$sx0*$sx1,$sy0*$sy1],
-        -rotate=>$rot0+$rot1,
-        -translate=>[$tx0+$tx1,$ty0+$ty1],
+        -skew      => [$sa0 + $sa1, $sb0 + $sb1],
+        -scale     => [$sx0 * $sx1, $sy0 * $sy1],
+        -rotate    => $r0 + $r1,
+        -translate => [$tx0 + $tx1, $ty0 + $ty1],
     );
     return $self;
 }
 
 =item $content->matrix($a, $b, $c, $d, $e, $f)
 
-(Advanced) Sets the current transformation matrix manually.  Unless
-you have a particular need to enter transformations manually, you
-should use the C<transform> method instead.
+(Advanced) Sets the current transformation matrix manually.  Unless you have a
+particular need to enter transformations manually, you should use the
+C<transform> method instead.
 
 =cut
 
 sub _matrix_text {
-    my ($a,$b,$c,$d,$e,$f)=@_;
-    return (floats($a,$b,$c,$d,$e,$f),'Tm');
+    my ($a, $b, $c, $d, $e, $f) = @_;
+    return (floats($a, $b, $c, $d, $e, $f), 'Tm');
 }
 
 sub _matrix_gfx {
-    my ($a,$b,$c,$d,$e,$f)=@_;
-    return (floats($a,$b,$c,$d,$e,$f),'cm');
+    my ($a, $b, $c, $d, $e, $f) = @_;
+    return (floats($a, $b, $c, $d, $e, $f), 'cm');
 }
 
 sub matrix {
-    my $self=shift @_;
-    my ($a,$b,$c,$d,$e,$f)=@_;
-    if (defined $a) {
+    my $self = shift();
+    if (scalar(@_)) {
+        my ($a, $b, $c, $d, $e, $f) = @_;
         if ($self->_in_text_object()) {
-            $self->add(_matrix_text($a,$b,$c,$d,$e,$f));
-            @{$self->{' textmatrix'}}=($a,$b,$c,$d,$e,$f);
-            @{$self->{' textlinematrix'}}=(0,0);
+            $self->add(_matrix_text($a, $b, $c, $d, $e, $f));
+            $self->{' textmatrix'} = [$a, $b, $c, $d, $e, $f];
+            $self->{' textlinematrix'} = [0, 0];
         }
         else {
-            $self->add(_matrix_gfx($a,$b,$c,$d,$e,$f));
+            $self->add(_matrix_gfx($a, $b, $c, $d, $e, $f));
         }
     }
+
     if ($self->_in_text_object()) {
         return @{$self->{' textmatrix'}};
     }
@@ -328,9 +304,9 @@ sub matrix {
 }
 
 sub matrix_update {
-    my ($self,$tx,$ty)=@_;
-    $self->{' textlinematrix'}->[0]+=$tx;
-    $self->{' textlinematrix'}->[1]+=$ty;
+    my ($self, $tx, $ty)=@_;
+    $self->{' textlinematrix'}->[0] += $tx;
+    $self->{' textlinematrix'}->[1] += $ty;
     return $self;
 }
 
@@ -359,8 +335,8 @@ sub save {
 
 =item $content->restore
 
-Restores the most recently saved graphics state and text state,
-removing it from the stack.
+Restores the most recently saved graphics state and text state, removing it from
+the stack.
 
 =cut
 
@@ -382,12 +358,13 @@ Sets the width of the stroke.
 =cut
 
 sub _linewidth {
-    my ($linewidth)=@_;
+    my $linewidth = shift();
     return ($linewidth, 'w');
 }
+
 sub linewidth {
-    my ($this,$linewidth)=@_;
-    $this->add(_linewidth($linewidth));
+    my ($self, $linewidth) = @_;
+    $self->add(_linewidth($linewidth));
 }
 
 =item $content->linecap($style)
@@ -402,8 +379,8 @@ The stroke ends at the end of the path, with no projection.
 
 =item 1 = Round Cap
 
-An arc is drawn around the end of the path with a diameter equal to
-the line width, and is filled in.
+An arc is drawn around the end of the path with a diameter equal to the line
+width, and is filled in.
 
 =item 2 = Projecting Square Cap
 
@@ -414,12 +391,12 @@ The stroke continues past the end of the path for half the line width.
 =cut
 
 sub _linecap {
-    my ($linecap)=@_;
+    my $linecap = shift();
     return ($linecap, 'J');
 }
 
 sub linecap {
-    my ($self,$linecap)=@_;
+    my ($self, $linecap) = @_;
     $self->add(_linecap($linecap));
 }
 
@@ -431,14 +408,13 @@ Sets the style of join to be used at corners of a path.
 
 =item 0 = Miter Join
 
-The outer edges of the stroke extend until they meet, up to the limit
-specified below.  If the limit would be surpassed, a bevel join is
-used instead.
+The outer edges of the stroke extend until they meet, up to the limit specified
+below.  If the limit would be surpassed, a bevel join is used instead.
 
 =item 1 = Round Join
 
-A circle with a diameter equal to the linewidth is drawn around the
-corner point, producing a rounded corner.
+A circle with a diameter equal to the linewidth is drawn around the corner
+point, producing a rounded corner.
 
 =item 2 = Bevel Join
 
@@ -449,11 +425,12 @@ A triangle is drawn to fill in the notch between the two strokes.
 =cut
 
 sub _linejoin {
-    my ($linejoin)=@_;
+    my $linejoin = shift();
     return ($linejoin, 'j');
 }
+
 sub linejoin {
-    my ($this,$linejoin)=@_;
+    my ($this, $linejoin) = @_;
     $this->add(_linejoin($linejoin));
 }
 
@@ -461,24 +438,23 @@ sub linejoin {
 
 Sets the miter limit when the line join style is a miter join.
 
-The C<$ratio> is the maximum length of the miter (inner to outer
-corner) divided by the line width. Any miter above this ratio will be
-converted to a bevel join. The practical effect is that lines meeting
-at shallow angles are chopped off instead of producing long pointed
-corners.
+The C<$ratio> is the maximum length of the miter (inner to outer corner) divided
+by the line width. Any miter above this ratio will be converted to a bevel
+join. The practical effect is that lines meeting at shallow angles are chopped
+off instead of producing long pointed corners.
 
 There is no documented default miter limit.
 
 =cut
 
+sub _miterlimit {
+    my $limit = shift();
+    return ($limit, 'M');
+}
+
 sub miterlimit {
     my ($self, $limit) = @_;
     $self->add(_miterlimit($limit));
-}
-
-sub _miterlimit {
-    my ($limit) = @_;
-    return ($limit, 'M');
 }
 
 # Deprecated: miterlimit was originally named incorrectly
@@ -497,14 +473,13 @@ Sets the line dash pattern.
 
 If called without any arguments, a solid line will be drawn.
 
-If called with one argument, the dashes and gaps will have equal
-lengths.
+If called with one argument, the dashes and gaps will have equal lengths.
 
-If called with two or more arguments, the arguments represent
-alternating dash and gap lengths.
+If called with two or more arguments, the arguments represent alternating dash
+and gap lengths.
 
-If called with a hash of arguments, a dash phase may be set, which
-specifies the distance into the pattern at which to start the dash.
+If called with a hash of arguments, a dash phase may be set, which specifies the
+distance into the pattern at which to start the dash.
 
 =cut
 
@@ -517,8 +492,11 @@ sub _linedash {
         if ($a[0] =~ /^\-/) {
             my %a = @a;
 
-            # Deprecated: the -full and -clear options will be removed in a future release
-            $a{'-pattern'} = [$a{'-full'} || 0, $a{'-clear'} || 0] unless exists $a{'-pattern'};
+            # Deprecated: the -full and -clear options will be removed in a
+            # future release
+            unless (exists $a{'-pattern'}) {
+                $a{'-pattern'} = [$a{'-full'} || 0, $a{'-clear'} || 0];
+            }
 
             return ('[', floats(@{$a{'-pattern'}}), ']', ($a{'-shift'} || 0), 'd');
         }
@@ -529,39 +507,37 @@ sub _linedash {
 }
 
 sub linedash {
-    my ($self,@a)=@_;
+    my ($self, @a) = @_;
     $self->add(_linedash(@a));
 }
 
 =item $content->flatness($tolerance)
 
-(Advanced) Sets the maximum variation in output pixels when drawing
-curves.
+(Advanced) Sets the maximum variation in output pixels when drawing curves.
 
 =cut
 
 sub _flatness {
-    my ($flatness)=@_;
+    my $flatness = shift();
     return ($flatness, 'i');
 }
 
 sub flatness {
-    my ($self,$flatness)=@_;
+    my ($self, $flatness) = @_;
     $self->add(_flatness($flatness));
 }
 
 =item $content->egstate($object)
 
-(Advanced) Adds an Extended Graphic State object containing additional
-state parameters.
+(Advanced) Adds an Extended Graphic State object containing additional state
+parameters.
 
 =cut
 
 sub egstate {
-    my $self = shift;
-    my $egs = shift;
-    $self->add('/'.$egs->name,'gs');
-    $self->resource('ExtGState',$egs->name,$egs);
+    my ($self, $egstate) = @_;
+    $self->add('/' . $egstate->name(), 'gs');
+    $self->resource('ExtGState', $egstate->name(), $egstate);
     return $self;
 }
 
