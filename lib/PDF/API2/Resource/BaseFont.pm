@@ -124,7 +124,7 @@ sub tounicodemap {
         $stream .= qq|1 begincodespacerange\n<00> <FF>\nendcodespacerange\n|;
         $stream .= qq|256 beginbfchar\n|;
         for (my $j = 0; $j < 256; $j++) {
-            $stream .= sprintf(qq|<%02X> <%04X>\n|, $j, $self->uniByEnc($j));
+            $stream .= sprintf(qq|<%02X> <%04X>\n|, $j, $self->uniByEnc($j) // 0);
         }
         $stream .= qq|endbfchar\n|;
     }
