@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.039     2021-03-04
+
     - PDF::API2->open($filename) no longer reads the entire file into memory
       before working on it, instead reading from the file as needed.  This
       results in a substantial reduction in memory usage and start-up time for
