@@ -554,56 +554,54 @@ Starts a new path at the specified coordinates.
 =cut
 
 sub _move {
-    my($x,$y)=@_;
-    return (floats($x,$y), 'm');
+    my ($x, $y) =@_;
+    return (floats($x, $y), 'm');
 }
+
 sub move {
-    my $self=shift @_;
-    my ($x,$y);
-    while(defined($x = shift)) {
-        $y = shift;
-        $self->{' x'}=$x;
-        $self->{' y'}=$y;
-        $self->{' mx'}=$x;
-        $self->{' my'}=$y;
+    my $self = shift();
+    my ($x, $y);
+    while (defined($x = shift())) {
+        $y = shift();
         if ($self->_in_text_object()) {
-            $self->add_post(floats($x,$y), 'm');
+            $self->add_post(floats($x, $y), 'm');
         }
         else {
-            $self->add(floats($x,$y), 'm');
+            $self->add(floats($x, $y), 'm');
         }
+        $self->{' x'} = $self->{' mx'} = $x;
+        $self->{' y'} = $self->{' my'} = $y;
     }
     return $self;
 }
 
 =item $content->line($x, $y)
 
-Extends the path in a line from the current coordinates to the
-specified coordinates, and updates the current position to be the new
-coordinates.
+Extends the path in a line from the current coordinates to the specified
+coordinates, and updates the current position to be the new coordinates.
 
 Note: The line will not appear until you call C<stroke>.
 
 =cut
 
 sub _line {
-    my ($x,$y) = @_;
-    return (floats($x,$y), 'l');
+    my ($x, $y) = @_;
+    return (floats($x, $y), 'l');
 }
 
 sub line {
-    my $self = shift;
-    my ($x,$y);
-    while(defined($x = shift)) {
-        $y = shift;
-        $self->{' x'}=$x;
-        $self->{' y'}=$y;
+    my $self = shift();
+    my ($x, $y);
+    while (defined($x = shift())) {
+        $y = shift();
         if ($self->_in_text_object()) {
-            $self->add_post(floats($x,$y), 'l');
+            $self->add_post(floats($x, $y), 'l');
         }
         else {
-            $self->add(floats($x,$y), 'l');
+            $self->add(floats($x, $y), 'l');
         }
+        $self->{' x'} = $x;
+        $self->{' y'} = $y;
     }
     return $self;
 }
@@ -612,78 +610,77 @@ sub line {
 
 =item $content->vline($y)
 
-Shortcut for drawing horizontal and vertical lines from the current
-position.
+Shortcut for drawing horizontal and vertical lines from the current position.
 
 =cut
 
 sub hline {
     my ($self, $x) = @_;
+    $self->{' x'} = $x;
     if ($self->_in_text_object()) {
-        $self->add_post(floats($x,$self->{' y'}),'l');
+        $self->add_post(floats($x, $self->{' y'}), 'l');
     }
     else {
-        $self->add(floats($x,$self->{' y'}),'l');
+        $self->add(floats($x, $self->{' y'}), 'l');
     }
-    $self->{' x'}=$x;
     return $self;
 }
 
 sub vline {
     my ($self, $y) = @_;
     if ($self->_in_text_object()) {
-        $self->add_post(floats($self->{' x'},$y),'l');
+        $self->add_post(floats($self->{' x'}, $y), 'l');
     }
     else {
-        $self->add(floats($self->{' x'},$y),'l');
+        $self->add(floats($self->{' x'}, $y), 'l');
     }
-    $self->{' y'}=$y;
+    $self->{' y'} = $y;
     return $self;
 }
 
 =item $content->poly($x1, $y1, ..., $xn, $yn)
 
-Shortcut for creating a polyline path.  Moves to C<[$x1, $y1]>, and
-then extends the path in lines along the specified coordinates.
+Shortcut for creating a polyline path.  Moves to C<[$x1, $y1]>, and then extends
+the path in lines along the specified coordinates.
 
 =cut
 
 sub poly {
-    my $self = shift;
-    my $x = shift;
-    my $y = shift;
-    $self->move($x,$y);
+    my $self = shift();
+    my $x = shift();
+    my $y = shift();
+    $self->move($x, $y);
     $self->line(@_);
     return $self;
 }
 
 =item $content->curve($cx1, $cy1, $cx2, $cy2, $x, $y)
 
-Extends the path in a curve from the current point to C<($x, $y)>,
-using the two specified points to create a cubic Bezier curve, and
-updates the current position to be the new point.
+Extends the path in a curve from the current point to C<($x, $y)>, using the two
+specified points to create a cubic Bezier curve, and updates the current
+position to be the new point.
 
 Note: The curve will not appear until you call C<stroke>.
 
 =cut
 
 sub curve {
-    my $self = shift;
-    my($x1,$y1,$x2,$y2,$x3,$y3);
-    while (defined($x1 = shift)) {
-        $y1 = shift;
-        $x2 = shift;
-        $y2 = shift;
-        $x3 = shift;
-        $y3 = shift;
+    my $self = shift();
+    my ($x1, $y1, $x2, $y2, $x3, $y3);
+    while (defined($x1 = shift())) {
+        $y1 = shift();
+        $x2 = shift();
+        $y2 = shift();
+        $x3 = shift();
+        $y3 = shift();
         if ($self->_in_text_object()) {
-            $self->add_post(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
+            $self->add_post(floats($x1, $y1, $x2, $y2, $x3, $y3), 'c');
         }
         else {
-            $self->add(floats($x1,$y1,$x2,$y2,$x3,$y3),'c');
+            $self->add(floats($x1, $y1, $x2, $y2, $x3, $y3), 'c');
         }
-        $self->{' x'}=$x3;
-        $self->{' y'}=$y3;
+        $self->{' x'} = $x3;
+        $self->{' y'} = $y3;
     }
     return $self;
 }
@@ -699,51 +696,51 @@ Note: The curve will not appear until you call C<stroke>.
 =cut
 
 sub spline {
-    my $self = shift;
+    my $self = shift();
 
-    while(scalar @_ >= 4) {
-        my $cx = shift;
-        my $cy = shift;
-        my $x = shift;
-        my $y = shift;
-        my $c1x = (2*$cx+$self->{' x'})/3;
-        my $c1y = (2*$cy+$self->{' y'})/3;
-        my $c2x = (2*$cx+$x)/3;
-        my $c2y = (2*$cy+$y)/3;
-        $self->curve($c1x,$c1y,$c2x,$c2y,$x,$y);
+    while (scalar @_ >= 4) {
+        my $cx = shift();
+        my $cy = shift();
+        my $x = shift();
+        my $y = shift();
+        my $c1x = (2 * $cx + $self->{' x'}) / 3;
+        my $c1y = (2 * $cy + $self->{' y'}) / 3;
+        my $c2x = (2 * $cx + $x) / 3;
+        my $c2y = (2 * $cy + $y) / 3;
+        $self->curve($c1x, $c1y, $c2x, $c2y, $x, $y);
     }
 }
 
 =item $content->arc($x, $y, $a, $b, $alpha, $beta, $move)
 
-Extends the path along an arc of an ellipse centered at C<[x, y]>.
-The major and minor axes of the ellipse are C<$a> and C<$b>,
-respectively, and the arc moves from C<$alpha> degrees to C<$beta>
-degrees.  The current position is then set to the endpoint of the arc.
+Extends the path along an arc of an ellipse centered at C<[x, y]>.  The major
+and minor axes of the ellipse are C<$a> and C<$b>, respectively, and the arc
+moves from C<$alpha> degrees to C<$beta> degrees.  The current position is then
+set to the endpoint of the arc.
 
-Set C<$move> to a true value if this arc is the beginning of a new
-path instead of the continuation of an existing path.
+Set C<$move> to a true value if this arc is the beginning of a new path instead
+of the continuation of an existing path.
 
 =cut
 
 # Private
 sub arctocurve {
-    my ($a,$b,$alpha,$beta) = @_;
-    if (abs($beta-$alpha) > 30) {
+    my ($a, $b, $alpha, $beta) = @_;
+    if (abs($beta - $alpha) > 30) {
         return (
-            arctocurve($a,$b,$alpha,($beta+$alpha)/2),
-            arctocurve($a,$b,($beta+$alpha)/2,$beta)
+            arctocurve($a, $b, $alpha, ($beta + $alpha) / 2),
+            arctocurve($a, $b, ($beta + $alpha) / 2, $beta)
         );
     }
     else {
         $alpha = ($alpha * pi / 180);
         $beta  = ($beta * pi / 180);
 
-        my $bcp = (4.0/3 * (1 - cos(($beta - $alpha)/2)) / sin(($beta - $alpha)/2));
+        my $bcp = (4.0 / 3 * (1 - cos(($beta - $alpha) / 2)) / sin(($beta - $alpha) / 2));
         my $sin_alpha = sin($alpha);
-        my $sin_beta =  sin($beta);
+        my $sin_beta  = sin($beta);
         my $cos_alpha = cos($alpha);
-        my $cos_beta =  cos($beta);
+        my $cos_beta  = cos($beta);
 
         my $p0_x = $a * $cos_alpha;
         my $p0_y = $b * $sin_alpha;
@@ -754,136 +751,135 @@ sub arctocurve {
         my $p3_x = $a * $cos_beta;
         my $p3_y = $b * $sin_beta;
 
-        return ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
+        return ($p0_x, $p0_y, $p1_x, $p1_y, $p2_x, $p2_y, $p3_x, $p3_y);
     }
 }
 
 sub arc {
-    my ($self,$x,$y,$a,$b,$alpha,$beta,$move) = @_;
-    my @points = arctocurve($a,$b,$alpha,$beta);
-    my ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
+    my ($self, $x, $y, $a, $b, $alpha, $beta, $move) = @_;
+    my @points = arctocurve($a, $b, $alpha, $beta);
+    my ($p0_x, $p0_y, $p1_x, $p1_y, $p2_x, $p2_y, $p3_x, $p3_y);
 
-    $p0_x= $x + shift @points;
-    $p0_y= $y + shift @points;
+    $p0_x = $x + shift(@points);
+    $p0_y = $y + shift(@points);
 
-    $self->move($p0_x,$p0_y) if($move);
+    $self->move($p0_x, $p0_y) if $move;
 
-    while (scalar @points > 0) {
-        $p1_x = $x + shift @points;
-        $p1_y = $y + shift @points;
-        $p2_x = $x + shift @points;
-        $p2_y = $y + shift @points;
-        $p3_x = $x + shift @points;
-        $p3_y = $y + shift @points;
-        $self->curve($p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-        shift @points;
-        shift @points;
-        $self->{' x'}=$p3_x;
-        $self->{' y'}=$p3_y;
+    while (scalar @points) {
+        $p1_x = $x + shift(@points);
+        $p1_y = $y + shift(@points);
+        $p2_x = $x + shift(@points);
+        $p2_y = $y + shift(@points);
+        $p3_x = $x + shift(@points);
+        $p3_y = $y + shift(@points);
+        $self->curve($p1_x, $p1_y, $p2_x, $p2_y, $p3_x, $p3_y);
+        shift(@points);
+        shift(@points);
+        $self->{' x'} = $p3_x;
+        $self->{' y'} = $p3_y;
     }
     return $self;
 }
 
 =item $content->bogen($x1, $y1, $x2, $y2, $radius, $move, $outer, $reverse)
 
-Extends the path along an arc of a circle of the specified radius
-between C<[x1, y1]> to C<[x2, y2]>.  The current position is then set
-to the endpoint of the arc.
+Extends the path along an arc of a circle of the specified radius between
+C<[x1,y1]> to C<[x2,y2]>.  The current position is then set to the endpoint of
+the arc.
 
-Set C<$move> to a true value if this arc is the beginning of a new
-path instead of the continuation of an existing path.
+Set C<$move> to a true value if this arc is the beginning of a new path instead
+of the continuation of an existing path.
 
-Set C<$outer> to a true value to draw the larger arc between the two
-points instead of the smaller one.
+Set C<$outer> to a true value to draw the larger arc between the two points
+instead of the smaller one.
 
-Set C<$reverse> to a true value to draw the mirror image of the
-specified arc.
+Set C<$reverse> to a true value to draw the mirror image of the specified arc.
 
-C<$radius * 2> cannot be smaller than the distance from C<[x1, y1]> to
-C<[x2, y2]>.
+C<$radius * 2> cannot be smaller than the distance from C<[x1,y1]> to
+C<[x2,y2]>.
 
 Note: The curve will not appear until you call C<stroke>.
 
 =cut
 
 sub bogen {
-    my ($self,$x1,$y1,$x2,$y2,$r,$move,$larc,$spf) = @_;
-    my ($p0_x,$p0_y,$p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-    my $x = $x2-$x1;
-    my $y = $y2-$y1;
-    my $z = sqrt($x**2+$y**2);
-    my $alpha_rad = asin($y/$z);
+    my ($self, $x1, $y1, $x2, $y2, $r, $move, $larc, $spf) = @_;
+    my ($p0_x, $p0_y, $p1_x, $p1_y, $p2_x, $p2_y, $p3_x, $p3_y);
+    my $x = $x2 - $x1;
+    my $y = $y2 - $y1;
+    my $z = sqrt($x ** 2 + $y ** 2);
+    my $alpha_rad = asin($y / $z);
 
-    $alpha_rad+=pi/2 if($x<0 and $y>0);
-    $alpha_rad-=pi/2 if($x<0 and $y<0);
+    $alpha_rad += pi / 2 if $x < 0 and $y > 0;
+    $alpha_rad -= pi / 2 if $x < 0 and $y < 0;
 
-    my $alpha=rad2deg($alpha_rad);
+    my $alpha = rad2deg($alpha_rad);
     # use the complement angle for span
-    $alpha -= 180 if ($spf and $spf > 0);
+    $alpha -= 180 if $spf and $spf > 0;
 
-    my $d=2*$r;
-    my ($beta,$beta_rad,@points);
+    my $d = 2 * $r;
+    my ($beta, $beta_rad, @points);
 
-    $beta=rad2deg(2*asin($z/$d));
-    $beta=360-$beta if ($larc and $larc > 0);
+    $beta = rad2deg(2 * asin($z / $d));
+    $beta = 360 - $beta if $larc and $larc > 0;
 
-    $beta_rad=deg2rad($beta);
+    $beta_rad = deg2rad($beta);
 
-    @points=arctocurve($r,$r,90+$alpha+$beta/2,90+$alpha-$beta/2);
+    @points = arctocurve($r, $r, 90 + $alpha + $beta / 2, 90 + $alpha - $beta / 2);
 
     if ($spf and $spf > 0) {
-        my @pts=@points;
-        @points=();
-        while ($y=pop @pts) {
-            $x=pop @pts;
-            push(@points,$x,$y);
+        my @pts = @points;
+        @points = ();
+        while ($y = pop(@pts)) {
+            $x = pop(@pts);
+            push(@points, $x, $y);
         }
     }
 
-    $p0_x=shift @points;
-    $p0_y=shift @points;
-    $x=$x1-$p0_x;
-    $y=$y1-$p0_y;
+    $p0_x = shift(@points);
+    $p0_y = shift(@points);
+    $x = $x1 - $p0_x;
+    $y = $y1 - $p0_y;
 
-    $self->move($x1,$y1) if($move);
+    $self->move($x1, $y1) if $move;
 
-    while(scalar @points > 0) {
-        $p1_x= $x + shift @points;
-        $p1_y= $y + shift @points;
-        $p2_x= $x + shift @points;
-        $p2_y= $y + shift @points;
+    while (scalar @points) {
+        $p1_x = $x + shift(@points);
+        $p1_y = $y + shift(@points);
+        $p2_x = $x + shift(@points);
+        $p2_y = $y + shift(@points);
         # if we run out of data points, use the end point instead
         if (scalar @points == 0) {
             $p3_x = $x2;
             $p3_y = $y2;
         }
         else {
-            $p3_x= $x + shift @points;
-            $p3_y= $y + shift @points;
+            $p3_x = $x + shift(@points);
+            $p3_y = $y + shift(@points);
         }
-        $self->curve($p1_x,$p1_y,$p2_x,$p2_y,$p3_x,$p3_y);
-        shift @points;
-        shift @points;
+        $self->curve($p1_x, $p1_y, $p2_x, $p2_y, $p3_x, $p3_y);
+        shift(@points);
+        shift(@points);
     }
     return $self;
 }
 
-=item $content->close
+=item $content->close()
 
-Closes and ends the current path by extending a line from the current
-position to the starting position.
+Closes and ends the current path by extending a line from the current position
+to the starting position.
 
 =cut
 
 sub close {
-    my $self = shift;
+    my $self = shift();
     $self->add('h');
-    $self->{' x'}=$self->{' mx'};
-    $self->{' y'}=$self->{' my'};
+    $self->{' x'} = $self->{' mx'};
+    $self->{' y'} = $self->{' my'};
     return $self;
 }
 
-=item $content->endpath
+=item $content->endpath()
 
 Ends the current path without explicitly enclosing it.
 
@@ -897,17 +893,17 @@ sub endpath {
 
 =item $content->ellipse($x, $y, $a, $b)
 
-Creates an elliptical path centered on C<[$x, $y]>, with major and
-minor axes specified by C<$a> and C<$b>, respectively.
+Creates an elliptical path centered on C<[$x,$y]>, with major and minor axes
+specified by C<$a> and C<$b>, respectively.
 
 Note: The ellipse will not appear until you call C<stroke> or C<fill>.
 
 =cut
 
 sub ellipse {
-    my ($self,$x,$y,$a,$b) = @_;
-    $self->arc($x,$y,$a,$b,0,360,1);
-    $self->close;
+    my ($self, $x, $y, $a, $b) = @_;
+    $self->arc($x, $y, $a, $b, 0, 360, 1);
+    $self->close();
     return $self;
 }
 
@@ -921,68 +917,67 @@ Note: The circle will not appear until you call C<stroke> or C<fill>.
 =cut
 
 sub circle {
-    my ($self,$x,$y,$r) = @_;
-    $self->arc($x,$y,$r,$r,0,360,1);
-    $self->close;
+    my ($self, $x, $y, $r) = @_;
+    $self->arc($x, $y, $r, $r, 0, 360, 1);
+    $self->close();
     return $self;
 }
 
 =item $content->pie($x, $y, $a, $b, $alpha, $beta)
 
-Creates a pie-shaped path from an ellipse centered on C<[$x, $y]>.
-The major and minor axes of the ellipse are C<$a> and C<$b>,
-respectively, and the arc moves from C<$alpha> degrees to C<$beta>
-degrees.
+Creates a pie-shaped path from an ellipse centered on C<[$x,$y]>.  The major and
+minor axes of the ellipse are C<$a> and C<$b>, respectively, and the arc moves
+from C<$alpha> degrees to C<$beta> degrees.
 
 Note: The pie will not appear until you call C<stroke> or C<fill>.
 
 =cut
 
 sub pie {
-    my $self = shift;
-    my ($x,$y,$a,$b,$alpha,$beta)=@_;
-    my ($p0_x,$p0_y)=arctocurve($a,$b,$alpha,$beta);
-    $self->move($x,$y);
-    $self->line($p0_x+$x,$p0_y+$y);
-    $self->arc($x,$y,$a,$b,$alpha,$beta);
-    $self->close;
+    my $self = shift();
+    my ($x, $y, $a, $b, $alpha, $beta) = @_;
+    my ($p0_x, $p0_y) = arctocurve($a, $b, $alpha, $beta);
+    $self->move($x, $y);
+    $self->line($p0_x + $x, $p0_y + $y);
+    $self->arc($x, $y, $a, $b, $alpha, $beta);
+    $self->close();
 }
 
 =item $content->rect($x1, $y1, $w1, $h1, ..., $xn, $yn, $wn, $hn)
 
-Creates paths for one or more rectangles, with their lower left points
-at C<[$x, $y]> and with the specified widths and heights.
+Creates paths for one or more rectangles, with their lower left points at
+C<[$x,$y]> and with the specified widths and heights.
 
-Note: The rectangle will not appear until you call C<stroke> or C<fill>.
+Note: The rectangles will not appear until you call C<stroke> or C<fill>.
 
 =cut
 
 sub rect {
-    my $self = shift;
-    my ($x,$y,$w,$h);
-    while (defined($x = shift)) {
-        $y = shift;
-        $w = shift;
-        $h = shift;
-        $self->add(floats($x,$y,$w,$h),'re');
+    my $self = shift();
+    my ($x, $y, $w, $h);
+    while (defined($x = shift())) {
+        $y = shift();
+        $w = shift();
+        $h = shift();
+        $self->add(floats($x, $y, $w, $h), 're');
     }
-    $self->{' x'}=$x;
-    $self->{' y'}=$y;
+    $self->{' x'} = $x;
+    $self->{' y'} = $y;
     return $self;
 }
 
 =item $content->rectxy($x1, $y1, $x2, $y2)
 
-Creates a rectangular path, with C<[$x1, $y1]> and and C<[$x2, $y2]>
-specifying opposite corners.
+Creates a rectangular path, with C<[$x1,$y1]> and and C<[$x2,$y2]> specifying
+opposite corners.
 
 Note: The rectangle will not appear until you call C<stroke> or C<fill>.
 
 =cut
 
 sub rectxy {
-    my ($self,$x,$y,$x2,$y2)=@_;
-    $self->rect($x,$y,($x2-$x),($y2-$y));
+    my ($self, $x, $y, $x2, $y2) = @_;
+    $self->rect($x, $y, ($x2 - $x), ($y2 - $y));
     return $self;
 }
 
@@ -1003,8 +998,8 @@ sub _stroke {
 }
 
 sub stroke {
-    my $self = shift;
-    $self->add(_stroke);
+    my $self = shift();
+    $self->add(_stroke());
     return $self;
 }
 
@@ -1012,17 +1007,16 @@ sub stroke {
 
 Fills the current path.
 
-If the path intersects with itself, the nonzero winding rule will be
-used to determine which part of the path is filled in.  If you would
-prefer to use the even-odd rule, pass a true argument.
+If the path intersects with itself, the nonzero winding rule will be used to
+determine which part of the path is filled in.  If you would prefer to use the
+even-odd rule, pass a true argument.
 
-See the PDF Specification, section 8.5.3.3, for more details on
-filling.
+See the PDF Specification, section 8.5.3.3, for more details on filling.
 
 =cut
 
 sub fill {
-    my $self = shift;
+    my $self = shift();
     $self->add(shift() ? 'f*' : 'f');
     return $self;
 }
@@ -1034,20 +1028,19 @@ Fills and then strokes the current path.
 =cut
 
 sub fillstroke {
-    my $self = shift;
+    my $self = shift();
     $self->add(shift() ? 'B*' : 'B');
     return $self;
 }
 
 =item $content->clip($use_even_odd_fill)
 
-Modifies the current clipping path by intersecting it with the current
-path.
+Modifies the current clipping path by intersecting it with the current path.
 
 =cut
 
 sub clip {
-    my $self = shift;
+    my $self = shift();
     $self->add(shift() ? 'W*' : 'W');
     return $self;
 }
