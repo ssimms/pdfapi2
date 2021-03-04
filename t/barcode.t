@@ -5,8 +5,7 @@ use strict;
 
 use PDF::API2;
 
-my $pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+my $pdf = PDF::API2->new(-compress => 0);
 
 # Check to ensure all barcode types can be loaded
 

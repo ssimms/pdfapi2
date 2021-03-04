@@ -32,6 +32,10 @@
       objects by editing their hash values instead of using these accessors,
       you'll need to update your code.
 
+    - Added a -compress option (on by default) to PDF::API2->new(), open(), and
+      open_scalar().  If disabled, most streams won't be compressed, which can
+      simplify debugging.
+
 
 2.038     2020-08-31
 

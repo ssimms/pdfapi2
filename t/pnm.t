@@ -7,8 +7,7 @@ use PDF::API2;
 
 # Filename
 
-my $pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+my $pdf = PDF::API2->new(-compress => 0);
 
 my $pnm = $pdf->image_pnm('t/resources/1x1.pbm');
 isa_ok($pnm, 'PDF::API2::Resource::XObject::Image::PNM',

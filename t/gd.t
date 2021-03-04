@@ -14,8 +14,7 @@ SKIP: {
     my $gd = GD::Image->new(1, 1);
     $gd->colorAllocate(0, 0, 0);
 
-    my $pdf = PDF::API2->new();
-    $pdf->{forcecompress} = 0;
+    my $pdf = PDF::API2->new(-compress => 0);
 
     my $img = $pdf->image_gd($gd);
     isa_ok($img, 'PDF::API2::Resource::XObject::Image::GD',

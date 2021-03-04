@@ -7,8 +7,7 @@ use PDF::API2;
 
 # Filename
 
-my $pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+my $pdf = PDF::API2->new(-compress => 0);
 
 my $png = $pdf->image_png('t/resources/1x1.png');
 isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',

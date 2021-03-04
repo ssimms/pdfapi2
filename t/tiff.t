@@ -7,8 +7,7 @@ use PDF::API2;
 
 # Filename
 
-my $pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+my $pdf = PDF::API2->new(-compress => 0);
 
 my $tiff = $pdf->image_tiff('t/resources/1x1.tif');
 isa_ok($tiff, 'PDF::API2::Resource::XObject::Image::TIFF',
@@ -37,8 +36,7 @@ close $fh;
 
 # LZW Compression
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 
 my $lzw_tiff = $pdf->image_tiff('t/resources/1x1-lzw.tif');
 isa_ok($lzw_tiff, 'PDF::API2::Resource::XObject::Image::TIFF',

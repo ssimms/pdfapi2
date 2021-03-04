@@ -52,8 +52,7 @@ $text = $page->text();
 
 # text
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -66,8 +65,7 @@ is($width, '50.016',
 
 # text with indent
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -80,8 +78,7 @@ is($width, '50.016',
 
 # text_right
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -92,8 +89,7 @@ like($pdf->stringify(), qr/\[ 4168 \(Test Text\) \] TJ/,
 
 # text_center
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -104,8 +100,7 @@ like($pdf->stringify(), qr/\[ 2084 \(Test Text\) \] TJ/,
 
 # text_justified
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -116,8 +111,7 @@ like($pdf->stringify(), qr/10.992 Tw \(Test Text\) Tj 0 Tw/,
 
 # paragraph
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -131,8 +125,7 @@ is($leftover, 'aaa aaa aaa aaa aaa aaa',
 
 # paragraph, align right
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -145,8 +138,7 @@ like($pdf->stringify(),
 
 # paragraph, align center
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -159,8 +151,7 @@ like($pdf->stringify(),
 
 # paragraph, justified left
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -173,8 +164,7 @@ like($pdf->stringify(),
 
 # paragraph, justified right
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -188,8 +178,7 @@ like($pdf->stringify(),
 
 # paragraph, justified center
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -203,8 +192,7 @@ like($pdf->stringify(),
 
 # paragraph, justified, last line justified
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
@@ -218,8 +206,7 @@ like($pdf->stringify(),
 
 # paragraphs (formerly "section")
 
-$pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+$pdf = PDF::API2->new(-compress => 0);
 $text = $pdf->page->text();
 $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);

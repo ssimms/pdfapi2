@@ -73,9 +73,9 @@ PDF::API2 - Facilitates the creation and modification of PDF files
 
 =item $pdf = PDF::API2->new(%options)
 
-Creates a new PDF object.  If you will be saving it as a file and
-already know the filename, you can give the '-file' option to minimize
-possible memory requirements later on.
+Creates a new PDF object.  If you will be saving it as a file and already know
+the filename, you can give the '-file' option to minimize possible memory
+requirements later on.
 
 B<Example:>
 
@@ -90,6 +90,9 @@ B<Example:>
     $pdf = PDF::API2->new(-file => 'our/new.pdf');
     ...
     $pdf->save();
+
+To turn off automatic compression of PDF contents, include option C<-compress>
+with a false value.  This is generally only useful for debugging.
 
 =cut
 
@@ -109,7 +112,12 @@ sub new {
     weaken $self->{'catalog'};
     $self->{'fonts'} = {};
     $self->{'pagestack'} = [];
-    $self->{'forcecompress'} = 1;
+    if (exists $options{'-compress'}) {
+        $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
+    }
+    else {
+        $self->{'forcecompress'} = 1;
+    }
     $self->preferences(%options);
     if ($options{'-file'}) {
         $self->{'pdf'}->create_file($options{'-file'});
@@ -123,7 +131,7 @@ sub new {
     return $self;
 }
 
-=item $pdf = PDF::API2->open($pdf_file)
+=item $pdf = PDF::API2->open($pdf_file, %options)
 
 Opens an existing PDF file.
 
@@ -136,6 +144,9 @@ B<Example:>
     $pdf = PDF::API2->open('our/to/be/updated.pdf');
     ...
     $pdf->update();
+
+To turn off automatic compression of PDF contents, include option C<-compress>
+with a false value.  This is generally only useful for debugging.
 
 =cut
 
@@ -152,7 +163,7 @@ sub open {
 
     my $is_writable = -w $file;
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($file, $is_writable);
-    _open_common($self);
+    _open_common($self, %options);
     $self->{'pdf'}->{' fname'} = $file;
     $self->{'opened_readonly'} = 1 unless $is_writable;
 
@@ -160,7 +171,7 @@ sub open {
 }
 
 sub _open_common {
-    my $self = shift();
+    my ($self, %options) = @_;
 
     $self->{'pdf'}->{'Root'}->realise();
     $self->{'pdf'}->{' version'} ||= '1.3';
@@ -174,13 +185,18 @@ sub _open_common {
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     weaken $self->{'catalog'};
 
-    $self->{'forcecompress'} = 1;
+    if (exists $options{'-compress'}) {
+        $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
+    }
+    else {
+        $self->{'forcecompress'} = 1;
+    }
     $self->{'fonts'} = {};
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
     return $self;
 }
 
-=item $pdf = PDF::API2->open_scalar($pdf_string)
+=item $pdf = PDF::API2->open_scalar($pdf_string, %options)
 
 Opens a PDF contained in a string.
 
@@ -194,6 +210,9 @@ B<Example:>
     $pdf = PDF::API2->open_scalar($pdf_string);
     ...
     $pdf->saveas('our/new.pdf');
+
+To turn off automatic compression of PDF contents, include option C<-compress>
+with a false value.  This is generally only useful for debugging.
 
 =cut
 
@@ -214,7 +233,7 @@ sub open_scalar {
     CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
 
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($fh, 1);
-    _open_common($self);
+    _open_common($self, %options);
     $self->{'opened_scalar'} = 1;
 
     return $self;
@@ -1230,7 +1249,7 @@ sub openpage {
             # this will be fixed by the following code or content or filters
 
             ## if we like compress we will do it now to do quicker saves
-            if ($self->{'forcecompress'} > 0) {
+            if ($self->{'forcecompress'}) {
                 # $content->compressFlate();
                 $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
                 $content->{' nofilt'} = 1;
@@ -1402,7 +1421,7 @@ sub importPageIntoForm {
             # so we just copy it and add the required "qQ"
             $xo->add('q', $k->{' stream'}, 'Q');
         }
-        $xo->compressFlate() if $self->{'forcecompress'} > 0;
+        $xo->compressFlate() if $self->{'forcecompress'};
     }
 
     return $xo;

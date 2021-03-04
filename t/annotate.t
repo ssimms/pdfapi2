@@ -6,8 +6,7 @@ use warnings;
 use PDF::API2;
 use PDF::API2::Basic::PDF::Array;
 
-my $pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+my $pdf = PDF::API2->new(-compress => 0);
 my $page = $pdf->page();
 
 # Text annotation

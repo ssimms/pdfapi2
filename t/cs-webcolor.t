@@ -5,8 +5,7 @@ use strict;
 
 use PDF::API2;
 
-my $pdf = PDF::API2->new();
-$pdf->{forcecompress} = 0;
+my $pdf = PDF::API2->new(-compress => 0);
 
 my $cs = $pdf->colorspace_web();
 my $gfx = $pdf->page->gfx();
