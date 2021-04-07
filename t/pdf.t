@@ -15,7 +15,7 @@ is($info{'Producer'}, 'PDF::API2 Test Suite', 'Check info string');
 my $gfx = $pdf->page->gfx();
 $gfx->fillcolor('blue');
 
-my $new = PDF::API2->open_scalar($pdf->stringify(), );
+my $new = PDF::API2->open_scalar($pdf->stringify());
 %info = $new->info();
 is($info{'Producer'}, 'PDF::API2 Test Suite', 'Check info string after save and reload');
 
