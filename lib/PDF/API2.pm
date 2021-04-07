@@ -185,6 +185,7 @@ sub _open_common {
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     weaken $self->{'catalog'};
 
+    $self->{'opened'} = 1;
     if (exists $options{'-compress'}) {
         $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
     }
@@ -1050,6 +1051,13 @@ sub stringify {
     if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         $str = ${$self->{'content_ref'}};
+    }
+    elsif ($self->{'opened'}) {
+        my $fh = FileHandle->new();
+        CORE::open($fh, '>', \$str) || die "Can't begin scalar IO";
+        $self->{'pdf'}->clone_file($fh);
+        $self->{'pdf'}->close_file();
+        $fh->close();
     }
     else {
         my $fh = FileHandle->new();

@@ -1,8 +1,9 @@
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use warnings;
 use strict;
 
+use File::Temp qw(tempfile);
 use PDF::API2;
 
 my $pdf = PDF::API2->new();
@@ -90,3 +91,24 @@ $pdf->pageLabel(0, { -prefix => 'Test' });
 like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D >> \] >>},
      q{Page Numbering: Decimal Characters (implicit), with prefix});
 
+
+##
+## stringify
+##
+
+$pdf = PDF::API2->new(-compress => 0);
+$gfx = $pdf->page->gfx();
+$gfx->fillcolor('blue');
+
+$string = $pdf->stringify();
+like($string, qr/0 0 1 rg/,
+     q{Stringify of newly-created PDF contains expected content});
+
+my ($fh, $filename) = tempfile();
+print $fh $string;
+close $fh;
+
+$pdf = PDF::API2->open($filename);
+$string = $pdf->stringify();
+like($string, qr/0 0 1 rg/,
+     q{Stringify of newly-opened PDF contains expected content});
