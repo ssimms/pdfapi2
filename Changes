@@ -3,6 +3,9 @@
     - [RT #134957] Fix encoding of \n in a PDF string containing non-printable
       characters (reported by Stuart Henderson).
 
+    - [RT #133131] Fix endianness of 64-bit numbers in cross-reference stream
+      widths array (reported by Christopher Papademetrious, fix by Vadim Repin).
+
 
 2.039     2021-03-04
 
