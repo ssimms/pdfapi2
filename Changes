@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+    - [RT #134957] Fix encoding of \n in a PDF string containing non-printable
+      characters (reported by Stuart Henderson).
+
+
 2.039     2021-03-04
 
     - PDF::API2->open($filename) no longer reads the entire file into memory

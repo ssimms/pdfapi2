@@ -192,7 +192,7 @@ sub as_pdf {
     }
     else {
         if ($str =~ m/[^\n\r\t\b\f\040-\176\200-\377]/oi) {
-            $str =~ s/(.)/sprintf('%02X', ord($1))/oge;
+            $str =~ s/(.)/sprintf('%02X', ord($1))/soge;
             return "<$str>";
         }
         else {
