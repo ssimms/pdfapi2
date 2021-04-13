@@ -136,4 +136,3 @@ like($string, qr/0 0 1 rg/,
      q{saveas($opened_filename) contains original content});
 like($string, qr/1 0 0 rg/,
      q{saveas($opened_filename) contains new content});
-
