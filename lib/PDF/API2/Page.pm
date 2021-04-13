@@ -45,7 +45,7 @@ sub new {
 
 =item $page = PDF::API2::Page->coerce $pdf, $pdfpage
 
-Returns a page object converted from $pdfpage (called from $pdf->openpage).
+Returns a page object converted from $pdfpage (called from $pdf->open_page).
 
 =cut
 

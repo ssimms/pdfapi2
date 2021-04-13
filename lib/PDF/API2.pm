@@ -47,7 +47,7 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     $page = $pdf->page();
 
     # Retrieve an existing page
-    $page = $pdf->openpage($page_number);
+    $page = $pdf->open_page($page_number);
 
     # Set the page size
     $page->mediabox('Letter');
@@ -1164,7 +1164,7 @@ sub page {
     return $page;
 }
 
-=item $page = $pdf->openpage($page_number)
+=item $page = $pdf->open_page($page_number)
 
 Returns the L<PDF::API2::Page> object of page $page_number.
 
@@ -1174,14 +1174,17 @@ document.
 B<Example:>
 
     $pdf = PDF::API2->open('our/99page.pdf');
-    $page = $pdf->openpage(1);   # returns the first page
-    $page = $pdf->openpage(99);  # returns the last page
-    $page = $pdf->openpage(-1);  # returns the last page
-    $page = $pdf->openpage(999); # returns undef
+    $page = $pdf->open_page(1);   # returns the first page
+    $page = $pdf->open_page(99);  # returns the last page
+    $page = $pdf->open_page(-1);  # returns the last page
+    $page = $pdf->open_page(999); # returns undef
 
 =cut
 
-sub openpage {
+# Deprecated (renamed)
+sub openpage { return open_page(@_); } ## no critic
+
+sub open_page {
     my $self = shift();
     my $index = shift() || 0;
     my ($page, $rotate, $media, $trans);
@@ -1370,7 +1373,7 @@ sub importPageIntoForm {
         $s_page = $s_idx;
     }
     else {
-        $s_page = $s_pdf->openpage($s_idx);
+        $s_page = $s_pdf->open_page($s_idx);
     }
 
     $self->{'apiimportcache'} ||= {};
@@ -1405,7 +1408,7 @@ sub importPageIntoForm {
     # create a whole content stream
     ## technically it is possible to submit an unfinished
     ## (eg. newly created) source-page, but that's nonsense,
-    ## so we expect a page fixed by openpage and die otherwise
+    ## so we expect a page fixed by open_page and die otherwise
     unless ($s_page->{' opened'}) {
         croak join(' ',
                    "Pages may only be imported from a complete PDF.",
@@ -1416,7 +1419,7 @@ sub importPageIntoForm {
         $s_page->fixcontents();
 
         $xo->{' stream'} = '';
-        # openpage pages only contain one stream
+        # open_page pages only contain one stream
         my ($k) = $s_page->{'Contents'}->elements();
         $k->realise();
         if ($k->{' nofilt'}) {
@@ -1477,7 +1480,7 @@ sub import_page {
         $s_page = $s_idx;
     }
     else {
-        $s_page = $s_pdf->openpage($s_idx);
+        $s_page = $s_pdf->open_page($s_idx);
     }
 
     if (ref($t_idx) eq 'PDF::API2::Page') {

@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - Renamed openpage to open_page in PDF::API2.  The old name is deprecated.
+
+
 2.040     2021-04-13
 
     - Fix open() followed by stringify() resulting in a corrupt (mostly-empty)

@@ -86,7 +86,7 @@ $page->update();
 $string = $pdf->stringify();
 
 $pdf = PDF::API2->open_scalar($string);
-$page = $pdf->openpage(1);
+$page = $pdf->open_page(1);
 $annotation = $page->annotation();
 
 $annotation->text('This is an annotation', -rect => [ 72, 144, 172, 244 ]);
