@@ -1256,12 +1256,8 @@ sub openpage {
                 $content->{' stream'} .= ' Q ';
             }
 
-            ## $content->{'Length'} = PDFNum(length($content->{' stream'}));
-            # this will be fixed by the following code or content or filters
-
-            ## if we like compress we will do it now to do quicker saves
+            # if we like compress we will do it now to do quicker saves
             if ($self->{'forcecompress'}) {
-                # $content->compressFlate();
                 $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
                 $content->{' nofilt'} = 1;
                 delete $content->{'-docompress'};
@@ -1408,7 +1404,7 @@ sub importPageIntoForm {
 
     # create a whole content stream
     ## technically it is possible to submit an unfinished
-    ## (eg. newly created) source-page, but thats nonsense,
+    ## (eg. newly created) source-page, but that's nonsense,
     ## so we expect a page fixed by openpage and die otherwise
     unless ($s_page->{' opened'}) {
         croak join(' ',
@@ -1416,9 +1412,6 @@ sub importPageIntoForm {
                    "Save and reopen the source PDF object first.");
     }
 
-    # since the source page comes from openpage it may already
-    # contain the required starting 'q' without the final 'Q'
-    # if forcecompress is in effect
     if (defined $s_page->{'Contents'}) {
         $s_page->fixcontents();
 
@@ -1427,8 +1420,7 @@ sub importPageIntoForm {
         my ($k) = $s_page->{'Contents'}->elements();
         $k->realise();
         if ($k->{' nofilt'}) {
-          # we have a finished stream here
-          # so we unfilter
+          # we have a finished stream here so we unfilter
           $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
         }
         else {
