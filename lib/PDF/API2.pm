@@ -995,6 +995,9 @@ sub saveas {
         unless ($self->{'pdf'}->{' fname'}) {
             $self->{'pdf'}->out_file($file);
         }
+        elsif ($self->{'pdf'}->{' fname'} eq $file) {
+            $self->update();
+        }
         else {
             $self->{'pdf'}->clone_file($file);
             $self->{'pdf'}->close_file();

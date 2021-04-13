@@ -1,4 +1,4 @@
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 use warnings;
 use strict;
@@ -112,3 +112,28 @@ $pdf = PDF::API2->open($filename);
 $string = $pdf->stringify();
 like($string, qr/0 0 1 rg/,
      q{Stringify of newly-opened PDF contains expected content});
+
+##
+## saveas with same filename
+##
+
+$pdf = PDF::API2->new(-compress => 0);
+$gfx = $pdf->page->gfx();
+$gfx->fillcolor('blue');
+
+($fh, $filename) = tempfile();
+print $fh $pdf->stringify();
+close $fh;
+
+$pdf = PDF::API2->open($filename, -compress => 0);
+$gfx = $pdf->page->gfx();
+$gfx->fillcolor('red');
+$pdf->saveas($filename);
+
+$pdf = PDF::API2->open($filename, -compress => 0);
+$string = $pdf->stringify();
+like($string, qr/0 0 1 rg/,
+     q{saveas($opened_filename) contains original content});
+like($string, qr/1 0 0 rg/,
+     q{saveas($opened_filename) contains new content});
+
