@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.040     2021-04-13
+
     - Fix open() followed by stringify() resulting in a corrupt (mostly-empty)
       PDF, which was broken by changes in 2.039 (reported by Gareth Tunley).
 
