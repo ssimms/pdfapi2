@@ -1204,7 +1204,7 @@ sub openpage {
         weaken $page->{' apipdf'};
         weaken $page->{' api'};
         $self->{'pdf'}->out_obj($page);
-        if (($rotate = $page->find_prop('Rotate')) and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
+        if (($rotate = $page->find_prop('Rotate')) and not $page->{' opened'}) {
             $rotate = ($rotate->val() + 360) % 360;
 
             if ($rotate != 0 and not $self->default('nounrotate')) {
@@ -1239,7 +1239,7 @@ sub openpage {
             $trans = '';
         }
 
-        if (defined $page->{'Contents'} and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
+        if (defined $page->{'Contents'} and not $page->{' opened'}) {
             $page->fixcontents();
             my $uncontent = delete $page->{'Contents'};
             my $content = $page->gfx();
@@ -1268,7 +1268,7 @@ sub openpage {
                 $content->{'Length'} = PDFNum(length($content->{' stream'}));
             }
         }
-        $page->{' fixed'} = 1;
+        $page->{' opened'} = 1;
     }
 
     $self->{'pdf'}->out_obj($page);
@@ -1410,7 +1410,11 @@ sub importPageIntoForm {
     ## technically it is possible to submit an unfinished
     ## (eg. newly created) source-page, but thats nonsense,
     ## so we expect a page fixed by openpage and die otherwise
-    die "page not processed via openpage ..." unless $s_page->{' fixed'} == 1;
+    unless ($s_page->{' opened'}) {
+        croak join(' ',
+                   "Pages may only be imported from a complete PDF.",
+                   "Save and reopen the source PDF object first.");
+    }
 
     # since the source page comes from openpage it may already
     # contain the required starting 'q' without the final 'Q'
