@@ -1412,7 +1412,7 @@ sub importPageIntoForm {
     unless ($s_page->{' opened'}) {
         croak join(' ',
                    "Pages may only be imported from a complete PDF.",
-                   "Save and reopen the source PDF object first.");
+                   "Save and reopen the source PDF object first");
     }
 
     if (defined $s_page->{'Contents'}) {
