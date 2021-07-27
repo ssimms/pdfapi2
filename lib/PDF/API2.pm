@@ -2432,13 +2432,20 @@ sub outlines {
     my $self = shift();
 
     require PDF::API2::Outlines;
-    $self->{'pdf'}->{'Root'}->{'Outlines'} ||= PDF::API2::Outlines->new($self);
-
     my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
+    if ($obj) {
+        bless $obj, 'PDF::API2::Outlines';
+        $obj->{' api'} = $self;
+        weaken $obj->{' api'};
+    }
+    else {
+        $obj = PDF::API2::Outlines->new($self);
 
-    $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
-    $self->{'pdf'}->out_obj($obj);
-    $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
+        $self->{'pdf'}->{'Root'}->{'Outlines'} = $obj;
+        $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
+        $self->{'pdf'}->out_obj($obj);
+        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
+    }
 
     return $obj;
 }

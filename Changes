@@ -17,6 +17,9 @@
       indirect objects, which can be highly-interconnected (reported by Leon
       Winter).
 
+    - [RT #41971] Fix when attempting to read an existing PDF's outlines
+      (reported by Damyan Ivanov, fix based on a patch by Vadim Repin).
+
 
 2.040     2021-04-13
 
