@@ -1321,13 +1321,6 @@ sub out_trailer {
                              # Entries specific to cross-reference streams
                              qw(Index W XRefStm));
 
-    #    $size = @{$self->{' printed'}} + @{$self->{' free'}};
-    #    $tdict->{'Size'} = PDFNum($tdict->{'Size'}->val + $size);
-    # PDFSpec 1.3 says for /Size: (Required) Total number of entries in the file's
-    # cross-reference table, including the original table and all updates. Which
-    # is what the previous two lines implement.
-    # But this seems to make Acrobat croak on saving so we try the following from
-    # basil.duval@epfl.ch
     $tdict->{'Size'} = PDFNum($self->{' maxobj'});
 
     my $tloc = $fh->tell();
@@ -1358,10 +1351,6 @@ sub out_trailer {
 
     $j = 0; my $first = -1; $k = 0;
     for ($i = 0; $i <= $#xreflist + 1; $i++) {
-#        if ($i == 0) {
-#            $first = $i; $j = $xreflist[0]->{' objnum'};
-#            $fh->printf("0 1\n%010d 65535 f \n", $ff);
-#        }
         if ($i > $#xreflist || $self->{' objects'}{$xreflist[$i]->uid}[0] != $j + 1) {
             push @out, ($first == -1 ? "0 " : "$self->{' objects'}{$xreflist[$first]->uid}[0] ") . ($i - $first) . "\n";
             if ($first == -1) {
@@ -1370,7 +1359,7 @@ sub out_trailer {
             }
             for ($j = $first; $j < $i; $j++) {
                 my $xref = $xreflist[$j];
-                if (defined $freelist[$k] && defined $xref && "$freelist[$k]" eq "$xref") {
+                if (defined($freelist[$k]) and defined($xref) and "$freelist[$k]" eq "$xref") {
                     $k++;
                     push @out, pack("A10AA5A4",
                                     sprintf("%010d", (defined $freelist[$k] ?
@@ -1391,46 +1380,46 @@ sub out_trailer {
             $j++;
         }
     }
-    if ( exists $tdict-> { Type } and $tdict-> { Type }-> val eq 'XRef' ) {
-        my ( @index, @stream );
-        for ( @out ) {
+    if (exists $tdict->{'Type'} and $tdict->{'Type'}->val() eq 'XRef') {
+        my (@index, @stream);
+        for (@out) {
             my @a = split;
-            @a == 2 ? push @index, @a : push @stream, \@a
+            @a == 2 ? push @index, @a : push @stream, \@a;
         }
-        my $i = $self->{ ' maxobj' } ++;
-        $self-> add_obj( $tdict, $i, 0 );
-        $self-> out_obj( $tdict );
+        my $i = $self->{' maxobj'}++;
+        $self->add_obj($tdict, $i, 0);
+        $self->out_obj($tdict );
 
         push @index, $i, 1;
-        push @stream, [ $tloc, 0, 'n' ];
+        push @stream, [$tloc, 0, 'n'];
 
         my $len = $tloc > 0xFFFF ? 4 : 2;           # don't expect files > 4 Gb
         my $tpl = $tloc > 0xFFFF ? 'CNC' : 'CnC';   # don't expect gennum > 255, it's absurd.
                                                     # Adobe doesn't use them anymore anyway
         my $stream = '';
-        my @prev   = ( 0 ) x ( $len + 2 );
-        for ( @stream ) {
-            $_-> [ 1 ] = 0 if $_-> [ 2 ] eq 'f' and $_-> [ 1 ] == 65535;
-            my @line = unpack 'C*', pack $tpl, $_-> [ 2 ] eq 'n' ? 1 : 0, @{ $_ }[ 0 .. 1 ];
+        my @prev = (0) x ($len + 2);
+        for (@stream) {
+            $_->[1] = 0 if $_->[2] eq 'f' and $_->[1] == 65535;
+            my @line = unpack 'C*', pack $tpl, $_->[2] eq 'n' ? 1 : 0, @{$_}[0..1];
 
             $stream .= pack 'C*', 2,                # prepend filtering method, "PNG Up"
-                map {( $line[ $_ ] - $prev[ $_ ] + 256 ) % 256 } 0 .. $#line;
-            @prev    = @line;
+                map {($line[$_] - $prev[$_] + 256) % 256 } 0 .. $#line;
+            @prev = @line;
         }
-        $tdict-> { Size }   = PDFNum( $i + 1 );
-        $tdict-> { Index }  = PDFArray( map PDFNum( $_ ), @index );
-        $tdict-> { W }      = PDFArray( map PDFNum( $_ ), 1, $len, 1 );
-        $tdict-> { Filter } = PDFName( 'FlateDecode' );
+        $tdict->{'Size'}   = PDFNum($i + 1);
+        $tdict->{'Index'}  = PDFArray(map PDFNum( $_ ), @index);
+        $tdict->{'W'}      = PDFArray(map PDFNum( $_ ), 1, $len, 1);
+        $tdict->{'Filter'} = PDFName('FlateDecode');
 
-        $tdict-> { DecodeParms } = PDFDict;
-        $tdict-> { DecodeParms }-> val-> { Predictor } = PDFNum( 12 );
-        $tdict-> { DecodeParms }-> val-> { Columns }   = PDFNum( $len + 2 );
+        $tdict->{'DecodeParms'} = PDFDict();
+        $tdict->{'DecodeParms'}->val->{'Predictor'} = PDFNum(12);
+        $tdict->{'DecodeParms'}->val->{'Columns'}   = PDFNum($len + 2);
 
-        $stream = PDF::API2::Basic::PDF::Filter::FlateDecode-> new-> outfilt( $stream, 1 );
-        $tdict-> { ' stream' } = $stream;
-        $tdict-> { ' nofilt' } = 1;
-        delete $tdict-> { Length };
-        $self-> ship_out;
+        $stream = PDF::API2::Basic::PDF::Filter::FlateDecode->new->outfilt($stream, 1);
+        $tdict->{' stream'} = $stream;
+        $tdict->{' nofilt'} = 1;
+        delete $tdict->{'Length'};
+        $self->ship_out();
     }
     else {
         $fh->print("xref\n", @out, "trailer\n");
