@@ -111,6 +111,11 @@ sub release {
     my @tofree = values %$self;
     %$self = ();
 
+    # PDFs with highly-interconnected page trees or outlines can hit Perl's
+    # recursion limit pretty easily, so disable the warning for this specific
+    # loop.
+    no warnings 'recursion';
+
     while (my $item = shift @tofree) {
         # common case: value is not reference
         my $ref = ref($item) || next;

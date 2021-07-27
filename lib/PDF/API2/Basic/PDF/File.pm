@@ -298,6 +298,11 @@ sub release {
         delete $self->{$key};
     }
 
+    # PDFs with highly-interconnected page trees or outlines can hit Perl's
+    # recursion limit pretty easily, so disable the warning for this specific
+    # loop.
+    no warnings 'recursion';
+
     while (my $item = shift @tofree) {
         if (blessed($item) and $item->can('release')) {
             $item->release(1);
