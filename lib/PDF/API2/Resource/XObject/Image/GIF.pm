@@ -7,6 +7,7 @@ use warnings;
 
 # VERSION
 
+use Carp;
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
@@ -120,7 +121,7 @@ sub new {
 
     $class = ref($class) if ref($class);
 
-    $self = $class->SUPER::new($pdf,$name || 'Gx' . pdfkey());
+    $self = $class->SUPER::new($pdf, $name || 'Gx' . pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
 
     $self->{' apipdf'} = $pdf;
@@ -199,12 +200,10 @@ sub new {
         elsif ($sep == 0x3b) { # trailer
             last;
         }
-        elsif ($sep == 0x21) {
-            # Graphic Control Extension
-            $fh->read($buf, 1); # tag.
-            my $tag=unpack('C', $buf);
-            die "unsupported graphic control extension ($tag)" unless $tag == 0xF9;
-            $fh->read($buf, 1); # len.
+        else { # extension
+            $fh->read($buf, 1); # tag
+            my $tag = unpack('C', $buf);
+            $fh->read($buf, 1); # length
             my $len = unpack('C', $buf);
             my $stream = '';
             while ($len > 0) {
@@ -213,22 +212,28 @@ sub new {
                 $fh->read($buf, 1);
                 $len = unpack('C', $buf);
             }
-            my ($cFlags, $delay, $transIndex) = unpack('CvC', $stream);
-            if (($cFlags & 0x01) and not $opts{'-notrans'}) {
-                $self->{'Mask'} = PDFArray(PDFNum($transIndex),
-                                           PDFNum($transIndex));
+
+            # Graphic Control Extension
+            if ($sep == 0x21 and $tag == 0xF9) {
+                my ($cFlags, $delay, $transIndex) = unpack('CvC', $stream);
+                if (($cFlags & 0x01) and not $opts{'-notrans'}) {
+                    $self->{'Mask'} = PDFArray(PDFNum($transIndex),
+                                               PDFNum($transIndex));
+                }
             }
-        }
-        else {
-            # extension
-            $fh->read($buf, 1); # tag.
-            my $tag=unpack('C', $buf);
-            $fh->read($buf, 1); # tag.
-            my $len = unpack('C', $buf);
-            while ($len > 0) {
-                $fh->read($buf, $len);
-                $fh->read($buf, 1);
-                $len=unpack('C', $buf);
+
+            # Comment Extension
+            elsif ($sep == 0x21 and $tag == 0xFE) {
+                # NOOP: ignore
+            }
+
+            # Plain Text Extension
+            elsif ($sep == 0x21 and $tag == 0x01) {
+                # NOOP: ignore
+            }
+
+            elsif ($sep == 0x21) {
+                carp "Ignoring unsupported GIF extension $tag";
             }
         }
     }

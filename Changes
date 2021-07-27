@@ -2,6 +2,9 @@
 
     - Renamed openpage to open_page in PDF::API2.  The old name is deprecated.
 
+    - [RT #44877] GIFs containing comments or plain-text representations will no
+      longer result in an error (reported by Chris Czub).
+
 
 2.040     2021-04-13
 
