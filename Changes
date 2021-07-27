@@ -5,6 +5,9 @@
     - [RT #44877] GIFs containing comments or plain-text representations will no
       longer result in an error (reported by Chris Czub).
 
+    - [RT #132844] Fix corruption when a PGM image is included (reported by Jeff
+      Ratcliffe, fix by Vadim Repin).
+
 
 2.040     2021-04-13
 

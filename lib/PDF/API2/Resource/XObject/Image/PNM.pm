@@ -135,7 +135,6 @@ sub read_pnm {
         $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
     }
     elsif ($info->{'type'} == 5) { # PGM
-        $buf .= <$fh>;
         if ($info->{'max'} == 255) {
             $s = 0;
         }
