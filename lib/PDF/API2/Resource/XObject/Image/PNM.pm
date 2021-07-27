@@ -17,18 +17,22 @@ use PDF::API2::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
 
 sub new {
-    my ($class, $pdf, $file, $name) = @_;
+    my ($class, $pdf, $file, %opts) = @_;
     my $self;
 
     $class = ref($class) if ref($class);
 
-    $self = $class->SUPER::new($pdf, $name || 'Nx' . pdfkey());
+    $self = $class->SUPER::new($pdf, 'Nx' . pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
 
-    $self->{' apipdf'} = $pdf;
-    weaken $self->{' apipdf'};
-
     $self->read_pnm($pdf, $file);
+
+    if ($opts{'-compress'}) {
+        $self->filters('FlateDecode');
+    }
+    else {
+        $self->filters('ASCIIHexDecode');
+    }
 
     return $self;
 }
@@ -182,8 +186,6 @@ sub read_pnm {
     $self->height($info->{'height'});
 
     $self->bits_per_component($bpc);
-
-    $self->filters('FlateDecode');
 
     $self->colorspace($cs);
 

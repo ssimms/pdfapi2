@@ -2088,8 +2088,10 @@ Imports and returns a new PNM image object.  C<$file> may be either a filename o
 sub image_pnm {
     my ($self, $file, %opts) = @_;
 
+    $opts{'-compress'} = $self->{'forcecompress'};
+
     require PDF::API2::Resource::XObject::Image::PNM;
-    my $obj = PDF::API2::Resource::XObject::Image::PNM->new($self->{'pdf'}, $file);
+    my $obj = PDF::API2::Resource::XObject::Image::PNM->new($self->{'pdf'}, $file, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
 
