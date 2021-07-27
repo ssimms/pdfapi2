@@ -15,7 +15,10 @@ sub outfilt {
 
     # Each byte of the input string gets encoded as two hexadecimal
     # characters.
-    $string =~ s/(.)/sprintf('%02x', ord($1))/oge;
+    $string =~ s/(.)/sprintf('%02x', ord($1))/ges;
+
+    # Wrap after 72 characters
+    $string =~ s/(.{72})/$1\n/g;
 
     # The EOD (end-of-document) marker is a greater-than sign
     $string .= '>' if $include_eod;
