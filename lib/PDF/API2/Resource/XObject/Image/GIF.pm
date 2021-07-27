@@ -137,7 +137,7 @@ sub new {
     my $buf;
     $fh->seek(0, 0);
     $fh->read($buf, 6); # signature
-    unless($buf=~/^GIF[0-9][0-9][a-b]/) {
+    unless ($buf =~ /^GIF[0-9][0-9][a-b]/) {
         die "Unknown image signature '$buf' -- not a GIF";
     }
 
@@ -157,7 +157,7 @@ sub new {
 
     until ($fh->eof()) {
         $fh->read($buf, 1); # tag.
-        my $sep=unpack('C', $buf);
+        my $sep = unpack('C', $buf);
         if ($sep == 0x2C) {
             $fh->read($buf, 9); # image descriptor
             my ($left, $top, $w, $h, $flags) = unpack('vvvvC', $buf);
