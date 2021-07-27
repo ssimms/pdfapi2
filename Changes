@@ -1,12 +1,14 @@
 {{$NEXT}}
 
-    - Renamed openpage to open_page in PDF::API2.  The old name is deprecated.
+    - Rename openpage to open_page in PDF::API2.  The old name is deprecated.
 
     - [RT #44877] GIFs containing comments or plain-text representations will no
       longer result in an error (reported by Chris Czub).
 
     - [RT #132844] Fix corruption when a PGM image is included (reported by Jeff
       Ratcliffe, fix by Vadim Repin).
+
+    - Expand PNM support to include all image types.
 
 
 2.040     2021-04-13

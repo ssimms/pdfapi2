@@ -7,10 +7,10 @@ package PDF::API2::Resource::XObject::Image::PNM;
 use base 'PDF::API2::Resource::XObject::Image';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
 
 # VERSION
 
+use Carp;
 use IO::File;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
@@ -37,11 +37,10 @@ sub new {
     return $self;
 }
 
-# READPPMHEADER
 # Originally from Image::PBMLib by Elijah Griffin (28 Feb 2003)
-sub readppmheader {
+sub _read_header {
     my $fh = shift();
-    my $in = '';
+    my $in;
     my $no_comments;
     my %info;
     my $rc;
@@ -117,7 +116,7 @@ sub readppmheader {
 sub read_pnm {
     my ($self, $pdf, $file) = @_;
 
-    my ($buf, $t, $s, $line);
+    my ($buf, $t, $scale, $line);
     my $bpc;
     my $cs;
 
@@ -131,54 +130,173 @@ sub read_pnm {
     binmode($fh, ':raw');
     $fh->seek(0, 0);
 
-    my $info = readppmheader($fh);
-    if ($info->{'type'} == 4) { # PBM
+    my $info = _read_header($fh);
+    if ($info->{'type'} == 1) { # ASCII PBM
         $bpc = 1;
-        read($fh, $self->{' stream'}, ($info->{'width'} * $info->{'height'} / 8));
         $cs = 'DeviceGray';
         $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
+
+        # Read the remainder of the file
+        local $/ = undef;
+        my $plain = <$fh>;
+
+        # Discard everything other than ASCII 1 and 0
+        $plain =~ s/[^01]+//g;
+
+        # Check length
+        my $size = $info->{'width'} * $info->{'height'};
+        croak "Incomplete ASCII PBM" if length($plain) < $size;
+
+        # Discard any additional bits
+        $plain = substr($plain, 0, $size) if length($plain) > $size;
+
+        # Pad with zeroes
+        $plain .= '0' x (8 - (length($plain) % 8));
+
+        # Convert to binary
+        $self->{' stream'} = pack('B*', $plain);
     }
-    elsif ($info->{'type'} == 5) { # PGM
-        if ($info->{'max'} == 255) {
-            $s = 0;
-        }
-        else {
-            $s = 255 / $info->{'max'};
-        }
-        $bpc = 8;
-        if ($s > 0) {
-            for ($line = ($info->{'width'} * $info->{'height'}); $line > 0; $line--) {
-                read($fh, $buf, 1);
-                $self->{' stream'} .= pack('C', (unpack('C', $buf) * $s));
-            }
-        }
-        else {
-            read($fh, $self->{' stream'}, $info->{'width'} * $info->{'height'});
-        }
+    elsif ($info->{'type'} == 2) { # ASCII PGM
         $cs = 'DeviceGray';
-    }
-    elsif ($info->{'type'} == 6) { # PPM
-        if ($info->{'max'} == 255) {
-            $s = 0;
+
+        # Read the remainder of the file
+        local $/ = undef;
+        my $plain = <$fh>;
+
+        # Discard everything other than digits and whitespace
+        $plain =~ s/[^\d\s]+//gs;
+        $plain =~ s/^\s+//;
+
+        # Convert to an array of integers
+        my @raster = split m/\s+/, $plain;
+
+        # Check length
+        my $size = $info->{'width'} * $info->{'height'};
+        croak "Incomplete ASCII PGM" if scalar(@raster) < $size;
+
+        # Discard any additional integers
+        splice @raster, $size if scalar(@raster) > $size;
+
+        # Scale
+        $scale = 1;
+        if ($info->{'max'} <= 255) {
+            $bpc = 8;
+            $scale = 255 / $info->{'max'} unless $info->{'max'} == 255;
         }
         else {
-            $s = 255 / $info->{'max'};
+            $bpc = 16;
+            $scale = 65535 / $info->{'max'} unless $info->{'max'} == 65535;
         }
-        $bpc = 8;
-        if ($s > 0) {
-            for ($line = ($info->{'width'} * $info->{'height'}); $line > 0; $line--) {
-                read($fh, $buf, 1);
-                $self->{' stream'} .= pack('C', (unpack('C', $buf) * $s));
-                read($fh, $buf, 1);
-                $self->{' stream'} .= pack('C', (unpack('C', $buf) * $s));
-                read($fh, $buf, 1);
-                $self->{' stream'} .= pack('C', (unpack('C', $buf) * $s));
+        @raster = map { $_ * $scale } @raster;
+
+        # Convert to bytes
+        if ($bpc == 8) {
+            $self->{' stream'} = pack('C*', @raster);
+        }
+        else {
+            $self->{' stream'} = pack('S*', @raster);
+        }
+    }
+    elsif ($info->{'type'} == 3) { # ASCII PPM
+        $cs = 'DeviceRGB';
+
+        # Read the remainder of the file
+        local $/ = undef;
+        my $plain = <$fh>;
+
+        # Discard everything other than digits and whitespace
+        $plain =~ s/[^\d\s]+//gs;
+        $plain =~ s/^\s+//;
+
+        # Convert to an array of integers
+        my @raster = split m/\s+/, $plain;
+
+        # Check length
+        my $size = $info->{'width'} * $info->{'height'};
+        croak "Incomplete ASCII PGM" if scalar(@raster) < $size * 3;
+
+        # Discard any additional integers
+        splice @raster, $size if scalar(@raster) > $size * 3;
+
+        # Scale
+        $scale = 1;
+        if ($info->{'max'} <= 255) {
+            $bpc = 8;
+            $scale = 255 / $info->{'max'} unless $info->{'max'} == 255;
+        }
+        else {
+            $bpc = 16;
+            $scale = 65535 / $info->{'max'} unless $info->{'max'} == 65535;
+        }
+        @raster = map { $_ * $scale } @raster;
+
+        # Convert to bytes
+        if ($bpc == 8) {
+            $self->{' stream'} = pack('C*', @raster);
+        }
+        else {
+            $self->{' stream'} = pack('S*', @raster);
+        }
+    }
+    elsif ($info->{'type'} == 4) { # Raw PBM
+        $cs = 'DeviceGray';
+        $bpc = 1;
+        $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
+        read($fh, $self->{' stream'}, ($info->{'width'} * $info->{'height'} / 8));
+    }
+    elsif ($info->{'type'} == 5) { # Raw PGM
+        $cs = 'DeviceGray';
+        $bpc = $info->{'max'} <= 255 ? 8 : 16;
+
+        if ($info->{'max'} == 255 or $info->{'max'} == 65535) {
+            $scale = 1;
+        }
+        else {
+            $scale = ($bpc == 8 ? 255 : 65535) / $info->{'max'};
+        }
+
+        my $size = $info->{'width'} * $info->{'height'};
+        if ($scale == 1) {
+            read($fh, $self->{' stream'}, $size * ($bpc / 8));
+        }
+        else {
+            for (1 .. $size) {
+                read($fh, $buf, $bpc / 8);
+                if ($bpc == 8) {
+                    $self->{' stream'} .= pack('C', (unpack('C', $buf) * $scale));
+                }
+                else {
+                    $self->{' stream'} .= pack('S', (unpack('S', $buf) * $scale));
+                }
             }
         }
-        else {
-            read($fh, $self->{' stream'}, $info->{'width'} * $info->{'height'} * 3);
-        }
+    }
+    elsif ($info->{'type'} == 6) { # Raw PPM
         $cs = 'DeviceRGB';
+        $bpc = $info->{'max'} <= 255 ? 8 : 16;
+
+        if ($info->{'max'} == 255 or $info->{'max'} == 65535) {
+            $scale = 1;
+        }
+        else {
+            $scale = ($bpc == 8 ? 255 : 65535) / $info->{'max'};
+        }
+
+        my $size = $info->{'width'} * $info->{'height'};
+        if ($scale == 1) {
+            read($fh, $self->{' stream'}, $size * ($bpc / 8) * 3);
+        }
+        else {
+            for (1 .. ($size * 3)) {
+                read($fh, $buf, $bpc / 8);
+                if ($bpc == 8) {
+                    $self->{' stream'} .= pack('C', (unpack('C', $buf) * $scale));
+                }
+                else {
+                    $self->{' stream'} .= pack('S', (unpack('S', $buf) * $scale));
+                }
+            }
+        }
     }
     close $fh;
 
