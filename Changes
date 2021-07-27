@@ -2,6 +2,9 @@
 
     - Rename openpage to open_page in PDF::API2.  The old name is deprecated.
 
+    - [RT #136648] Fix when writing PDFs containing cross-reference streams
+      (reported by Chris Papademetrious, fix by Vadim Repin from RT #117184).
+
     - [RT #44877] GIFs containing comments or plain-text representations will no
       longer result in an error (reported by Chris Czub).
 
