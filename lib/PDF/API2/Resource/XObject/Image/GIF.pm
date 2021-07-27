@@ -137,7 +137,7 @@ sub new {
     my $buf;
     $fh->seek(0, 0);
     $fh->read($buf, 6); # signature
-    unless ($buf =~ /^GIF[0-9][0-9][a-b]/) {
+    unless ($buf =~ /^GIF[0-9][0-9][a-z]/) {
         die "Unknown image signature '$buf' -- not a GIF";
     }
 
