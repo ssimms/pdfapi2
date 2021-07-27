@@ -82,11 +82,7 @@ sub new
     my $space=$opts{-space}||'0';
     my $bold=($opts{-bold}||0)*10; # convert to em
 
-    $self->{' slant'}=$slant;
-    $self->{' oblique'}=$oblique;
-    $self->{' bold'}=$bold;
-    $self->{' boldmove'}=0.001;
-    $self->{' space'}=$space;
+    $font->encodeByName($opts{'-encode'}) if $opts{'-encode'};
 
     $class = ref $class if ref $class;
     $self = $class->SUPER::new($pdf,
@@ -178,7 +174,10 @@ sub new
             next;
         }
         my $char=PDFDict();
-        my $wth=int($font->width(chr($w))*1000*$slant+2*$space);
+
+        my $uni = $self->data->{uni}->[$w];
+        my $wth = int($font->width(chr($uni))*1000*$slant+2*$space);
+
         $procs->{$font->glyphByEnc($w)}=$char;
         #$char->{Filter}=PDFArray(PDFName('FlateDecode'));
         $char->{' stream'}=$wth." 0 ".join(' ',map { int($_) } $self->fontbbox)." d1\n";
@@ -196,16 +195,15 @@ sub new
             $char->{' stream'}.="/FSN 800 Tf\n";
             $char->{' stream'}.=($slant*110)." Tz\n";
             $char->{' stream'}.=" [ -$space ] TJ\n" if($space);
-            my $ch=$self->encByUni(hex($ci->{upper}));
-            $wth=int($font->width(chr($ch))*800*$slant*1.1+2*$space);
-            $char->{' stream'}.=$font->text(chr($ch));
+            $wth=int($font->width(uc chr($uni))*800*$slant*1.1+2*$space);
+            $char->{' stream'}.=$font->text(uc chr($uni));
         }
         else
         {
             $char->{' stream'}.="/FSN 1000 Tf\n";
             $char->{' stream'}.=($slant*100)." Tz\n" if($slant!=1);
             $char->{' stream'}.=" [ -$space ] TJ\n" if($space);
-            $char->{' stream'}.=$font->text(chr($w));
+            $char->{' stream'}.=$font->text( chr( $uni ));
         }
         $char->{' stream'}.=" Tj\nET\n";
         push @widths,$wth;
