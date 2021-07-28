@@ -47,7 +47,7 @@ delete $barcode->{'Filter'};
 my $gfx = $page->gfx();
 $gfx->formimage($barcode, 100, 100, 1);
 
-my $string = $pdf->stringify();
+my $string = $pdf->to_string();
 
 like($string, qr{/BBox \[ 0 0 39 20 \]},
      q{Barcode is the expected size});

@@ -16,6 +16,10 @@ local $SIG{'__WARN__'} = sub { warn $_[0] unless $_[0] =~ /Unhandled type: GLOB/
 my $pdf = PDF::API2->open('t/resources/sample.pdf');
 memory_cycle_ok($pdf, q{Open sample.pdf});
 
+# TODO: Create a sample PDF that uses as much PDF::API2 functionality as
+# possible (outlines and annotations in particular) to build confidence that all
+# circular references have been removed.
+
 # Check pagestack weakened status
 
 my $page = $pdf->page();
@@ -36,6 +40,6 @@ ok(isweak($pdf->{'pagestack'}->[1]),
     $pdf->corefont('Helvetica');
 }
 
-lives_ok(sub { $pdf->stringify() }, 'Font added inside a black is still present on save');
+lives_ok(sub { $pdf->to_string() }, 'Font added inside a black is still present on save');
 
 done_testing();

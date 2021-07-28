@@ -18,7 +18,7 @@ is($png->width(), 1,
 
 my $gfx = $pdf->page->gfx();
 $gfx->image($png, 72, 144, 216, 288);
-like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
+like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add PNG to PDF});
 
 # RGBA PNG file
@@ -33,7 +33,7 @@ my $page = $pdf->page();
 $page->mediabox(840,600);
 $gfx=$page->gfx;
 $gfx->image($png,134,106,510,281);
-my $rgba1_pdf_string = $pdf->stringify();
+my $rgba1_pdf_string = $pdf->to_string();
 
 # RGBA PNG file Pure Perl
 
@@ -47,7 +47,7 @@ my $page2 = $pdf->page();
 $page2->mediabox(840,600);
 my $gfx2=$page2->gfx;
 $gfx2->image($png2,134,106,510,281);
-my $rgba2_pdf_string = $pdf->stringify();
+my $rgba2_pdf_string = $pdf->to_string();
 delete $ENV{'PDFAPI2_PNG_PP'};
 
 is(substr($rgba1_pdf_string, 0, 512), substr($rgba2_pdf_string, 0, 512),

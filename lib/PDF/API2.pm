@@ -65,7 +65,7 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     $text->text('Hello World!');
 
     # Save the PDF
-    $pdf->saveas('/path/to/new.pdf');
+    $pdf->to_file('/path/to/new.pdf');
 
 =head1 GENERIC METHODS
 
@@ -81,15 +81,15 @@ B<Example:>
 
     $pdf = PDF::API2->new();
     ...
-    print $pdf->stringify();
+    print $pdf->to_string();
 
     $pdf = PDF::API2->new();
     ...
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
     $pdf = PDF::API2->new(-file => 'our/new.pdf');
     ...
-    $pdf->save();
+    $pdf->to_file();
 
 To turn off automatic compression of PDF contents, include option C<-compress>
 with a false value.  This is generally only useful for debugging.
@@ -139,7 +139,7 @@ B<Example:>
 
     $pdf = PDF::API2->open('our/old.pdf');
     ...
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
     $pdf = PDF::API2->open('our/to/be/updated.pdf');
     ...
@@ -210,7 +210,7 @@ B<Example:>
 
     $pdf = PDF::API2->open_scalar($pdf_string);
     ...
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
 To turn off automatic compression of PDF contents, include option C<-compress>
 with a false value.  This is generally only useful for debugging.
@@ -885,31 +885,17 @@ sub pageLabel {
     return;
 }
 
-=item $pdf->finishobjects(@objects)
-
-Force objects to be written to file if possible.
-
-B<Example:>
-
-    $pdf = PDF::API2->new(-file => 'our/new.pdf');
-    ...
-    $pdf->finishobjects($page, $gfx, $txt);
-    ...
-    $pdf->save();
-
-=cut
-
+# Deprecated (use to_file instead)
+#
+# This method allows for objects to be written to disk in advance of finally
+# saving and closing the file.  Otherwise, it's no different than just calling
+# to_file when all changes have been made.  There's no memory advantage since
+# ship_out doesn't remove objects from memory.
 sub finishobjects {
     my ($self, @objs) = @_;
 
-    if ($self->{'opened_scalar'}) {
-        die "invalid method invocation: no file, use 'saveas' instead.";
-    }
-    elsif ($self->{'partial_save'}) {
+    if ($self->{'partial_save'}) {
         $self->{'pdf'}->ship_out(@objs);
-    }
-    else {
-        die "invalid method invocation: no file, use 'saveas' instead.";
     }
 
     return;
@@ -946,18 +932,7 @@ sub proc_pages {
     return @pages;
 }
 
-=item $pdf->update()
-
-Saves a previously opened document.
-
-B<Example:>
-
-    $pdf = PDF::API2->open('our/to/be/updated.pdf');
-    ...
-    $pdf->update();
-
-=cut
-
+# Deprecated (use to_file instead)
 sub update {
     my $self = shift();
     croak "File is read-only" if $self->{'opened_readonly'};
@@ -965,22 +940,28 @@ sub update {
     return;
 }
 
-=item $pdf->saveas($file)
+=item $pdf->to_file("/path/to/file.pdf")
 
-Save the document to $file and remove the object structure from memory.
+Save the document to disk and close the file.  A filename is optional if one was
+specified while opening or creating the PDF.
 
-B<Example:>
-
-    $pdf = PDF::API2->new();
-    ...
-    $pdf->saveas('our/new.pdf');
+As a side effect, the document structure is removed from memory when the file is
+saved, so it will no longer be usable.
 
 =cut
 
-sub saveas {
+# Deprecated (renamed)
+sub save   { return to_file(@_) } ## no critic
+sub saveas { return to_file(@_) } ## no critic
+
+sub to_file {
     my ($self, $file) = @_;
 
-    if ($self->{'opened_scalar'}) {
+    if ($self->{'partial_save'} and not $file) {
+        $self->{'pdf'}->close_file();
+    }
+    elsif ($self->{'opened_scalar'}) {
+        croak 'A filename argument is required' unless $file;
         $self->{'pdf'}->append_file();
         my $fh;
         CORE::open($fh, '>', $file) or die "Unable to open $file for writing: $!";
@@ -988,10 +969,8 @@ sub saveas {
         print $fh ${$self->{'content_ref'}};
         CORE::close($fh);
     }
-    elsif ($self->{'partial_save'}) {
-        $self->{'pdf'}->close_file();
-    }
     else {
+        croak 'A filename argument is required' unless $file;
         unless ($self->{'pdf'}->{' fname'}) {
             $self->{'pdf'}->out_file($file);
         }
@@ -1004,73 +983,61 @@ sub saveas {
         }
     }
 
+    # This can be eliminated once we're confident that circular references are
+    # no longer an issue.  See t/circular-references.t.
     $self->end();
+
     return;
 }
 
-sub save {
-    my ($self, $file) = @_;
+=item $string = $pdf->to_string()
 
-    if ($self->{'opened_scalar'}) {
-        die "invalid method invocation: use 'saveas' instead.";
-    }
-    elsif ($self->{'partial_save'}) {
-        $self->{'pdf'}->close_file();
-    }
-    else {
-        die "invalid method invocation: use 'saveas' instead.";
-    }
+Return the document as a string.
 
-    $self->end();
-    return;
-}
-
-=item $string = $pdf->stringify()
-
-Return the document as a string and remove the object structure from memory.
-
-B<Example:>
-
-    $pdf = PDF::API2->new();
-    ...
-    print $pdf->stringify();
+As a side effect, the document structure is removed from memory when the string
+is created, so it will no longer be usable.
 
 =cut
 
 # Maintainer's note: The object is being destroyed because it contains
-# circular references that would otherwise result in memory not being
-# freed if the object merely goes out of scope.  If possible, the
-# circular references should be eliminated so that stringify doesn't
-# need to be destructive.
+# (contained?) circular references that would otherwise result in memory not
+# being freed if the object merely goes out of scope.  If possible, the circular
+# references should be eliminated so that to_string doesn't need to be
+# destructive.  See t/circular-references.t.
 #
-# I've opted not to just require a separate call to release() because
-# it would likely introduce memory leaks in many existing programs
-# that use this module.
+# I've opted not to just require a separate call to release() because it would
+# likely introduce memory leaks in many existing programs that use this module.
 
-sub stringify {
+# Deprecated (renamed)
+sub stringify { return to_string(@_) } ## no critic
+
+sub to_string {
     my $self = shift();
 
-    my $str = '';
+    my $string = '';
     if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
-        $str = ${$self->{'content_ref'}};
+        $string = ${$self->{'content_ref'}};
     }
     elsif ($self->{'opened'}) {
         my $fh = FileHandle->new();
-        CORE::open($fh, '>', \$str) || die "Can't begin scalar IO";
+        CORE::open($fh, '>', \$string) || die "Can't begin scalar IO";
         $self->{'pdf'}->clone_file($fh);
         $self->{'pdf'}->close_file();
         $fh->close();
     }
     else {
         my $fh = FileHandle->new();
-        CORE::open($fh, '>', \$str) || die "Can't begin scalar IO";
+        CORE::open($fh, '>', \$string) || die "Can't begin scalar IO";
         $self->{'pdf'}->out_file($fh);
         $fh->close();
     }
+
+    # This can be eliminated once we're confident that circular references are
+    # no longer an issue.  See t/circular-references.t.
     $self->end();
 
-    return $str;
+    return $string;
 }
 
 sub release {
@@ -1351,7 +1318,7 @@ B<Example:>
     # Add it to the new PDF's first page at 1/2 scale
     $gfx->formimage($xo, 0, 0, 0.5);
 
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
 B<Note:> You can only import a page from an existing PDF file.
 
@@ -1457,7 +1424,7 @@ B<Example:>
     # Add page 2 from the old PDF as page 1 of the new PDF
     $page = $pdf->import_page($old, 2);
 
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
 B<Note:> You can only import a page from an existing PDF file.
 
@@ -1615,17 +1582,17 @@ B<Example:>
     $pdf = PDF::API2->new();
     $pdf->mediabox('A4');
     ...
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
     $pdf = PDF::API2->new();
     $pdf->mediabox(595, 842);
     ...
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
     $pdf = PDF::API2->new;
     $pdf->mediabox(0, 0, 595, 842);
     ...
-    $pdf->saveas('our/new.pdf');
+    $pdf->to_file('our/new.pdf');
 
 =cut
 

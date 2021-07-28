@@ -15,7 +15,7 @@ $gfx->move(72, 144);
 $gfx->hline(288);
 $gfx->stroke();
 
-my $string = $pdf->stringify();
+my $string = $pdf->to_string();
 
 like($string, qr{obj \[ /Indexed /DeviceRGB 255},
      q{ColorSpace is present});

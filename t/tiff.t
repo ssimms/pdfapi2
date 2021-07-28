@@ -18,7 +18,7 @@ is($tiff->width(), 1,
 
 my $gfx = $pdf->page->gfx();
 $gfx->image($tiff, 72, 144, 216, 288);
-like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
+like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add TIFF to PDF});
 
 # Filehandle
@@ -45,7 +45,7 @@ isa_ok($lzw_tiff, 'PDF::API2::Resource::XObject::Image::TIFF',
 $gfx = $pdf->page->gfx();
 $gfx->image($lzw_tiff, 72, 360, 216, 432);
 
-like($pdf->stringify(), qr/q 216 0 0 432 72 360 cm \S+ Do Q/,
+like($pdf->to_string(), qr/q 216 0 0 432 72 360 cm \S+ Do Q/,
      q{Add TIFF to PDF});
 
 # Missing file

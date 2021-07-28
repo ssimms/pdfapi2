@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    - Merged saveas and save into a new to_file method.  The old names are
+      deprecated but will continue to work.
+
+    - Renamed stringify to to_string.  The old name is deprecated but will
+      continue to work.
+
 2.041     2021-07-27
 
     - Bug reports should now be made at GitHub Issues rather than RT.

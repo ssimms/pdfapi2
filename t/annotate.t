@@ -14,7 +14,7 @@ my $page = $pdf->page();
 my $annotation = $page->annotation();
 $annotation->text('This is an annotation', -rect => [ 72, 144, 172, 244 ]);
 
-my $string = $pdf->stringify();
+my $string = $pdf->to_string();
 like($string,
      qr{/Annot /Subtype /Text /Border \[ 0 0 0 \] /Contents \(This is an annotation\) /Rect \[ 72 144 172 244 \]},
      q{Text Annotation in a rectangle});
@@ -28,7 +28,7 @@ $annotation = $page->annotation();
 my $page2 = $pdf->page();
 $annotation->link($page2);
 
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 like($string,
     qr{/Annot /Subtype /Link /A << /D \[ \d+ 0 R /XYZ null null null \] /S /GoTo >>},
     q{Link Annotation});
@@ -41,7 +41,7 @@ $annotation = $page->annotation();
 
 $annotation->url('http://perl.org');
 
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 like($string,
     qr{/Annot /Subtype /Link /A << /S /URI /URI \(http://perl.org\) >>},
     q{URL Annotation});
@@ -54,7 +54,7 @@ $annotation = $page->annotation();
 
 $annotation->file('test.pdf');
 
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 like($string,
     qr{/Annot /Subtype /Link /A << /F \(test.pdf\) /S /Launch >>},
     q{File Annotation});
@@ -67,7 +67,7 @@ $annotation = $page->annotation();
 
 $annotation->pdf_file('test.pdf', 2);
 
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 like($string,
     qr{/Annot /Subtype /Link /A << /D \[ 2 /XYZ null null null \] /F \(test.pdf\) /S /GoToR >>},
     q{File Annotation});
@@ -83,7 +83,7 @@ $pdf->{'pdf'}->new_obj($array);
 
 $page->{'Annots'} = $array;
 $page->update();
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 
 $pdf = PDF::API2->open_scalar($string);
 $page = $pdf->open_page(1);
@@ -91,7 +91,7 @@ $annotation = $page->annotation();
 
 $annotation->text('This is an annotation', -rect => [ 72, 144, 172, 244 ]);
 
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 like($string,
      qr{/Annot /Subtype /Text /Border \[ 0 0 0 \] /Contents \(This is an annotation\) /Rect \[ 72 144 172 244 \]},
      q{Add an annotation to an existing annotations array stored in an indirect object});

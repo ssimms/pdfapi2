@@ -16,7 +16,7 @@ is(join(',', $pdf->mediabox()),
    '0,0,612,792',
    q{Global media box can be read after being set});
 
-my $string = $pdf->stringify();
+my $string = $pdf->to_string();
 
 like($string, qr{/MediaBox \[ 0 0 612 792 \]},
     q{Global media box is recorded in the PDF});

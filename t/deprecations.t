@@ -20,7 +20,7 @@ ok($image, q{new_api still works});
 
 $pdf = PDF::API2->new();
 $pdf->page->gfx->fillcolor('blue');
-my $pdf_string = $pdf->stringify();
+my $pdf_string = $pdf->to_string();
 
 # openScalar
 $pdf = PDF::API2->openScalar($pdf_string);

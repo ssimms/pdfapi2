@@ -95,9 +95,9 @@ deallocates the pdf-structures.
 sub saveas {
     my ($self,$file)=@_;
     if($file eq '-') {
-        return $self->{api}->stringify;
+        return $self->{api}->to_string();
     } else {
-        $self->{api}->saveas($file);
+        $self->{api}->to_file($file);
         return $self;
     }
     $self->{api}->end;
