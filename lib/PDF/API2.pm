@@ -2510,7 +2510,8 @@ This module does not work with perl's -l command-line switch.
 PDF::API2 was originally written by Alfred Reibenschuh, extending code written
 by Martin Hosken.
 
-It is currently being maintained and developed by Steve Simms.
+It is currently being maintained and developed by Steve Simms, with patches from
+numerous contributors who are credited in the Changes file.
 
 =head1 LICENSE
 
