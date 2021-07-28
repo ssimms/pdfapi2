@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    - Bug reports should now be made at GitHub Issues rather than RT.
+
     - Rename openpage to open_page in PDF::API2.  The old name is deprecated.
 
     - [RT #136648] Fix when writing PDFs containing cross-reference streams
