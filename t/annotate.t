@@ -82,7 +82,6 @@ my $array = PDF::API2::Basic::PDF::Array->new();
 $pdf->{'pdf'}->new_obj($array);
 
 $page->{'Annots'} = $array;
-$page->update();
 $string = $pdf->to_string();
 
 $pdf = PDF::API2->open_scalar($string);
