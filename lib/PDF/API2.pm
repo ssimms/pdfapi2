@@ -143,7 +143,7 @@ B<Example:>
 
     $pdf = PDF::API2->open('our/to/be/updated.pdf');
     ...
-    $pdf->update();
+    $pdf->to_file();
 
 To turn off automatic compression of PDF contents, include option C<-compress>
 with a false value.  This is generally only useful for debugging.
@@ -975,7 +975,8 @@ sub to_file {
             $self->{'pdf'}->out_file($file);
         }
         elsif ($self->{'pdf'}->{' fname'} eq $file) {
-            $self->update();
+            croak "File is read-only" if $self->{'opened_readonly'};
+            $self->{'pdf'}->close_file();
         }
         else {
             $self->{'pdf'}->clone_file($file);
