@@ -58,14 +58,12 @@ sub coerce {
     return $self;
 }
 
-=item $page->update
-
-Marks a page to be updated (by $pdf->update).
-
-=cut
-
+# Deprecated.  Marking the page as dirty should only be needed in rare cases
+# when the page hash is being edited directly rather than through the API.  In
+# that case, the out_obj call can be made manually.  There's no reason (that I
+# can think of) to have a specific call just (and only) for Page objects.
 sub update {
-    my ($self) = @_;
+    my $self = shift();
     $self->{' apipdf'}->out_obj($self);
     return $self;
 }
@@ -324,7 +322,7 @@ sub annotation {
 
     unless (exists $self->{'Annots'}) {
         $self->{'Annots'} = PDFArray();
-        $self->update();
+        $self->{' apipdf'}->out_obj($self);
     }
     elsif (ref($self->{'Annots'}) =~ /Objind/) {
         $self->{'Annots'}->realise();
