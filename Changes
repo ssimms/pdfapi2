@@ -6,6 +6,17 @@
     - Renamed stringify to to_string.  The old name is deprecated but will
       continue to work.
 
+    - Created a convenience method $pdf->font, which combines corefont, ttfont,
+      psfont, and bdfont.  The type-specific methods have not been deprecated.
+
+    - Added font_path and set_font_path accessors for the font search path (the
+      list of directories searched when a font name is included without its full
+      path).  Renamed addFontDirs to add_to_font_path.  The old name is
+      deprecated but will continue to work.
+
+    - Removed C:/WinNT/Fonts from the default font search path.
+
+
 2.041     2021-07-27
 
     - Bug reports should now be made at GitHub Issues rather than RT.

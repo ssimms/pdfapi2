@@ -26,8 +26,9 @@ use PDF::API2::NamedDestination;
 
 use Scalar::Util qw(weaken);
 
-our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC),
-                  qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
+my @font_path = __PACKAGE__->set_font_path('/usr/share/fonts',
+                                           '/usr/local/share/fonts',
+                                           'c:/windows/fonts');
 
 =head1 NAME
 
@@ -1705,40 +1706,102 @@ sub artbox {
 
 =over
 
-=item @directories = PDF::API2::addFontDirs($dir1, $dir2, ...)
+=item @directories = PDF::API2->add_to_font_path('/my/fonts', '/path/to/fonts', ...)
 
-Adds one or more directories to the search path for finding font
-files.
+Add one or more directories to the list of paths to be searched for font files.
+This is optional, and allows fonts to be added to a PDF without passing the full
+path to the file.
 
-Returns the list of searched directories.
+Returns the font search path.
 
 =cut
 
-sub addFontDirs {
-    my @dirs = @_;
-    push @FontDirs, @dirs;
-    return @FontDirs;
+# Deprecated (renamed)
+sub addFontDirs { return add_to_font_path(@_) }
+
+sub add_to_font_path {
+    # Allow this method to be called using either :: or -> notation.
+    shift() if ref($_[0]);
+    shift() if $_[0] eq __PACKAGE__;
+
+    push @font_path, @_;
+    return @font_path;
 }
 
-sub _findFont {
+=item @directories = PDF::API2->set_font_path('/my/fonts', '/path/to/fonts', ...)
+
+Replace the existing font search path.  This should only be necessary if you
+need to remove a directory from the path for some reason, or need to reorder the
+list.
+
+Returns the font search path.
+
+=cut
+
+sub set_font_path {
+    # Allow this method to be called using either :: or -> notation.
+    shift() if ref($_[0]);
+    shift() if $_[0] eq __PACKAGE__;
+
+    @font_path = ((map { "$_/PDF/API2/fonts" } @INC), @_);
+
+    return @font_path;
+}
+
+=item @directories = PDF::API2->font_path()
+
+Return the list of directories that will be searched (in order) in addition to
+the current directory when you add a font to a PDF without using including the
+full path to the font file.
+
+=cut
+
+sub font_path {
+    return @font_path;
+}
+
+sub _find_font {
     my $font = shift();
-    my @fonts = ($font, map { "$_/$font" } @FontDirs);
-    shift @fonts while scalar(@fonts) and not -f $fonts[0];
-    return $fonts[0];
+
+    # Check the current directory
+    return $font if -f $font;
+
+    # Check the font search path
+    foreach my $directory (@font_path) {
+        return "$directory/$font" if -f "$directory/$font";
+    }
+
+    return;
 }
 
-=item $font = $pdf->corefont($fontname, [%options])
+=item $font = $pdf->font($name, %options)
 
-Returns a new Adobe core font object.
+Add a font to the PDF.  Returns the font object, to be used by
+L<PDF::API2::Content>.
 
-B<Examples:>
+The font C<$name> is either one of the 14 built-in font names (e.g. Helvetica)
+or the path to a font file.
 
-    $font = $pdf->corefont('Times-Roman');
-    $font = $pdf->corefont('Times-Bold');
-    $font = $pdf->corefont('Helvetica');
-    $font = $pdf->corefont('ZapfDingbats');
+    my $pdf = PDF::API2->new();
+    my $font1 = $pdf->font('Helvetica Bold');
+    my $font2 = $pdf->font('/path/to/ComicSans.ttf');
+    my $page = $pdf->page();
+    my $content = $page->text();
 
-Valid %options are:
+    $content->translate(1 * 72, 9 * 72);
+    $content->font($font1, 24);
+    $content->text('Hello, World!');
+
+    $content->distance(0, -36);
+    $content->font($font2, 12);
+    $content->text('This is some sample text.');
+
+    $pdf->to_file('sample.pdf');
+
+TrueType (ttf/otf), Adobe PostScript (pfa/pfb), and Adobe Glyph Bitmap
+Distribution Format (bdf) fonts are supported.
+
+The following C<%options> may be included:
 
 =over
 
@@ -1750,11 +1813,51 @@ Changes the encoding of the font from its default.
 
 Enables kerning if data is available.
 
+=item -afmfile (PostScript fonts only)
+
+Specifies the location of the font metrics file.
+
+=item -pfmfile (PostScript fonts only)
+
+Specifies the location of the printer font metrics file.  This option overrides
+the -encode option.
+
+=item -isocmap (TrueType fonts only)
+
+Uses the ISO Unicode map instead of the default MS Unicode map.
+
+=item -noembed (TrueType fonts only)
+
+Disables embedding of the font file.
+
 =back
 
-See Also: L<PDF::API2::Resource::Font::CoreFont>.
+The font type is detected based on the file's extension.  If you need to include
+a supported font with a different file extension, you can instead call C<ttfont>
+(TrueType), C<psfont> (PostScript), or C<bdfont> (Glyph Bitmap) with the same
+arguments.
 
 =cut
+
+sub font {
+    my ($self, $name, %options) = @_;
+
+    if ($name =~ /\.[ot]tf$/i) {
+        return $self->ttfont($name, %options);
+    }
+    elsif ($name =~ /\.pf[ab]$/i) {
+        return $self->psfont($name, %options);
+    }
+    elsif ($name =~ /\.bdf$/i) {
+        return $self->bdfont($name, %options);
+    }
+    elsif ($name =~ /(\..*)$/) {
+        croak "Unrecognized font file extension: $1";
+    }
+    else {
+        return $self->corefont($name, %options);
+    }
+}
 
 sub corefont {
     my ($self, $name, %opts) = @_;
@@ -1765,48 +1868,14 @@ sub corefont {
     return $obj;
 }
 
-=item $font = $pdf->psfont($ps_file, [%options])
-
-Returns a new Adobe Type1 font object.
-
-B<Examples:>
-
-    $font = $pdf->psfont('Times-Book.pfa', -afmfile => 'Times-Book.afm');
-    $font = $pdf->psfont('/fonts/Synest-FB.pfb', -pfmfile => '/fonts/Synest-FB.pfm');
-
-Valid %options are:
-
-=over
-
-=item -encode
-
-Changes the encoding of the font from its default.
-
-=item -afmfile
-
-Specifies the location of the font metrics file.
-
-=item -pfmfile
-
-Specifies the location of the printer font metrics file.  This option
-overrides the -encode option.
-
-=item -dokern
-
-Enables kerning if data is available.
-
-=back
-
-=cut
-
 sub psfont {
     my ($self, $psf, %opts) = @_;
 
     foreach my $o (qw(-afmfile -pfmfile)) {
         next unless defined $opts{$o};
-        $opts{$o} = _findFont($opts{$o});
+        $opts{$o} = _find_font($opts{$o});
     }
-    $psf = _findFont($psf);
+    $psf = _find_font($psf) or croak "Unable to find font \"$psf\"";
     require PDF::API2::Resource::Font::Postscript;
     my $obj = PDF::API2::Resource::Font::Postscript->new($self->{'pdf'}, $psf, %opts);
 
@@ -1816,41 +1885,8 @@ sub psfont {
     return $obj;
 }
 
-=item $font = $pdf->ttfont($ttf_file, [%options])
-
-Returns a new TrueType or OpenType font object.
-
-B<Examples:>
-
-    $font = $pdf->ttfont('Times.ttf');
-    $font = $pdf->ttfont('Georgia.otf');
-
-Valid %options are:
-
-=over
-
-=item -encode
-
-Changes the encoding of the font from its default.
-
-=item -isocmap
-
-Use the ISO Unicode Map instead of the default MS Unicode Map.
-
-=item -dokern
-
-Enables kerning if data is available.
-
-=item -noembed
-
-Disables embedding of the font file.
-
-=back
-
-=cut
-
 sub ttfont {
-    my ($self, $file, %opts) = @_;
+    my ($self, $name, %opts) = @_;
 
     # PDF::API2 doesn't set BaseEncoding for TrueType fonts, so text
     # isn't searchable unless a ToUnicode CMap is included.  Include
@@ -1858,12 +1894,24 @@ sub ttfont {
     # performance and file size reasons) by setting -unicodemap to 0.
     $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
 
-    $file = _findFont($file);
+    my $file = _find_font($name) or croak "Unable to find font \"$name\"";
     require PDF::API2::Resource::CIDFont::TrueType;
     my $obj = PDF::API2::Resource::CIDFont::TrueType->new($self->{'pdf'}, $file, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
     $obj->tounicodemap() if $opts{-unicodemap};
+
+    return $obj;
+}
+
+sub bdfont {
+    my ($self, @opts) = @_;
+
+    require PDF::API2::Resource::Font::BdFont;
+    my $obj = PDF::API2::Resource::Font::BdFont->new($self->{'pdf'}, @opts);
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    # $obj->tounicodemap(); # does not support Unicode
 
     return $obj;
 }
@@ -1954,26 +2002,6 @@ sub synfont {
 
     $self->{'pdf'}->out_obj($self->{'pages'});
     $obj->tounicodemap() if $opts{-unicodemap};
-
-    return $obj;
-}
-
-=item $font = $pdf->bdfont($bdf_file)
-
-Returns a new BDF font object, based on the specified Adobe BDF file.
-
-See Also: L<PDF::API2::Resource::Font::BdFont>
-
-=cut
-
-sub bdfont {
-    my ($self, @opts) = @_;
-
-    require PDF::API2::Resource::Font::BdFont;
-    my $obj = PDF::API2::Resource::Font::BdFont->new($self->{'pdf'}, @opts);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-    # $obj->tounicodemap(); # does not support Unicode
 
     return $obj;
 }
