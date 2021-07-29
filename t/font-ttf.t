@@ -18,7 +18,7 @@ SKIP: {
         unless $font_file;
 
     my $pdf = PDF::API2->new();
-    my $font = $pdf->ttfont($font_file);
+    my $font = $pdf->font($font_file);
 
     # Do something with the font to see if it appears to have opened
     # properly.
