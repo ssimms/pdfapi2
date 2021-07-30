@@ -54,7 +54,7 @@ source PDF the stream starts.
 =cut
 
 sub new {
-    my ($class) = @_;
+    my $class = shift();
     $class = ref($class) if ref($class);
 
     my $self = $class->SUPER::new(@_);
