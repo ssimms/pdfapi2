@@ -16,6 +16,10 @@
 
     - Removed C:/WinNT/Fonts from the default font search path.
 
+    - Named Destinations are now fully documented, with updated method names and
+      arguments.  The old method names and arguments are deprecated but will
+      continue to work.
+
 
 2.041     2021-07-27
 
