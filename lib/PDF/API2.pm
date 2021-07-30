@@ -241,311 +241,296 @@ sub open_scalar {
     return $self;
 }
 
-=item $pdf->preferences(%options)
+=item $layout = $pdf->page_layout()
 
-Controls viewing preferences for the PDF.
+=item $pdf = $pdf->page_layout($layout)
 
-B<Page Mode Options:>
+Get or set the page layout that should be used when the PDF is opened.
 
-=over
-
-=item -fullscreen
-
-Full-screen mode, with no menu bar, window controls, or any other window visible.
-
-=item -thumbs
-
-Thumbnail images visible.
-
-=item -outlines
-
-Document outline visible.
-
-=back
-
-B<Page Layout Options:>
+C<$layout> is one of the following:
 
 =over
 
-=item -singlepage
+=item single_page (or undef)
 
 Display one page at a time.
 
-=item -onecolumn
+=item one_column
 
-Display the pages in one column.
+Display the pages in one column (a.k.a. continuous).
 
-=item -twocolumnleft
+=item two_column_left
 
-Display the pages in two columns, with oddnumbered pages on the left.
+Display the pages in two columns, with odd-numbered pages on the left.
 
-=item -twocolumnright
+=item two_column_right
 
-Display the pages in two columns, with oddnumbered pages on the right.
+Display the pages in two columns, with odd-numbered pages on the right.
 
-=back
+=item two_page_left
 
-B<Viewer Options:>
+Display two pages at a time, with odd-numbered pages on the left.
 
-=over
+=item two_page_right
 
-=item -hidetoolbar
-
-Specifying whether to hide tool bars.
-
-=item -hidemenubar
-
-Specifying whether to hide menu bars.
-
-=item -hidewindowui
-
-Specifying whether to hide user interface elements.
-
-=item -fitwindow
-
-Specifying whether to resize the document's window to the size of the displayed page.
-
-=item -centerwindow
-
-Specifying whether to position the document's window in the center of the screen.
-
-=item -displaytitle
-
-Specifying whether the window's title bar should display the
-document title taken from the Title entry of the document information
-dictionary.
-
-=item -afterfullscreenthumbs
-
-Thumbnail images visible after Full-screen mode.
-
-=item -afterfullscreenoutlines
-
-Document outline visible after Full-screen mode.
-
-=item -printscalingnone
-
-Set the default print setting for page scaling to none.
-
-=item -simplex
-
-Print single-sided by default.
-
-=item -duplexflipshortedge
-
-Print duplex by default and flip on the short edge of the sheet.
-
-=item -duplexfliplongedge
-
-Print duplex by default and flip on the long edge of the sheet.
+Display two pages at a time, with odd-numbered pages on the right.
 
 =back
-
-B<Initial Page Options>:
-
-=over
-
-=item -firstpage => [ $page, %options ]
-
-Specifying the page (either a page number or a page object) to be
-displayed, plus one of the following options:
-
-=over
-
-=item -fit => 1
-
-Display the page designated by page, with its contents magnified just
-enough to fit the entire page within the window both horizontally and
-vertically. If the required horizontal and vertical magnification
-factors are different, use the smaller of the two, centering the page
-within the window in the other dimension.
-
-=item -fith => $top
-
-Display the page designated by page, with the vertical coordinate top
-positioned at the top edge of the window and the contents of the page
-magnified just enough to fit the entire width of the page within the
-window.
-
-=item -fitv => $left
-
-Display the page designated by page, with the horizontal coordinate
-left positioned at the left edge of the window and the contents of the
-page magnified just enough to fit the entire height of the page within
-the window.
-
-=item -fitr => [ $left, $bottom, $right, $top ]
-
-Display the page designated by page, with its contents magnified just
-enough to fit the rectangle specified by the coordinates left, bottom,
-right, and top entirely within the window both horizontally and
-vertically. If the required horizontal and vertical magnification
-factors are different, use the smaller of the two, centering the
-rectangle within the window in the other dimension.
-
-=item -fitb => 1
-
-Display the page designated by page, with its contents magnified just
-enough to fit its bounding box entirely within the window both
-horizontally and vertically. If the required horizontal and vertical
-magnification factors are different, use the smaller of the two,
-centering the bounding box within the window in the other dimension.
-
-=item -fitbh => $top
-
-Display the page designated by page, with the vertical coordinate top
-positioned at the top edge of the window and the contents of the page
-magnified just enough to fit the entire width of its bounding box
-within the window.
-
-=item -fitbv => $left
-
-Display the page designated by page, with the horizontal coordinate
-left positioned at the left edge of the window and the contents of the
-page magnified just enough to fit the entire height of its bounding
-box within the window.
-
-=item -xyz => [ $left, $top, $zoom ]
-
-Display the page designated by page, with the coordinates (left, top)
-positioned at the top-left corner of the window and the contents of
-the page magnified by the factor zoom. A zero (0) value for any of the
-parameters left, top, or zoom specifies that the current value of that
-parameter is to be retained unchanged.
-
-=back
-
-=back
-
-B<Example:>
-
-    $pdf->preferences(
-        -fullscreen => 1,
-        -onecolumn => 1,
-        -afterfullscreenoutlines => 1,
-        -firstpage => [$page, -fit => 1],
-    );
 
 =cut
 
+sub page_layout {
+    my $self = shift();
+
+    unless (@_) {
+        return 'single_page' unless $self->{'catalog'}->{'PageLayout'};
+        my $layout = $self->{'catalog'}->{'PageLayout'}->val();
+        return 'single_page' if $layout eq 'SinglePage';
+        return 'one_column' if $layout eq 'OneColumn';
+        return 'two_column_left' if $layout eq 'TwoColumnLeft';
+        return 'two_column_right' if $layout eq 'TwoColumnRight';
+        return 'two_page_left'  if $layout eq 'TwoPageLeft';
+        return 'two_page_right' if $layout eq 'TwoPageRight';
+        warn "Unknown page layout: $layout";
+        return $layout;
+    }
+
+    my $name = shift() // 'single_page';
+    my $layout = ($name eq 'single_page'      ? 'SinglePage'     :
+                  $name eq 'one_column'       ? 'OneColumn'      :
+                  $name eq 'two_column_left'  ? 'TwoColumnLeft'  :
+                  $name eq 'two_column_right' ? 'TwoColumnRight' :
+                  $name eq 'two_page_left'    ? 'TwoPageLeft'    :
+                  $name eq 'two_page_right'   ? 'TwoPageRight'   : '');
+
+    croak "Invalid page layout: $name" unless $layout;
+    $self->{'catalog'}->{'PageMode'} = PDFName($layout);
+    $self->{'pdf'}->out_obj($self->{'catalog'});
+    return $self;
+}
+
+=item $mode = $pdf->page_mode()
+
+=item $pdf = $pdf->page_mode($mode)
+
+Get or set the page mode, which describes how the PDF should be displayed when
+opened.
+
+C<$mode> is one of the following:
+
+=over
+
+=item none (or undef)
+
+Neither outlines nor thumbnails should be displayed.
+
+=item outlines
+
+Show the document outline.
+
+=item thumbnails
+
+Show the page thumbnails.
+
+=item full_screen
+
+Open in full-screen mode, with no menu bar, window controls, or any other window
+visible.
+
+=item optional_content
+
+Show the optional content group panel.
+
+=item attachments
+
+Show the attachments panel.
+
+=back
+
+=cut
+
+sub page_mode {
+    my $self = shift();
+
+    unless (@_) {
+        return 'none' unless $self->{'catalog'}->{'PageMode'};
+        my $mode = $self->{'catalog'}->{'PageMode'}->val();
+        return 'none'             if $mode eq 'UseNone';
+        return 'outlines'         if $mode eq 'UseOutlines';
+        return 'thumbnails'       if $mode eq 'UseThumbs';
+        return 'full_screen'      if $mode eq 'FullScreen';
+        return 'optional_content' if $mode eq 'UseOC';
+        return 'attachments'      if $mode eq 'UseAttachments';
+        warn "Unknown page mode: $mode";
+        return $mode;
+    }
+
+    my $name = shift() // 'none';
+    my $mode = ($name eq 'none'             ? 'UseNone'        :
+                $name eq 'outlines'         ? 'UseOutlines'    :
+                $name eq 'thumbnails'       ? 'UseThumbs'      :
+                $name eq 'full_screen'      ? 'FullScreen'     :
+                $name eq 'optional_content' ? 'UseOC'          :
+                $name eq 'attachments'      ? 'UseAttachments' : '');
+
+    croak "Invalid page mode: $name" unless $mode;
+    $self->{'catalog'}->{'PageMode'} = PDFName($mode);
+    $self->{'pdf'}->out_obj($self->{'catalog'});
+    return $self;
+}
+
+=item %preferences = $pdf->viewer_preferences()
+
+=item $pdf = $pdf->viewer_preferences(%preferences)
+
+Get or set PDF viewer preferences, as described in
+L<PDF::API2::ViewerPreferences>.
+
+=cut
+
+sub viewer_preferences {
+    my $self = shift();
+    require PDF::API2::ViewerPreferences;
+    my $prefs = PDF::API2::ViewerPreferences->new($self);
+    unless (@_) {
+        return $prefs->get_preferences();
+    }
+    return $prefs->set_preferences(@_);
+}
+
+=item $pdf = $pdf->open_action($page, $location, @args)
+
+Set the destination in the PDF that should be displayed when the document is
+opened.
+
+C<$page> may be either a page number or a page object.  The other parameters are
+as described in L<PDF::API2::NamedDestination>.
+
+=cut
+
+sub open_action {
+    my ($self, $page, @args) = @_;
+
+    # $page can be either a page number or a page object
+    $page = PDFNum($page) unless ref($page);
+
+    require PDF::API2::NamedDestination;
+    my $array = PDF::API2::NamedDestination::_destination($page, @args);
+    $self->{'catalog'}->{'OpenAction'} = $array;
+    $self->{'pdf'}->out_obj($self->{'catalog'});
+    return $self;
+}
+
+# Deprecated; the various preferences have been split out into their own methods
 sub preferences {
     my ($self, %options) = @_;
 
     # Page Mode Options
     if ($options{'-fullscreen'}) {
-        $self->{'catalog'}->{'PageMode'} = PDFName('FullScreen');
+        $self->page_mode('full_screen');
     }
     elsif ($options{'-thumbs'}) {
-        $self->{'catalog'}->{'PageMode'} = PDFName('UseThumbs');
+        $self->page_mode('thumbnails');
     }
     elsif ($options{'-outlines'}) {
-        $self->{'catalog'}->{'PageMode'} = PDFName('UseOutlines');
+        $self->page_mode('outlines');
     }
     else {
-        $self->{'catalog'}->{'PageMode'} = PDFName('UseNone');
+        $self->page_mode('none');
     }
 
     # Page Layout Options
     if ($options{'-singlepage'}) {
-        $self->{'catalog'}->{'PageLayout'} = PDFName('SinglePage');
+        $self->page_layout('single_page');
     }
     elsif ($options{'-onecolumn'}) {
-        $self->{'catalog'}->{'PageLayout'} = PDFName('OneColumn');
+        $self->page_layout('one_column');
     }
     elsif ($options{'-twocolumnleft'}) {
-        $self->{'catalog'}->{'PageLayout'} = PDFName('TwoColumnLeft');
+        $self->page_layout('two_column_left');
     }
     elsif ($options{'-twocolumnright'}) {
-        $self->{'catalog'}->{'PageLayout'} = PDFName('TwoColumnRight');
+        $self->page_layout('two_column_right');
     }
     else {
-        $self->{'catalog'}->{'PageLayout'} = PDFName('SinglePage');
+        $self->page_layout('single_page');
     }
 
     # Viewer Preferences
-    $self->{'catalog'}->{'ViewerPreferences'} ||= PDFDict();
-    $self->{'catalog'}->{'ViewerPreferences'}->realise();
-
     if ($options{'-hidetoolbar'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'HideToolbar'} = PDFBool(1);
+        $self->viewer_preferences(hide_toolbar => 1);
     }
     if ($options{'-hidemenubar'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'HideMenubar'} = PDFBool(1);
+        $self->viewer_preferences(hide_menubar => 1);
     }
     if ($options{'-hidewindowui'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'HideWindowUI'} = PDFBool(1);
+        $self->viewer_preferences(hide_window_ui => 1);
     }
     if ($options{'-fitwindow'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'FitWindow'} = PDFBool(1);
+        $self->viewer_preferences(fit_window => 1);
     }
     if ($options{'-centerwindow'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'CenterWindow'} = PDFBool(1);
+        $self->viewer_preferences(center_window => 1);
     }
     if ($options{'-displaytitle'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'DisplayDocTitle'} = PDFBool(1);
+        $self->viewer_preferences(display_doc_title => 1);
     }
     if ($options{'-righttoleft'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'Direction'} = PDFName('R2L');
+        $self->viewer_preferences(direction => 'r2l');
     }
 
     if ($options{'-afterfullscreenthumbs'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'NonFullScreenPageMode'} = PDFName('UseThumbs');
+        $self->viewer_preferences(non_full_screen_page_mode => 'thumbnails');
     }
     elsif ($options{'-afterfullscreenoutlines'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'NonFullScreenPageMode'} = PDFName('UseOutlines');
+        $self->viewer_preferences(non_full_screen_page_mode => 'outlines');
     }
     else {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'NonFullScreenPageMode'} = PDFName('UseNone');
+        $self->viewer_preferences(non_full_screen_page_mode => 'none');
     }
 
     if ($options{'-printscalingnone'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'PrintScaling'} = PDFName('None');
+        $self->viewer_preferences(print_scaling => 'none');
     }
 
     if ($options{'-simplex'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'Duplex'} = PDFName('Simplex');
+        $self->viewer_preferences(duplex => 'simplex');
     }
     elsif ($options{'-duplexfliplongedge'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'Duplex'} = PDFName('DuplexFlipLongEdge');
+        $self->viewer_preferences(duplex => 'duplex_long');
     }
     elsif ($options{'-duplexflipshortedge'}) {
-        $self->{'catalog'}->{'ViewerPreferences'}->{'Duplex'} = PDFName('DuplexFlipShortEdge');
+        $self->viewer_preferences(duplex => 'duplex_short');
     }
 
     # Open Action
     if ($options{'-firstpage'}) {
-        my ($page, %args) = @{$options{-firstpage}};
-        $args{'-fit'} = 1 unless scalar keys %args;
-
-        # $page can be either a page number (which needs to be wrapped
-        # in PDFNum) or a page object (which doesn't).
-        $page = PDFNum($page) unless ref($page);
+        my ($page, %args) = @{$options{'-firstpage'}};
+        $args{'-fit'} = 1 unless keys %args;
 
         if (defined $args{'-fit'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('Fit'));
+            $self->open_action($page, 'fit');
         }
         elsif (defined $args{'-fith'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitH'), PDFNum($args{'-fith'}));
+            $self->open_action($page, 'fith', $args{'-fith'});
         }
         elsif (defined $args{'-fitb'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitB'));
+            $self->open_action($page, 'fitb');
         }
         elsif (defined $args{'-fitbh'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitBH'), PDFNum($args{'-fitbh'}));
+            $self->open_action($page, 'fitbh', $args{'-fitbh'});
         }
         elsif (defined $args{'-fitv'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitV'), PDFNum($args{'-fitv'}));
+            $self->open_action($page, 'fitv', $args{'-fitv'});
         }
         elsif (defined $args{'-fitbv'}) {
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitBV'), PDFNum($args{'-fitbv'}));
+            $self->open_action($page, 'fitbv', $args{'-fitbv'});
         }
         elsif (defined $args{'-fitr'}) {
-            croak 'insufficient parameters to -fitr => []' unless scalar @{$args{'-fitr'}} == 4;
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('FitR'), map { PDFNum($_) } @{$args{'-fitr'}});
+            $self->open_action($page, 'fitr', @{$args{'-fitr'}});
         }
         elsif (defined $args{'-xyz'}) {
-            croak 'insufficient parameters to -xyz => []' unless scalar @{$args{'-xyz'}} == 3;
-            $self->{'catalog'}->{'OpenAction'} = PDFArray($page, PDFName('XYZ'), map { PDFNum($_) } @{$args{'-xyz'}});
+            $self->open_action($page, 'xyz', @{$args{'-xyz'}});
         }
     }
     $self->{'pdf'}->out_obj($self->{'catalog'});

@@ -9,6 +9,10 @@
     - Created a convenience method $pdf->font, which combines corefont, ttfont,
       psfont, and bdfont.  The type-specific methods have not been deprecated.
 
+    - Replaced $pdf->preferences() with separate page_mode, page_layout,
+      viewer_preferences, and open_action methods, all of which are now fully
+      documented.  The old method is deprecated but will continue to work.
+
     - Added font_path and set_font_path accessors for the font search path (the
       list of directories searched when a font name is included without its full
       path).  Renamed addFontDirs to add_to_font_path.  The old name is
