@@ -191,13 +191,11 @@ sub readcffdict {
         }
         elsif ($b0 == 28) { # int16
             read($fh, $buf, 2);
-            $v = unpack('n', $buf);
-            $v = -(0x10000 - $v) if $v > 0x7fff;
+            $v = unpack('n!', $buf);
         }
         elsif ($b0 == 29) { # int32
             read($fh, $buf, 4);
-            $v = unpack('N', $buf);
-            $v = -$v + 0xffffffff + 1 if $v > 0x7fffffff;
+            $v = unpack('N!', $buf);
         }
         elsif ($b0 == 30) { # float
             my $e = 1;
@@ -272,12 +270,18 @@ sub read_kern_table {
             my $nc = unpack('n', $buf);
             foreach (1 .. $nc) {
                 read($fh, $buf, 6);
-                my ($idx1, $idx2, $val) = unpack('n3', $buf);
-                $val -= 65536 if $val > 32767;
-                $val = $val < 0 ? -floor($val * 1000 / $upem) : -ceil($val * 1000 / $upem);
+                my ($idx1, $idx2, $val) = unpack('n2n!', $buf);
+                if ($val < 0) {
+                    $val = -floor($val * 1000 / $upem);
+                }
+                else {
+                    $val = -ceil($val * 1000 / $upem);
+                }
                 if ($val != 0) {
                     $data->{"$idx1:$idx2"} = $val;
-                    $data->{$self->data->{'g2n'}->[$idx1] . ':' . $self->data->{'g2n'}->[$idx2]} = $val;
+                    $data->{join(':',
+                                 $self->data->{'g2n'}->[$idx1],
+                                 $self->data->{'g2n'}->[$idx2])} = $val;
                 }
             }
         }
