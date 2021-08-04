@@ -52,8 +52,8 @@ sub _look_for_font {
     if (defined $subs->{$fname}) {
         my $data = _look_for_font($subs->{$fname}->{'-alias'});
         foreach my $k (keys %{$subs->{$fname}}) {
-            next if($k =~ /^\-/);
-            if (substr($k,0,1) eq '+') {
+            next if $k =~ /^\-/;
+            if (substr($k, 0, 1) eq '+') {
                 $data->{substr($k, 1)} .= $subs->{$fname}->{$k};
             }
             else {
