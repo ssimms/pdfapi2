@@ -15,31 +15,84 @@ our $cmap  = {};
 our $alias;
 our $subs;
 
+=encoding UTF-8
+
 =head1 NAME
 
-PDF::API2::Resource::CIDFont::CJKFont - Base class for CJK fonts
+PDF::API2::Resource::CIDFont::CJKFont - Deprecated base class for CJK fonts
 
-=head1 METHODS
+This is not the CJK font support you are looking for.  It dates back to the days
+when Unicode was young and poorly supported.  PDFs created using this class are
+not portable.
+
+Instead, use a regular TrueType or OpenType font that includes Unicode support
+and create your PDF normally:
+
+    use PDF::API2;
+    use utf8;
+
+    my $pdf = PDF::API2->new();
+    my $font = $pdf->font('/path/to/font.ttf');
+    my $page = $pdf->page();
+    my $content = $page->text();
+    $content->font($font, 24);
+
+    # Chinese
+    $content->translate(72, 72 * 9);
+    $content->text('你好');
+
+    # Japanese
+    $content->distance(0, -72);
+    $content->text('こんにちは');
+
+    # Korean
+    $content->distance(0, -72);
+    $content->text('안녕하세요');
+
+    $pdf->to_file('hello.pdf');
+
+Note: The maintainer is not familiar with CJK languages and has deprecated this
+class based on his current understanding of Unicode and from reading many bug
+reports.  If you are successfully using the CJK support from this class and
+think it should not be deprecated, please contact him to discuss.
+
+=head1 DEPRECATED METHODS
 
 =over
 
-=item $font = PDF::API2::Resource::CIDFont::CJKFont->new $pdf, $cjkname, %options
+=item $font = $class->new($pdf, $cjk_font_name, %options)
 
-Returns a cjk-font object.
+Returns a CJK font object.  The requested font will not be embedded in the PDF,
+so it will only be readable on computers that have the font installed.
 
-Traditional Chinese: Ming Ming-Bold Ming-Italic Ming-BoldItalic
+Available fonts:
 
-Simplified Chinese: Song Song-Bold Song-Italic Song-BoldItalic
+=over
 
-Korean: MyungJo MyungJo-Bold MyungJo-Italic MyungJo-BoldItalic
+=item Chinese (Traditional)
 
-Japanese (Mincho): KozMin KozMin-Bold KozMin-Italic KozMin-BoldItalic
+Ming, Ming-Bold, Ming-Italic, and Ming-BoldItalic
 
-Japanese (Gothic): KozGo KozGo-Bold KozGo-Italic KozGo-BoldItalic
+=item Chinese (Simplified)
 
-Defined Options:
+Song, Song-Bold, Song-Italic, and Song-BoldItalic
 
-    -encode ... specify fonts encoding for non-utf8 text.
+=item Korean
+
+MyungJo, MyungJo-Bold, MyungJo-Italic, and MyungJo-BoldItalic
+
+=item Japanese (Mincho Serif)
+
+KozMin, KozMin-Bold, KozMin-Italic, and KozMin-BoldItalic
+
+=item Japanese (Gothic Sans Serif)
+
+KozGo, KozGo-Bold, KozGo-Italic, KozGo-BoldItalic
+
+=back
+
+If the text isn't UTF-8, include an C<-encode> option with the encoding to be
+used.
 
 =cut
 

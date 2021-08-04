@@ -1901,29 +1901,8 @@ sub bdfont {
     return $obj;
 }
 
-=item $font = $pdf->cjkfont($cjkname, [%options])
-
-Returns a new CJK font object.
-
-B<Examples:>
-
-    $font = $pdf->cjkfont('korean');
-    $font = $pdf->cjkfont('traditional');
-
-Valid %options are:
-
-=over
-
-=item -encode
-
-Changes the encoding of the font from its default.
-
-=back
-
-See Also: L<PDF::API2::Resource::CIDFont::CJKFont>
-
-=cut
-
+# Deprecated.  Use Unicode-supporting TrueType fonts instead.
+# See PDF::API2::Resource::CIDFont::CJKFont for details.
 sub cjkfont {
     my ($self, $name, %opts) = @_;
 
