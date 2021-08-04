@@ -530,11 +530,11 @@ sub new {
     return ($self, $data);
 }
 
-sub font { return $_[0]->{' font'}; }
-sub data { return $_[0]->{' data'}; }
-sub iscff { return $_[0]->data->{'iscff'}; }
+sub font { return $_[0]->{' font'} }
+sub data { return $_[0]->{' data'} }
+sub iscff { return $_[0]->data->{'iscff'} }
 
-sub haveKernPairs { return $_[0]->data->{'kern'} ? 1 : 0; }
+sub haveKernPairs { return $_[0]->data->{'kern'} ? 1 : 0 }
 
 sub kernPairCid {
     my ($self, $i1, $i2) = @_;
