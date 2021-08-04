@@ -99,7 +99,8 @@ sub new {
     $data->{'g2u'} = [ @{$cmap->{'g2u'}} ];
 
     $class = ref($class) if ref($class);
-    my $self = $class->SUPER::new($pdf, $data->{'apiname'} . pdfkey());
+    my $key = ($data->{'apiname'} // '') . pdfkey();
+    my $self = $class->SUPER::new($pdf, $key);
     $pdf->new_obj($self) if defined($pdf) and not $self->is_obj($pdf);
 
     $self->{' data'} = $data;
