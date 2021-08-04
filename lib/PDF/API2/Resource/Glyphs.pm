@@ -22,23 +22,24 @@ sub _generate {
 
     my $fh;
     open $fh, '<', $uniglyph_file;
-    my $uuu = {};
+    my $u = {};
+    my $g = {};
     while (my $line = <$fh>) {
         next if $line =~ m|^#|;
         chomp $line;
         $line =~ s|\s+\#.+$||go;
-        my ($uni, $name, $prio) = split(/\s+;\s+/, $line);
+        my ($uni, $name, $priority) = split(/\s+;\s+/, $line);
         $uni = hex($uni);
-        $uuu->{u}->{$uni} ||= [];
-        $uuu->{g}->{$name} ||= [];
-        push @{$uuu->{u}->{$uni}},  { uni => $uni, name => $name, prio => $prio };
-        push @{$uuu->{g}->{$name}}, { uni => $uni, name => $name, prio => $prio };
+        $u->{$uni} ||= [];
+        $g->{$name} ||= [];
+        push @{$u->{$uni}},  { uni => $uni, name => $name, priority => $priority };
+        push @{$g->{$name}}, { uni => $uni, name => $name, priority => $priority };
     }
-    close($fh);
+    close $fh;
 
     my %u2n;
-    foreach my $k (keys %{$uuu->{u}}) {
-        $u2n{$k} = $uuu->{u}->{$k}->[0]->{'name'};
+    foreach my $k (keys %$u) {
+        $u2n{$k} = $u->{$k}->[0]->{'name'};
     }
     print "our \$u2n = {\n";
     foreach my $key (sort { $a <=> $b } keys %u2n) {
@@ -47,8 +48,8 @@ sub _generate {
     print "};\n\n";
 
     my %n2u;
-    foreach my $k (keys %{$uuu->{g}}) {
-        my ($r) = sort { $a->{prio} <=> $b->{prio}} @{$uuu->{g}->{$k}};
+    foreach my $k (keys %$g) {
+        my ($r) = sort { $a->{'priority'} <=> $b->{'priority'}} @{$g->{$k}};
         $n2u{$k} = $r->{'uni'};
     }
     print "our \$n2u = {\n";
