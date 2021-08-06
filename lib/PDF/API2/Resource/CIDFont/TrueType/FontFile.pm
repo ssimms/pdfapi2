@@ -512,8 +512,14 @@ sub new {
     $data->{'u2n'} = { map { $data->{'g2u'}->[$_] => $data->{'g2n'}->[$_] } (0 .. (scalar @{$data->{'g2u'}} - 1)) };
 
     $data->{'wx'} = [];
-    foreach my $w (0 .. (scalar @{$data->{'g2u'}} - 1)) {
-        $data->{'wx'}->[$w] = int($font->{'hmtx'}->read->{'advance'}[$w] * 1000 / $data->{'upem'}) || $data->{'missingwidth'};
+    foreach my $i (0 .. (scalar @{$data->{'g2u'}} - 1)) {
+        my $hmtx = $font->{'hmtx'}->read->{'advance'}->[$i];
+        if ($hmtx) {
+            $data->{'wx'}->[$i] = int($hmtx * 1000 / $data->{'upem'});
+        }
+        else {
+            $data->{'wx'}->[$i] = $data->{'missingwidth'};
+        }
     }
 
     $data->{'kern'} = read_kern_table($font, $data->{'upem'}, $self);
