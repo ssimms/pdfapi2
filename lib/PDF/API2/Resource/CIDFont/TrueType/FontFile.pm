@@ -453,7 +453,7 @@ sub new {
         $data->{'e2u'} = [unpack('U*', decode('cp1252', pack('C*', 0 .. 255)))];
     }
 
-    if (($font->{'post'}->read->{'FormatType'} == 3) and defined $font->{'cmap'}->read->find_ms()) {
+    if ($font->{'post'}->read->{'FormatType'} == 3 and defined $font->{'cmap'}->read->find_ms()) {
         $data->{'g2n'} = [];
         foreach my $u (sort { $a <=> $b } keys %{$font->{'cmap'}->read->find_ms->{'val'}}) {
             my $n = nameByUni($u);
