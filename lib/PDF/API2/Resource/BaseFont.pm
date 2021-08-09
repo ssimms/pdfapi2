@@ -8,7 +8,6 @@ use warnings;
 # VERSION
 
 use Compress::Zlib;
-use Encode qw(:all);
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
 use Scalar::Util qw(weaken);
