@@ -51,13 +51,13 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     $page = $pdf->open_page($page_number);
 
     # Set the page size
-    $page->mediabox('Letter');
+    $page->size('Letter');
 
     # Add a built-in font to the PDF
-    $font = $pdf->corefont('Helvetica-Bold');
+    $font = $pdf->font('Helvetica-Bold');
 
     # Add an external TTF font to the PDF
-    $font = $pdf->ttfont('/path/to/font.ttf');
+    $font = $pdf->font('/path/to/font.ttf');
 
     # Add some text to the page
     $text = $page->text();
@@ -1554,35 +1554,42 @@ sub pages {
     return scalar @{$self->{'pagestack'}};
 }
 
-=item ($llx, $lly, $urx, $ury) = $pdf->mediabox()
+=item $pdf->default_page_size($size)
 
-=item $pdf->mediabox($name)
+=item @rectangle = $pdf->default_page_size()
 
-=item $pdf->mediabox($w, $h)
+Set the default physical size for pages in the PDF.  If called without arguments, return the coordinates of the rectangle describing the default physical page size.
 
-=item $pdf->mediabox($llx, $lly, $urx, $ury)
-
-Get or set the global mediabox.
-
-B<Example:>
-
-    $pdf = PDF::API2->new();
-    $pdf->mediabox('A4');
-    ...
-    $pdf->to_file('our/new.pdf');
-
-    $pdf = PDF::API2->new();
-    $pdf->mediabox(595, 842);
-    ...
-    $pdf->to_file('our/new.pdf');
-
-    $pdf = PDF::API2->new;
-    $pdf->mediabox(0, 0, 595, 842);
-    ...
-    $pdf->to_file('our/new.pdf');
+See L<PDF::API2::Page/"Page Sizes"> for possible values.
 
 =cut
 
+sub default_page_size {
+    my $self = shift();
+
+    # Set
+    if (@_) {
+        return $self->default_page_boundaries(media => @_);
+    }
+
+    # Get
+    my $boundaries = $self->default_page_boundaries();
+    return @{$boundaries->{'media'}};
+}
+
+=item $pdf->default_page_boundaries(%boundaries)
+
+=item \%boundaries = $pdf->default_page_boundaries()
+
+Set default prepress page boundaries for pages in the PDF.  If called without
+arguments, returns the coordinates of the rectangles describing each of the
+supported page boundaries.
+
+See the equivalent C<page_boundaries> method in L<PDF::API2::Page> for details.
+
+=cut
+
+# Called by PDF::API2::Page::boundaries via the default_page_* methods below
 sub _bounding_box {
     my $self = shift();
     my $type = shift();
@@ -1600,89 +1607,47 @@ sub _bounding_box {
     }
 
     # Set
-    $self->{'pages'}->{$type} = PDFArray(map { PDFNum(float($_)) } page_size(@_));
+    $self->{'pages'}->{$type} = PDFArray(map { PDFNum(float($_)) } @_);
     return $self;
 }
 
+sub default_page_boundaries {
+    return PDF::API2::Page::boundaries(@_);
+}
+
+# Deprecated; use default_page_size or default_page_boundaries
 sub mediabox {
     my $self = shift();
-    return $self->_bounding_box('MediaBox', @_);
+    return $self->_bounding_box('MediaBox') unless @_;
+    return $self->_bounding_box('MediaBox', page_size(@_));
 }
 
-=item ($llx, $lly, $urx, $ury) = $pdf->cropbox()
-
-=item $pdf->cropbox($name)
-
-=item $pdf->cropbox($w, $h)
-
-=item $pdf->cropbox($llx, $lly, $urx, $ury)
-
-Get or set the global cropbox.
-
-The cropbox defaults to the mediabox.
-
-=cut
-
+# Deprecated; use default_page_boundaries
 sub cropbox {
     my $self = shift();
-    return $self->_bounding_box('CropBox', @_);
+    return $self->_bounding_box('CropBox') unless @_;
+    return $self->_bounding_box('CropBox', page_size(@_));
 }
 
-=item ($llx, $lly, $urx, $ury) = $pdf->bleedbox()
-
-=item $pdf->bleedbox($name)
-
-=item $pdf->bleedbox($w, $h)
-
-=item $pdf->bleedbox($llx, $lly, $urx, $ury)
-
-Get or set the global bleedbox.
-
-The bleedbox defaults to the cropbox.
-
-=cut
-
+# Deprecated; use default_page_boundaries
 sub bleedbox {
     my $self = shift();
-    return $self->_bounding_box('BleedBox', @_);
+    return $self->_bounding_box('BleedBox') unless @_;
+    return $self->_bounding_box('BleedBox', page_size(@_));
 }
 
-=item ($llx, $lly, $urx, $ury) = $pdf->trimbox()
-
-=item $pdf->trimbox($name)
-
-=item $pdf->trimbox($w, $h)
-
-=item $pdf->trimbox($llx, $lly, $urx, $ury)
-
-Get or set the global trimbox.
-
-The trimbox defaults to the cropbox.
-
-=cut
-
+# Deprecated; use default_page_boundaries
 sub trimbox {
     my $self = shift();
-    return $self->_bounding_box('TrimBox', @_);
+    return $self->_bounding_box('TrimBox') unless @_;
+    return $self->_bounding_box('TrimBox', page_size(@_));
 }
 
-=item ($llx, $lly, $urx, $ury) = $pdf->artbox()
-
-=item $pdf->artbox($name)
-
-=item $pdf->artbox($w, $h)
-
-=item $pdf->artbox($llx, $lly, $urx, $ury)
-
-Get or sets the global artbox.
-
-The artbox defaults to the cropbox.
-
-=cut
-
+# Deprecated; use default_page_boundaries
 sub artbox {
     my $self = shift();
-    return $self->_bounding_box('ArtBox', @_);
+    return $self->_bounding_box('ArtBox') unless @_;
+    return $self->_bounding_box('ArtBox', page_size(@_));
 }
 
 =back

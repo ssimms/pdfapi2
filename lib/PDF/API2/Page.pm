@@ -7,25 +7,67 @@ use warnings;
 
 # VERSION
 
+use Carp;
 use POSIX qw(floor);
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(looks_like_number weaken);
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Content;
 use PDF::API2::Content::Text;
 use PDF::API2::Util;
 
+my $page_sizes = {
+    # Metric A
+    '4a0'     => [ 4760, 6716 ],
+    '2a0'     => [ 3368, 4760 ],
+    'a0'      => [ 2380, 3368 ],
+    'a1'      => [ 1684, 2380 ],
+    'a2'      => [ 1190, 1684 ],
+    'a3'      => [  842, 1190 ],
+    'a4'      => [  595,  842 ],
+    'a5'      => [  421,  595 ],
+    'a6'      => [  297,  421 ],
+
+    # Metric B
+    '4b0'     => [ 5656, 8000 ],
+    '2b0'     => [ 4000, 5656 ],
+    'b0'      => [ 2828, 4000 ],
+    'b1'      => [ 2000, 2828 ],
+    'b2'      => [ 1414, 2000 ],
+    'b3'      => [ 1000, 1414 ],
+    'b4'      => [  707, 1000 ],
+    'b5'      => [  500,  707 ],
+    'b6'      => [  353,  500 ],
+
+    # US
+    'letter'  => [  612,  792 ],
+    'legal'   => [  612, 1008 ],
+    'ledger'  => [ 1224,  792 ],
+    'tabloid' => [  792, 1224 ],
+};
+
 =head1 NAME
 
 PDF::API2::Page - Methods to interact with individual pages
 
-=head1 METHODS
+=head1 SYNOPSIS
 
-=over
+    my $pdf = PDF::API2->new();
 
-=item $page = PDF::API2::Page->new $pdf, $parent, $index
+    # Add a page to a new or existing PDF
+    my $page = $pdf->page();
 
-Returns a page object (called from $pdf->page).
+    # Set the page size
+    $page->size('letter');
+
+    # Set prepress page boundaries
+    $page->boundaries(media => '12x18', trim => 0.5 * 72);
+
+    # Create a content object for drawing shapes
+    my $gfx = $page->gfx();
+
+    # Create a content object for text
+    my $text = $page->text();
 
 =cut
 
@@ -42,12 +84,6 @@ sub new {
     $parent->add_page($self, $index);
     return $self;
 }
-
-=item $page = PDF::API2::Page->coerce $pdf, $pdfpage
-
-Returns a page object converted from $pdfpage (called from $pdf->open_page).
-
-=cut
 
 sub coerce {
     my ($class, $pdf, $page) = @_;
@@ -68,21 +104,271 @@ sub update {
     return $self;
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->mediabox()
+=head1 PAGE SIZE METHODS
 
-=item $page->mediabox($w, $h)
+=over
 
-=item $page->mediabox($llx, $lly, $urx, $ury)
+=item $page = $page->size($size)
 
-=item $page->mediabox($alias)
+=item @rectangle = $page->size()
 
-Get or set the mediabox.  This method supports the following aliases:
-'4A0', '2A0', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6',
-'4B0', '2B0', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6',
-'LETTER', 'BROADSHEET', 'LEDGER', 'TABLOID', 'LEGAL',
-'EXECUTIVE', and '36X36'.
+Set the physical page size or return the coordinates of the rectangle enclosing
+the physical page size.
+
+    # Set the page size using a common US name
+    $page->size('letter');
+
+    # Set the page size using coordinates in points (X1, Y1, X2, Y2)
+    $page->size([0, 0, 612, 792]);
+
+See Page Sizes below for possible values.
+
+The size method is a convenient shortcut for setting the PDF's media box when
+other prepress page boundaries aren't required.  It's equivalent to the
+following:
+
+    # Set
+    $page = $page->boundaries(media => $size);
+
+    # Get
+    @rectangle = $page->boundaries->{'media'}->@*;
 
 =cut
+
+sub size {
+    my $self = shift();
+
+    # Set
+    if (@_) {
+        return $self->boundaries(media => @_);
+    }
+
+    # Get
+    my $boundaries = $self->boundaries();
+    return @{$boundaries->{'media'}};
+}
+
+=item $page = $page->boundaries(%boundaries)
+
+=item \%boundaries = $page->boundaries()
+
+Set prepress page boundaries to facilitate printing.  Returns the current page boundaries if called without arguments.
+
+    $page->boundaries(
+        # 13x19 physical sheet size
+        media => '13x19',
+
+        # sheet content is 11x17 with 0.25" bleed
+        bleed => [0.75 * 72, 0.75 * 72, 12.25 * 72, 18.25 * 72],
+
+        # 11x17 final trimmed size
+        trim  => 0.25 * 72,
+    );
+
+The C<%boundaries> hash contains one or more page boundary keys (see Page
+Boundaries), each with a corresponding size (see Page Sizes).  If called without
+arguments, the returned hashref will contain all five boundaries.
+
+=back
+
+=head2 Page Boundaries
+
+PDF defines five page boundaries.  When creating PDFs for print shops, you'll
+most commonly use just the media box and trim box.  Traditional print shops may
+also use the bleed box when adding printer's marks and other information.
+
+=over
+
+=item * media
+
+The media box defines the boundaries of the physical medium on which the page is
+to be printed.  It may include any extended area surrounding the finished page
+for bleed, printing marks, or other such purposes.  The default value is a US
+letter page (8.5" x 11").
+
+=item * crop
+
+The crop box defines the region to which the contents of the page shall be
+clipped (cropped) when displayed or printed.  The default value is the page's
+media box.
+
+This is a historical page boundary.  You'll likely want to set the bleed and/or
+trim boxes instead.
+
+=item * bleed
+
+The bleed box defines the region to which the contents of the page shall be
+clipped when output in a production environment.  This may include any extra
+bleed area needed to accommodate the physical limitations of cutting, folding,
+and trimming equipment.  The actual printed page (media box) may include
+printing marks that fall outside the bleed box.  The default value is the page's
+crop box.
+
+=item * trim
+
+The trim box defines the intended dimensions of the finished page after
+trimming.  It may be smaller than the media box to allow for production-related
+content, such as printing instructions, cut marks, or color bars.  The default
+value is the page's crop box.
+
+=item * art
+
+The art box defines the extent of the page's meaningful content (including
+potential white space) as intended by the page's creator.  The default value is
+the page's crop box.
+
+=back
+
+=head2 Page Sizes
+
+PDF page sizes are stored as rectangle coordinates.  For convenience, PDF::API2
+also provides a number of aliases and shortcuts that are more human-friendly.
+
+The following formats are supported:
+
+=over
+
+=item a standard page size
+
+    $page->boundaries(media => 'A4');
+
+Aliases for the most common paper sizes are built in (case-insensitive).
+
+US: Letter, Legal, Ledger, Tabloid
+
+Metric: 4A0, 2A0, A0 - A6, 4B0, 2B0, and B0 - B6
+
+=item a "WxH" string in inches
+
+    $page->boundaries(media => '8.5x11');
+
+Many US paper sizes are commonly identified by their size in inches rather than
+by a particular name.  These can be passed as strings with the width and height
+separated by an C<x>.
+
+Examples: C<4x6>, C<12x18>, C<8.5x11>
+
+=item a number representing a reduction (in points) from the next-larger box
+
+For example, a 12" x 18" physical sheet to be trimmed down to an 11" x 17" sheet
+can be specified as follows:
+
+    # Note: There are 72 points per inch
+    $page->boundaries(media => '12x18', trim => 0.5 * 72);
+
+    # Equivalent
+    $page->boundaries(media => [0,        0,        12   * 72, 18   * 72],
+                      trim  => [0.5 * 72, 0.5 * 72, 11.5 * 72, 17.5 * 72]);
+
+The "next-larger box" follows this order, stopping at the first defined value:
+
+    art -> trim -> bleed -> media
+
+    crop -> media
+
+=item [$width, $height] in points
+
+    $page->boundaries(media => [8.5 * 72, 11 * 7.2]);
+
+For other page sizes, the width and height (in points) can be given directly as
+an array.
+
+=item [$x1, $y1, $x2, $y2] in points
+
+    $page->boundaries(media => [0, 0, 8.5 * 72, 11 * 72]);
+
+Finally, the absolute coordinates of the bottom-left and top-right corners of a
+rectangle can be specified.
+
+=back
+
+=cut
+
+sub _to_rectangle {
+    my $value = shift();
+
+    # An array of two or four numbers in points
+    if (ref($value) eq 'ARRAY') {
+        if (@$value == 2) {
+            return (0, 0, @$value);
+        }
+        elsif (@$value == 4) {
+            return @$value;
+        }
+        croak "Page boundary array must contain two or four numbers";
+    }
+
+    # WxH in inches
+    if ($value =~ /^([0-9.]+)\s*x\s*([0-9.]+)$/) {
+        my ($w, $h) = ($1, $2);
+        if (looks_like_number($w) and looks_like_number($h)) {
+            return (0, 0, $w * 72, $h * 72);
+        }
+    }
+
+    # Common names for page sizes
+    if ($page_sizes->{lc $value}) {
+        return (0, 0, @{$page_sizes->{lc $value}});
+    }
+
+    if (ref($value)) {
+        croak "Unrecognized page size";
+    }
+    else {
+        croak "Unrecognized page size: $value";
+    }
+}
+
+sub boundaries {
+    my ($self, %boxes) = @_;
+
+    # Set
+    foreach my $box (qw(media crop bleed trim art)) {
+        next unless exists $boxes{$box};
+
+        # Special case: A single number as the value for anything other than
+        # MediaBox means to take the next larger size and reduce it by this
+        # amount in points on all four sides, provided the larger size was also
+        # included.
+        my $value = $boxes{$box};
+        my @rectangle;
+        if ($box ne 'media' and not ref($value) and looks_like_number($value)) {
+            my $parent = ($box eq 'crop'  ? 'media' :
+                          $box eq 'bleed' ? 'media' :
+                          $box eq 'trim'  ? 'bleed' : 'trim');
+            $parent = 'bleed' if $parent eq 'trim'  and not $boxes{'trim'};
+            $parent = 'media' if $parent eq 'bleed' and not $boxes{'bleed'};
+            $parent = 'media' if $parent eq 'bleed' and not $boxes{'bleed'};
+            unless ($boxes{$parent}) {
+                croak "Single-number argument for $box requires $parent";
+            }
+
+            @rectangle = @{$boxes{$parent}};
+            $rectangle[0] += $value;
+            $rectangle[1] += $value;
+            $rectangle[2] -= $value;
+            $rectangle[3] -= $value;
+        }
+        else {
+            @rectangle = _to_rectangle($value);
+        }
+
+        my $box_name = ucfirst($box) . 'Box';
+        $self->_bounding_box($box_name, @rectangle);
+        $boxes{$box} = [@rectangle];
+    }
+
+    # Get
+    unless (keys %boxes) {
+        my %boundaries;
+        foreach my $box (qw(Media Crop Bleed Trim Art)) {
+            $boundaries{lc($box)} = [$self->_bounding_box(uc($box) . 'Box')];
+        }
+        return \%boundaries;
+    }
+
+    return $self;
+}
 
 sub _bounding_box {
     my $self = shift();
@@ -108,9 +394,11 @@ sub _bounding_box {
     return $self;
 }
 
+# Deprecated; use size(...) or boundaries('media', ...)
 sub mediabox {
     my $self = shift();
-    return $self->_bounding_box('MediaBox', @_);
+    return $self->_bounding_box('MediaBox') unless @_;
+    return $self->_bounding_box('MediaBox', page_size(@_));
 }
 
 # Deprecated
@@ -119,23 +407,11 @@ sub get_mediabox {
     return $self->_bounding_box('MediaBox');
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->cropbox()
-
-=item $page->cropbox($w, $h)
-
-=item $page->cropbox($llx, $lly, $urx, $ury)
-
-=item $page->cropbox($alias)
-
-Get or set the cropbox.  This method supports the same aliases as mediabox.
-
-The cropbox defaults to the mediabox.
-
-=cut
-
+# Deprecated; use boundaries('crop', ...)
 sub cropbox {
     my $self = shift();
-    return $self->_bounding_box('CropBox', @_);
+    return $self->_bounding_box('CropBox') unless @_;
+    return $self->_bounding_box('CropBox', page_size(@_));
 }
 
 # Deprecated
@@ -144,23 +420,11 @@ sub get_cropbox {
     return $self->_bounding_box('CropBox');
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->bleedbox()
-
-=item $page->bleedbox($w, $h)
-
-=item $page->bleedbox($llx, $lly, $urx, $ury)
-
-=item $page->bleedbox($alias)
-
-Get or set the bleedbox.  This method supports the same aliases as mediabox.
-
-The bleedbox defaults to the cropbox.
-
-=cut
-
+# Deprecated; use boundaries('bleed', ...)
 sub bleedbox {
     my $self = shift();
-    return $self->_bounding_box('BleedBox', @_);
+    return $self->_bounding_box('BleedBox') unless @_;
+    return $self->_bounding_box('BleedBox', page_size(@_));
 }
 
 # Deprecated
@@ -169,21 +433,11 @@ sub get_bleedbox {
     return $self->_bounding_box('BleedBox');
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->trimbox()
-
-=item $page->trimbox($w, $h)
-
-=item $page->trimbox($llx, $lly, $urx, $ury)
-
-Get or set the trimbox.  This method supports the same aliases as mediabox.
-
-The trimbox defaults to the cropbox.
-
-=cut
-
+# Deprecated; use boundaries('trim', ...)
 sub trimbox {
     my $self = shift();
-    return $self->_bounding_box('TrimBox', @_);
+    return $self->_bounding_box('TrimBox') unless @_;
+    return $self->_bounding_box('TrimBox', page_size(@_));
 }
 
 # Deprecated
@@ -192,23 +446,11 @@ sub get_trimbox {
     return $self->_bounding_box('TrimBox');
 }
 
-=item ($llx, $lly, $urx, $ury) = $page->artbox()
-
-=item $page->artbox($w, $h)
-
-=item $page->artbox($llx, $lly, $urx, $ury)
-
-=item $page->artbox($alias)
-
-Get or set the artbox.  This method supports the same aliases as mediabox.
-
-The rtbox defaults to the cropbox.
-
-=cut
-
+# Deprecated; use boundaries('art', ...)
 sub artbox {
     my $self = shift();
-    return $self->_bounding_box('ArtBox', @_);
+    return $self->_bounding_box('ArtBox') unless @_;
+    return $self->_bounding_box('ArtBox', page_size(@_));
 }
 
 # Deprecated
@@ -216,6 +458,10 @@ sub get_artbox {
     my $self = shift();
     return $self->_bounding_box('ArtBox');
 }
+
+=head1 PAGE CONTENT METHODS
+
+=over
 
 =item $page->rotate $deg
 

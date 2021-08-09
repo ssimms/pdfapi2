@@ -6,6 +6,25 @@
     - Renamed stringify to to_string.  The old name is deprecated but will
       continue to work.
 
+    - Added $page->boundaries() and $pdf->default_page_boundaries() to replace
+      the separate methods for the various page boundaries.  The supported
+      arguments are slightly different; some edge cases have been removed and
+      new options have been added.  See below and the PDF::API2::Page
+      documentation for details.  The old names are deprecated but will continue
+      to work.
+
+    - Added $page->size() and $pdf->default_page_size() as a shortcut for
+      setting the media box.
+
+    - Both $page->size() and $page->boundaries() (and their $pdf default
+      equivalents) now accept "WxH" page sizes in inches (e.g. 11x17 or 8.5x11).
+      This does not apply to the deprecated versions of these methods.
+
+    - Both $page->size() and $page->boundaries() (and their $pdf default
+      equivalents) now accept a single number for page boundaries other than the
+      media box, representing an amount in points to shrink the next larger box.
+      This does not apply to the deprecated versions of these methods.
+
     - Created a convenience method $pdf->font, which combines corefont, ttfont,
       psfont, and bdfont.  The type-specific methods have not been deprecated.
 
