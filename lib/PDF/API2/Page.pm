@@ -228,7 +228,7 @@ The following formats are supported:
 
 =over
 
-=item a standard page size
+=item * a standard page size
 
     $page->boundaries(media => 'A4');
 
@@ -238,7 +238,7 @@ US: Letter, Legal, Ledger, Tabloid
 
 Metric: 4A0, 2A0, A0 - A6, 4B0, 2B0, and B0 - B6
 
-=item a "WxH" string in inches
+=item * a "WxH" string in inches
 
     $page->boundaries(media => '8.5x11');
 
@@ -248,7 +248,7 @@ separated by an C<x>.
 
 Examples: C<4x6>, C<12x18>, C<8.5x11>
 
-=item a number representing a reduction (in points) from the next-larger box
+=item * a number representing a reduction (in points) from the next-larger box
 
 For example, a 12" x 18" physical sheet to be trimmed down to an 11" x 17" sheet
 can be specified as follows:
@@ -266,14 +266,14 @@ The "next-larger box" follows this order, stopping at the first defined value:
 
     crop -> media
 
-=item [$width, $height] in points
+=item * [$width, $height] in points
 
     $page->boundaries(media => [8.5 * 72, 11 * 7.2]);
 
 For other page sizes, the width and height (in points) can be given directly as
 an array.
 
-=item [$x1, $y1, $x2, $y2] in points
+=item * [$x1, $y1, $x2, $y2] in points
 
     $page->boundaries(media => [0, 0, 8.5 * 72, 11 * 72]);
 
