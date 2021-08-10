@@ -33,35 +33,61 @@ my $alias = {
 
 =head1 NAME
 
-PDF::API2::Resource::Font::CoreFont - Module for using the 14 PDF built-in fonts.
+PDF::API2::Resource::Font::CoreFont - Module for using the 14 standard PDF fonts.
 
 =head1 SYNOPSIS
 
-    use PDF::API2;
     my $pdf = PDF::API2->new();
-    my $font = $pdf->corefont('Times-Roman');
+    my $font = $pdf->font('Times-Roman');
 
-=head1 METHODS
+    my $page = $pdf->page();
+    my $text = $page->text();
+    $text->font($font, 20);
+    $text->translate(200, 700);
+    $text->text('Hello world!');
+
+    $pdf->to_file('/path/to/new.pdf');
+
+=head1 STANDARD FONTS
+
+The following fourteen fonts are available in all PDF readers that conform to
+the PDF specification:
 
 =over
 
-=item $font = PDF::API2::Resource::Font::CoreFont->new($pdf, $name, %options)
+=item * Courier
 
-Returns a corefont object.  Spaces and hyphens are ignored in the name, which is
-also case-insensitive.
+=item * Courier-Bold
 
-=cut
+=item * Courier-BoldOblique
 
-=pod
+=item * Courier-Oblique
 
-Valid C<%options> are:
+=item * Helvetica
 
-C<-encode> changes the encoding of the font from its default.  See L<Encode> for
-the supported values.
+=item * Helvetica-Bold
 
-C<-pdfname> changes the reference name of the font from its default.  The
-reference name is normally generated automatically and can be retrieved via
-C<$name = $font->fontname()>.
+=item * Helvetica-BoldOblique
+
+=item * Helvetica-Oblique
+
+=item * Symbol
+
+=item * Times-Bold
+
+=item * Times-BoldItalic
+
+=item * Times-Italic
+
+=item * Times-Roman
+
+=item * ZapfDingbats
+
+=back
+
+These fonts (except Symbol and ZapfDingbats) include glyphs for ASCII and
+certain Latin characters only.  If other characters are needed, you will need to
+embed a font file.
 
 =cut
 
@@ -151,45 +177,3 @@ sub new {
 }
 
 1;
-
-__END__
-
-=back
-
-=head1 SUPPORTED FONTS
-
-=over
-
-=item PDF::API2::CoreFont supports the following Adobe core fonts:
-
-  Courier
-  Courier-Bold
-  Courier-BoldOblique
-  Courier-Oblique
-  Helvetica
-  Helvetica-Bold
-  Helvetica-BoldOblique
-  Helvetica-Oblique
-  Symbol
-  Times-Bold
-  Times-BoldItalic
-  Times-Italic
-  Times-Roman
-  ZapfDingbats
-
-=item PDF::API2::CoreFont supports the following Windows fonts:
-
-  Georgia
-  Georgia,Bold
-  Georgia,BoldItalic
-  Georgia,Italic
-  Verdana
-  Verdana,Bold
-  Verdana,BoldItalic
-  Verdana,Italic
-  Webdings
-  Wingdings
-
-=back
-
-=cut

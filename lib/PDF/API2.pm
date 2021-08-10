@@ -1729,11 +1729,12 @@ sub _find_font {
 Add a font to the PDF.  Returns the font object, to be used by
 L<PDF::API2::Content>.
 
-The font C<$name> is either one of the 14 built-in font names (e.g. Helvetica)
-or the path to a font file.
+The font C<$name> is either the name of one of the L<standard 14
+fonts|PDF::API2::Resource::Font::CoreFont/"STANDARD FONTS"> (e.g. Helvetica) or
+the path to a font file.
 
     my $pdf = PDF::API2->new();
-    my $font1 = $pdf->font('Helvetica Bold');
+    my $font1 = $pdf->font('Helvetica-Bold');
     my $font2 = $pdf->font('/path/to/ComicSans.ttf');
     my $page = $pdf->page();
     my $content = $page->text();
@@ -1792,6 +1793,26 @@ arguments.
 sub font {
     my ($self, $name, %options) = @_;
 
+    my $standard_fonts = {
+        'Courier'               => 1,
+        'Courier-Bold'          => 1,
+        'Courier-BoldOblique'   => 1,
+        'Courier-Oblique'       => 1,
+        'Helvetica'             => 1,
+        'Helvetica-Bold'        => 1,
+        'Helvetica-BoldOblique' => 1,
+        'Helvetica-Oblique'     => 1,
+        'Symbol'                => 1,
+        'Times-Bold'            => 1,
+        'Times-BoldItalic'      => 1,
+        'Times-Italic'          => 1,
+        'Times-Roman'           => 1,
+        'ZapfDingbats'          => 1,
+    };
+
+    if ($standard_fonts->{$name}) {
+        return $self->corefont($name, %options);
+    }
     if ($name =~ /\.[ot]tf$/i) {
         return $self->ttfont($name, %options);
     }
@@ -1805,7 +1826,7 @@ sub font {
         croak "Unrecognized font file extension: $1";
     }
     else {
-        return $self->corefont($name, %options);
+        croak "Unrecognized font: $name";
     }
 }
 
