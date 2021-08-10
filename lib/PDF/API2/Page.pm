@@ -214,7 +214,7 @@ the page's crop box.
 PDF page sizes are stored as rectangle coordinates.  For convenience, PDF::API2
 also supports a number of aliases and shortcuts that are more human-friendly.
 
-The following formats are supported:
+The following formats are available:
 
 =over
 
@@ -256,6 +256,9 @@ The "next-larger box" follows this order, stopping at the first defined value:
     art -> trim -> bleed -> media
 
     crop -> media
+
+This option isn't available for the media box since it is by definition the
+largest boundary.
 
 =item * [$width, $height] in points
 
