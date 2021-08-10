@@ -106,25 +106,25 @@ sub update {
 
 =head1 PAGE SIZE METHODS
 
-=over
+=head2 size
 
-=item $page = $page->size($size)
-
-=item @rectangle = $page->size()
-
-Set the physical page size or return the coordinates of the rectangle enclosing
-the physical page size.
-
-    # Set the page size using a common US name
+    # Set the page size using a common name
     $page->size('letter');
 
     # Set the page size using coordinates in points (X1, Y1, X2, Y2)
     $page->size([0, 0, 612, 792]);
 
-See Page Sizes below for possible values.
+    # Get the page coordinates in points
+    my @rectangle = $page->size();
+
+Set the physical page size (a.k.a. media box) when called with an argument.
+See L</"Page Sizes"> below for possible values.  Returns the C<$page> object.
+
+Returns the coordinates of the rectangle enclosing the physical page size when
+called without arguments.
 
 The size method is a convenient shortcut for setting the PDF's media box when
-other prepress page boundaries aren't required.  It's equivalent to the
+print-related page boundaries aren't required.  It's equivalent to the
 following:
 
     # Set
@@ -148,30 +148,20 @@ sub size {
     return @{$boundaries->{'media'}};
 }
 
-=item $page = $page->boundaries(%boundaries)
-
-=item \%boundaries = $page->boundaries()
-
-Set prepress page boundaries to facilitate printing.  Returns the current page boundaries if called without arguments.
+=head2 boundaries
 
     $page->boundaries(
-        # 13x19 physical sheet size
         media => '13x19',
-
-        # sheet content is 11x17 with 0.25" bleed
         bleed => [0.75 * 72, 0.75 * 72, 12.25 * 72, 18.25 * 72],
-
-        # 11x17 final trimmed size
         trim  => 0.25 * 72,
     );
 
-The C<%boundaries> hash contains one or more page boundary keys (see Page
-Boundaries), each with a corresponding size (see Page Sizes).  If called without
-arguments, the returned hashref will contain all five boundaries.
+Set prepress page boundaries when called with a hash containing one or more page
+boundary definitions.  Returns the C<$page> object.
 
-=back
+Returns the current page boundaries if called without arguments.
 
-=head2 Page Boundaries
+=head3 Page Boundaries
 
 PDF defines five page boundaries.  When creating PDFs for print shops, you'll
 most commonly use just the media box and trim box.  Traditional print shops may
@@ -219,16 +209,16 @@ the page's crop box.
 
 =back
 
-=head2 Page Sizes
+=head3 Page Sizes
 
 PDF page sizes are stored as rectangle coordinates.  For convenience, PDF::API2
-also provides a number of aliases and shortcuts that are more human-friendly.
+also supports a number of aliases and shortcuts that are more human-friendly.
 
 The following formats are supported:
 
 =over
 
-=item * a standard page size
+=item * a standard paper size
 
     $page->boundaries(media => 'A4');
 
@@ -248,10 +238,7 @@ separated by an C<x>.
 
 Examples: C<4x6>, C<12x18>, C<8.5x11>
 
-=item * a number representing a reduction (in points) from the next-larger box
-
-For example, a 12" x 18" physical sheet to be trimmed down to an 11" x 17" sheet
-can be specified as follows:
+=item * a number (in points) representing a reduction from the next-larger box
 
     # Note: There are 72 points per inch
     $page->boundaries(media => '12x18', trim => 0.5 * 72);
@@ -259,6 +246,10 @@ can be specified as follows:
     # Equivalent
     $page->boundaries(media => [0,        0,        12   * 72, 18   * 72],
                       trim  => [0.5 * 72, 0.5 * 72, 11.5 * 72, 17.5 * 72]);
+
+This example shows a 12" x 18" physical sheet that will be reduced to a final
+size of 11" x 17" by trimming 0.5" from each edge.  The smaller boundary is
+assumed to be centered on the larger one.
 
 The "next-larger box" follows this order, stopping at the first defined value:
 
@@ -270,14 +261,14 @@ The "next-larger box" follows this order, stopping at the first defined value:
 
     $page->boundaries(media => [8.5 * 72, 11 * 7.2]);
 
-For other page sizes, the width and height (in points) can be given directly as
-an array.
+For other page or boundary sizes, the width and height (in points) can be given
+directly as an array.
 
 =item * [$x1, $y1, $x2, $y2] in points
 
     $page->boundaries(media => [0, 0, 8.5 * 72, 11 * 72]);
 
-Finally, the absolute coordinates of the bottom-left and top-right corners of a
+Finally, the raw coordinates of the bottom-left and top-right corners of a
 rectangle can be specified.
 
 =back
