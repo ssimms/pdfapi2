@@ -28,10 +28,10 @@
       This does not apply to the deprecated versions of these methods.
 
     - Created a convenience method $pdf->font, which combines corefont, ttfont,
-      psfont, and bdfont.  The type-specific methods have *not* been deprecated.
-      Unlike corefont, font requires the exact name of one of the standard
-      fonts.  Kerning is on by default (vs. off by default in the type-specific
-      methods).
+      psfont, and bdfont.  The type-specific methods have been deprecated but
+      will continue to work.  Unlike corefont, font requires the exact name of
+      one of the standard fonts.  Kerning is on by default (vs. off by default
+      in the type-specific methods).
 
     - Tentatively deprecated $pdf->cjkfont.  If you're successfully using this
       method for CJK font support, read PDF::API2::Resource::CIDFont::CJKFont

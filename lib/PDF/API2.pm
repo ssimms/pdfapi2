@@ -1772,61 +1772,80 @@ the path to a font file.
 
     $pdf->save('sample.pdf');
 
-TrueType (ttf/otf), Adobe PostScript (pfa/pfb), and Adobe Glyph Bitmap
+TrueType (ttf/otf), Adobe PostScript Type 1 (pfa/pfb), and Adobe Glyph Bitmap
 Distribution Format (bdf) fonts are supported.
 
-The following C<%options> may be included:
+The following C<%options> are available:
 
 =over
 
-=item -encode
+=item * format
 
-Changes the encoding of the font from its default.
+The font format is normally detected automatically based on the file's
+extension.  If you're using a font with an atypical extension, you can set
+C<format> to one of C<truetype> (TrueType or OpenType), C<type1> (PostScript
+Type 1), or C<bitmap> (Adobe Bitmap).
 
-=item -dokern
+=item * kerning
 
-Enables kerning if data is available (on by default; set false to disable).
+Kerning (automatic adjustment of space between pairs of characters) is enabled
+by default if the font includes this information.  Set this option to false to
+disable.
 
-=item -afmfile (PostScript fonts only)
+=item * afm_file (PostScript Type 1 fonts only)
 
 Specifies the location of the font metrics file.
 
-=item -pfmfile (PostScript fonts only)
+=item * pfm_file (PostScript Type 1 fonts only)
 
 Specifies the location of the printer font metrics file.  This option overrides
 the -encode option.
 
-=item -noembed (TrueType fonts only)
+=item * embed (TrueType fonts only)
 
-Disables embedding of the font file.
+Fonts are embedded in the PDF by default, which is required to ensure that they
+can be viewed properly on a device that doesn't have the font installed.  Set
+this option to false to prevent the font from being embedded.
 
 =back
-
-The font type is detected based on the file's extension.  If you need to include
-a supported font with a different file extension, you can instead call C<ttfont>
-(TrueType), C<psfont> (PostScript), or C<bdfont> (Glyph Bitmap) with the same
-arguments.
 
 =cut
 
 sub font {
     my ($self, $name, %options) = @_;
 
-    $options{'-dokern'} //= 1;
+    if (exists $options{'kerning'}) {
+        $options{'-dokern'} = delete $options{'kerning'};
+    }
 
     require PDF::API2::Resource::Font::CoreFont;
-
     if (PDF::API2::Resource::Font::CoreFont->is_standard($name)) {
         return $self->corefont($name, %options);
     }
-    if ($name =~ /\.[ot]tf$/i) {
+
+    my $format = $options{'format'};
+    $format //= ($name =~ /\.[ot]tf$/i ? 'truetype' :
+                 $name =~ /\.pf[ab]$/i ? 'type1'    :
+                 $name =~ /\.bdf$/i    ? 'bitmap'   : '');
+
+    if ($format eq 'truetype') {
+        $options{'embed'} //= 1;
         return $self->ttfont($name, %options);
     }
-    elsif ($name =~ /\.pf[ab]$/i) {
+    elsif ($format eq 'type1') {
+        if (exists $options{'afm_file'}) {
+            $options{'-afmfile'} = delete $options{'afm_file'};
+        }
+        if (exists $options{'pfm_file'}) {
+            $options{'-pfmfile'} = delete $options{'pfm_file'};
+        }
         return $self->psfont($name, %options);
     }
-    elsif ($name =~ /\.bdf$/i) {
+    elsif ($format eq 'bitmap') {
         return $self->bdfont($name, %options);
+    }
+    elsif ($format) {
+        croak "Unrecognized font format: $format";
     }
     elsif ($name =~ /(\..*)$/) {
         croak "Unrecognized font file extension: $1";
@@ -1870,6 +1889,12 @@ sub ttfont {
     # the ToUnicode CMap by default, but allow it to be disabled (for
     # performance and file size reasons) by setting -unicodemap to 0.
     $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
+
+    # -noembed is deprecated (replace with embed => 0)
+    if ($opts{'-noembed'}) {
+        $opts{'embed'} //= 1;
+    }
+    $opts{'embed'} //= 1;
 
     my $file = _find_font($name) or croak "Unable to find font \"$name\"";
     require PDF::API2::Resource::CIDFont::TrueType;

@@ -52,7 +52,7 @@ sub new {
     $de->{'Subtype'} = PDFName($self->iscff() ? 'CIDFontType0' : 'CIDFontType2');
     $de->{'BaseFont'} = PDFName($self->fontname());
     $de->{'DW'} = PDFNum($self->missingwidth());
-    unless ($opts{'-noembed'}) {
+    if ($opts{'embed'}) {
     	$des->{$self->iscff() ? 'FontFile3' : 'FontFile2'} = $ff;
     }
     unless ($self->issymbol()) {

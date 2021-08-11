@@ -371,7 +371,7 @@ sub new {
     $self->{' font'} = $font;
     $self->{' data'} = $data;
 
-    $data->{'noembed'} = $opts{'-noembed'} ? 1 : 0;
+    $data->{'noembed'} = $opts{'embed'} ? 0 : 1;
     $data->{'iscff'} = defined($font->{'CFF '}) ? 1 : 0;
 
     $self->{'Subtype'} = PDFName('CIDFontType0C') if $data->{'iscff'};
