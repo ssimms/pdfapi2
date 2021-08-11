@@ -1785,7 +1785,7 @@ Changes the encoding of the font from its default.
 
 =item -dokern
 
-Enables kerning if data is available.
+Enables kerning if data is available (on by default; set false to disable).
 
 =item -afmfile (PostScript fonts only)
 
@@ -1815,6 +1815,8 @@ arguments.
 
 sub font {
     my ($self, $name, %options) = @_;
+
+    $options{'-dokern'} //= 1;
 
     my $standard_fonts = {
         'Courier'               => 1,
