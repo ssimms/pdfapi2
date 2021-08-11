@@ -1796,10 +1796,6 @@ Specifies the location of the font metrics file.
 Specifies the location of the printer font metrics file.  This option overrides
 the -encode option.
 
-=item -isocmap (TrueType fonts only)
-
-Uses the ISO Unicode map instead of the default MS Unicode map.
-
 =item -noembed (TrueType fonts only)
 
 Disables embedding of the font file.

@@ -411,7 +411,7 @@ sub new {
     $data->{'subname'} = $font->{'name'}->find_name(2);
     $data->{'subname'} =~ s/[\x00-\x1f\s]//g;
 
-    $font->{'cmap'}->read->find_ms($opts{'-isocmap'} || 0);
+    $font->{'cmap'}->read->find_ms();
     if (defined $font->{'cmap'}->find_ms()) {
         $data->{'issymbol'} = ($font->{'cmap'}->find_ms->{'Platform'} == 3 and $font->{'cmap'}->read->find_ms->{'Encoding'} == 0) || 0;
     }
