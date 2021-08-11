@@ -1818,24 +1818,9 @@ sub font {
 
     $options{'-dokern'} //= 1;
 
-    my $standard_fonts = {
-        'Courier'               => 1,
-        'Courier-Bold'          => 1,
-        'Courier-BoldOblique'   => 1,
-        'Courier-Oblique'       => 1,
-        'Helvetica'             => 1,
-        'Helvetica-Bold'        => 1,
-        'Helvetica-BoldOblique' => 1,
-        'Helvetica-Oblique'     => 1,
-        'Symbol'                => 1,
-        'Times-Bold'            => 1,
-        'Times-BoldItalic'      => 1,
-        'Times-Italic'          => 1,
-        'Times-Roman'           => 1,
-        'ZapfDingbats'          => 1,
-    };
+    require PDF::API2::Resource::Font::CoreFont;
 
-    if ($standard_fonts->{$name}) {
+    if (PDF::API2::Resource::Font::CoreFont->is_standard($name)) {
         return $self->corefont($name, %options);
     }
     if ($name =~ /\.[ot]tf$/i) {

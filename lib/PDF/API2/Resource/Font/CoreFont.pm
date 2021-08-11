@@ -134,7 +134,7 @@ sub _deep_copy {
 
 sub new {
     my ($class, $pdf, $name, %options) = @_;
-    my $data;
+    my $is_standard = is_standard($name);
 
     if (-f $name) {
         eval "require '$name'";
@@ -145,7 +145,7 @@ sub new {
     $lookname =~ s/[^a-z0-9]+//gi;
     $lookname = $alias->{$lookname} if $alias->{$lookname};
 
-    $options{'-encode'} ||= 'asis';
+    my $data;
     unless (defined $options{'-metrics'}) {
         $data = { _look_for_font($lookname) };
     }
@@ -173,7 +173,46 @@ sub new {
 
     $self->encodeByData($options{'-encode'});
 
+    # The standard non-symbolic fonts use unmodified WinAnsiEncoding.
+    if ($is_standard and not $self->issymbol() and not $options{'-encode'}) {
+        $self->{'Encoding'} = PDFName('WinAnsiEncoding');
+        delete $self->{'FirstChar'};
+        delete $self->{'LastChar'};
+        delete $self->{'Widths'};
+    }
+
     return $self;
+}
+
+=head1 METHODS
+
+=head2 is_standard
+
+    my $boolean = $class->is_standard($name);
+
+Returns true if C<$name> is an exact, case-sensitive match for one of the
+standard font names shown above.
+
+=cut
+
+sub is_standard {
+    my $name = pop();
+
+    return 1 if $name eq 'Courier';
+    return 1 if $name eq 'Courier-Bold';
+    return 1 if $name eq 'Courier-BoldOblique';
+    return 1 if $name eq 'Courier-Oblique';
+    return 1 if $name eq 'Helvetica';
+    return 1 if $name eq 'Helvetica-Bold';
+    return 1 if $name eq 'Helvetica-BoldOblique';
+    return 1 if $name eq 'Helvetica-Oblique';
+    return 1 if $name eq 'Symbol';
+    return 1 if $name eq 'Times-Bold';
+    return 1 if $name eq 'Times-BoldItalic';
+    return 1 if $name eq 'Times-Italic';
+    return 1 if $name eq 'Times-Roman';
+    return 1 if $name eq 'ZapfDingbats';
+    return;
 }
 
 1;
