@@ -199,7 +199,7 @@ foreach $file ( @FILES ) {
   	} # while(<FILEIN>)
   	$pdf->textend;
   	close(FILEIN);
-  	$pdf->to_file($outfile);
+  	$pdf->save($outfile);
 } # foreach $file (@FILES)
 
 sub newpage() {

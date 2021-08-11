@@ -97,7 +97,7 @@ sub saveas {
     if($file eq '-') {
         return $self->{api}->to_string();
     } else {
-        $self->{api}->to_file($file);
+        $self->{api}->save($file);
         return $self;
     }
     $self->{api}->end;

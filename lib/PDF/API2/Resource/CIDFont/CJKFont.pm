@@ -49,7 +49,7 @@ and create your PDF normally:
     $content->distance(0, -72);
     $content->text('안녕하세요');
 
-    $pdf->to_file('hello.pdf');
+    $pdf->save('hello.pdf');
 
 Note: The maintainer is not familiar with CJK languages and has deprecated this
 class based on his current understanding of Unicode and from reading many bug

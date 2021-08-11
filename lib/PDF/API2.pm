@@ -66,7 +66,7 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     $text->text('Hello World!');
 
     # Save the PDF
-    $pdf->to_file('/path/to/new.pdf');
+    $pdf->save('/path/to/new.pdf');
 
 =head1 GENERIC METHODS
 
@@ -86,11 +86,11 @@ B<Example:>
 
     $pdf = PDF::API2->new();
     ...
-    $pdf->to_file('our/new.pdf');
+    $pdf->save('our/new.pdf');
 
     $pdf = PDF::API2->new(-file => 'our/new.pdf');
     ...
-    $pdf->to_file();
+    $pdf->save();
 
 To turn off automatic compression of PDF contents, include option C<-compress>
 with a false value.  This is generally only useful for debugging.
@@ -140,11 +140,11 @@ B<Example:>
 
     $pdf = PDF::API2->open('our/old.pdf');
     ...
-    $pdf->to_file('our/new.pdf');
+    $pdf->save('our/new.pdf');
 
     $pdf = PDF::API2->open('our/to/be/updated.pdf');
     ...
-    $pdf->to_file();
+    $pdf->save();
 
 To turn off automatic compression of PDF contents, include option C<-compress>
 with a false value.  This is generally only useful for debugging.
@@ -211,7 +211,7 @@ B<Example:>
 
     $pdf = PDF::API2->open_scalar($pdf_string);
     ...
-    $pdf->to_file('our/new.pdf');
+    $pdf->save('our/new.pdf');
 
 To turn off automatic compression of PDF contents, include option C<-compress>
 with a false value.  This is generally only useful for debugging.
@@ -871,11 +871,11 @@ sub pageLabel {
     return;
 }
 
-# Deprecated (use to_file instead)
+# Deprecated (use save instead)
 #
 # This method allows for objects to be written to disk in advance of finally
 # saving and closing the file.  Otherwise, it's no different than just calling
-# to_file when all changes have been made.  There's no memory advantage since
+# save when all changes have been made.  There's no memory advantage since
 # ship_out doesn't remove objects from memory.
 sub finishobjects {
     my ($self, @objs) = @_;
@@ -918,7 +918,7 @@ sub proc_pages {
     return @pages;
 }
 
-# Deprecated (use to_file instead)
+# Deprecated (use save instead)
 sub update {
     my $self = shift();
     croak "File is read-only" if $self->{'opened_readonly'};
@@ -926,7 +926,7 @@ sub update {
     return;
 }
 
-=item $pdf->to_file("/path/to/file.pdf")
+=item $pdf->save("/path/to/file.pdf")
 
 Save the document to disk and close the file.  A filename is optional if one was
 specified while opening or creating the PDF.
@@ -937,10 +937,9 @@ saved, so it will no longer be usable.
 =cut
 
 # Deprecated (renamed)
-sub save   { return to_file(@_) } ## no critic
-sub saveas { return to_file(@_) } ## no critic
+sub saveas { return save(@_) } ## no critic
 
-sub to_file {
+sub save {
     my ($self, $file) = @_;
 
     if ($self->{'partial_save'} and not $file) {
@@ -1305,7 +1304,7 @@ B<Example:>
     # Add it to the new PDF's first page at 1/2 scale
     $gfx->formimage($xo, 0, 0, 0.5);
 
-    $pdf->to_file('our/new.pdf');
+    $pdf->save('our/new.pdf');
 
 B<Note:> You can only import a page from an existing PDF file.
 
@@ -1411,7 +1410,7 @@ B<Example:>
     # Add page 2 from the old PDF as page 1 of the new PDF
     $page = $pdf->import_page($old, 2);
 
-    $pdf->to_file('our/new.pdf');
+    $pdf->save('our/new.pdf');
 
 B<Note:> You can only import a page from an existing PDF file.
 
@@ -1747,7 +1746,7 @@ the path to a font file.
     $content->font($font2, 12);
     $content->text('This is some sample text.');
 
-    $pdf->to_file('sample.pdf');
+    $pdf->save('sample.pdf');
 
 TrueType (ttf/otf), Adobe PostScript (pfa/pfb), and Adobe Glyph Bitmap
 Distribution Format (bdf) fonts are supported.

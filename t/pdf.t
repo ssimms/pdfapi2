@@ -114,7 +114,7 @@ like($string, qr/0 0 1 rg/,
      q{To_String of newly-opened PDF contains expected content});
 
 ##
-## to_file with same filename
+## save with same filename
 ##
 
 $pdf = PDF::API2->new(-compress => 0);
@@ -128,11 +128,11 @@ close $fh;
 $pdf = PDF::API2->open($filename, -compress => 0);
 $gfx = $pdf->page->gfx();
 $gfx->fillcolor('red');
-$pdf->to_file($filename);
+$pdf->save($filename);
 
 $pdf = PDF::API2->open($filename, -compress => 0);
 $string = $pdf->to_string();
 like($string, qr/0 0 1 rg/,
-     q{to_file($opened_filename) contains original content});
+     q{save($opened_filename) contains original content});
 like($string, qr/1 0 0 rg/,
-     q{to_file($opened_filename) contains new content});
+     q{save($opened_filename) contains new content});

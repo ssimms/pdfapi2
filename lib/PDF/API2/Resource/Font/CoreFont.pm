@@ -46,7 +46,7 @@ PDF::API2::Resource::Font::CoreFont - Module for using the 14 standard PDF fonts
     $text->translate(200, 700);
     $text->text('Hello world!');
 
-    $pdf->to_file('/path/to/new.pdf');
+    $pdf->save('/path/to/new.pdf');
 
 =head1 STANDARD FONTS
 

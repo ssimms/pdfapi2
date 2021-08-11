@@ -1,7 +1,7 @@
 {{$NEXT}}
 
-    - Merged saveas and save into a new to_file method.  The old names are
-      deprecated but will continue to work.
+    - Merged saveas into save.  The old name is deprecated but will continue to
+      work.
 
     - Renamed stringify to to_string.  The old name is deprecated but will
       continue to work.

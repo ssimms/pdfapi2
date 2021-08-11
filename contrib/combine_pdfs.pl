@@ -29,4 +29,4 @@ foreach my $input_file (@ARGV) {
 }
 
 print "Writing $output_file\n";
-$output_pdf->to_file($output_file);
+$output_pdf->save($output_file);
