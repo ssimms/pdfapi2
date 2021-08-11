@@ -34,7 +34,7 @@ is(ref($page), 'PDF::API2::Page',
    q{importpage still works});
 
 # openpage
-$pdf2 = PDF::API2->open_scalar($pdf_string);
+$pdf2 = PDF::API2->from_string($pdf_string);
 $page = $pdf->openpage(1);
 is(ref($page), 'PDF::API2::Page',
    q{openpage still works});

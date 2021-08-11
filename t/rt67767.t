@@ -11,7 +11,7 @@ my $page = $empty_page_pdf->page();
 $page->mediabox('Letter');
 
 # Save and reopen the PDF
-$empty_page_pdf = PDF::API2->open_scalar($empty_page_pdf->to_string());
+$empty_page_pdf = PDF::API2->from_string($empty_page_pdf->to_string());
 
 my $container_pdf = PDF::API2->new();
 

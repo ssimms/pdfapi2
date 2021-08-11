@@ -198,9 +198,9 @@ sub _open_common {
     return $self;
 }
 
-=item $pdf = PDF::API2->open_scalar($pdf_string, %options)
+=item $pdf = PDF::API2->from_string($pdf_string, %options)
 
-Opens a PDF contained in a string.
+Reads a PDF contained in a string.
 
 B<Example:>
 
@@ -209,7 +209,7 @@ B<Example:>
     undef $/;  # Read the whole file at once
     $pdf_string = <$fh>;
 
-    $pdf = PDF::API2->open_scalar($pdf_string);
+    $pdf = PDF::API2->from_string($pdf_string);
     ...
     $pdf->save('our/new.pdf');
 
@@ -219,9 +219,10 @@ with a false value.  This is generally only useful for debugging.
 =cut
 
 # Deprecated (renamed)
-sub openScalar { return open_scalar(@_); } ## no critic
+sub openScalar  { return from_string(@_); } ## no critic
+sub open_scalar { return from_string(@_); } ## no critic
 
-sub open_scalar {
+sub from_string {
     my ($class, $content, %options) = @_;
 
     my $self = {};

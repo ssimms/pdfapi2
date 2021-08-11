@@ -3,8 +3,8 @@
     - Merged saveas into save.  The old name is deprecated but will continue to
       work.
 
-    - Renamed stringify to to_string.  The old name is deprecated but will
-      continue to work.
+    - Renamed open_scalar to from_string.  Renamed stringify to to_string.  The
+      old names are deprecated but will continue to work.
 
     - Added $page->boundaries() and $pdf->default_page_boundaries() to replace
       the separate methods for the various page boundaries.  The supported

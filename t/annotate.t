@@ -84,7 +84,7 @@ $pdf->{'pdf'}->new_obj($array);
 $page->{'Annots'} = $array;
 $string = $pdf->to_string();
 
-$pdf = PDF::API2->open_scalar($string);
+$pdf = PDF::API2->from_string($string);
 $page = $pdf->open_page(1);
 $annotation = $page->annotation();
 
