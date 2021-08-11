@@ -71,5 +71,3 @@ close $fh;
 $pdf = PDF::API2->new();
 eval { $pdf->image_png('t/resources/this.file.does.not.exist') };
 ok($@, q{Fail fast if the requested file doesn't exist});
-
-$pdf->end();

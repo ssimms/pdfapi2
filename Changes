@@ -3,6 +3,8 @@
     - Merged saveas into save.  The old name is deprecated but will continue to
       work.
 
+    - Renamed end to close.
+
     - Renamed open_scalar to from_string.  Renamed stringify to to_string.  The
       old names are deprecated but will continue to work.
 

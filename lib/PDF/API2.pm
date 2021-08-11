@@ -68,32 +68,30 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     # Save the PDF
     $pdf->save('/path/to/new.pdf');
 
-=head1 GENERIC METHODS
+=head1 INPUT/OUTPUT METHODS
+
+=head2 new
+
+    my $pdf = PDF::API2->new(%options);
+
+Create a new PDF.
+
+The following options are available:
 
 =over
 
-=item $pdf = PDF::API2->new(%options)
+=item * file
 
-Creates a new PDF object.  If you will be saving it as a file and already know
-the filename, you can give the '-file' option to minimize possible memory
-requirements later on.
+If you will be saving the PDF to disk and already know the filename, you can
+include it here to open the file for writing immediately.  C<file> may also be
+a filehandle.
 
-B<Example:>
+=item * compress
 
-    $pdf = PDF::API2->new();
-    ...
-    print $pdf->to_string();
+By default, most of the PDF will be compressed to save space.  To turn this off
+(generally only useful for testing or debugging), set C<compress> to 0.
 
-    $pdf = PDF::API2->new();
-    ...
-    $pdf->save('our/new.pdf');
-
-    $pdf = PDF::API2->new(-file => 'our/new.pdf');
-    ...
-    $pdf->save();
-
-To turn off automatic compression of PDF contents, include option C<-compress>
-with a false value.  This is generally only useful for debugging.
+=back
 
 =cut
 
@@ -113,15 +111,25 @@ sub new {
     weaken $self->{'catalog'};
     $self->{'fonts'} = {};
     $self->{'pagestack'} = [];
+
+    # -compress is deprecated (remove the hyphen)
     if (exists $options{'-compress'}) {
-        $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
+        $options{'compress'} //= delete $options{'-compress'};
+    }
+
+    if (exists $options{'compress'}) {
+        $self->{'forcecompress'} = $options{'compress'} ? 1 : 0;
     }
     else {
         $self->{'forcecompress'} = 1;
     }
     $self->preferences(%options);
-    if ($options{'-file'}) {
-        $self->{'pdf'}->create_file($options{'-file'});
+
+    # -file is deprecated (remove the hyphen)
+    $options{'file'} //= $options{'-file'} if $options{'-file'};
+
+    if ($options{'file'}) {
+        $self->{'pdf'}->create_file($options{'file'});
         $self->{'partial_save'} = 1;
     }
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
@@ -132,22 +140,22 @@ sub new {
     return $self;
 }
 
-=item $pdf = PDF::API2->open($pdf_file, %options)
+=head2 open
 
-Opens an existing PDF file.
+    my $pdf = PDF::API2->open('/path/to/file.pdf', %options);
 
-B<Example:>
+Open an existing PDF file.
 
-    $pdf = PDF::API2->open('our/old.pdf');
-    ...
-    $pdf->save('our/new.pdf');
+The following option is available:
 
-    $pdf = PDF::API2->open('our/to/be/updated.pdf');
-    ...
-    $pdf->save();
+=over
 
-To turn off automatic compression of PDF contents, include option C<-compress>
-with a false value.  This is generally only useful for debugging.
+=item * compress
+
+By default, most of the PDF will be compressed to save space.  To turn this off
+(generally only useful for testing or debugging), set C<compress> to 0.
+
+=back
 
 =cut
 
@@ -187,8 +195,14 @@ sub _open_common {
     weaken $self->{'catalog'};
 
     $self->{'opened'} = 1;
+
+    # -compress is deprecated (remove the hyphen)
     if (exists $options{'-compress'}) {
-        $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
+        $options{'compress'} //= delete $options{'-compress'};
+    }
+
+    if (exists $options{'compress'}) {
+        $self->{'forcecompress'} = $options{'compress'} ? 1 : 0;
     }
     else {
         $self->{'forcecompress'} = 1;
@@ -198,23 +212,129 @@ sub _open_common {
     return $self;
 }
 
-=item $pdf = PDF::API2->from_string($pdf_string, %options)
+=head2 save
 
-Reads a PDF contained in a string.
+    $pdf->save('/path/to/file.pdf');
 
-B<Example:>
+Write the PDF to disk and close the file.  A filename is optional if one was
+specified while opening or creating the PDF.
 
-    # Read a PDF into a string, for the purpose of demonstration
-    open $fh, 'our/old.pdf' or die $@;
-    undef $/;  # Read the whole file at once
-    $pdf_string = <$fh>;
+As a side effect, the document structure is removed from memory when the file is
+saved, so it will no longer be usable.
 
-    $pdf = PDF::API2->from_string($pdf_string);
-    ...
-    $pdf->save('our/new.pdf');
+=cut
 
-To turn off automatic compression of PDF contents, include option C<-compress>
-with a false value.  This is generally only useful for debugging.
+# Deprecated (renamed)
+sub saveas { return save(@_) } ## no critic
+
+sub save {
+    my ($self, $file) = @_;
+
+    if ($self->{'partial_save'} and not $file) {
+        $self->{'pdf'}->close_file();
+    }
+    elsif ($self->{'opened_scalar'}) {
+        croak 'A filename argument is required' unless $file;
+        $self->{'pdf'}->append_file();
+        my $fh;
+        CORE::open($fh, '>', $file) or die "Unable to open $file for writing: $!";
+        binmode($fh, ':raw');
+        print $fh ${$self->{'content_ref'}};
+        CORE::close($fh);
+    }
+    else {
+        croak 'A filename argument is required' unless $file;
+        unless ($self->{'pdf'}->{' fname'}) {
+            $self->{'pdf'}->out_file($file);
+        }
+        elsif ($self->{'pdf'}->{' fname'} eq $file) {
+            croak "File is read-only" if $self->{'opened_readonly'};
+            $self->{'pdf'}->close_file();
+        }
+        else {
+            $self->{'pdf'}->clone_file($file);
+            $self->{'pdf'}->close_file();
+        }
+    }
+
+    # This can be eliminated once we're confident that circular references are
+    # no longer an issue.  See t/circular-references.t.
+    $self->close();
+
+    return;
+}
+
+# Deprecated (use save instead)
+#
+# This method allows for objects to be written to disk in advance of finally
+# saving and closing the file.  Otherwise, it's no different than just calling
+# save when all changes have been made.  There's no memory advantage since
+# ship_out doesn't remove objects from memory.
+sub finishobjects {
+    my ($self, @objs) = @_;
+
+    if ($self->{'partial_save'}) {
+        $self->{'pdf'}->ship_out(@objs);
+    }
+
+    return;
+}
+
+# Deprecated (use save instead)
+sub update {
+    my $self = shift();
+    croak "File is read-only" if $self->{'opened_readonly'};
+    $self->{'pdf'}->close_file();
+    return;
+}
+
+=head2 close
+
+    $pdf->close();
+
+Close an open file (if relevant) and remove the object structure from memory.
+
+PDF::API2 contains circular references, so this call is necessary in
+long-running processes to keep from running out of memory.
+
+This will be called automatically when you save or stringify a PDF.
+You should only need to call it explicitly if you are reading PDF
+files and not writing them.
+
+=cut
+
+# Deprecated (renamed)
+sub release { return $_[0]->close() }
+sub end     { return $_[0]->close() }
+
+sub close {
+    my $self = shift();
+    $self->{'pdf'}->release() if defined $self->{'pdf'};
+
+    foreach my $key (keys %$self) {
+        $self->{$key} = undef;
+        delete $self->{$key};
+    }
+
+    return;
+}
+
+=head2 from_string
+
+    my $pdf = PDF::API2->from_string($pdf_string, %options);
+
+Read a PDF document contained in a string.
+
+The following option is available:
+
+=over
+
+=item * compress
+
+By default, most of the PDF will be compressed to save space.  To turn this off
+(generally only useful for testing or debugging), set C<compress> to 0.
+
+=back
 
 =cut
 
@@ -241,6 +361,63 @@ sub from_string {
 
     return $self;
 }
+
+=head2 to_string
+
+    my $string = $pdf->to_string();
+
+Return the PDF document as a string.
+
+As a side effect, the document structure is removed from memory when the string
+is created, so it will no longer be usable.
+
+=cut
+
+# Maintainer's note: The object is being destroyed because it contains
+# (contained?) circular references that would otherwise result in memory not
+# being freed if the object merely goes out of scope.  If possible, the circular
+# references should be eliminated so that to_string doesn't need to be
+# destructive.  See t/circular-references.t.
+#
+# I've opted not to just require a separate call to close() because it would
+# likely introduce memory leaks in many existing programs that use this module.
+
+# Deprecated (renamed)
+sub stringify { return to_string(@_) } ## no critic
+
+sub to_string {
+    my $self = shift();
+
+    my $string = '';
+    if ($self->{'opened_scalar'}) {
+        $self->{'pdf'}->append_file();
+        $string = ${$self->{'content_ref'}};
+    }
+    elsif ($self->{'opened'}) {
+        my $fh = FileHandle->new();
+        CORE::open($fh, '>', \$string) || die "Can't begin scalar IO";
+        $self->{'pdf'}->clone_file($fh);
+        $self->{'pdf'}->close_file();
+        $fh->close();
+    }
+    else {
+        my $fh = FileHandle->new();
+        CORE::open($fh, '>', \$string) || die "Can't begin scalar IO";
+        $self->{'pdf'}->out_file($fh);
+        $fh->close();
+    }
+
+    # This can be eliminated once we're confident that circular references are
+    # no longer an issue.  See t/circular-references.t.
+    $self->close();
+
+    return $string;
+}
+
+
+=head1 GENERIC METHODS
+
+=over
 
 =item $layout = $pdf->page_layout()
 
@@ -872,22 +1049,6 @@ sub pageLabel {
     return;
 }
 
-# Deprecated (use save instead)
-#
-# This method allows for objects to be written to disk in advance of finally
-# saving and closing the file.  Otherwise, it's no different than just calling
-# save when all changes have been made.  There's no memory advantage since
-# ship_out doesn't remove objects from memory.
-sub finishobjects {
-    my ($self, @objs) = @_;
-
-    if ($self->{'partial_save'}) {
-        $self->{'pdf'}->ship_out(@objs);
-    }
-
-    return;
-}
-
 sub proc_pages {
     my ($pdf, $object) = @_;
 
@@ -917,144 +1078,6 @@ sub proc_pages {
     }
 
     return @pages;
-}
-
-# Deprecated (use save instead)
-sub update {
-    my $self = shift();
-    croak "File is read-only" if $self->{'opened_readonly'};
-    $self->{'pdf'}->close_file();
-    return;
-}
-
-=item $pdf->save("/path/to/file.pdf")
-
-Save the document to disk and close the file.  A filename is optional if one was
-specified while opening or creating the PDF.
-
-As a side effect, the document structure is removed from memory when the file is
-saved, so it will no longer be usable.
-
-=cut
-
-# Deprecated (renamed)
-sub saveas { return save(@_) } ## no critic
-
-sub save {
-    my ($self, $file) = @_;
-
-    if ($self->{'partial_save'} and not $file) {
-        $self->{'pdf'}->close_file();
-    }
-    elsif ($self->{'opened_scalar'}) {
-        croak 'A filename argument is required' unless $file;
-        $self->{'pdf'}->append_file();
-        my $fh;
-        CORE::open($fh, '>', $file) or die "Unable to open $file for writing: $!";
-        binmode($fh, ':raw');
-        print $fh ${$self->{'content_ref'}};
-        CORE::close($fh);
-    }
-    else {
-        croak 'A filename argument is required' unless $file;
-        unless ($self->{'pdf'}->{' fname'}) {
-            $self->{'pdf'}->out_file($file);
-        }
-        elsif ($self->{'pdf'}->{' fname'} eq $file) {
-            croak "File is read-only" if $self->{'opened_readonly'};
-            $self->{'pdf'}->close_file();
-        }
-        else {
-            $self->{'pdf'}->clone_file($file);
-            $self->{'pdf'}->close_file();
-        }
-    }
-
-    # This can be eliminated once we're confident that circular references are
-    # no longer an issue.  See t/circular-references.t.
-    $self->end();
-
-    return;
-}
-
-=item $string = $pdf->to_string()
-
-Return the document as a string.
-
-As a side effect, the document structure is removed from memory when the string
-is created, so it will no longer be usable.
-
-=cut
-
-# Maintainer's note: The object is being destroyed because it contains
-# (contained?) circular references that would otherwise result in memory not
-# being freed if the object merely goes out of scope.  If possible, the circular
-# references should be eliminated so that to_string doesn't need to be
-# destructive.  See t/circular-references.t.
-#
-# I've opted not to just require a separate call to release() because it would
-# likely introduce memory leaks in many existing programs that use this module.
-
-# Deprecated (renamed)
-sub stringify { return to_string(@_) } ## no critic
-
-sub to_string {
-    my $self = shift();
-
-    my $string = '';
-    if ($self->{'opened_scalar'}) {
-        $self->{'pdf'}->append_file();
-        $string = ${$self->{'content_ref'}};
-    }
-    elsif ($self->{'opened'}) {
-        my $fh = FileHandle->new();
-        CORE::open($fh, '>', \$string) || die "Can't begin scalar IO";
-        $self->{'pdf'}->clone_file($fh);
-        $self->{'pdf'}->close_file();
-        $fh->close();
-    }
-    else {
-        my $fh = FileHandle->new();
-        CORE::open($fh, '>', \$string) || die "Can't begin scalar IO";
-        $self->{'pdf'}->out_file($fh);
-        $fh->close();
-    }
-
-    # This can be eliminated once we're confident that circular references are
-    # no longer an issue.  See t/circular-references.t.
-    $self->end();
-
-    return $string;
-}
-
-sub release {
-    my $self = shift();
-    $self->end();
-    return;
-}
-
-=item $pdf->end()
-
-Remove the object structure from memory.  PDF::API2 contains circular
-references, so this call is necessary in long-running processes to
-keep from running out of memory.
-
-This will be called automatically when you save or stringify a PDF.
-You should only need to call it explicitly if you are reading PDF
-files and not writing them.
-
-=cut
-
-sub end {
-    my $self = shift();
-    $self->{'pdf'}->release() if defined $self->{'pdf'};
-
-    foreach my $key (keys %$self) {
-        $self->{$key} = undef;
-        delete $self->{$key};
-    }
-
-    return;
 }
 
 =back

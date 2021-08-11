@@ -100,7 +100,6 @@ sub saveas {
         $self->{api}->save($file);
         return $self;
     }
-    $self->{api}->end;
     foreach my $k (keys %{$self}) {
         if(blessed($k) and $k->can('release')) {
             $k->release(1);
