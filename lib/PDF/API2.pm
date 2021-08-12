@@ -56,7 +56,7 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     # Add a built-in font to the PDF
     $font = $pdf->font('Helvetica-Bold');
 
-    # Add an external TTF font to the PDF
+    # Add an external TrueType font to the PDF
     $font = $pdf->font('/path/to/font.ttf');
 
     # Add some text to the page
@@ -1677,77 +1677,9 @@ sub artbox {
 
 =head1 FONT METHODS
 
-=over
+=head2 font
 
-=item @directories = PDF::API2->add_to_font_path('/my/fonts', '/path/to/fonts', ...)
-
-Add one or more directories to the list of paths to be searched for font files.
-This is optional, and allows fonts to be added to a PDF without passing the full
-path to the file.
-
-Returns the font search path.
-
-=cut
-
-# Deprecated (renamed)
-sub addFontDirs { return add_to_font_path(@_) }
-
-sub add_to_font_path {
-    # Allow this method to be called using either :: or -> notation.
-    shift() if ref($_[0]);
-    shift() if $_[0] eq __PACKAGE__;
-
-    push @font_path, @_;
-    return @font_path;
-}
-
-=item @directories = PDF::API2->set_font_path('/my/fonts', '/path/to/fonts', ...)
-
-Replace the existing font search path.  This should only be necessary if you
-need to remove a directory from the path for some reason, or need to reorder the
-list.
-
-Returns the font search path.
-
-=cut
-
-sub set_font_path {
-    # Allow this method to be called using either :: or -> notation.
-    shift() if ref($_[0]);
-    shift() if $_[0] eq __PACKAGE__;
-
-    @font_path = ((map { "$_/PDF/API2/fonts" } @INC), @_);
-
-    return @font_path;
-}
-
-=item @directories = PDF::API2->font_path()
-
-Return the list of directories that will be searched (in order) in addition to
-the current directory when you add a font to a PDF without using including the
-full path to the font file.
-
-=cut
-
-sub font_path {
-    return @font_path;
-}
-
-sub _find_font {
-    my $font = shift();
-
-    # Check the current directory
-    return $font if -f $font;
-
-    # Check the font search path
-    foreach my $directory (@font_path) {
-        return "$directory/$font" if -f "$directory/$font";
-    }
-
-    return;
-}
-
-=item $font = $pdf->font($name, %options)
+    my $font = $pdf->font($name, %options)
 
 Add a font to the PDF.  Returns the font object, to be used by
 L<PDF::API2::Content>.
@@ -1771,6 +1703,9 @@ the path to a font file.
     $content->text('This is some sample text.');
 
     $pdf->save('sample.pdf');
+
+The path can be omitted if the font file is in the current directory or one of
+the directories returned by C<font_path>.
 
 TrueType (ttf/otf), Adobe PostScript Type 1 (pfa/pfb), and Adobe Glyph Bitmap
 Distribution Format (bdf) fonts are supported.
@@ -1855,6 +1790,108 @@ sub font {
     }
 }
 
+=head2 synthetic_font
+
+    $font = $pdf->synthetic_font($base_font, %options)
+
+Create and return a new synthetic font object.  See
+L<PDF::API2::Resource::Font::SynFont> for details.
+
+=cut
+
+# Deprecated (renamed)
+sub synfont { return synthetic_font(@_) }
+
+sub synthetic_font {
+    my ($self, $font, %opts) = @_;
+
+    # PDF::API2 doesn't set BaseEncoding for TrueType fonts, so text
+    # isn't searchable unless a ToUnicode CMap is included.  Include
+    # the ToUnicode CMap by default, but allow it to be disabled (for
+    # performance and file size reasons) by setting -unicodemap to 0.
+    $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
+
+    require PDF::API2::Resource::Font::SynFont;
+    my $obj = PDF::API2::Resource::Font::SynFont->new($self->{'pdf'}, $font, %opts);
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $obj->tounicodemap() if $opts{-unicodemap};
+
+    return $obj;
+}
+
+=head2 font_path
+
+    @directories = PDF::API2->font_path()
+
+Return the list of directories that will be searched (in order) in addition to
+the current directory when you add a font to a PDF without including the full
+path to the font file.
+
+=cut
+
+sub font_path {
+    return @font_path;
+}
+
+=head2 add_to_font_path
+
+    @directories = PDF::API2->add_to_font_path('/my/fonts', '/path/to/fonts');
+
+Add one or more directories to the list of paths to be searched for font files.
+
+Returns the font search path.
+
+=cut
+
+# Deprecated (renamed)
+sub addFontDirs { return add_to_font_path(@_) }
+
+sub add_to_font_path {
+    # Allow this method to be called using either :: or -> notation.
+    shift() if ref($_[0]);
+    shift() if $_[0] eq __PACKAGE__;
+
+    push @font_path, @_;
+    return @font_path;
+}
+
+=head2 set_font_path
+
+    @directories = PDF::API2->set_font_path('/my/fonts', '/path/to/fonts');
+
+Replace the existing font search path.  This should only be necessary if you
+need to remove a directory from the path for some reason, or if you need to
+reorder the list.
+
+Returns the font search path.
+
+=cut
+
+sub set_font_path {
+    # Allow this method to be called using either :: or -> notation.
+    shift() if ref($_[0]);
+    shift() if $_[0] eq __PACKAGE__;
+
+    @font_path = ((map { "$_/PDF/API2/fonts" } @INC), @_);
+
+    return @font_path;
+}
+
+sub _find_font {
+    my $font = shift();
+
+    # Check the current directory
+    return $font if -f $font;
+
+    # Check the font search path
+    foreach my $directory (@font_path) {
+        return "$directory/$font" if -f "$directory/$font";
+    }
+
+    return;
+}
+
 sub corefont {
     my ($self, $name, %opts) = @_;
     require PDF::API2::Resource::Font::CoreFont;
@@ -1932,34 +1969,6 @@ sub cjkfont {
     return $obj;
 }
 
-=item $font = $pdf->synthetic_font($base_font, %options)
-
-Returns a new synthetic font object.  See L<PDF::API2::Resource::Font::SynFont>
-for details.
-
-=cut
-
-# Deprecated (renamed)
-sub synfont { return synthetic_font(@_) }
-
-sub synthetic_font {
-    my ($self, $font, %opts) = @_;
-
-    # PDF::API2 doesn't set BaseEncoding for TrueType fonts, so text
-    # isn't searchable unless a ToUnicode CMap is included.  Include
-    # the ToUnicode CMap by default, but allow it to be disabled (for
-    # performance and file size reasons) by setting -unicodemap to 0.
-    $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
-
-    require PDF::API2::Resource::Font::SynFont;
-    my $obj = PDF::API2::Resource::Font::SynFont->new($self->{'pdf'}, $font, %opts);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap};
-
-    return $obj;
-}
-
 # Deprecated.  Use Unicode-supporting TrueType fonts instead.
 sub unifont {
     my ($self, @opts) = @_;
@@ -1969,8 +1978,6 @@ sub unifont {
 
     return $obj;
 }
-
-=back
 
 =head1 IMAGE METHODS
 
