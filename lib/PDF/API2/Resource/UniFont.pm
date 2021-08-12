@@ -8,54 +8,6 @@ use warnings;
 use Carp;
 use Encode qw(:all);
 
-=head1 NAME
-
-PDF::API2::Resource::UniFont - Unicode Font Support
-
-=head1 METHODS
-
-=over
-
-=item $font = PDF::API2::Resource::UniFont->new($pdf, @fontspecs, %options);
-
-Returns a uni-font object.
-
-=cut
-
-=pod
-
-B<FONTSPECS:> fonts can be registered using the following hash-ref:
-
-    {
-        font   => $fontobj,     # the font to be registered
-        blocks => $blockspec,   # the unicode blocks, the font is being registered for
-        codes  => $codespec,    # the unicode codepoints, -"-
-    }
-
-B<BLOCKSPECS:>
-
-    [
-        1, 3,    # register font for blocks 1 and 3
-        [1, 3],  # register font for blocks 1 .. 3
-    ]
-
-B<CODESPECS:>
-
-    [
-        1, 3,    # register font for codepoints 1 and 3
-        [1, 3],  # register font for codepoints 1 .. 3
-    ]
-
-B<NOTE:> if you want to register a font for the entire unicode space
-(ie. U+0000 .. U+FFFF), then simply specify a font-object without the hash-ref.
-
-Valid %options are:
-
-  '-encode' ... changes the encoding of the font from its default.
-    (see "perldoc Encode" for a list of valid tags)
-
-=cut
-
 sub new {
     my $class = shift();
     $class = ref($class) if ref($class);
@@ -210,9 +162,5 @@ sub text {
 
     return $value;
 }
-
-=back
-
-=cut
 
 1;

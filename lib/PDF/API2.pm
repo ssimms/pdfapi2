@@ -1987,26 +1987,7 @@ sub synfont {
     return $obj;
 }
 
-=item $font = $pdf->unifont(@fontspecs, %options)
-
-Returns a new uni-font object, based on the specified fonts and options.
-
-B<BEWARE:> This is not a true pdf-object, but a virtual/abstract font definition!
-
-See Also: L<PDF::API2::Resource::UniFont>.
-
-Valid %options are:
-
-=over
-
-=item -encode
-
-Changes the encoding of the font from its default.
-
-=back
-
-=cut
-
+# Deprecated.  Use Unicode-supporting TrueType fonts instead.
 sub unifont {
     my ($self, @opts) = @_;
 

@@ -37,6 +37,9 @@
       method for CJK font support, read PDF::API2::Resource::CIDFont::CJKFont
       and contact me to discuss your use case.
 
+    - Tentatively deprecated $pdf->unifont.  If you're successfully using this
+      method for Unicode support, please contact me to discuss your use case.
+
     - Replaced $pdf->preferences() with separate page_mode, page_layout,
       viewer_preferences, and open_action methods, all of which are now fully
       documented.  The old method is deprecated but will continue to work.
