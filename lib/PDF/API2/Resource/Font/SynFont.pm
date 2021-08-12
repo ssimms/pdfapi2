@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::SynFont;
 use base 'PDF::API2::Resource::Font';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
 
 # VERSION
 
@@ -15,30 +15,20 @@ use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME
 
-PDF::API2::Resource::Font::SynFont - Module for using synthetic Fonts.
+PDF::API2::Resource::Font::SynFont - Module for creating synthetic Fonts.
 
 =head1 SYNOPSIS
 
-    #
-    use PDF::API2;
-    #
     $pdf = PDF::API2->new;
     $sft = $pdf->synfont($cft);
-    #
 
 =head1 METHODS
 
-=over 4
-
-=cut
+=over
 
 =item $font = PDF::API2::Resource::Font::SynFont->new $pdf, $fontobj, %options
 
 Returns a synfont object.
-
-=cut
-
-=pod
 
 Valid %options are:
 
@@ -70,41 +60,37 @@ I<-caps>
 
 =cut
 
-sub new
-{
-    my ($class,$pdf,$font,@opts) = @_;
-    my ($self,$data);
-    my %opts=@opts;
-    my $first=1;
-    my $last=255;
-    my $slant=$opts{-slant}||1;
-    my $oblique=$opts{-oblique}||0;
-    my $space=$opts{-space}||'0';
-    my $bold=($opts{-bold}||0)*10; # convert to em
+sub new {
+    my ($class, $pdf, $font, %opts) = @_;
+    my $first = 1;
+    my $last = 255;
+    my $slant = $opts{'-slant'} || 1;
+    my $oblique = $opts{'-oblique'} || 0;
+    my $space = $opts{'-space'} || 0;
+    my $bold = ($opts{'-bold'} || 0) * 10; # convert to em
 
     $font->encodeByName($opts{'-encode'}) if $opts{'-encode'};
 
-    $class = ref $class if ref $class;
-    $self = $class->SUPER::new($pdf,
-        pdfkey()
-        .'+'.($font->name)
-        .($opts{-caps} ? '+Caps' : '')
-        .($opts{-vname} ? '+'.$opts{-vname} : '')
-    );
-    $pdf->new_obj($self) unless($self->is_obj($pdf));
-    $self->{' font'}=$font;
-    $self->{' data'}={
+    $class = ref($class) if ref($class);
+    my $self = $class->SUPER::new($pdf,
+                                  pdfkey()
+                                  . '+' . $font->name()
+                                  . ($opts{'-caps'} ? '+Caps' : '')
+                                  . ($opts{'-vname'} ? '+' . $opts{'-vname'} : ''));
+    $pdf->new_obj($self) unless $self->is_obj($pdf);
+    $self->{' font'} = $font;
+    $self->{' data'} = {
         'type' => 'Type3',
-        'ascender' => $font->ascender,
-        'capheight' => $font->capheight,
-        'descender' => $font->descender,
+        'ascender' => $font->ascender(),
+        'capheight' => $font->capheight(),
+        'descender' => $font->descender(),
         'iscore' => '0',
-        'isfixedpitch' => $font->isfixedpitch,
-        'italicangle' => $font->italicangle + $oblique,
-        'missingwidth' => $font->missingwidth * $slant,
-        'underlineposition' => $font->underlineposition,
-        'underlinethickness' => $font->underlinethickness,
-        'xheight' => $font->xheight,
+        'isfixedpitch' => $font->isfixedpitch(),
+        'italicangle' => $font->italicangle() + $oblique,
+        'missingwidth' => $font->missingwidth() * $slant,
+        'underlineposition' => $font->underlineposition(),
+        'underlinethickness' => $font->underlinethickness(),
+        'xheight' => $font->xheight(),
         'firstchar' => $first,
         'lastchar' => $last,
         'char' => [ '.notdef' ],
@@ -114,131 +100,134 @@ sub new
         'wx' => { 'space' => '600' },
     };
 
-    if(ref($font->fontbbox))
-    {
-        $self->data->{fontbbox}=[ @{$font->fontbbox} ];
+    my $data = $self->data();
+    if (ref($font->fontbbox())) {
+        $data->{'fontbbox'} = [ @{$font->fontbbox()} ];
     }
-    else
-    {
-        $self->data->{fontbbox}=[ $font->fontbbox ];
+    else {
+        $data->{'fontbbox'} = [ $font->fontbbox() ];
     }
-    $self->data->{fontbbox}->[0]*=$slant;
-    $self->data->{fontbbox}->[2]*=$slant;
+    $data->{'fontbbox'}->[0] *= $slant;
+    $data->{'fontbbox'}->[2] *= $slant;
 
     $self->{'Subtype'} = PDFName('Type3');
     $self->{'FirstChar'} = PDFNum($first);
     $self->{'LastChar'} = PDFNum($last);
-    $self->{'FontMatrix'} = PDFArray(map { PDFNum($_) } ( 0.001, 0, 0, 0.001, 0, 0 ) );
-    $self->{'FontBBox'} = PDFArray(map { PDFNum($_) } ( $self->fontbbox ) );
+    $self->{'FontMatrix'} = PDFArray(map { PDFNum($_) } (0.001, 0, 0, 0.001, 0, 0));
+    $self->{'FontBBox'} = PDFArray(map { PDFNum($_) } $self->fontbbox());
 
-    my $procs=PDFDict();
+    my $procs = PDFDict();
     $pdf->new_obj($procs);
     $self->{'CharProcs'} = $procs;
 
-    $self->{Resources}=PDFDict();
-    $self->{Resources}->{ProcSet}=PDFArray(map { PDFName($_) } qw[ PDF Text ImageB ImageC ImageI ]);
-    my $xo=PDFDict();
-    $self->{Resources}->{Font}=$xo;
-    $self->{Resources}->{Font}->{FSN}=$font;
-    foreach my $w ($first..$last)
-    {
-        $self->data->{char}->[$w]=$font->glyphByEnc($w);
-        $self->data->{uni}->[$w]=uniByName($self->data->{char}->[$w]);
-        $self->data->{u2e}->{$self->data->{uni}->[$w]}=$w;
+    $self->{'Resources'} = PDFDict();
+    $self->{'Resources'}->{'ProcSet'} = PDFArray(map { PDFName($_) }
+                                                 qw(PDF Text ImageB ImageC ImageI));
+    my $xo = PDFDict();
+    $self->{'Resources'}->{'Font'} = $xo;
+    $self->{'Resources'}->{'Font'}->{'FSN'} = $font;
+    foreach my $w ($first .. $last) {
+        $data->{'char'}->[$w] = $font->glyphByEnc($w);
+        $data->{'uni'}->[$w] = uniByName($data->{'char'}->[$w]);
+        if (defined $data->{'uni'}->[$w]) {
+            $data->{'u2e'}->{$data->{'uni'}->[$w]} = $w;
+        }
     }
 
-    if($font->isa('PDF::API2::Resource::CIDFont'))
-    {
-      $self->{'Encoding'}=PDFDict();
-      $self->{'Encoding'}->{Type}=PDFName('Encoding');
-      $self->{'Encoding'}->{Differences}=PDFArray();
-      foreach my $w ($first..$last)
-      {
-          if(defined $self->data->{char}->[$w] && $self->data->{char}->[$w] ne '.notdef')
-          {
-            $self->{'Encoding'}->{Differences}->add_elements(PDFNum($w),PDFName($self->data->{char}->[$w]));
-          }
-      }
+    if ($font->isa('PDF::API2::Resource::CIDFont')) {
+        $self->{'Encoding'} = PDFDict();
+        $self->{'Encoding'}->{'Type'} = PDFName('Encoding');
+        $self->{'Encoding'}->{'Differences'} = PDFArray();
+        foreach my $w ($first .. $last) {
+            my $char = $data->{'char'}->[$w];
+            if (defined $char and $char ne '.notdef') {
+                $self->{'Encoding'}->{'Differences'}->add_elements(PDFNum($w),
+                                                                   PDFName($char));
+            }
+        }
     }
-    else
-    {
-      $self->{'Encoding'}=$font->{Encoding};
+    else {
+        $self->{'Encoding'} = $font->{'Encoding'};
     }
 
-    my @widths=();
-    foreach my $w ($first..$last)
-    {
-        if($self->data->{char}->[$w] eq '.notdef')
-        {
-            push @widths,$self->missingwidth;
+    my @widths;
+    foreach my $w ($first .. $last) {
+        if ($data->{'char'}->[$w] eq '.notdef') {
+            push @widths, $self->missingwidth();
             next;
         }
-        my $char=PDFDict();
+        my $char = PDFDict();
 
-        my $uni = $self->data->{uni}->[$w];
-        my $wth = int($font->width(chr($uni))*1000*$slant+2*$space);
+        my $uni = $data->{'uni'}->[$w];
+        my $wth = int($font->width(chr($uni)) * 1000 * $slant + 2 * $space);
 
-        $procs->{$font->glyphByEnc($w)}=$char;
-        #$char->{Filter}=PDFArray(PDFName('FlateDecode'));
-        $char->{' stream'}=$wth." 0 ".join(' ',map { int($_) } $self->fontbbox)." d1\n";
-        $char->{' stream'}.="BT\n";
-        $char->{' stream'}.=join(' ',1,0,tan(deg2rad($oblique)),1,0,0)." Tm\n" if($oblique);
-        $char->{' stream'}.="2 Tr ".($bold)." w\n" if($bold);
-        # my $ci = charinfo($self->data->{uni}->[$w]);
-        my $ci={};
-  		if ($self->data->{uni}->[$w] ne '')
-  		{
-    		$ci = charinfo($self->data->{uni}->[$w]);
-  		}
-        if($opts{-caps} && $ci->{upper})
-        {
-            $char->{' stream'}.="/FSN 800 Tf\n";
-            $char->{' stream'}.=($slant*110)." Tz\n";
-            $char->{' stream'}.=" [ -$space ] TJ\n" if($space);
-            $wth=int($font->width(uc chr($uni))*800*$slant*1.1+2*$space);
-            $char->{' stream'}.=$font->text(uc chr($uni));
+        $procs->{$font->glyphByEnc($w)} = $char;
+        #$char->{'Filter'} = PDFArray(PDFName('FlateDecode'));
+        $char->{' stream'} = $wth . ' 0 ' . join(' ', map { int($_) } $self->fontbbox()) . " d1\n";
+        $char->{' stream'} .= "BT\n";
+        if ($oblique) {
+            my @matrix = (1, 0, tan(deg2rad($oblique)), 1, 0, 0);
+            $char->{' stream'} .= join(' ', @matrix) . " Tm\n";
         }
-        else
-        {
-            $char->{' stream'}.="/FSN 1000 Tf\n";
-            $char->{' stream'}.=($slant*100)." Tz\n" if($slant!=1);
-            $char->{' stream'}.=" [ -$space ] TJ\n" if($space);
-            $char->{' stream'}.=$font->text( chr( $uni ));
+        $char->{' stream'} .= "2 Tr " . $bold . " w\n" if $bold;
+        my $ci = {};
+        if ($data->{'uni'}->[$w] ne '') {
+            $ci = charinfo($data->{'uni'}->[$w]);
         }
-        $char->{' stream'}.=" Tj\nET\n";
-        push @widths,$wth;
-        $self->data->{wx}->{$font->glyphByEnc($w)}=$wth;
+        if ($opts{'-caps'} and $ci->{'upper'}) {
+            $char->{' stream'} .= "/FSN 800 Tf\n";
+            $char->{' stream'} .= ($slant * 110) . " Tz\n";
+            $char->{' stream'} .= " [ -$space ] TJ\n" if $space;
+            $wth = int($font->width(uc chr($uni)) * 800 * $slant * 1.1 + 2 * $space);
+            $char->{' stream'} .= $font->text(uc chr($uni));
+        }
+        else {
+            $char->{' stream'} .= "/FSN 1000 Tf\n";
+            $char->{' stream'} .= ($slant * 100) . " Tz\n" if $slant != 1;
+            $char->{' stream'} .= " [ -$space ] TJ\n" if $space;
+            $char->{' stream'} .= $font->text(chr($uni));
+        }
+        $char->{' stream'} .= " Tj\nET\n";
+        push @widths, $wth;
+        $data->{'wx'}->{$font->glyphByEnc($w)} = $wth;
         $pdf->new_obj($char);
     }
 
-    $procs->{'.notdef'}=$procs->{$font->data->{char}->[32]};
-    $self->{Widths}=PDFArray(map { PDFNum($_) } @widths);
-    $self->data->{e2n}=$self->data->{char};
-    $self->data->{e2u}=$self->data->{uni};
+    $procs->{'.notdef'} = $procs->{$font->data->{'char'}->[32]};
+    $self->{'Widths'} = PDFArray(map { PDFNum($_) } @widths);
+    $data->{'e2n'} = $data->{'char'};
+    $data->{'e2u'} = $data->{'uni'};
 
-    $self->data->{u2c}={};
-    $self->data->{u2e}={};
-    $self->data->{u2n}={};
-    $self->data->{n2c}={};
-    $self->data->{n2e}={};
-    $self->data->{n2u}={};
+    $data->{'u2c'} = {};
+    $data->{'u2e'} = {};
+    $data->{'u2n'} = {};
+    $data->{'n2c'} = {};
+    $data->{'n2e'} = {};
+    $data->{'n2u'} = {};
 
-    foreach my $n (reverse 0..255)
-    {
-        $self->data->{n2c}->{$self->data->{char}->[$n] || '.notdef'}=$n unless(defined $self->data->{n2c}->{$self->data->{char}->[$n] || '.notdef'});
-        $self->data->{n2e}->{$self->data->{e2n}->[$n] || '.notdef'}=$n unless(defined $self->data->{n2e}->{$self->data->{e2n}->[$n] || '.notdef'});
+    foreach my $n (reverse 0 .. 255) {
+        $data->{'n2c'}->{$data->{'char'}->[$n] // '.notdef'} //= $n;
+        $data->{'n2e'}->{$data->{'e2n'}->[$n] // '.notdef'} //= $n;
 
-        $self->data->{n2u}->{$self->data->{e2n}->[$n] || '.notdef'}=$self->data->{e2u}->[$n] unless(defined $self->data->{n2u}->{$self->data->{e2n}->[$n] || '.notdef'});
-        $self->data->{n2u}->{$self->data->{char}->[$n] || '.notdef'}=$self->data->{uni}->[$n] unless(defined $self->data->{n2u}->{$self->data->{char}->[$n] || '.notdef'});
+        $data->{'n2u'}->{$data->{'e2n'}->[$n] // '.notdef'} //= $data->{'e2u'}->[$n];
+        $data->{'n2u'}->{$data->{'char'}->[$n] // '.notdef'} //= $data->{'uni'}->[$n];
 
-        $self->data->{u2c}->{$self->data->{uni}->[$n]}=$n unless(defined $self->data->{u2c}->{$self->data->{uni}->[$n]});
-        $self->data->{u2e}->{$self->data->{e2u}->[$n]}=$n unless(defined $self->data->{u2e}->{$self->data->{e2u}->[$n]});
+        if (defined $data->{'uni'}->[$n]) {
+            $data->{'u2c'}->{$data->{'uni'}->[$n]} //= $n;
+        }
+        if (defined $data->{'e2u'}->[$n]) {
+            $data->{'u2e'}->{$data->{'e2u'}->[$n]} //= $n;
 
-        $self->data->{u2n}->{$self->data->{e2u}->[$n]}=($self->data->{e2n}->[$n] || '.notdef') unless(defined $self->data->{u2n}->{$self->data->{e2u}->[$n]});
-        $self->data->{u2n}->{$self->data->{uni}->[$n]}=($self->data->{char}->[$n] || '.notdef') unless(defined $self->data->{u2n}->{$self->data->{uni}->[$n]});
+            my $value = ($data->{'e2n'}->[$n] // '.notdef');
+            $data->{'u2n'}->{$data->{'e2u'}->[$n]} //= $value;
+        }
+        if (defined $data->{'uni'}->[$n]) {
+            my $value = ($data->{'char'}->[$n] // '.notdef');
+            $data->{'u2n'}->{$data->{'uni'}->[$n]} //= $value;
+        }
     }
 
-    return($self);
+    return $self;
 }
 
 1;
