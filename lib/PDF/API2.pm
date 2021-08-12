@@ -1932,44 +1932,17 @@ sub cjkfont {
     return $obj;
 }
 
-=item $font = $pdf->synfont($basefont, [%options])
+=item $font = $pdf->synthetic_font($base_font, %options)
 
-Returns a new synthetic font object.
-
-B<Examples:>
-
-    $cf  = $pdf->corefont('Times-Roman', -encode => 'latin1');
-    $sf  = $pdf->synfont($cf, -slant => 0.85);  # compressed 85%
-    $sfb = $pdf->synfont($cf, -bold => 1);      # embolden by 10em
-    $sfi = $pdf->synfont($cf, -oblique => -12); # italic at -12 degrees
-
-Valid %options are:
-
-=over
-
-=item -slant
-
-Slant/expansion factor (0.1-0.9 = slant, 1.1+ = expansion).
-
-=item -oblique
-
-Italic angle (+/-)
-
-=item -bold
-
-Emboldening factor (0.1+, bold = 1, heavy = 2, ...)
-
-=item -space
-
-Additional character spacing in ems (0-1000)
-
-=back
-
-See Also: L<PDF::API2::Resource::Font::SynFont>
+Returns a new synthetic font object.  See L<PDF::API2::Resource::Font::SynFont>
+for details.
 
 =cut
 
-sub synfont {
+# Deprecated (renamed)
+sub synfont { return synthetic_font(@_) }
+
+sub synthetic_font {
     my ($self, $font, %opts) = @_;
 
     # PDF::API2 doesn't set BaseEncoding for TrueType fonts, so text

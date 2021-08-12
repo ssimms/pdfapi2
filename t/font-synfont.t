@@ -26,6 +26,6 @@ SKIP: {
     ok($font->glyphNum() > 0,
        q{Able to read a count of glyphs (>0) from a TrueType font});
 
-    like($font->{'Name'}->val(), qr/^\w+\+De/,
+    like($font->{'Name'}->val(), qr/^SynDe/,
          q{Font has the expected name});
 }

@@ -33,6 +33,13 @@
       one of the standard fonts.  Kerning is on by default (vs. off by default
       in the type-specific methods).
 
+    - Renamed synfont to synthetic_font.  Renamed and documented the options.
+      The old names are deprecated but will continue to work.  The new hscale
+      option (formerly -slant) now takes a percentage (100 = no change, vs. 1 =
+      no change for -slant) to match the hscale method in Content.  The new
+      "bold" option is in thousandths of a text unit, vs. hundredths for
+      "-bold", so multiply the old value by 10 when migrating.
+
     - Tentatively deprecated $pdf->cjkfont.  If you're successfully using this
       method for CJK font support, read PDF::API2::Resource::CIDFont::CJKFont
       and contact me to discuss your use case.

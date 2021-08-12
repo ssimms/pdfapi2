@@ -19,44 +19,56 @@ PDF::API2::Resource::Font::SynFont - Module for creating synthetic Fonts.
 
 =head1 SYNOPSIS
 
-    $pdf = PDF::API2->new;
-    $sft = $pdf->synfont($cft);
+    my $pdf = PDF::API2->new();
+    my $base_font = $pdf->font('Helvetica');
 
-=head1 METHODS
+    # Create a condensed synthetic font
+    my $condensed = $pdf->synthetic_font($base_font, hscale => 80);
 
-=over
+    # Compare the two fonts
+    my $text = $pdf->page->text();
 
-=item $font = PDF::API2::Resource::Font::SynFont->new $pdf, $fontobj, %options
+    $text->font($base_font, 18);
+    $text->distance(72, 720);
+    $text->text('Hello World!');
 
-Returns a synfont object.
+    $text->font($condensed, 18);
+    $text->distance(0, -36);
+    $text->text('Hello World!');
 
-Valid %options are:
+    $pdf->save('sample.pdf');
 
-I<-encode>
-... changes the encoding of the font from its default.
-See I<perl's Encode> for the supported values.
+=head1 DESCRIPTION
 
-I<-pdfname>
-... changes the reference-name of the font from its default.
-The reference-name is normally generated automatically and can be
-retrieved via $pdfname=$font->name.
+This module allows you to create a custom font based on an existing font,
+adjusting the scale, stroke thickness, angle, and other properties of each
+glyph.
 
-I<-slant>
-... slant/expansion factor (0.1-0.9 = slant, 1.1+ = expansion).
+=head1 FONT OPTIONS
 
-I<-oblique>
-... italic angle (+/-)
+=head2 hscale
 
-I<-bold>
-... embolding factor (0.1+, bold=1, heavy=2, ...).
+A percentage to condense (less than 100) or expand (greater than 100) the glyphs
+horizontally.
 
-I<-space>
-... additional charspacing in em (0-1000).
+=head2 angle
 
-I<-caps>
-... create synthetic small-caps.
+A number of degrees to lean the glyphs to the left (negative angle) or to the
+right (positive angle).
 
-=back
+=head2 bold
+
+A stroke width, in thousandths of a text unit, to add to the glyph's outline,
+creating a bold effect.
+
+=head2 smallcaps
+
+Set to true to replace lower-case characters with small versions of their
+upper-case glyphs.
+
+=head2 space
+
+Additional space, in thousandths of a text unit, to add between glyphs.
 
 =cut
 
@@ -64,19 +76,34 @@ sub new {
     my ($class, $pdf, $font, %opts) = @_;
     my $first = 1;
     my $last = 255;
-    my $slant = $opts{'-slant'} || 1;
-    my $oblique = $opts{'-oblique'} || 0;
-    my $space = $opts{'-space'} || 0;
-    my $bold = ($opts{'-bold'} || 0) * 10; # convert to em
+
+    # Deprecated options
+    if (exists $opts{'-bold'}) {
+        $opts{'bold'} //= (delete $opts{'-bold'}) * 10;
+    }
+    if (exists $opts{'-caps'}) {
+        $opts{'smallcaps'} //= delete $opts{'-caps'};
+    }
+    if (exists $opts{'-oblique'}) {
+        $opts{'angle'} //= delete $opts{'-oblique'};
+    }
+    if (exists $opts{'-slant'}) {
+        $opts{'hscale'} //= (delete $opts{'-slant'}) * 100;
+    }
+    if (exists $opts{'-space'}) {
+        $opts{'space'} //= delete $opts{'-space'};
+    }
+
+    my $angle  = $opts{'angle'} // 0;
+    my $bold   = ($opts{'bold'} // 0);
+    my $hscale = ($opts{'hscale'} // 100) / 100;
+    my $space  = $opts{'space'} // 0;
 
     $font->encodeByName($opts{'-encode'}) if $opts{'-encode'};
 
     $class = ref($class) if ref($class);
-    my $self = $class->SUPER::new($pdf,
-                                  pdfkey()
-                                  . '+' . $font->name()
-                                  . ($opts{'-caps'} ? '+Caps' : '')
-                                  . ($opts{'-vname'} ? '+' . $opts{'-vname'} : ''));
+    my $key = $opts{'name'} // 'Syn' . $font->name() . pdfkey();
+    my $self = $class->SUPER::new($pdf, $key);
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' font'} = $font;
     $self->{' data'} = {
@@ -86,8 +113,8 @@ sub new {
         'descender' => $font->descender(),
         'iscore' => '0',
         'isfixedpitch' => $font->isfixedpitch(),
-        'italicangle' => $font->italicangle() + $oblique,
-        'missingwidth' => $font->missingwidth() * $slant,
+        'italicangle' => $font->italicangle() + $angle,
+        'missingwidth' => $font->missingwidth() * $hscale,
         'underlineposition' => $font->underlineposition(),
         'underlinethickness' => $font->underlinethickness(),
         'xheight' => $font->xheight(),
@@ -107,8 +134,8 @@ sub new {
     else {
         $data->{'fontbbox'} = [ $font->fontbbox() ];
     }
-    $data->{'fontbbox'}->[0] *= $slant;
-    $data->{'fontbbox'}->[2] *= $slant;
+    $data->{'fontbbox'}->[0] *= $hscale;
+    $data->{'fontbbox'}->[2] *= $hscale;
 
     $self->{'Subtype'} = PDFName('Type3');
     $self->{'FirstChar'} = PDFNum($first);
@@ -159,14 +186,14 @@ sub new {
         my $char = PDFDict();
 
         my $uni = $data->{'uni'}->[$w];
-        my $wth = int($font->width(chr($uni)) * 1000 * $slant + 2 * $space);
+        my $wth = int($font->width(chr($uni)) * 1000 * $hscale + 2 * $space);
 
         $procs->{$font->glyphByEnc($w)} = $char;
         #$char->{'Filter'} = PDFArray(PDFName('FlateDecode'));
         $char->{' stream'} = $wth . ' 0 ' . join(' ', map { int($_) } $self->fontbbox()) . " d1\n";
         $char->{' stream'} .= "BT\n";
-        if ($oblique) {
-            my @matrix = (1, 0, tan(deg2rad($oblique)), 1, 0, 0);
+        if ($angle) {
+            my @matrix = (1, 0, tan(deg2rad($angle)), 1, 0, 0);
             $char->{' stream'} .= join(' ', @matrix) . " Tm\n";
         }
         $char->{' stream'} .= "2 Tr " . $bold . " w\n" if $bold;
@@ -174,16 +201,16 @@ sub new {
         if ($data->{'uni'}->[$w] ne '') {
             $ci = charinfo($data->{'uni'}->[$w]);
         }
-        if ($opts{'-caps'} and $ci->{'upper'}) {
+        if ($opts{'smallcaps'} and $ci->{'upper'}) {
             $char->{' stream'} .= "/FSN 800 Tf\n";
-            $char->{' stream'} .= ($slant * 110) . " Tz\n";
+            $char->{' stream'} .= ($hscale * 110) . " Tz\n";
             $char->{' stream'} .= " [ -$space ] TJ\n" if $space;
-            $wth = int($font->width(uc chr($uni)) * 800 * $slant * 1.1 + 2 * $space);
+            $wth = int($font->width(uc chr($uni)) * 800 * $hscale * 1.1 + 2 * $space);
             $char->{' stream'} .= $font->text(uc chr($uni));
         }
         else {
             $char->{' stream'} .= "/FSN 1000 Tf\n";
-            $char->{' stream'} .= ($slant * 100) . " Tz\n" if $slant != 1;
+            $char->{' stream'} .= ($hscale * 100) . " Tz\n" if $hscale != 1;
             $char->{' stream'} .= " [ -$space ] TJ\n" if $space;
             $char->{' stream'} .= $font->text(chr($uni));
         }
@@ -193,7 +220,7 @@ sub new {
         $pdf->new_obj($char);
     }
 
-    $procs->{'.notdef'} = $procs->{$font->data->{'char'}->[32]};
+    $procs->{'.notdef'} = $procs->{$font->data->{'char'}->[32] // 0};
     $self->{'Widths'} = PDFArray(map { PDFNum($_) } @widths);
     $data->{'e2n'} = $data->{'char'};
     $data->{'e2u'} = $data->{'uni'};
