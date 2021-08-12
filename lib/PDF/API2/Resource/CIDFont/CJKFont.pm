@@ -21,6 +21,8 @@ our $subs;
 
 PDF::API2::Resource::CIDFont::CJKFont - Deprecated base class for CJK fonts
 
+=head1 DESCRIPTION
+
 This is not the CJK font support you are looking for.  It dates back to the days
 when Unicode was young and poorly supported.  PDFs created using this class are
 not portable.
