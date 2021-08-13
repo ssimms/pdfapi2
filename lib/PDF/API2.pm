@@ -2429,22 +2429,33 @@ __END__
 
 =back
 
-=head1 SUPPORTED PERL VERSIONS
+=head1 BACKWARD COMPATIBILITY
 
-PDF::API2 will aim to support all major Perl versions that were released in the
-past six years, plus one, in order to continue working for the life of most
-long-term-stable (LTS) server distributions.
+Code written using PDF::API2 should continue to work unchanged for the life of
+most long-term-stable (LTS) server distributions.  Specifically, it should
+continue working for versions of Perl that were L<released|perlhist> within the
+past five years (the typical support window for LTS releases) plus six months
+(allowing plenty of time for package freezes prior to release).
 
-For example, a version of PDF::API2 released on 2018-01-01 would support the
-last major version of Perl released before 2012-01-01, which happens to be 5.14.
+In PDF::API2, method names, options, and functionality change over time.
+Functionality that's documented (not just in source code comments) should also
+continue working for the same time period, though deprecation warnings may be
+added.  There may be exceptions if your code happens to rely on bugs that get
+fixed.
 
-If you need to use this module on a server with an extremely out-of-date version
-of Perl, consider using either plenv or Perlbrew to run a newer version of Perl
-without needing admin privileges.
+Undocumented features, features marked as experimental, and underlying data
+structures may change at any time.  An exception is for features that were
+previously documented, which should continue to work for the same time period
+after the documentation is removed.
 
-=head1 KNOWN ISSUES
+Before migrating to a new LTS server version, it's recommended that you upgrade
+to the latest version of PDF::API2, enable C<use warnings>, and check your
+server logs for deprecations.  Once these are resolved, your code should be safe
+to use for any PDF::API2 releases during that LTS support window.
 
-This module does not work with perl's -l command-line switch.
+Please note that this section does not constitute a warranty or guarantee.
+Failure to meet this backward compatibility goal will generally be considered a
+bug, but the license's "no warranty" clause continues to apply.
 
 =head1 AUTHOR
 

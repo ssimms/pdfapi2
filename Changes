@@ -1,19 +1,26 @@
 {{$NEXT}}
 
-    - Merged saveas into save.  The old name is deprecated but will continue to
-      work.
+    - This release includes many changes to method names, options, and
+      documentation aimed at improving approachability, so I've added a Backward
+      Compatibility section to the PDF::API2 POD (replacing the Supported Perl
+      Versions section) explaining that deprecated method names and options
+      should continue to work unchanged for an extended and defined period of
+      time, though not indefinitely.
 
-    - Renamed end to close.
+    - Renamed several methods in the PDF::API2 base class:
 
-    - Renamed open_scalar to from_string.  Renamed stringify to to_string.  The
-      old names are deprecated but will continue to work.
+      - end -> close
+      - open_scalar -> from_string
+      - stringify -> to_string
+      - pages -> page_count
+
+    - Merged saveas into save.
 
     - Added $page->boundaries() and $pdf->default_page_boundaries() to replace
       the separate methods for the various page boundaries.  The supported
       arguments are slightly different; some edge cases have been removed and
       new options have been added.  See below and the PDF::API2::Page
-      documentation for details.  The old names are deprecated but will continue
-      to work.
+      documentation for details.
 
     - Added $page->size() and $pdf->default_page_size() as a shortcut for
       setting the media box.
@@ -28,17 +35,16 @@
       This does not apply to the deprecated versions of these methods.
 
     - Created a convenience method $pdf->font, which combines corefont, ttfont,
-      psfont, and bdfont.  The type-specific methods have been deprecated but
-      will continue to work.  Unlike corefont, font requires the exact name of
-      one of the standard fonts.  Kerning is on by default (vs. off by default
-      in the type-specific methods).
+      psfont, and bdfont.  Unlike corefont, font requires the exact name of one
+      of the standard fonts.  Kerning is on by default (vs. off by default in
+      the type-specific methods).
 
     - Renamed synfont to synthetic_font.  Renamed and documented the options.
-      The old names are deprecated but will continue to work.  The new hscale
-      option (formerly -slant) now takes a percentage (100 = no change, vs. 1 =
-      no change for -slant) to match the hscale method in Content.  The new
-      "bold" option is in thousandths of a text unit, vs. hundredths for
-      "-bold", so multiply the old value by 10 when migrating.
+      The new hscale option (formerly -slant) now takes a percentage (100 = no
+      change, vs. 1 = no change for -slant) to match the hscale method in
+      Content.  The new "bold" option is in thousandths of a text unit,
+      vs. hundredths for "-bold", so multiply the old value by 10 when
+      migrating.
 
     - Tentatively deprecated $pdf->cjkfont.  If you're successfully using this
       method for CJK font support, read PDF::API2::Resource::CIDFont::CJKFont
@@ -49,18 +55,16 @@
 
     - Replaced $pdf->preferences() with separate page_mode, page_layout,
       viewer_preferences, and open_action methods, all of which are now fully
-      documented.  The old method is deprecated but will continue to work.
+      documented.
 
     - Added font_path and set_font_path accessors for the font search path (the
       list of directories searched when a font name is included without its full
-      path).  Renamed addFontDirs to add_to_font_path.  The old name is
-      deprecated but will continue to work.
+      path).  Renamed addFontDirs to add_to_font_path.
 
     - Removed C:/WinNT/Fonts from the default font search path.
 
     - Named Destinations are now fully documented, with updated method names and
-      arguments.  The old method names and arguments are deprecated but will
-      continue to work.
+      arguments.
 
 
 2.041     2021-07-27
