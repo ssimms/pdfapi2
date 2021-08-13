@@ -20,7 +20,7 @@ BEGIN {
 
 =head1 NAME
 
-PDF::API2::Lite - lite pdf creation
+PDF::API2::Lite - (do not use)
 
 =head1 SYNOPSIS
 
@@ -29,6 +29,16 @@ PDF::API2::Lite - lite pdf creation
     $img = $pdf->image('some.jpg');
     $font = $pdf->corefont('Times-Roman');
     $font = $pdf->ttfont('TimesNewRoman.ttf');
+
+=head1 DESCRIPTION
+
+This class is unmaintained (since 2007) and should not be used in new code.  It
+combines many of the methods from L<PDF::API2> and L<PDF::API2::Content> into a
+single class but isn't otherwise any easier to use.
+
+There have been many improvements and clarifications made to the rest of the
+distribution that aren't reflected here, so the term "Lite" no longer applies.
+It remains solely for compatibility with existing legacy code.
 
 =head1 METHODS
 
@@ -635,10 +645,4 @@ __END__
 
 =back
 
-=head1 AUTHOR
-
-alfred reibenschuh
-
 =cut
-
-
