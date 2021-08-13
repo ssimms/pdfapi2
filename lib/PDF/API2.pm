@@ -1566,13 +1566,16 @@ sub import_page {
     return $t_page;
 }
 
-=item $count = $pdf->pages()
+=item $count = $pdf->page_count()
 
-Returns the number of pages in the document.
+Return the number of pages in the document.
 
 =cut
 
-sub pages {
+# Deprecated (renamed)
+sub pages { return page_count(@_) }
+
+sub page_count {
     my $self = shift();
     return scalar @{$self->{'pagestack'}};
 }
