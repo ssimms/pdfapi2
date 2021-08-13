@@ -15,6 +15,9 @@ use warnings;
 #
 # If uniglyph.txt changes, use _generate to create new hashes, and
 # paste the output into this file.
+#
+# uniglyph.txt contains names from AGL/WGL4, XML, (X)HTML, and SGML to
+# facilitate interoperability.
 
 sub _generate {
     my $uniglyph_file = shift();

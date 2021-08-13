@@ -5,6 +5,7 @@ use warnings;
 
 # VERSION
 
+# This is an amalgamation of the X11, SGML, and (X)HTML specification sets
 sub get_colors {
     return (
         aliceblue            => '#EFF7FF',

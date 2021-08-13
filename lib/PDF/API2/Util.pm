@@ -676,37 +676,3 @@ sub getPaperSizes {
 }
 
 1;
-
-__END__
-
-=head1 NAME
-
-PDF::API2::Util - utility package for often use methods across the package.
-
-=head1 PREDEFINED PAPERSIZES
-
-=over 4
-
-=item %sizes = getPaperSizes();
-
-Returns a hash containing the available paper size aliases as keys and
-their dimensions as a two-element array reference.
-
-=back
-
-=head1 PREDEFINED COLORS
-
-See the source of L<PDF::API2::Resource::Colors> for a complete list.
-
-B<Please Note:> This is an amalgamation of the X11, SGML and (X)HTML
-specification sets.
-
-=head1 PREDEFINED GLYPH-NAMES
-
-See the file C<uniglyph.txt> for a complete list.
-
-B<Please Note:> You may notice that apart from the 'AGL/WGL4', names
-from the XML, (X)HTML and SGML specification sets have been included
-to enable interoperability towards PDF.
-
-=cut
