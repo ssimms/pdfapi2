@@ -32,7 +32,7 @@ my @font_path = __PACKAGE__->set_font_path('/usr/share/fonts',
 
 =head1 NAME
 
-PDF::API2 - Facilitates the creation and modification of PDF files
+PDF::API2 - Create, modify, and examine PDF files
 
 =head1 SYNOPSIS
 

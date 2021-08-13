@@ -17,7 +17,7 @@ use warnings;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Array - Corresponds to a PDF array. Inherits from L<PDF::Objind>
+PDF::API2::Basic::PDF::Array - Low-level PDF array object
 
 =head1 METHODS
 

@@ -16,8 +16,7 @@ use strict;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Name - Inherits from L<PDF::API2::Basic::PDF::String>
-and stores PDF names (things beginning with /)
+PDF::API2::Basic::PDF::Name - Low-level PDF name object
 
 =head1 METHODS
 

@@ -15,8 +15,7 @@ use warnings;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Objind - PDF indirect object reference. Also acts as an abstract
-superclass for all elements in a PDF file.
+PDF::API2::Basic::PDF::Objind - Low-level PDF indirect object
 
 =head1 INSTANCE VARIABLES
 

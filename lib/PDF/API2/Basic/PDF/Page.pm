@@ -20,7 +20,7 @@ use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Page - Represents a PDF page, inherits from L<PDF::API2::Basic::PDF::Pages>
+PDF::API2::Basic::PDF::Page - Low-level PDF page object
 
 =head1 DESCRIPTION
 

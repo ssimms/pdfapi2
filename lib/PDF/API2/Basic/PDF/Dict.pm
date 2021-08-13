@@ -24,7 +24,7 @@ use PDF::API2::Basic::PDF::Name;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Dict - PDF Dictionaries and Streams. Inherits from L<PDF::Objind>
+PDF::API2::Basic::PDF::Dict - Low-level dictionary and stream objects
 
 =head1 INSTANCE VARIABLES
 

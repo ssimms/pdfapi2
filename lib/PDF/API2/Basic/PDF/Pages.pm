@@ -25,7 +25,7 @@ our %inst = map {$_ => 1} qw(Parent Type);
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Pages - a PDF pages hierarchical element. Inherits from L<PDF::API2::Basic::PDF::Dict>
+PDF::API2::Basic::PDF::Pages - Low-level page tree object
 
 =head1 DESCRIPTION
 

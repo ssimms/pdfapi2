@@ -16,8 +16,7 @@ use strict;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::String - PDF String type objects and superclass
-for simple objects that are basically stringlike (Number, Name, etc.)
+PDF::API2::Basic::PDF::String - Low-level PDF string object
 
 =head1 METHODS
 

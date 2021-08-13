@@ -14,7 +14,7 @@ use strict;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::File - Holds the trailers and cross-reference tables for a PDF file
+PDF::API2::Basic::PDF::File - Low-level PDF file access
 
 =head1 SYNOPSIS
 
