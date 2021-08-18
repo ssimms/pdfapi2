@@ -17,10 +17,11 @@ PDF::API2::Outline - Manage PDF outlines (a.k.a. bookmarks)
 
 =head1 SYNOPSIS
 
+    # Get/create the top-level outline tree
     my $outlines = $pdf->outlines();
 
     # Add an entry
-    my $outline = $outline->outline();
+    my $outline = $outlines->outline();
     $outline->title("First Page");
     $outline->destination($pdf->open_page(1));
 
@@ -82,53 +83,11 @@ sub count {
     return $count;
 }
 
-=head2 title
-
-    $outline = $outline->title($text);
-
-Set the title of the outline.
-
-=cut
-
-sub title {
-    my ($self, $text) = @_;
-    $self->{'Title'} = PDFStr($text);
-    return $self;
-}
-
-=head2 closed
-
-    $outline = $outline->closed();
-
-Set the status of the outline to closed (i.e. collapsed).
-
-=cut
-
-sub closed {
-    my $self = shift();
-    $self->{' closed'} = 1;
-    return $self;
-}
-
-=head2 open
-
-    $outline->open();
-
-Set the status of the outline to open (i.e. expanded).
-
-=cut
-
-sub open {
-    my $self = shift();
-    delete $self->{' closed'};
-    return $self;
-}
-
 =head2 outline
 
     $child_outline = $parent_outline->outline();
 
-Create a nested outline.
+Add an entry at the end of the current outline.
 
 =cut
 
@@ -144,6 +103,20 @@ sub outline {
     }
 
     return $child;
+}
+
+=head2 title
+
+    $outline = $outline->title($text);
+
+Set the title of the outline.
+
+=cut
+
+sub title {
+    my ($self, $text) = @_;
+    $self->{'Title'} = PDFStr($text);
+    return $self;
 }
 
 =head2 destination
@@ -199,6 +172,34 @@ sub dest {
     return $self->destination($destination, $location, @args);
 }
 
+=head2 open
+
+    $outline->open();
+
+Set the status of the outline to open (i.e. expanded).
+
+=cut
+
+sub open {
+    my $self = shift();
+    delete $self->{' closed'};
+    return $self;
+}
+
+=head2 closed
+
+    $outline = $outline->closed();
+
+Set the status of the outline to closed (i.e. collapsed).
+
+=cut
+
+sub closed {
+    my $self = shift();
+    $self->{' closed'} = 1;
+    return $self;
+}
+
 =head2 uri
 
     $outline = $outline->uri($uri);
@@ -245,7 +246,7 @@ sub launch {
 
 =head2 pdf
 
-    $outline = $outline->pdf($filename, $page_number, $location, @args)
+    $outline = $outline->pdf($filename, $page_number, $location, @args);
 
 Open another PDF file to a particular page number (first page is zero, which is
 also the default).  The page can optionally be positioned at a particular
