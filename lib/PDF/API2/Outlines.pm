@@ -17,4 +17,9 @@ sub new {
     return $self;
 }
 
+sub count {
+    my $self = shift();
+    return abs($self->SUPER::count());
+}
+
 1;
