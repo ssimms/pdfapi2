@@ -15,13 +15,13 @@ use PDF::API2::Basic::PDF::Utils;
 
 =head1 NAME
 
-PDF::API2::NamedDestination - Add named destination shortcuts to a PDF
+PDF::API2::NamedDestination - Add named destinations (views) to a PDF
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $destination = PDF::API2::NamedDestination->new($pdf, ...)
+    $destination = PDF::API2::NamedDestination->new($pdf, ...);
 
 Creates a new named destination object.  If any additional arguments are
 present, they will be passed to C<destination()>.
@@ -53,15 +53,18 @@ sub new_api {
     return $destination;
 }
 
-=item $destination->destination($page, $location, @args)
+=head2 destination
 
-A destination defines a particular view of a PDF, consisting of a page object,
-the location of the window on that page, and possible coordinate and zoom
-arguments.
+    $destination = $destination->destination($page, $location, @args);
 
+A destination is a particular view of a PDF, consisting of a page object, the
+location of the window on that page, and possible coordinate and zoom arguments.
+
+    # The XYZ location takes three arguments
     my $dest1 = PDF::API2::NamedDestination->new($pdf);
     $dest->destination($pdf->open_page(1), 'xyz' => ($x, $y, $zoom));
 
+    # The Fit location doesn't require any arguments
     my $dest2 = PDF::API2::NamedDestination->new($pdf);
     $dest->destination($pdf->open_page(2), 'fit');
 
@@ -69,7 +72,7 @@ The following locations are available:
 
 =over
 
-=item xyz ($left, $top, $zoom)
+=item * xyz ($left, $top, $zoom)
 
 Display the page with the coordinates (C<$left>, C<$top>) positioned at the
 upper-left corner of the window and the contents of the page magnified by the
@@ -77,28 +80,28 @@ factor C<$zoom>. An C<undef> value for any of the arguments specifies that the
 current value of that argument shall be retained unchanged.  A zoom factor of 0
 has the same meaning as C<undef>.
 
-=item fit
+=item * fit
 
 Display the page with its contents magnified just enough to fit the entire page
 within the window both horizontally and vertically. If the required horizontal
 and vertical magnification factors are different, use the smaller of the two,
 centering the page within the window in the other dimension.
 
-=item fith ($top)
+=item * fith ($top)
 
 Display the page with the vertical coordinate C<$top> positioned at the top edge
 of the window and the contents of the page magnified just enough to fit the
 entire width of the page within the window.  An C<undef> value for C<$top>
 specifies that the current value of that argument shall be retained unchanged.
 
-=item fitv ($left)
+=item * fitv ($left)
 
 Display the page with the horizontal coordinate C<$left> positioned at the left
 edge of the window and the contents of the page magnified just enough to fit the
 entire height of the page within the window.  An C<undef> value for C<$left>
 specifies that the current value of that argument shall be retained unchanged.
 
-=item fitr ($left, $bottom, $right, $top)
+=item * fitr ($left, $bottom, $right, $top)
 
 Display the page with its contents magnified just enough to fit the rectangle
 specified by the coordinates C<$left>, C<$bottom>, C<$right>, and C<$top>
@@ -106,14 +109,14 @@ entirely within the window both horizontally and vertically. If the required
 horizontal and vertical magnification factors are different, use the smaller of
 the two, centering the rectangle within the window in the other dimension.
 
-=item fitb
+=item * fitb
 
 Display the page with its contents magnified just enough to fit its bounding box
 entirely within the window both horizontally and vertically. If the required
 horizontal and vertical magnification factors are different, use the smaller of
 the two, centering the bounding box within the window in the other dimension.
 
-=item fitbh ($top)
+=item * fitbh ($top)
 
 Display the page with the vertical coordinate C<$top> positioned at the top edge
 of the window and the contents of the page magnified just enough to fit the
@@ -121,7 +124,7 @@ entire width of its bounding box within the window.  An C<undef> value for
 C<$top> specifies that the current value of that argument shall be retained
 unchanged.
 
-=item fitbv ($left)
+=item * fitbv ($left)
 
 Display the page with the horizontal coordinate C<$left> positioned at the left
 edge of the window and the contents of the page magnified just enough to fit the
@@ -200,7 +203,7 @@ sub dest {
         elsif (defined $opts{'-fitbh'}) {
             $self->{'D'} = _destination($page, 'fitbh', $opts{'-fitbh'});
         }
-        elsif (defined $opts{-fitv}) {
+        elsif (defined $opts{'-fitv'}) {
             $self->{'D'} = _destination($page, 'fitv', $opts{'-fitv'});
         }
         elsif (defined $opts{'-fitbv'}) {
@@ -217,7 +220,9 @@ sub dest {
     return $self;
 }
 
-=item $destination->goto($page, $location, @args)
+=head2 goto
+
+    $destination = $destination->goto($page, $location, @args);
 
 A go-to action changes the view to a specified destination (page, location, and
 magnification factor).
@@ -239,7 +244,9 @@ sub link {
     return $self->dest(@_);
 }
 
-=item $destination->uri($uri)
+=head2 uri
+
+    $destination = $destination->uri($uri);
 
 A URI action indicates that a URI -- typically a web page -- should be launched.
 
@@ -257,9 +264,11 @@ sub uri {
     return $self;
 }
 
-=item $destination->launch($file)
+=head2 launch
 
-A launch action launches an application or opens or prints a document.
+    $destination = $destination->launch($file);
+
+A launch action runs an application or opens or prints a document.
 
 C<$file> contains the path to the application to be launched or the document to
 be opened or printed.
@@ -278,7 +287,9 @@ sub launch {
     return $self;
 }
 
-=item $destination->pdf($file, $page_number, $location, @args)
+=head2 pdf
+
+    $destination = $destination->pdf($file, $page_number, $location, @args);
 
 Similar to C<goto>, but the destination is in a different PDF file located at
 C<$file>.  C<$page_number> is an integer rather than a page object, and the
@@ -304,9 +315,5 @@ sub pdfile {
 
     return $self->dest(PDFNum($page_number), @args);
 }
-
-=back
-
-=cut
 
 1;
