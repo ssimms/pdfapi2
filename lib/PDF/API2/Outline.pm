@@ -28,9 +28,9 @@ Returns a new outline object (called from $outlines->outline()).
 sub new {
     my ($class, $api, $parent, $prev) = @_;
     my $self = $class->SUPER::new();
-    $self->{'Parent'}  = $parent if defined $parent;
-    $self->{'Prev'}    = $prev   if defined $prev;
-    $self->{' api'}    = $api;
+    $self->{'Parent'} = $parent if defined $parent;
+    $self->{'Prev'}   = $prev   if defined $prev;
+    $self->{' api'}   = $api;
     weaken $self->{' api'};
     return $self;
 }
@@ -55,29 +55,28 @@ sub next {
 
 sub first {
     my $self = shift();
-    $self->{'First'} = $self->{' children'}->[0] if defined $self->{' children'} and defined $self->{' children'}->[0];
+    if (defined $self->{' children'} and defined $self->{' children'}->[0]) {
+        $self->{'First'} = $self->{' children'}->[0];
+    }
     return $self->{'First'};
 }
 
 sub last {
     my $self = shift();
-    $self->{'Last'} = $self->{' children'}->[-1] if defined $self->{' children'} and defined $self->{' children'}->[-1];
+    if (defined $self->{' children'} and defined $self->{' children'}->[-1]) {
+        $self->{'Last'} = $self->{' children'}->[-1];
+    }
     return $self->{'Last'};
 }
 
 sub count {
     my $self  = shift();
-    my $count = scalar @{$self->{' children'} || []};
+    my $count = scalar @{$self->{' children'} // []};
     $count += $_->count() for @{$self->{' children'}};
-    $self->{'Count'} = PDFNum($self->{' closed'} ? -$count : $count) if $count > 0;
+    if ($count > 0) {
+        $self->{'Count'} = PDFNum($self->{' closed'} ? -$count : $count);
+    }
     return $count;
-}
-
-sub fix_outline {
-    my $self = shift();
-    $self->first();
-    $self->last();
-    $self->count();
 }
 
 =item $outline->title($text)
@@ -129,7 +128,9 @@ sub outline {
     $child->prev($self->{' children'}->[-1]) if defined $self->{' children'};
     $self->{' children'}->[-1]->next($child) if defined $self->{' children'};
     push @{$self->{' children'}}, $child;
-    $self->{' api'}->{'pdf'}->new_obj($child) unless $child->is_obj($self->{' api'}->{'pdf'});
+    unless ($child->is_obj($self->{' api'}->{'pdf'})) {
+        $self->{' api'}->{'pdf'}->new_obj($child);
+    }
 
     return $child;
 }
@@ -277,36 +278,47 @@ sub pdf_file {
     return $self;
 }
 
+sub __fit {
+    require PDF::API2::NamedDestination;
+    return PDF::API2::NamedDestination::_destination(@_);
+}
+
 sub _fit {
     my ($destination, %options) = @_;
+
     if (defined $options{'-fit'}) {
-        return PDFArray($destination, PDFName('Fit'));
+        return __fit($destination, 'fit');
     }
     elsif (defined $options{'-fith'}) {
-        return PDFArray($destination, PDFName('FitH'), PDFNum($options{'-fith'}));
+        return __fit($destination, 'fith', $options{'-fith'});
     }
     elsif (defined $options{'-fitb'}) {
-        return PDFArray($destination, PDFName('FitB'));
+        return __fit($destination, 'fitb');
     }
     elsif (defined $options{'-fitbh'}) {
-        return PDFArray($destination, PDFName('FitBH'), PDFNum($options{'-fitbh'}));
+        return __fit($destination, 'fitbh', $options{'-fitbh'});
     }
     elsif (defined $options{'-fitv'}) {
-        return PDFArray($destination, PDFName('FitV'), PDFNum($options{'-fitv'}));
+        return __fit($destination, 'fitv', $options{'-fitv'});
     }
     elsif (defined $options{'-fitbv'}) {
-        return PDFArray($destination, PDFName('FitBV'), PDFNum($options{'-fitbv'}));
+        return __fit($destination, 'fitbv', $options{'-fitbv'});
     }
     elsif (defined $options{'-fitr'}) {
-        croak "Incorrect number of parameters (expected four) to -fitr" unless scalar @{$options{'-fitr'}} == 4;
-        return PDFArray($destination, PDFName('FitR'), map { PDFNum($_) } @{$options{'-fitr'}});
+        return __fit($destination, 'fitr', @{$options{'-fitr'}});
     }
     elsif (defined $options{'-xyz'}) {
-        croak "Incorrect number of parameters (expected three) to -xyz" unless scalar @{$options{'-xyz'}} == 3;
-        return PDFArray($destination, PDFName('XYZ'), map { defined $_ ? PDFNum($_) : PDFNull() } @{$options{'-xyz'}});
+        return __fit($destination, 'xyz', @{$options{'-xyz'}});
     }
 
     return;
+}
+
+sub fix_outline {
+    my $self = shift();
+    $self->first();
+    $self->last();
+    $self->count();
 }
 
 sub outobjdeep {
