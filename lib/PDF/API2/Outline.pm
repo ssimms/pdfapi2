@@ -15,9 +15,16 @@ use Scalar::Util qw(weaken);
 
 PDF::API2::Outline - Manage PDF outlines (a.k.a. bookmarks)
 
-=head1 METHODS
+=head1 SYNOPSIS
 
-=over
+    my $outlines = $pdf->outlines();
+
+    # Add an entry
+    my $outline = $outline->outline();
+    $outline->title("First Page");
+    $outline->destination($pdf->open_page(1));
+
+=head1 METHODS
 
 =cut
 
@@ -75,7 +82,9 @@ sub count {
     return $count;
 }
 
-=item $outline->title($text)
+=head2 title
+
+    $outline = $outline->title($text);
 
 Set the title of the outline.
 
@@ -87,7 +96,9 @@ sub title {
     return $self;
 }
 
-=item $outline->closed()
+=head2 closed
+
+    $outline = $outline->closed();
 
 Set the status of the outline to closed (i.e. collapsed).
 
@@ -99,7 +110,9 @@ sub closed {
     return $self;
 }
 
-=item $outline->open()
+=head2 open
+
+    $outline->open();
 
 Set the status of the outline to open (i.e. expanded).
 
@@ -111,9 +124,11 @@ sub open {
     return $self;
 }
 
-=item $child_outline = $parent_outline->outline()
+=head2 outline
 
-Returns a nested outline.
+    $child_outline = $parent_outline->outline();
+
+Create a nested outline.
 
 =cut
 
@@ -131,10 +146,12 @@ sub outline {
     return $child;
 }
 
-=item $outline->destination($destination, $location, @args)
+=head2 destination
 
-Sets the destination page and optional position of the outline.  C<$location>
-and C<@args> are as defined in L<PDF::API2::NamedDestination/"destination">.
+    $outline = $outline->destination($destination, $location, @args);
+
+Set the destination page and optional position of the outline.  C<$location> and
+C<@args> are as defined in L<PDF::API2::NamedDestination/"destination">.
 
 C<$destination> can optionally be the name of a named destination defined
 elsewhere.
@@ -182,7 +199,9 @@ sub dest {
     return $self->destination($destination, $location, @args);
 }
 
-=item $outline->uri($uri)
+=head2 uri
+
+    $outline = $outline->uri($uri);
 
 Launch a URI -- typically a web page -- when the outline item is activated.
 
@@ -202,7 +221,9 @@ sub uri {
     return $self;
 }
 
-=item $outline->launch($file)
+=head2 launch
+
+    $outline->launch($file);
 
 Launch an application or file when the outline item is activated.
 
@@ -222,11 +243,14 @@ sub launch {
     return $self;
 }
 
-=item $outline->pdf_file($filename, $page_number, %position)
+=head2 pdf
 
-Open a PDF file to a particular page number (first page is zero, which is also
-the default).  The page can optionally be positioned at a particular place in
-the viewport (see dest for details).
+    $outline = $outline->pdf($filename, $page_number, $location, @args)
+
+Open another PDF file to a particular page number (first page is zero, which is
+also the default).  The page can optionally be positioned at a particular
+location if C<$location> and C<@args> are set -- see
+L<PDF::API2::NamedDestination/"destination"> for possible settings.
 
 =cut
 
@@ -277,9 +301,5 @@ sub outobjdeep {
     $self->fix_outline();
     return $self->SUPER::outobjdeep(@_);
 }
-
-=back
-
-=cut
 
 1;
