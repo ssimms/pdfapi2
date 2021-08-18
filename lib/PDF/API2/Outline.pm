@@ -74,12 +74,24 @@ sub last {
 }
 
 sub count {
-    my $self  = shift();
-    my $count = scalar @{$self->{' children'} // []};
-    $count += $_->count() for @{$self->{' children'}};
-    if ($count > 0) {
-        $self->{'Count'} = PDFNum($self->{' closed'} ? -$count : $count);
+    my $self = shift();
+
+    # Set count to the number of descendant items that will be visible when the
+    # current item is open.
+    my $count = 0;
+    if ($self->has_children()) {
+        $count += @{$self->{' children'}};
+        foreach my $child (@{$self->{' children'}}) {
+            next unless $child->has_children();
+            next unless $child->is_open();
+            $count += $child->count();
+        }
     }
+
+    if ($count) {
+        $self->{'Count'} = PDFNum($self->is_open() ? $count : -$count);
+    }
+
     return $count;
 }
 
