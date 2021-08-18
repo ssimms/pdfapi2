@@ -83,6 +83,12 @@ sub count {
     return $count;
 }
 
+sub has_children {
+    my $self = shift();
+    return unless $self->{' children'};
+    return @{$self->{' children'}} > 0;
+}
+
 =head2 outline
 
     $child_outline = $parent_outline->outline();
@@ -172,32 +178,50 @@ sub dest {
     return $self->destination($destination, $location, @args);
 }
 
-=head2 open
+=head2 is_open
 
-    $outline->open();
+    # Get
+    my $boolean = $outline->is_open();
 
-Set the status of the outline to open (i.e. expanded).
+    # Set
+    my $outline = $outline->is_open($boolean);
+
+Get/set whether the outline is expanded or collapsed.
 
 =cut
 
-sub open {
+sub is_open {
     my $self = shift();
-    delete $self->{' closed'};
+
+    # Get
+    unless (@_) {
+        my $count = $self->count();
+        return unless $count;
+        return $self->count() > 0;
+    }
+
+    # Set
+    my $is_open = shift();
+    if ($is_open) {
+        delete $self->{' closed'};
+    }
+    else {
+        $self->{' closed'} = 1;
+    }
+
     return $self;
 }
 
-=head2 closed
+# Deprecated
+sub open {
+    my $self = shift();
+    return $self->is_open(1);
+}
 
-    $outline = $outline->closed();
-
-Set the status of the outline to closed (i.e. collapsed).
-
-=cut
-
+# Deprecated
 sub closed {
     my $self = shift();
-    $self->{' closed'} = 1;
-    return $self;
+    return $self->is_open(0);
 }
 
 =head2 uri
