@@ -19,10 +19,6 @@ PDF::API2::Outline - Manage PDF outlines (a.k.a. bookmarks)
 
 =over
 
-=item $outline = PDF::API2::Outline->new($api, $parent, $prev)
-
-Returns a new outline object (called from $outlines->outline()).
-
 =cut
 
 sub new {
@@ -135,116 +131,87 @@ sub outline {
     return $child;
 }
 
-=item $outline->dest($page_object, %position)
+=item $outline->destination($destination, $location, @args)
 
-Sets the destination page and optional position of the outline.
+Sets the destination page and optional position of the outline.  C<$location>
+and C<@args> are as defined in L<PDF::API2::NamedDestination/"destination">.
 
-%position can be any of the following:
-
-=over
-
-=item -fit => 1
-
-Display the page designated by page, with its contents magnified just enough to
-fit the entire page within the window both horizontally and vertically. If the
-required horizontal and vertical magnification factors are different, use the
-smaller of the two, centering the page within the window in the other dimension.
-
-=item -fith => $top
-
-Display the page designated by page, with the vertical coordinate $top
-positioned at the top edge of the window and the contents of the page magnified
-just enough to fit the entire width of the page within the window.
-
-=item -fitv => $left
-
-Display the page designated by page, with the horizontal coordinate $left
-positioned at the left edge of the window and the contents of the page magnified
-just enough to fit the entire height of the page within the window.
-
-=item -fitr => [$left, $bottom, $right, $top]
-
-Display the page designated by page, with its contents magnified just enough to
-fit the rectangle specified by the coordinates $left, $bottom, $right, and $top
-entirely within the window both horizontally and vertically. If the required
-horizontal and vertical magnification factors are different, use the smaller of
-the two, centering the rectangle within the window in the other dimension.
-
-=item -fitb => 1
-
-Display the page designated by page, with its contents magnified just enough to
-fit its bounding box entirely within the window both horizontally and
-vertically. If the required horizontal and vertical magnification factors are
-different, use the smaller of the two, centering the bounding box within the
-window in the other dimension.
-
-=item -fitbh => $top
-
-Display the page designated by page, with the vertical coordinate $top
-positioned at the top edge of the window and the contents of the page magnified
-just enough to fit the entire width of its bounding box within the window.
-
-=item -fitbv => $left
-
-Display the page designated by page, with the horizontal coordinate $left
-positioned at the left edge of the window and the contents of the page magnified
-just enough to fit the entire height of its bounding box within the window.
-
-=item -xyz => [$left, $top, $zoom]
-
-Display the page designated by page, with the coordinates ($left, $top)
-positioned at the top-left corner of the window and the contents of the page
-magnified by the factor $zoom. A zero (0) value for any of the parameters $left,
-$top, or $zoom specifies that the current value of that parameter is to be
-retained unchanged.
-
-=back
-
-=item $outline->dest($name)
-
-Connect the outline to a "Named Destination" defined elsewhere.
+C<$destination> can optionally be the name of a named destination defined
+elsewhere.
 
 =cut
 
-sub dest {
-    my ($self, $page, %options) = @_;
+sub _destination {
+    require PDF::API2::NamedDestination;
+    return PDF::API2::NamedDestination::_destination(@_);
+}
+
+sub destination {
+    my ($self, $destination, $location, @args) = @_;
+
+    # Remove an existing action dictionary
     delete $self->{'A'};
 
-    if (ref($page)) {
-        $options{'-xyz'} = [undef, undef, undef] unless scalar keys %options;
-        $self->{'Dest'} = _fit($page, %options);
+    if (ref($destination)) {
+        # Page Destination
+        $self->{'Dest'} = _destination($destination, $location, @args);
     }
     else {
-        $self->{'Dest'} = PDFStr($page);
+        # Named Destination
+        $self->{'Dest'} = PDFStr($destination);
     }
 
     return $self;
 }
 
-=item $outline->url($url)
+# Deprecated: Use destination with the indicated changes
+sub dest {
+    my ($self, $destination, $location, @args) = @_;
 
-Launch $url when the outline item is activated.
+    # Replace -fit => 1 or -fitb => 1 with just the location
+    if (defined $location) {
+        @args = () if $location eq '-fit' or $location eq '-fitb';
+    }
+
+    # Convert args from arrayref to array
+    @args = @{$args[0]} if @args and ref($args[0]) eq 'ARRAY';
+
+    # Remove hyphen prefix from location
+    $location =~ s/^-// if defined $location;
+
+    return $self->destination($destination, $location, @args);
+}
+
+=item $outline->uri($uri)
+
+Launch a URI -- typically a web page -- when the outline item is activated.
 
 =cut
 
-sub url {
-    my ($self, $url) = @_;
+# Deprecated (renamed)
+sub url { return uri(@_) }
+
+sub uri {
+    my ($self, $uri) = @_;
     delete $self->{'Dest'};
 
     $self->{'A'}          = PDFDict();
     $self->{'A'}->{'S'}   = PDFName('URI');
-    $self->{'A'}->{'URI'} = PDFStr($url);
+    $self->{'A'}->{'URI'} = PDFStr($uri);
 
     return $self;
 }
 
-=item $outline->file($filename)
+=item $outline->launch($file)
 
-Launch an application or file when the outline item is activated
+Launch an application or file when the outline item is activated.
 
 =cut
 
-sub file {
+# Deprecated (renamed)
+sub file { return launch(@_) }
+
+sub launch {
     my ($self, $file) = @_;
     delete $self->{'Dest'};
 
@@ -263,55 +230,39 @@ the viewport (see dest for details).
 
 =cut
 
-# Deprecated
+# Deprecated (renamed)
 sub pdfile { return pdf_file(@_) }
 
+# Deprecated; use pdf instead, with the indicated changes
 sub pdf_file {
-    my ($self, $file, $page_number, %options) = @_;
+    my ($self, $file, $page_number, $location, @args);
+
+    # Replace -fit => 1 or -fitb => 1 with just the location
+    if (defined $location) {
+        @args = () if $location eq '-fit' or $location eq '-fitb';
+    }
+
+    # Convert args from arrayref to array
+    @args = @{$args[0]} if @args and ref($args[0]) eq 'ARRAY';
+
+    # Remove hyphen prefix from location
+    $location =~ s/^-// if defined $location;
+
+    return $self->pdf($file, $page_number, $location, @args);
+}
+
+sub pdf {
+    my ($self, $file, $page_number, $location, @args) = @_;
+    $page_number //= 0;
     delete $self->{'Dest'};
 
     $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('GoToR');
     $self->{'A'}->{'F'} = PDFStr($file);
-    $self->{'A'}->{'D'} = _fit(PDFNum($page_number // 0), %options);
+
+    $self->{'A'}->{'D'} = _destination(PDFNum($page_number), $location, @args);
 
     return $self;
-}
-
-sub __fit {
-    require PDF::API2::NamedDestination;
-    return PDF::API2::NamedDestination::_destination(@_);
-}
-
-sub _fit {
-    my ($destination, %options) = @_;
-
-    if (defined $options{'-fit'}) {
-        return __fit($destination, 'fit');
-    }
-    elsif (defined $options{'-fith'}) {
-        return __fit($destination, 'fith', $options{'-fith'});
-    }
-    elsif (defined $options{'-fitb'}) {
-        return __fit($destination, 'fitb');
-    }
-    elsif (defined $options{'-fitbh'}) {
-        return __fit($destination, 'fitbh', $options{'-fitbh'});
-    }
-    elsif (defined $options{'-fitv'}) {
-        return __fit($destination, 'fitv', $options{'-fitv'});
-    }
-    elsif (defined $options{'-fitbv'}) {
-        return __fit($destination, 'fitbv', $options{'-fitbv'});
-    }
-    elsif (defined $options{'-fitr'}) {
-        return __fit($destination, 'fitr', @{$options{'-fitr'}});
-    }
-    elsif (defined $options{'-xyz'}) {
-        return __fit($destination, 'xyz', @{$options{'-xyz'}});
-    }
-
-    return;
 }
 
 sub fix_outline {
