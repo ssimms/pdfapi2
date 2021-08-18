@@ -125,14 +125,27 @@ sub outline {
 
 =head2 title
 
+    # Get
+    my $title = $outline->title();
+
+    # Set
     $outline = $outline->title($text);
 
-Set the title of the outline.
+Get/set the title of the outline item.
 
 =cut
 
 sub title {
-    my ($self, $text) = @_;
+    my $self = shift();
+
+    # Get
+    unless (@_) {
+        return unless $self->{'Title'};
+        return $self->{'Title'}->val();
+    }
+
+    # Set
+    my $text = shift();
     $self->{'Title'} = PDFStr($text);
     return $self;
 }
