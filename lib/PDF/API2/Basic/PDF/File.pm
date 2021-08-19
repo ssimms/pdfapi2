@@ -266,6 +266,64 @@ sub open {
     return $self;
 }
 
+sub version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->header_version($version);
+        if ($version >= 1.4) {
+            $self->trailer_version($version);
+        }
+        else {
+            delete $self->{'Root'}->{'Version'};
+            $self->out_obj($self->{'Root'});
+        }
+        return $version;
+    }
+
+    my $header_version = $self->header_version();
+    my $trailer_version = $self->trailer_version();
+    return $trailer_version if $trailer_version > $header_version;
+    return $header_version;
+}
+
+sub header_version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->{' version'} = $version;
+    }
+
+    return $self->{' version'};
+}
+
+sub trailer_version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->{'Root'}->{'Version'} = PDFName($version);
+        $self->out_obj($self->{'Root'});
+        return $version;
+    }
+
+    return unless $self->{'Root'}->{'Version'};
+    $self->{'Root'}->{'Version'}->realise();
+    return $self->{'Root'}->{'Version'}->val();
+}
+
+sub require_version {
+    my ($self, $min_version) = @_;
+    my $current_version = $self->version();
+    $self->version($min_version) if $current_version < $min_version;
+    return $current_version;
+}
+
 =head2 $p->release()
 
 Releases ALL of the memory used by the PDF document and all of its

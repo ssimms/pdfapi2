@@ -766,24 +766,7 @@ Get/set the PDF version (e.g. 1.4)
 
 sub version {
     my $self = shift();
-
-    if (@_) {
-        my $version = shift();
-        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
-        $self->header_version($version);
-        if ($version >= 1.4) {
-            $self->trailer_version($version);
-        }
-        else {
-            delete $self->{'pdf'}->{'Root'}->{'Version'};
-        }
-        return $version;
-    }
-
-    my $header_version = $self->header_version();
-    my $trailer_version = $self->trailer_version();
-    return $trailer_version if $trailer_version > $header_version;
-    return $header_version;
+    return $self->{'pdf'}->version(@_);
 }
 
 =item $version = $pdf->header_version([$new_version])
@@ -794,14 +777,7 @@ Get/set the PDF version stored in the file header.
 
 sub header_version {
     my $self = shift();
-
-    if (@_) {
-        my $version = shift();
-        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
-        $self->{'pdf'}->{' version'} = $version;
-    }
-
-    return $self->{'pdf'}->{' version'};
+    return $self->{'pdf'}->header_version(@_);
 }
 
 =item $version = $pdf->trailer_version([$new_version])
@@ -813,18 +789,7 @@ trailer, if it exists.  Returns C<undef> otherwise.
 
 sub trailer_version {
     my $self = shift();
-
-    if (@_) {
-        my $version = shift();
-        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
-        $self->{'pdf'}->{'Root'}->{'Version'} = PDFName($version);
-        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
-        return $version;
-    }
-
-    return unless $self->{'pdf'}->{'Root'}->{'Version'};
-    $self->{'pdf'}->{'Root'}->{'Version'}->realise();
-    return $self->{'pdf'}->{'Root'}->{'Version'}->val();
+    return $self->{'pdf'}->trailer_version(@_);
 }
 
 =item $prev_version = $pdf->require_version($version)
