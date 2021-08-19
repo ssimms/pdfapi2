@@ -2430,7 +2430,7 @@ __END__
 
 =back
 
-=head1 BACKWARD COMPATIBILITY
+=head1 BACKWARD COMPATIBILITY GOAL
 
 Code written using PDF::API2 should continue to work unchanged for the life of
 most long-term-stable (LTS) server distributions.  Specifically, it should
@@ -2442,7 +2442,8 @@ In PDF::API2, method names, options, and functionality change over time.
 Functionality that's documented (not just in source code comments) should also
 continue working for the same time period, though deprecation warnings may be
 added.  There may be exceptions if your code happens to rely on bugs that get
-fixed.
+fixed, including when a method in PDF::API2 is changed to more closely follow
+the PDF specification.
 
 Undocumented features, features marked as experimental, and underlying data
 structures may change at any time.  An exception is for features that were
@@ -2453,10 +2454,6 @@ Before migrating to a new LTS server version, it's recommended that you upgrade
 to the latest version of PDF::API2, enable C<use warnings>, and check your
 server logs for deprecations.  Once these are resolved, your code should be safe
 to use for any PDF::API2 releases during that LTS support window.
-
-Please note that this section does not constitute a warranty or guarantee.
-Failure to meet this backward compatibility goal will generally be considered a
-bug, but the license's "no warranty" clause continues to apply.
 
 =head1 AUTHOR
 
