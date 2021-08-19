@@ -73,6 +73,9 @@
       been updated to match those used in Named Destinations.  Various bugs have
       been fixed when reading or modifying outlines in existing PDFs.
 
+    - Updated annotation documentation.  Revised methods and arguments to match
+      those used in Named Destinations and Outlines.
+
     - A PDF version number specified in the document catalog is now respected by
       $pdf->version().  Added $pdf->header_version() and $pdf->trailer_version()
       accessors.
