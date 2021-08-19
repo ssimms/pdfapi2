@@ -66,6 +66,11 @@
     - Named Destinations are now fully documented, with updated method names and
       arguments.
 
+    - Outlines are now fully documented, with additional methods for examining
+      and modifying the outline tree.  Existing method names and arguments have
+      been updated to match those used in Named Destinations.  Various bugs have
+      been fixed when reading or modifying outlines in existing PDFs.
+
 
 2.041     2021-07-27
 

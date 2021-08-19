@@ -40,39 +40,36 @@ sub new {
     return $self;
 }
 
-sub parent {
+=head2 Examine the Outline Tree
+
+=head3 has_children
+
+    my $boolean = $outline->has_children();
+
+Return true if the current outline item has child items.
+
+=cut
+
+sub has_children {
     my $self = shift();
-    $self->{'Parent'} = shift() if defined $_[0];
-    return $self->{'Parent'};
+
+    # Opened by PDF::API2
+    return 1 if exists $self->{'First'};
+
+    # Created by PDF::API2
+    return @{$self->{' children'}} > 0 if exists $self->{' children'};
+
+    return;
 }
 
-sub prev {
-    my $self = shift();
-    $self->{'Prev'} = shift() if defined $_[0];
-    return $self->{'Prev'};
-}
+=head3 count
 
-sub next {
-    my $self = shift();
-    $self->{'Next'} = shift() if defined $_[0];
-    return $self->{'Next'};
-}
+    my $integer = $outline->count();
 
-sub first {
-    my $self = shift();
-    if (defined $self->{' children'} and defined $self->{' children'}->[0]) {
-        $self->{'First'} = $self->{' children'}->[0];
-    }
-    return $self->{'First'};
-}
+Return the number of descendants that are visible when the current outline item
+is open (expanded).
 
-sub last {
-    my $self = shift();
-    if (defined $self->{' children'} and defined $self->{' children'}->[-1]) {
-        $self->{'Last'} = $self->{' children'}->[-1];
-    }
-    return $self->{'Last'};
-}
+=cut
 
 sub count {
     my $self = shift();
@@ -114,21 +111,86 @@ sub _load_children {
     return $self;
 }
 
-sub has_children {
+=head3 first
+
+    my $child = $outline->first();
+
+Return the first child of the current outline level, if one exists.
+
+=cut
+
+sub first {
     my $self = shift();
-
-    # Opened by PDF::API2
-    return 1 if exists $self->{'First'};
-
-    # Created by PDF::API2
-    return @{$self->{' children'}} > 0 if exists $self->{' children'};
-
-    return;
+    if (defined $self->{' children'} and defined $self->{' children'}->[0]) {
+        $self->{'First'} = $self->{' children'}->[0];
+    }
+    return $self->{'First'};
 }
 
-=head2 insert
+=head3 last
 
-    $child_outline = $parent_outline->insert();
+    my $child = $outline->last();
+
+Return the last child of the current outline level, if one exists.
+
+=cut
+
+sub last {
+    my $self = shift();
+    if (defined $self->{' children'} and defined $self->{' children'}->[-1]) {
+        $self->{'Last'} = $self->{' children'}->[-1];
+    }
+    return $self->{'Last'};
+}
+
+=head3 parent
+
+    my $parent = $outline->parent();
+
+Return the parent of the current item, if not at the top level of the outline
+tree.
+
+=cut
+
+sub parent {
+    my $self = shift();
+    $self->{'Parent'} = shift() if defined $_[0];
+    return $self->{'Parent'};
+}
+
+=head3 prev
+
+    my $sibling = $outline->prev();
+
+Return the previous item of the current level of the outline tree.
+
+=cut
+
+sub prev {
+    my $self = shift();
+    $self->{'Prev'} = shift() if defined $_[0];
+    return $self->{'Prev'};
+}
+
+=head3 next
+
+    my $sibling = $outline->next();
+
+Return the next item of the current level of the outline tree.
+
+=cut
+
+sub next {
+    my $self = shift();
+    $self->{'Next'} = shift() if defined $_[0];
+    return $self->{'Next'};
+}
+
+=head2 Modify the Outline Tree
+
+=head3 insert
+
+    my $child = $outline->insert();
 
 Add an outline item at the end of the current outline's list of children.
 
@@ -152,9 +214,9 @@ sub insert {
     return $child;
 }
 
-=head2 insert_after
+=head3 insert_after
 
-    $sibling_outline = $outline->insert_after();
+    my $sibling = $outline->insert_after();
 
 Add an outline item immediately following the current item.
 
@@ -175,9 +237,9 @@ sub insert_after {
     return $sibling;
 }
 
-=head2 insert_before
+=head3 insert_before
 
-    $sibling_outline = $outline->insert_before();
+    $sibling = $outline->insert_before();
 
 Add an outline item immediately preceding the current item.
 
@@ -212,7 +274,7 @@ sub _reset_children {
     return $self;
 }
 
-=head2 delete
+=head3 delete
 
     $outline->delete();
 
@@ -237,7 +299,55 @@ sub delete {
     return;
 }
 
-=head2 title
+=head3 is_open
+
+    # Get
+    my $boolean = $outline->is_open();
+
+    # Set
+    my $outline = $outline->is_open($boolean);
+
+Get/set whether the outline is expanded or collapsed.
+
+=cut
+
+sub is_open {
+    my $self = shift();
+
+    # Get
+    unless (@_) {
+        # Created by PDF::API2
+        return $self->{' closed'} ? 0 : 1 if exists $self->{' closed'};
+
+        # Opened by PDF::API2
+        return $self->{'Count'}->val() > 0 if exists $self->{'Count'};
+
+        # Default
+        return 1;
+    }
+
+    # Set
+    my $is_open = shift();
+    $self->{' closed'} = (not $is_open);
+
+    return $self;
+}
+
+# Deprecated
+sub open {
+    my $self = shift();
+    return $self->is_open(1);
+}
+
+# Deprecated
+sub closed {
+    my $self = shift();
+    return $self->is_open(0);
+}
+
+=head2 Set Outline Attributes
+
+=head3 title
 
     # Get
     my $title = $outline->title();
@@ -264,7 +374,7 @@ sub title {
     return $self;
 }
 
-=head2 destination
+=head3 destination
 
     $outline = $outline->destination($destination, $location, @args);
 
@@ -317,53 +427,7 @@ sub dest {
     return $self->destination($destination, $location, @args);
 }
 
-=head2 is_open
-
-    # Get
-    my $boolean = $outline->is_open();
-
-    # Set
-    my $outline = $outline->is_open($boolean);
-
-Get/set whether the outline is expanded or collapsed.
-
-=cut
-
-sub is_open {
-    my $self = shift();
-
-    # Get
-    unless (@_) {
-        # Created by PDF::API2
-        return $self->{' closed'} ? 0 : 1 if exists $self->{' closed'};
-
-        # Opened by PDF::API2
-        return $self->{'Count'}->val() > 0 if exists $self->{'Count'};
-
-        # Default
-        return 1;
-    }
-
-    # Set
-    my $is_open = shift();
-    $self->{' closed'} = (not $is_open);
-
-    return $self;
-}
-
-# Deprecated
-sub open {
-    my $self = shift();
-    return $self->is_open(1);
-}
-
-# Deprecated
-sub closed {
-    my $self = shift();
-    return $self->is_open(0);
-}
-
-=head2 uri
+=head3 uri
 
     $outline = $outline->uri($uri);
 
@@ -385,7 +449,7 @@ sub uri {
     return $self;
 }
 
-=head2 launch
+=head3 launch
 
     $outline->launch($file);
 
@@ -407,7 +471,7 @@ sub launch {
     return $self;
 }
 
-=head2 pdf
+=head3 pdf
 
     $outline = $outline->pdf($filename, $page_number, $location, @args);
 
