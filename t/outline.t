@@ -93,4 +93,68 @@ ok(!$outlines->first->first->is_open(),
 is($outlines->first->title(), 'Test Outline',
    q{$outline->title() returns expected value from opened PDF});
 
+$pdf = PDF::API2->new(compress => 0);
+$page1 = $pdf->page();
+$page2 = $pdf->page();
+$outlines = $pdf->outlines();
+
+$a = $outlines->insert();
+$b = $outlines->insert();
+$c = $outlines->insert();
+$d = $a->insert_after();
+
+is($outlines->count(), 4,
+   q{3x insert + insert_after = 4 items});
+
+$e = $c->insert_before();
+
+is($outlines->count(), 5,
+   q{3x insert + insert_after + insert_before = 5 items});
+
+is($a->next(), $d,
+   q{$insert->insert_after() sets $insert->next()});
+
+is($d->prev(), $a,
+   q{$insert->insert_after() sets $sibling->prev()});
+
+is($b->prev(), $d,
+   q{$insert->insert_after() sets $insert->next->prev()});
+
+is($d->next(), $b,
+   q{$insert->insert_after() sets $sibling->next()});
+
+is($c->prev(), $e,
+   q{$insert->insert_before() sets $insert->prev()});
+
+is($e->next(), $c,
+   q{$insert->insert_before() sets $sibling->next()});
+
+is($b->next(), $e,
+   q{$insert->insert_before() sets $insert->prev->next()});
+
+is($e->prev(), $b,
+   q{$insert->insert_before() sets $sibling->prev()});
+
+my $f = $a->insert_before();
+
+is($a->prev(), $f,
+   q{$item->insert_before() on first item sets $item->prev()});
+
+is($f->next(), $a,
+   q{$item->insert_before() on first item sets $sibling->next()});
+
+ok(!$f->prev(),
+   q{$item->insert_before() on first item doesn't set $sibling->prev()});
+
+my $g = $c->insert_after();
+
+is($c->next(), $g,
+   q{$item->insert_after() on last item sets $item->next()});
+
+is($g->prev(), $c,
+   q{$item->insert_after() on last item sets $sibling->prev()});
+
+ok(!$g->next(),
+   q{$item->insert_after() on last item doesn't set $sibling->next()});
+
 done_testing();

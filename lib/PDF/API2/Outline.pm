@@ -126,15 +126,18 @@ sub has_children {
     return;
 }
 
-=head2 outline
+=head2 insert
 
-    $child_outline = $parent_outline->outline();
+    $child_outline = $parent_outline->insert();
 
-Add an entry at the end of the current outline.
+Add an outline item at the end of the current outline's list of children.
 
 =cut
 
-sub outline {
+# Deprecated (renamed)
+sub outline { return insert(@_) }
+
+sub insert {
     my $self = shift();
 
     my $child = PDF::API2::Outline->new($self->{' api'}, $self);
@@ -148,6 +151,76 @@ sub outline {
 
     return $child;
 }
+
+=head2 insert_after
+
+    $sibling_outline = $outline->insert_after();
+
+Add an outline item immediately following the current item.
+
+=cut
+
+sub insert_after {
+    my $self = shift();
+
+    my $sibling = PDF::API2::Outline->new($self->{' api'}, $self->parent());
+    $sibling->next($self->next());
+    $self->next->prev($sibling) if $self->next();
+    $self->next($sibling);
+    $sibling->prev($self);
+    unless ($sibling->is_obj($self->{' api'}->{'pdf'})) {
+        $self->{' api'}->{'pdf'}->new_obj($sibling);
+    }
+    $self->parent->_reset_children();
+    return $sibling;
+}
+
+=head2 insert_before
+
+    $sibling_outline = $outline->insert_before();
+
+Add an outline item immediately preceding the current item.
+
+=cut
+
+sub insert_before {
+    my $self = shift();
+
+    my $sibling = PDF::API2::Outline->new($self->{' api'}, $self->parent());
+    $sibling->prev($self->prev());
+    $self->prev->next($sibling) if $self->prev();
+    $self->prev($sibling);
+    $sibling->next($self);
+    unless ($sibling->is_obj($self->{' api'}->{'pdf'})) {
+        $self->{' api'}->{'pdf'}->new_obj($sibling);
+    }
+    $self->parent->_reset_children();
+    return $sibling;
+}
+
+sub _reset_children {
+    my $self = shift();
+    my $item = $self->first();
+    $self->{' children'} = [];
+    return unless $item;
+
+    push @{$self->{' children'}}, $item;
+    while ($item->next()) {
+        $item = $item->next();
+        push @{$self->{' children'}}, $item;
+    }
+    return $self;
+}
+
+=head2 delete
+
+    $outline->delete();
+
+Remove the current outline item from the outline tree.  If the item has any
+children, they will effectively be deleted as well since they will no longer be
+linked.
+
+=cut
 
 sub delete {
     my $self = shift();
