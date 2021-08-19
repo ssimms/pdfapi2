@@ -1814,26 +1814,39 @@ sub text_justified {
     return $width;
 }
 
-=item $width = $txt->advancewidth($string, %text_state)
+=item $width = $txt->text_width($string, %text_state)
 
 Returns the width of the string based on all currently set text state
 attributes.  These can optionally be overridden.
 
 =cut
 
-sub advancewidth {
+# Deprecated (renamed)
+sub advancewidth { return text_width(@_) }
+
+sub text_width {
     my ($self, $text, %opts) = @_;
     return 0 unless defined($text) and length($text);
+
     foreach my $k (qw(font fontsize wordspace charspace hscale)) {
         $opts{$k} = $self->{" $k"} unless defined $opts{$k};
     }
-    my $glyph_width = $opts{'font'}->width($text) * $opts{'fontsize'};
-    my $num_space = $text =~ y/\x20/\x20/;
-    my $num_char = length($text);
-    my $word_spaces = $opts{'wordspace'} * $num_space;
-    my $char_spaces = $opts{'charspace'} * ($num_char - 1);
-    my $advance = ($glyph_width + $word_spaces + $char_spaces) * $opts{'hscale'} / 100;
-    return $advance;
+
+    # Width of glyphs
+    my $width = $opts{'font'}->width($text) * $opts{'fontsize'};
+
+    # Width of space characters
+    my $space_count = $text =~ y/\x20/\x20/;
+    $width += $opts{'wordspace'} * $space_count;
+
+    # Width of space between characters
+    my $char_count = length($text);
+    $width += $opts{'charspace'} * ($char_count - 1);
+
+    # Horizontal scale multiplier
+    $width *= $opts{'hscale'} / 100;
+
+    return $width;
 }
 
 sub _text_fill_line {

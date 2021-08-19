@@ -46,6 +46,8 @@
       vs. hundredths for "-bold", so multiply the old value by 10 when
       migrating.
 
+    - Renamed $content->advancewidth() to $content->text_width().
+
     - Tentatively deprecated $pdf->cjkfont.  If you're successfully using this
       method for CJK font support, read PDF::API2::Resource::CIDFont::CJKFont
       and contact me to discuss your use case.
