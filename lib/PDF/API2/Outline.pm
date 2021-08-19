@@ -36,6 +36,7 @@ sub new {
     $self->{'Prev'}   = $prev   if defined $prev;
     $self->{' api'}   = $api;
     weaken $self->{' api'};
+    weaken $self->{'Parent'};
     return $self;
 }
 
@@ -80,6 +81,7 @@ sub count {
     # current item is open.
     my $count = 0;
     if ($self->has_children()) {
+        $self->_load_children() unless exists $self->{' children'};
         $count += @{$self->{' children'}};
         foreach my $child (@{$self->{' children'}}) {
             next unless $child->has_children();
@@ -95,10 +97,33 @@ sub count {
     return $count;
 }
 
+sub _load_children {
+    my $self = shift();
+    my $item = $self->{'First'};
+    return unless $item;
+    $item->realise();
+    bless $item, __PACKAGE__;
+
+    push @{$self->{' children'}}, $item;
+    while ($item->next()) {
+        $item = $item->next();
+        $item->realise();
+        bless $item, __PACKAGE__;
+        push @{$self->{' children'}}, $item;
+    }
+    return $self;
+}
+
 sub has_children {
     my $self = shift();
-    return unless $self->{' children'};
-    return @{$self->{' children'}} > 0;
+
+    # Opened by PDF::API2
+    return 1 if exists $self->{'First'};
+
+    # Created by PDF::API2
+    return @{$self->{' children'}} > 0 if exists $self->{' children'};
+
+    return;
 }
 
 =head2 outline
@@ -113,14 +138,30 @@ sub outline {
     my $self = shift();
 
     my $child = PDF::API2::Outline->new($self->{' api'}, $self);
-    $child->prev($self->{' children'}->[-1]) if defined $self->{' children'};
-    $self->{' children'}->[-1]->next($child) if defined $self->{' children'};
+    $self->{' children'} //= [];
+    $child->prev($self->{' children'}->[-1]) if @{$self->{' children'}};
+    $self->{' children'}->[-1]->next($child) if @{$self->{' children'}};
     push @{$self->{' children'}}, $child;
     unless ($child->is_obj($self->{' api'}->{'pdf'})) {
         $self->{' api'}->{'pdf'}->new_obj($child);
     }
 
     return $child;
+}
+
+sub delete {
+    my $self = shift();
+
+    my $prev = $self->prev();
+    my $next = $self->next();
+    $prev->next($next) if defined $prev;
+    $next->prev($prev) if defined $next;
+
+    my $siblings = $self->parent->{' children'};
+    @$siblings = grep { $_ ne $self } @$siblings;
+    delete $self->parent->{' children'} unless $self->parent->has_children();
+
+    return;
 }
 
 =head2 title
@@ -220,19 +261,19 @@ sub is_open {
 
     # Get
     unless (@_) {
-        my $count = $self->count();
-        return unless $count;
-        return $self->count() > 0;
+        # Created by PDF::API2
+        return $self->{' closed'} ? 0 : 1 if exists $self->{' closed'};
+
+        # Opened by PDF::API2
+        return $self->{'Count'}->val() > 0 if exists $self->{'Count'};
+
+        # Default
+        return 1;
     }
 
     # Set
     my $is_open = shift();
-    if ($is_open) {
-        delete $self->{' closed'};
-    }
-    else {
-        $self->{' closed'} = 1;
-    }
+    $self->{' closed'} = (not $is_open);
 
     return $self;
 }

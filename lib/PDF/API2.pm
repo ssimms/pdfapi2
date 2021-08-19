@@ -2375,6 +2375,7 @@ sub outlines {
     require PDF::API2::Outlines;
     my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
     if ($obj) {
+        $obj->realise();
         bless $obj, 'PDF::API2::Outlines';
         $obj->{' api'} = $self;
         weaken $obj->{' api'};
