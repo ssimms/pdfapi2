@@ -766,12 +766,78 @@ Get/set the PDF version (e.g. 1.4)
 
 sub version {
     my $self = shift();
-    if (scalar @_) {
+
+    if (@_) {
         my $version = shift();
         croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
-        $self->{'pdf'}->{' version'} = $1;
+        $self->header_version($version);
+        if ($version >= 1.4) {
+            $self->trailer_version($version);
+        }
+        else {
+            delete $self->{'pdf'}->{'Root'}->{'Version'};
+        }
+        return $version;
     }
+
+    my $header_version = $self->header_version();
+    my $trailer_version = $self->trailer_version();
+    return $trailer_version if $trailer_version > $header_version;
+    return $header_version;
+}
+
+=item $version = $pdf->header_version([$new_version])
+
+Get/set the PDF version stored in the file header.
+
+=cut
+
+sub header_version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->{'pdf'}->{' version'} = $version;
+    }
+
     return $self->{'pdf'}->{' version'};
+}
+
+=item $version = $pdf->trailer_version([$new_version])
+
+Get/set the PDF version stored in the document catalog, referenced in the
+trailer, if it exists.  Returns C<undef> otherwise.
+
+=cut
+
+sub trailer_version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->{'pdf'}->{'Root'}->{'Version'} = PDFName($version);
+        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
+        return $version;
+    }
+
+    return unless $self->{'pdf'}->{'Root'}->{'Version'};
+    $self->{'pdf'}->{'Root'}->{'Version'}->realise();
+    return $self->{'pdf'}->{'Root'}->{'Version'}->val();
+}
+
+=item $prev_version = $pdf->require_version($version)
+
+Ensures that the PDF version is at least C<$version>.
+
+=cut
+
+sub require_version {
+    my ($self, $min_version) = @_;
+    my $current_version = $self->version();
+    $self->version($min_version) if $current_version < $min_version;
+    return $current_version;
 }
 
 =item $bool = $pdf->isEncrypted()
