@@ -21,9 +21,9 @@ PDF::API2::Outline - Manage PDF outlines (a.k.a. bookmarks)
     my $outlines = $pdf->outlines();
 
     # Add an entry
-    my $outline = $outlines->outline();
-    $outline->title("First Page");
-    $outline->destination($pdf->open_page(1));
+    my $item = $outlines->insert();
+    $item->title('First Page');
+    $item->destination($pdf->open_page(1));
 
 =head1 METHODS
 
