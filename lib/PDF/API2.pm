@@ -2363,9 +2363,12 @@ sub shading {
     return $obj;
 }
 
-=item $otls = $pdf->outlines()
+=item $outlines = $pdf->outlines()
 
-Returns a new or existing outlines object.
+Creates (if needed) and returns the document's outline tree, which is also known
+as its bookmarks or the table of contents, depending on the PDF reader.
+
+To examine or modify C<$outlines>, see L<PDF::API2::Outline>.
 
 =cut
 
