@@ -240,8 +240,8 @@ sub open {
     binmode $fh, ':raw';
     $fh->seek(0, 0);            # go to start of file
     $fh->read($buffer, 255);
-    unless ($buffer =~ m/^\%PDF\-([12]\.\d)+\s*$cr/mo) {
-        die "$filename not a PDF file version 1.x";
+    unless ($buffer =~ /^\%PDF\-([12]\.\d+)\s*$cr/m) {
+        croak "$filename does not appear to be a valid PDF";
     }
     $self->{' version'} = $1;
 
@@ -397,7 +397,7 @@ sub create_file {
     }
 
     $self->{' OUTFILE'} = $fh;
-    $fh->print('%PDF-' . ($self->{' version'} || '1.2') . "\n");
+    $fh->print('%PDF-' . ($self->{' version'} // '1.4') . "\n");
     $fh->print("%\xC6\xCD\xCD\xB5\n");   # and some binary stuff in a comment
     return $self;
 }
