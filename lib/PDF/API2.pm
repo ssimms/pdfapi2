@@ -2368,7 +2368,7 @@ sub shading {
 Creates (if needed) and returns the document's outline tree, which is also known
 as its bookmarks or the table of contents, depending on the PDF reader.
 
-To examine or modify C<$outlines>, see L<PDF::API2::Outline>.
+To examine or modify the outline tree, see L<PDF::API2::Outline>.
 
 =cut
 
