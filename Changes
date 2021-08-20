@@ -13,6 +13,7 @@
       - open_scalar -> from_string
       - stringify -> to_string
       - pages -> page_count
+      - importPageIntoForm -> embed_page
       - isEncrypted -> is_encrypted
       - xmpMetadata -> xml_metadata
 

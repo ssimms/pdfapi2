@@ -1505,15 +1505,15 @@ sub walk_obj {
     return $target_object;
 }
 
-=item $xoform = $pdf->importPageIntoForm($source_pdf, $source_page_number)
+=item $xoform = $pdf->embed_page($source_pdf, $source_page_number)
 
-Returns a Form XObject created by extracting the specified page from $source_pdf.
+Returns a Form XObject created by extracting the specified page from
+$source_pdf.
 
-This is useful if you want to transpose the imported page somewhat
-differently onto a page (e.g. two-up, four-up, etc.).
+This is useful if you want to transpose the imported page somewhat differently
+onto a page (e.g. two-up, four-up, etc.).
 
-If $source_page_number is 0 or -1, it will return the last page in the
-document.
+If $source_page_number is 0 or -1, it will return the last page in the document.
 
 B<Example:>
 
@@ -1523,7 +1523,7 @@ B<Example:>
     $gfx = $page->gfx();
 
     # Import Page 2 from the old PDF
-    $xo = $pdf->importPageIntoForm($old, 2);
+    $xo = $pdf->embed_page($old, 2);
 
     # Add it to the new PDF's first page at 1/2 scale
     $gfx->formimage($xo, 0, 0, 0.5);
@@ -1534,7 +1534,10 @@ B<Note:> You can only import a page from an existing PDF file.
 
 =cut
 
-sub importPageIntoForm {
+# Deprecated (renamed)
+sub importPageIntoForm { return embed_page(@_) }
+
+sub embed_page {
     my ($self, $s_pdf, $s_idx) = @_;
     $s_idx ||= 0;
 
