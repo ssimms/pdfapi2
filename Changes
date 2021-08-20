@@ -40,6 +40,10 @@
       media box, representing an amount in points to shrink the next larger box.
       This does not apply to the deprecated versions of these methods.
 
+    - Replaced pageLabel with page_labels.  The option syntax is slightly
+      different (pass options as a hash instead of a hashref; remove hyphens
+      from option names).
+
     - Created a convenience method $pdf->font, which combines corefont, ttfont,
       psfont, and bdfont.  Unlike corefont, font requires the exact name of one
       of the standard fonts.  Kerning is on by default (vs. off by default in

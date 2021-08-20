@@ -1140,97 +1140,109 @@ sub default {
     return $previous_value;
 }
 
-=item $pdf->pageLabel($index, $options)
+=item $pdf->page_labels($page_index, %options)
 
-Sets page label options.
+Describes how pages should be numbered beginning at the specified page index,
+where index zero is the first page.
 
-B<Supported Options:>
+    # Generate a 30-page PDF
+    my $pdf = PDF::API2->new();
+    $pdf->page() for 1..30;
+
+    # Number pages i to v, 1 to 20, and A-1 to A-5, respectively
+    $pdf->page_labels(0, style => 'roman');
+    $pdf->page_labels(5, style => 'decimal');
+    $pdf->page_labels(25, style => 'decimal', prefix => 'A-');
+
+    $pdf->save('sample.pdf');
+
+The following options are available:
 
 =over
 
-=item -style
+=item * style
 
-Roman, roman, decimal, Alpha or alpha.
+One of C<decimal> (standard decimal arabic numerals), C<Roman> (uppercase roman
+numerals), C<roman> (lowercase roman numerals), C<Alpha> (uppercase letters),
+or C<alpha> (lowercase letters).
 
-=item -start
+There is no default numbering style.  If omitted, the page label will be just
+the prefix (if set) or an empty string.
 
-Restart numbering at given number.
+=item * prefix
 
-=item -prefix
+The label prefix for pages in this range.
 
-Text prefix for numbering.
+=item * start
+
+An integer (default: 1) representing the first value to be used in this page
+range.
 
 =back
 
-B<Example:>
-
-    # Start with Roman Numerals
-    $pdf->pageLabel(0, {
-        -style => 'roman',
-    });
-
-    # Switch to Arabic
-    $pdf->pageLabel(4, {
-        -style => 'decimal',
-    });
-
-    # Numbering for Appendix A
-    $pdf->pageLabel(32, {
-        -start => 1,
-        -prefix => 'A-'
-    });
-
-    # Numbering for Appendix B
-    $pdf->pageLabel( 36, {
-        -start => 1,
-        -prefix => 'B-'
-    });
-
-    # Numbering for the Index
-    $pdf->pageLabel(40, {
-        -style => 'Roman'
-        -start => 1,
-        -prefix => 'Index '
-    });
-
 =cut
 
+# Deprecated; replace with page_labels, updating arguments as shown
 sub pageLabel {
     my $self = shift();
+    while (@_) {
+        my $page_index = shift();
 
-    $self->{'catalog'}->{'PageLabels'} ||= PDFDict();
-    $self->{'catalog'}->{'PageLabels'}->{'Nums'} ||= PDFArray();
+        # Pass options as a hash rather than a hashref
+        my %options = %{shift() // {}};
 
-    my $nums = $self->{'catalog'}->{'PageLabels'}->{'Nums'};
-    while (scalar @_) {
-        my $index = shift();
-        my $opts = shift();
-
-        $nums->add_elements(PDFNum($index));
-
-        my $d = PDFDict();
-        if (defined $opts->{'-style'}) {
-            $d->{'S'} = PDFName($opts->{'-style'} eq 'Roman' ? 'R' :
-                                $opts->{'-style'} eq 'roman' ? 'r' :
-                                $opts->{'-style'} eq 'Alpha' ? 'A' :
-                                $opts->{'-style'} eq 'alpha' ? 'a' : 'D');
+        # Remove leading hyphens from option names
+        if (exists $options{'-prefix'}) {
+            $options{'prefix'} = delete $options{'-prefix'};
         }
-        else {
-            $d->{'S'} = PDFName('D');
+        if (exists $options{'-start'}) {
+            $options{'start'} = delete $options{'-start'};
+        }
+        if (exists $options{'-style'}) {
+            $options{'style'} = delete $options{'-style'};
         }
 
-        if (defined $opts->{'-prefix'}) {
-            $d->{'P'} = PDFStr($opts->{'-prefix'});
-        }
+        # page_labels doesn't have a default numbering style, to be consistent
+        # with the spec.
+        $options{'style'} //= 'D';
 
-        if (defined $opts->{'-start'}) {
-            $d->{'St'} = PDFNum($opts->{'-start'});
-        }
-
-        $nums->add_elements($d);
+        # Set one set of page labels at a time (support for multiple sets of
+        # page labels by pageLabel was undocumented).
+        $self->page_labels($page_index, %options);
     }
 
+    # Return nothing (page_labels returns $self, matching other setters)
     return;
+}
+
+sub page_labels {
+    my ($self, $page_index, %options) = @_;
+
+    $self->{'catalog'}->{'PageLabels'} //= PDFDict();
+    $self->{'catalog'}->{'PageLabels'}->{'Nums'} //= PDFArray();
+
+    my $nums = $self->{'catalog'}->{'PageLabels'}->{'Nums'};
+    $nums->add_elements(PDFNum($page_index));
+
+    my $d = PDFDict();
+    if (exists $options{'style'}) {
+        unless ($options{'style'} and $options{'style'} =~ /^([rad])/i) {
+            croak 'Invalid page numbering style';
+        }
+        $d->{'S'} = PDFName($1 eq 'd' ? 'D' : $1);
+    }
+
+    if (exists $options{'prefix'}) {
+        $d->{'P'} = PDFStr($options{'prefix'} // '');
+    }
+
+    if (exists $options{'start'}) {
+        $d->{'St'} = PDFNum($options{'start'} // '');
+    }
+
+    $nums->add_elements($d);
+
+    return $self;
 }
 
 sub proc_pages {
