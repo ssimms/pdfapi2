@@ -7,6 +7,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use Carp;
 use Encode qw(:all);
+use English;
 use FileHandle;
 
 use PDF::API2::Basic::PDF::Utils;
@@ -132,10 +133,13 @@ sub new {
         $self->{'pdf'}->create_file($options{'file'});
         $self->{'partial_save'} = 1;
     }
-    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
-    my $version = eval { $PDF::API2::VERSION } || '(Unreleased Version)';
-    $self->info('Producer' => "PDF::API2 $version [$^O]");
+    # Deprecated; used by info and infoMetaAttributes but not their replacements
+    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title
+                              Subject Keywords)];
+
+    my $version = eval { $PDF::API2::VERSION } || 'Development Version';
+    $self->producer("PDF::API2 $version ($OSNAME)");
 
     return $self;
 }
