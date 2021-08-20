@@ -769,42 +769,6 @@ sub version {
     return $self->{'pdf'}->version(@_);
 }
 
-=item $version = $pdf->header_version([$new_version])
-
-Get/set the PDF version stored in the file header.
-
-=cut
-
-sub header_version {
-    my $self = shift();
-    return $self->{'pdf'}->header_version(@_);
-}
-
-=item $version = $pdf->trailer_version([$new_version])
-
-Get/set the PDF version stored in the document catalog, referenced in the
-trailer, if it exists.  Returns C<undef> otherwise.
-
-=cut
-
-sub trailer_version {
-    my $self = shift();
-    return $self->{'pdf'}->trailer_version(@_);
-}
-
-=item $prev_version = $pdf->require_version($version)
-
-Ensures that the PDF version is at least C<$version>.
-
-=cut
-
-sub require_version {
-    my ($self, $min_version) = @_;
-    my $current_version = $self->version();
-    $self->version($min_version) if $current_version < $min_version;
-    return $current_version;
-}
-
 =item $bool = $pdf->isEncrypted()
 
 Checks if the previously opened PDF is encrypted.

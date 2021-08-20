@@ -77,11 +77,7 @@
       those used in Named Destinations and Outlines.
 
     - A PDF version number specified in the document catalog is now respected by
-      $pdf->version().  Added $pdf->header_version() and $pdf->trailer_version()
-      accessors.
-
-    - Added $pdf->require_version($version) to increase the PDF version if
-      needed by certain features.
+      $pdf->version().
 
 
 2.041     2021-07-27

@@ -266,6 +266,12 @@ sub open {
     return $self;
 }
 
+=head2 $p->version($version)
+
+Gets/sets the PDF version (e.g. 1.4)
+
+=cut
+
 sub version {
     my $self = shift();
 
@@ -289,6 +295,12 @@ sub version {
     return $header_version;
 }
 
+=head2 $version = $p->header_version($version)
+
+Gets/sets the PDF version stored in the file header.
+
+=cut
+
 sub header_version {
     my $self = shift();
 
@@ -300,6 +312,12 @@ sub header_version {
 
     return $self->{' version'};
 }
+
+=head2 $version = $p->trailer_version($version)
+
+Gets/sets the PDF version stored in the document catalog.
+
+=cut
 
 sub trailer_version {
     my $self = shift();
@@ -316,6 +334,12 @@ sub trailer_version {
     $self->{'Root'}->{'Version'}->realise();
     return $self->{'Root'}->{'Version'}->val();
 }
+
+=head2 $prev_version = $p->require_version($version)
+
+Ensures that the PDF version is at least C<$version>.
+
+=cut
 
 sub require_version {
     my ($self, $min_version) = @_;
