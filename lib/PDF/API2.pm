@@ -797,41 +797,65 @@ sub is_encrypted {
     return defined($self->{'pdf'}->{'Encrypt'}) ? 1 : 0;
 }
 
-=head1 GENERIC METHODS
+=head1 VIEWER METHODS
 
-=over
+=head2 open_action
 
-=item $layout = $pdf->page_layout()
+    $pdf = $pdf->open_action($page, $location, @args);
 
-=item $pdf = $pdf->page_layout($layout)
+Set the destination in the PDF that should be displayed when the document is
+opened.
 
-Get or set the page layout that should be used when the PDF is opened.
+C<$page> may be either a page number or a page object.  The other parameters are
+as described in L<PDF::API2::NamedDestination>.
+
+=cut
+
+sub open_action {
+    my ($self, $page, @args) = @_;
+
+    # $page can be either a page number or a page object
+    $page = PDFNum($page) unless ref($page);
+
+    require PDF::API2::NamedDestination;
+    my $array = PDF::API2::NamedDestination::_destination($page, @args);
+    $self->{'catalog'}->{'OpenAction'} = $array;
+    $self->{'pdf'}->out_obj($self->{'catalog'});
+    return $self;
+}
+
+=head2 page_layout
+
+    $layout = $pdf->page_layout();
+    $pdf = $pdf->page_layout($layout);
+
+Get/set the page layout that should be used when the PDF is opened.
 
 C<$layout> is one of the following:
 
 =over
 
-=item single_page (or undef)
+=item * single_page (or undef)
 
 Display one page at a time.
 
-=item one_column
+=item * one_column
 
 Display the pages in one column (a.k.a. continuous).
 
-=item two_column_left
+=item * two_column_left
 
 Display the pages in two columns, with odd-numbered pages on the left.
 
-=item two_column_right
+=item * two_column_right
 
 Display the pages in two columns, with odd-numbered pages on the right.
 
-=item two_page_left
+=item * two_page_left
 
 Display two pages at a time, with odd-numbered pages on the left.
 
-=item two_page_right
+=item * two_page_right
 
 Display two pages at a time, with odd-numbered pages on the right.
 
@@ -869,39 +893,43 @@ sub page_layout {
     return $self;
 }
 
-=item $mode = $pdf->page_mode()
+=head2 page_mode
 
-=item $pdf = $pdf->page_mode($mode)
+    # Get
+    $mode = $pdf->page_mode();
 
-Get or set the page mode, which describes how the PDF should be displayed when
+    # Set
+    $pdf = $pdf->page_mode($mode);
+
+Get/set the page mode, which describes how the PDF should be displayed when
 opened.
 
 C<$mode> is one of the following:
 
 =over
 
-=item none (or undef)
+=item * none (or undef)
 
 Neither outlines nor thumbnails should be displayed.
 
-=item outlines
+=item * outlines
 
 Show the document outline.
 
-=item thumbnails
+=item * thumbnails
 
 Show the page thumbnails.
 
-=item full_screen
+=item * full_screen
 
 Open in full-screen mode, with no menu bar, window controls, or any other window
 visible.
 
-=item optional_content
+=item * optional_content
 
 Show the optional content group panel.
 
-=item attachments
+=item * attachments
 
 Show the attachments panel.
 
@@ -939,9 +967,13 @@ sub page_mode {
     return $self;
 }
 
-=item %preferences = $pdf->viewer_preferences()
+=head2 viewer_preferences
 
-=item $pdf = $pdf->viewer_preferences(%preferences)
+    # Get
+    %preferences = $pdf->viewer_preferences();
+
+    # Set
+    $pdf = $pdf->viewer_preferences(%preferences);
 
 Get or set PDF viewer preferences, as described in
 L<PDF::API2::ViewerPreferences>.
@@ -956,29 +988,6 @@ sub viewer_preferences {
         return $prefs->get_preferences();
     }
     return $prefs->set_preferences(@_);
-}
-
-=item $pdf = $pdf->open_action($page, $location, @args)
-
-Set the destination in the PDF that should be displayed when the document is
-opened.
-
-C<$page> may be either a page number or a page object.  The other parameters are
-as described in L<PDF::API2::NamedDestination>.
-
-=cut
-
-sub open_action {
-    my ($self, $page, @args) = @_;
-
-    # $page can be either a page number or a page object
-    $page = PDFNum($page) unless ref($page);
-
-    require PDF::API2::NamedDestination;
-    my $array = PDF::API2::NamedDestination::_destination($page, @args);
-    $self->{'catalog'}->{'OpenAction'} = $array;
-    $self->{'pdf'}->out_obj($self->{'catalog'});
-    return $self;
 }
 
 # Deprecated; the various preferences have been split out into their own methods
@@ -1096,48 +1105,6 @@ sub preferences {
     $self->{'pdf'}->out_obj($self->{'catalog'});
 
     return $self;
-}
-
-=item $val = $pdf->default($parameter)
-
-=item $pdf->default($parameter, $value)
-
-Gets/sets the default value for a behaviour of PDF::API2.
-
-B<Supported Parameters:>
-
-=over
-
-=item nounrotate
-
-prohibits API2 from rotating imported/opened page to re-create a
-default pdf-context.
-
-=item pageencaps
-
-enables than API2 will add save/restore commands upon imported/opened
-pages to preserve graphics-state for modification.
-
-=item copyannots
-
-enables importing of annotations (B<*EXPERIMENTAL*>).
-
-=back
-
-=cut
-
-sub default {
-    my ($self, $parameter, $value) = @_;
-
-    # Parameter names may consist of lowercase letters, numbers, and underscores
-    $parameter = lc $parameter;
-    $parameter =~ s/[^a-z\d_]//g;
-
-    my $previous_value = $self->{$parameter};
-    if (defined $value) {
-        $self->{$parameter} = $value;
-    }
-    return $previous_value;
 }
 
 sub proc_pages {
@@ -2502,6 +2469,48 @@ sub xo_ean13 {
 =head1 OTHER METHODS
 
 =over
+
+=item $val = $pdf->default($parameter)
+
+=item $pdf->default($parameter, $value)
+
+Gets/sets the default value for a behaviour of PDF::API2.
+
+B<Supported Parameters:>
+
+=over
+
+=item * nounrotate
+
+prohibits API2 from rotating imported/opened page to re-create a
+default pdf-context.
+
+=item * pageencaps
+
+enables than API2 will add save/restore commands upon imported/opened
+pages to preserve graphics-state for modification.
+
+=item * copyannots
+
+enables importing of annotations (B<*EXPERIMENTAL*>).
+
+=back
+
+=cut
+
+sub default {
+    my ($self, $parameter, $value) = @_;
+
+    # Parameter names may consist of lowercase letters, numbers, and underscores
+    $parameter = lc $parameter;
+    $parameter =~ s/[^a-z\d_]//g;
+
+    my $previous_value = $self->{$parameter};
+    if (defined $value) {
+        $self->{$parameter} = $value;
+    }
+    return $previous_value;
+}
 
 =item $xo = $pdf->xo_form()
 
