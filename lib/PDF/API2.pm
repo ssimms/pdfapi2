@@ -1140,115 +1140,6 @@ sub default {
     return $previous_value;
 }
 
-=item $pdf->page_labels($page_number, %options)
-
-Describes how pages should be numbered beginning at the specified page number.
-
-    # Generate a 30-page PDF
-    my $pdf = PDF::API2->new();
-    $pdf->page() for 1..30;
-
-    # Number pages i to v, 1 to 20, and A-1 to A-5, respectively
-    $pdf->page_labels(1, style => 'roman');
-    $pdf->page_labels(6, style => 'decimal');
-    $pdf->page_labels(26, style => 'decimal', prefix => 'A-');
-
-    $pdf->save('sample.pdf');
-
-The following options are available:
-
-=over
-
-=item * style
-
-One of C<decimal> (standard decimal arabic numerals), C<Roman> (uppercase roman
-numerals), C<roman> (lowercase roman numerals), C<Alpha> (uppercase letters),
-or C<alpha> (lowercase letters).
-
-There is no default numbering style.  If omitted, the page label will be just
-the prefix (if set) or an empty string.
-
-=item * prefix
-
-The label prefix for pages in this range.
-
-=item * start
-
-An integer (default: 1) representing the first value to be used in this page
-range.
-
-=back
-
-=cut
-
-# Deprecated; replace with page_labels, updating arguments as shown
-sub pageLabel {
-    my $self = shift();
-    while (@_) {
-        my $page_index = shift();
-
-        # Pass options as a hash rather than a hashref
-        my %options = %{shift() // {}};
-
-        # Remove leading hyphens from option names
-        if (exists $options{'-prefix'}) {
-            $options{'prefix'} = delete $options{'-prefix'};
-        }
-        if (exists $options{'-start'}) {
-            $options{'start'} = delete $options{'-start'};
-        }
-        if (exists $options{'-style'}) {
-            $options{'style'} = delete $options{'-style'};
-        }
-
-        # page_labels doesn't have a default numbering style, to be consistent
-        # with the spec.
-        $options{'style'} //= 'D';
-
-        # Set one set of page labels at a time (support for multiple sets of
-        # page labels by pageLabel was undocumented).  Switch from 0-based to
-        # 1-based numbering.
-        $self->page_labels($page_index + 1, %options);
-    }
-
-    # Return nothing (page_labels returns $self, matching other setters)
-    return;
-}
-
-sub page_labels {
-    my ($self, $page_number, %options) = @_;
-
-    # $page_number is 1-based in order to be consistent with other PDF::API2
-    # methods, but the page label numbering is 0-based.
-    my $page_index = $page_number - 1;
-
-    $self->{'catalog'}->{'PageLabels'} //= PDFDict();
-    $self->{'catalog'}->{'PageLabels'}->{'Nums'} //= PDFArray();
-
-    my $nums = $self->{'catalog'}->{'PageLabels'}->{'Nums'};
-    $nums->add_elements(PDFNum($page_index));
-
-    my $d = PDFDict();
-    if (exists $options{'style'}) {
-        unless ($options{'style'} and $options{'style'} =~ /^([rad])/i) {
-            croak 'Invalid page numbering style';
-        }
-        $d->{'S'} = PDFName($1 eq 'd' ? 'D' : $1);
-    }
-
-    if (exists $options{'prefix'}) {
-        $d->{'P'} = PDFStr($options{'prefix'} // '');
-    }
-
-    if (exists $options{'start'}) {
-        $d->{'St'} = PDFNum($options{'start'} // '');
-    }
-
-    $nums->add_elements($d);
-
-    return $self;
-}
-
 sub proc_pages {
     my ($pdf, $object) = @_;
 
@@ -1284,28 +1175,20 @@ sub proc_pages {
 
 =head1 PAGE METHODS
 
-=over
+=head2 page
 
-=item $page = $pdf->page()
+     # Add a page to the end of the document
+     $page = $pdf->page();
 
-=item $page = $pdf->page($page_number)
+     # Insert a page before the specified page number
+     $page = $pdf->page($page_number);
 
 Returns a new page object.  By default, the page is added to the end
 of the document.  If you include an existing page number, the new page
 will be inserted in that position, pushing existing pages back.
 
-If $page_number is -1, the new page is inserted as the second-last page;
-if $page_number is 0, the new page is inserted as the last page.
-
-B<Example:>
-
-    $pdf = PDF::API2->new();
-
-    # Add a page.  This becomes page 1.
-    $page = $pdf->page();
-
-    # Add a new first page.  $page becomes page 2.
-    $another_page = $pdf->page(1);
+If C<$page_number> is -1, the new page is inserted as the second-last page; if
+C<$page_number> is 0, the new page is inserted as the last page.
 
 =cut
 
@@ -1341,20 +1224,13 @@ sub page {
     return $page;
 }
 
-=item $page = $pdf->open_page($page_number)
+=head2 open_page
 
-Returns the L<PDF::API2::Page> object of page $page_number.
+    $page = $pdf->open_page($page_number);
 
-If $page_number is 0 or -1, it will return the last page in the
-document.
+Returns the L<PDF::API2::Page> object of page C<$page_number>, if it exists.
 
-B<Example:>
-
-    $pdf = PDF::API2->open('our/99page.pdf');
-    $page = $pdf->open_page(1);   # returns the first page
-    $page = $pdf->open_page(99);  # returns the last page
-    $page = $pdf->open_page(-1);  # returns the last page
-    $page = $pdf->open_page(999); # returns undef
+If $page_number is 0 or -1, it will return the last page in the document.
 
 =cut
 
@@ -1456,178 +1332,35 @@ sub open_page {
     return $page;
 }
 
+=head2 page_count
 
-sub walk_obj {
-    my ($object_cache, $source_pdf, $target_pdf, $source_object, @keys) = @_;
+    $integer = $pdf->page_count();
 
-    if (ref($source_object) =~ /Objind$/) {
-        $source_object->realise();
-    }
-
-    return $object_cache->{scalar $source_object} if defined $object_cache->{scalar $source_object};
-    # die "infinite loop while copying objects" if $source_object->{' copied'};
-
-    my $target_object = $source_object->copy($source_pdf); ## thanks to: yaheath // Fri, 17 Sep 2004
-
-    # $source_object->{' copied'} = 1;
-    $target_pdf->new_obj($target_object) if $source_object->is_obj($source_pdf);
-
-    $object_cache->{scalar $source_object} = $target_object;
-
-    if (ref($source_object) =~ /Array$/) {
-        $target_object->{' val'} = [];
-        foreach my $k ($source_object->elements()) {
-            $k->realise() if ref($k) =~ /Objind$/;
-            $target_object->add_elements(walk_obj($object_cache, $source_pdf, $target_pdf, $k));
-        }
-    }
-    elsif (ref($source_object) =~ /Dict$/) {
-        @keys = keys(%$target_object) unless scalar @keys;
-        foreach my $k (@keys) {
-            next if $k =~ /^ /;
-            next unless defined $source_object->{$k};
-            $target_object->{$k} = walk_obj($object_cache, $source_pdf, $target_pdf, $source_object->{$k});
-        }
-        if ($source_object->{' stream'}) {
-            if ($target_object->{'Filter'}) {
-                $target_object->{' nofilt'} = 1;
-            }
-            else {
-                delete $target_object->{' nofilt'};
-                $target_object->{'Filter'} = PDFArray(PDFName('FlateDecode'));
-            }
-            $target_object->{' stream'} = $source_object->{' stream'};
-        }
-    }
-    delete $target_object->{' streamloc'};
-    delete $target_object->{' streamsrc'};
-
-    return $target_object;
-}
-
-=item $xoform = $pdf->embed_page($source_pdf, $source_page_number)
-
-Returns a Form XObject created by extracting the specified page from
-$source_pdf.
-
-This is useful if you want to transpose the imported page somewhat differently
-onto a page (e.g. two-up, four-up, etc.).
-
-If $source_page_number is 0 or -1, it will return the last page in the document.
-
-B<Example:>
-
-    $pdf = PDF::API2->new();
-    $old = PDF::API2->open('our/old.pdf');
-    $page = $pdf->page();
-    $gfx = $page->gfx();
-
-    # Import Page 2 from the old PDF
-    $xo = $pdf->embed_page($old, 2);
-
-    # Add it to the new PDF's first page at 1/2 scale
-    $gfx->formimage($xo, 0, 0, 0.5);
-
-    $pdf->save('our/new.pdf');
-
-B<Note:> You can only import a page from an existing PDF file.
+Return the number of pages in the document.
 
 =cut
 
 # Deprecated (renamed)
-sub importPageIntoForm { return embed_page(@_) }
+sub pages { return page_count(@_) }
 
-sub embed_page {
-    my ($self, $s_pdf, $s_idx) = @_;
-    $s_idx ||= 0;
-
-    unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
-        die "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
-    }
-
-    my ($s_page, $xo);
-
-    $xo = $self->xo_form();
-
-    if (ref($s_idx) eq 'PDF::API2::Page') {
-        $s_page = $s_idx;
-    }
-    else {
-        $s_page = $s_pdf->open_page($s_idx);
-    }
-
-    $self->{'apiimportcache'} ||= {};
-    $self->{'apiimportcache'}->{$s_pdf} ||= {};
-
-    # This should never get past MediaBox, since it's a required object.
-    foreach my $k (qw(MediaBox ArtBox TrimBox BleedBox CropBox)) {
-        # next unless defined $s_page->{$k};
-        # my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
-        next unless defined $s_page->find_prop($k);
-        my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
-        $xo->bbox(map { $_->val() } $box->elements());
-        last;
-    }
-    $xo->bbox(0, 0, 612, 792) unless defined $xo->{'BBox'};
-
-    foreach my $k (qw(Resources)) {
-        $s_page->{$k} = $s_page->find_prop($k);
-        next unless defined $s_page->{$k};
-        $s_page->{$k}->realise() if ref($s_page->{$k}) =~ /Objind$/;
-
-        foreach my $sk (qw(XObject ExtGState Font ProcSet Properties ColorSpace Pattern Shading)) {
-            next unless defined $s_page->{$k}->{$sk};
-            $s_page->{$k}->{$sk}->realise() if ref($s_page->{$k}->{$sk}) =~ /Objind$/;
-            foreach my $ssk (keys %{$s_page->{$k}->{$sk}}) {
-                next if $ssk =~ /^ /;
-                $xo->resource($sk, $ssk, walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k}->{$sk}->{$ssk}));
-            }
-        }
-    }
-
-    # create a whole content stream
-    ## technically it is possible to submit an unfinished
-    ## (eg. newly created) source-page, but that's nonsense,
-    ## so we expect a page fixed by open_page and die otherwise
-    unless ($s_page->{' opened'}) {
-        croak join(' ',
-                   "Pages may only be imported from a complete PDF.",
-                   "Save and reopen the source PDF object first");
-    }
-
-    if (defined $s_page->{'Contents'}) {
-        $s_page->fixcontents();
-
-        $xo->{' stream'} = '';
-        # open_page pages only contain one stream
-        my ($k) = $s_page->{'Contents'}->elements();
-        $k->realise();
-        if ($k->{' nofilt'}) {
-          # we have a finished stream here so we unfilter
-          $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
-        }
-        else {
-            # stream is an unfinished/unfiltered content
-            # so we just copy it and add the required "qQ"
-            $xo->add('q', $k->{' stream'}, 'Q');
-        }
-        $xo->compressFlate() if $self->{'forcecompress'};
-    }
-
-    return $xo;
+sub page_count {
+    my $self = shift();
+    return scalar @{$self->{'pagestack'}};
 }
 
-=item $page = $pdf->import_page($source_pdf, $source_page_number, $target_page_number)
+=head2 import_page
 
-Imports a page from $source_pdf and adds it to the specified position
-in $pdf.
+    $page = $pdf->import_page($source_pdf, $source_page_num, $target_page_num);
 
-If $source_page_number or $target_page_number is 0 or -1, the last
-page in the document is used.
+Imports a page from C<$source_pdf> and adds it to the specified position in
+C<$pdf>.
+
+If C<$source_page_num> or C<$target_page_num> is 0 or -1, the last page in the
+document is used.
 
 B<Note:> If you pass a page object instead of a page number for
-$target_page_number, the contents of the page will be merged into the
-existing page.
+C<$target_page_num>, the contents of the page will be merged into the existing
+page.
 
 B<Example:>
 
@@ -1769,25 +1502,291 @@ sub import_page {
     return $t_page;
 }
 
-=item $count = $pdf->page_count()
+=head2 embed_page
 
-Return the number of pages in the document.
+    $xobject = $pdf->embed_page($source_pdf, $source_page_number);
+
+Returns a Form XObject created by extracting the specified page from a
+C<$source_pdf>.
+
+This is useful if you want to transpose the imported page somewhat differently
+onto a page (e.g. two-up, four-up, etc.).
+
+If $source_page_number is 0 or -1, it will return the last page in the document.
+
+B<Example:>
+
+    $pdf = PDF::API2->new();
+    $old = PDF::API2->open('our/old.pdf');
+    $page = $pdf->page();
+    $gfx = $page->gfx();
+
+    # Import Page 2 from the old PDF
+    $xo = $pdf->embed_page($old, 2);
+
+    # Add it to the new PDF's first page at 1/2 scale
+    $gfx->formimage($xo, 0, 0, 0.5);
+
+    $pdf->save('our/new.pdf');
+
+B<Note:> You can only import a page from an existing PDF file.
 
 =cut
 
 # Deprecated (renamed)
-sub pages { return page_count(@_) }
+sub importPageIntoForm { return embed_page(@_) }
 
-sub page_count {
-    my $self = shift();
-    return scalar @{$self->{'pagestack'}};
+sub embed_page {
+    my ($self, $s_pdf, $s_idx) = @_;
+    $s_idx ||= 0;
+
+    unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
+        die "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
+    }
+
+    my ($s_page, $xo);
+
+    $xo = $self->xo_form();
+
+    if (ref($s_idx) eq 'PDF::API2::Page') {
+        $s_page = $s_idx;
+    }
+    else {
+        $s_page = $s_pdf->open_page($s_idx);
+    }
+
+    $self->{'apiimportcache'} ||= {};
+    $self->{'apiimportcache'}->{$s_pdf} ||= {};
+
+    # This should never get past MediaBox, since it's a required object.
+    foreach my $k (qw(MediaBox ArtBox TrimBox BleedBox CropBox)) {
+        # next unless defined $s_page->{$k};
+        # my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
+        next unless defined $s_page->find_prop($k);
+        my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
+        $xo->bbox(map { $_->val() } $box->elements());
+        last;
+    }
+    $xo->bbox(0, 0, 612, 792) unless defined $xo->{'BBox'};
+
+    foreach my $k (qw(Resources)) {
+        $s_page->{$k} = $s_page->find_prop($k);
+        next unless defined $s_page->{$k};
+        $s_page->{$k}->realise() if ref($s_page->{$k}) =~ /Objind$/;
+
+        foreach my $sk (qw(XObject ExtGState Font ProcSet Properties ColorSpace Pattern Shading)) {
+            next unless defined $s_page->{$k}->{$sk};
+            $s_page->{$k}->{$sk}->realise() if ref($s_page->{$k}->{$sk}) =~ /Objind$/;
+            foreach my $ssk (keys %{$s_page->{$k}->{$sk}}) {
+                next if $ssk =~ /^ /;
+                $xo->resource($sk, $ssk, walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k}->{$sk}->{$ssk}));
+            }
+        }
+    }
+
+    # create a whole content stream
+    ## technically it is possible to submit an unfinished
+    ## (eg. newly created) source-page, but that's nonsense,
+    ## so we expect a page fixed by open_page and die otherwise
+    unless ($s_page->{' opened'}) {
+        croak join(' ',
+                   "Pages may only be imported from a complete PDF.",
+                   "Save and reopen the source PDF object first");
+    }
+
+    if (defined $s_page->{'Contents'}) {
+        $s_page->fixcontents();
+
+        $xo->{' stream'} = '';
+        # open_page pages only contain one stream
+        my ($k) = $s_page->{'Contents'}->elements();
+        $k->realise();
+        if ($k->{' nofilt'}) {
+          # we have a finished stream here so we unfilter
+          $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
+        }
+        else {
+            # stream is an unfinished/unfiltered content
+            # so we just copy it and add the required "qQ"
+            $xo->add('q', $k->{' stream'}, 'Q');
+        }
+        $xo->compressFlate() if $self->{'forcecompress'};
+    }
+
+    return $xo;
 }
 
-=item $pdf->default_page_size($size)
+# Used by embed_page and import_page
+sub walk_obj {
+    my ($object_cache, $source_pdf, $target_pdf, $source_object, @keys) = @_;
 
-=item @rectangle = $pdf->default_page_size()
+    if (ref($source_object) =~ /Objind$/) {
+        $source_object->realise();
+    }
 
-Set the default physical size for pages in the PDF.  If called without arguments, return the coordinates of the rectangle describing the default physical page size.
+    return $object_cache->{scalar $source_object} if defined $object_cache->{scalar $source_object};
+    # die "infinite loop while copying objects" if $source_object->{' copied'};
+
+    my $target_object = $source_object->copy($source_pdf); ## thanks to: yaheath // Fri, 17 Sep 2004
+
+    # $source_object->{' copied'} = 1;
+    $target_pdf->new_obj($target_object) if $source_object->is_obj($source_pdf);
+
+    $object_cache->{scalar $source_object} = $target_object;
+
+    if (ref($source_object) =~ /Array$/) {
+        $target_object->{' val'} = [];
+        foreach my $k ($source_object->elements()) {
+            $k->realise() if ref($k) =~ /Objind$/;
+            $target_object->add_elements(walk_obj($object_cache, $source_pdf, $target_pdf, $k));
+        }
+    }
+    elsif (ref($source_object) =~ /Dict$/) {
+        @keys = keys(%$target_object) unless scalar @keys;
+        foreach my $k (@keys) {
+            next if $k =~ /^ /;
+            next unless defined $source_object->{$k};
+            $target_object->{$k} = walk_obj($object_cache, $source_pdf, $target_pdf, $source_object->{$k});
+        }
+        if ($source_object->{' stream'}) {
+            if ($target_object->{'Filter'}) {
+                $target_object->{' nofilt'} = 1;
+            }
+            else {
+                delete $target_object->{' nofilt'};
+                $target_object->{'Filter'} = PDFArray(PDFName('FlateDecode'));
+            }
+            $target_object->{' stream'} = $source_object->{' stream'};
+        }
+    }
+    delete $target_object->{' streamloc'};
+    delete $target_object->{' streamsrc'};
+
+    return $target_object;
+}
+
+=head2 page_labels
+
+    $pdf = $pdf->page_labels($page_number, %options);
+
+Describes how pages should be numbered beginning at the specified page number.
+
+    # Generate a 30-page PDF
+    my $pdf = PDF::API2->new();
+    $pdf->page() for 1..30;
+
+    # Number pages i to v, 1 to 20, and A-1 to A-5, respectively
+    $pdf->page_labels(1, style => 'roman');
+    $pdf->page_labels(6, style => 'decimal');
+    $pdf->page_labels(26, style => 'decimal', prefix => 'A-');
+
+    $pdf->save('sample.pdf');
+
+The following options are available:
+
+=over
+
+=item * style
+
+One of C<decimal> (standard decimal arabic numerals), C<Roman> (uppercase roman
+numerals), C<roman> (lowercase roman numerals), C<Alpha> (uppercase letters),
+or C<alpha> (lowercase letters).
+
+There is no default numbering style.  If omitted, the page label will be just
+the prefix (if set) or an empty string.
+
+=item * prefix
+
+The label prefix for pages in this range.
+
+=item * start
+
+An integer (default: 1) representing the first value to be used in this page
+range.
+
+=back
+
+=cut
+
+# Deprecated; replace with page_labels, updating arguments as shown
+sub pageLabel {
+    my $self = shift();
+    while (@_) {
+        my $page_index = shift();
+
+        # Pass options as a hash rather than a hashref
+        my %options = %{shift() // {}};
+
+        # Remove leading hyphens from option names
+        if (exists $options{'-prefix'}) {
+            $options{'prefix'} = delete $options{'-prefix'};
+        }
+        if (exists $options{'-start'}) {
+            $options{'start'} = delete $options{'-start'};
+        }
+        if (exists $options{'-style'}) {
+            $options{'style'} = delete $options{'-style'};
+        }
+
+        # page_labels doesn't have a default numbering style, to be consistent
+        # with the spec.
+        $options{'style'} //= 'D';
+
+        # Set one set of page labels at a time (support for multiple sets of
+        # page labels by pageLabel was undocumented).  Switch from 0-based to
+        # 1-based numbering.
+        $self->page_labels($page_index + 1, %options);
+    }
+
+    # Return nothing (page_labels returns $self, matching other setters)
+    return;
+}
+
+sub page_labels {
+    my ($self, $page_number, %options) = @_;
+
+    # $page_number is 1-based in order to be consistent with other PDF::API2
+    # methods, but the page label numbering is 0-based.
+    my $page_index = $page_number - 1;
+
+    $self->{'catalog'}->{'PageLabels'} //= PDFDict();
+    $self->{'catalog'}->{'PageLabels'}->{'Nums'} //= PDFArray();
+
+    my $nums = $self->{'catalog'}->{'PageLabels'}->{'Nums'};
+    $nums->add_elements(PDFNum($page_index));
+
+    my $d = PDFDict();
+    if (exists $options{'style'}) {
+        unless ($options{'style'} and $options{'style'} =~ /^([rad])/i) {
+            croak 'Invalid page numbering style';
+        }
+        $d->{'S'} = PDFName($1 eq 'd' ? 'D' : $1);
+    }
+
+    if (exists $options{'prefix'}) {
+        $d->{'P'} = PDFStr($options{'prefix'} // '');
+    }
+
+    if (exists $options{'start'}) {
+        $d->{'St'} = PDFNum($options{'start'} // '');
+    }
+
+    $nums->add_elements($d);
+
+    return $self;
+}
+
+=head2 default_page_size
+
+    # Set
+    $pdf->default_page_size($size);
+
+    # Get
+    @rectangle = $pdf->default_page_size()
+
+Set the default physical size for pages in the PDF.  If called without
+arguments, return the coordinates of the rectangle describing the default
+physical page size.
 
 See L<PDF::API2::Page/"Page Sizes"> for possible values.
 
@@ -1806,9 +1805,13 @@ sub default_page_size {
     return @{$boundaries->{'media'}};
 }
 
-=item $pdf->default_page_boundaries(%boundaries)
+=head2 default_page_boundaries
 
-=item \%boundaries = $pdf->default_page_boundaries()
+    # Set
+    $pdf->default_page_boundaries(%boundaries);
+
+    # Get
+    \%boundaries = $pdf->default_page_boundaries();
 
 Set default prepress page boundaries for pages in the PDF.  If called without
 arguments, returns the coordinates of the rectangles describing each of the
@@ -1878,8 +1881,6 @@ sub artbox {
     return $self->_bounding_box('ArtBox') unless @_;
     return $self->_bounding_box('ArtBox', page_size(@_));
 }
-
-=back
 
 =head1 FONT METHODS
 
