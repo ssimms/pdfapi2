@@ -1140,19 +1140,18 @@ sub default {
     return $previous_value;
 }
 
-=item $pdf->page_labels($page_index, %options)
+=item $pdf->page_labels($page_number, %options)
 
-Describes how pages should be numbered beginning at the specified page index,
-where index zero is the first page.
+Describes how pages should be numbered beginning at the specified page number.
 
     # Generate a 30-page PDF
     my $pdf = PDF::API2->new();
     $pdf->page() for 1..30;
 
     # Number pages i to v, 1 to 20, and A-1 to A-5, respectively
-    $pdf->page_labels(0, style => 'roman');
-    $pdf->page_labels(5, style => 'decimal');
-    $pdf->page_labels(25, style => 'decimal', prefix => 'A-');
+    $pdf->page_labels(1, style => 'roman');
+    $pdf->page_labels(6, style => 'decimal');
+    $pdf->page_labels(26, style => 'decimal', prefix => 'A-');
 
     $pdf->save('sample.pdf');
 
@@ -1207,8 +1206,9 @@ sub pageLabel {
         $options{'style'} //= 'D';
 
         # Set one set of page labels at a time (support for multiple sets of
-        # page labels by pageLabel was undocumented).
-        $self->page_labels($page_index, %options);
+        # page labels by pageLabel was undocumented).  Switch from 0-based to
+        # 1-based numbering.
+        $self->page_labels($page_index + 1, %options);
     }
 
     # Return nothing (page_labels returns $self, matching other setters)
@@ -1216,7 +1216,11 @@ sub pageLabel {
 }
 
 sub page_labels {
-    my ($self, $page_index, %options) = @_;
+    my ($self, $page_number, %options) = @_;
+
+    # $page_number is 1-based in order to be consistent with other PDF::API2
+    # methods, but the page label numbering is 0-based.
+    my $page_index = $page_number - 1;
 
     $self->{'catalog'}->{'PageLabels'} //= PDFDict();
     $self->{'catalog'}->{'PageLabels'}->{'Nums'} //= PDFArray();
