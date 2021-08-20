@@ -525,10 +525,10 @@ sub created {
     return $self->info_metadata('CreationDate', @_);
 }
 
-=head2 created
+=head2 modified
 
-    $date = $pdf->created();
-    $pdf = $pdf->created($date);
+    $date = $pdf->modified();
+    $pdf = $pdf->modified($date);
 
 Get/set/clear the document's modification date.  The date format is as described
 in C<created> above.
