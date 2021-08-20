@@ -1299,22 +1299,6 @@ sub open_page {
     return $page;
 }
 
-=head2 page_count
-
-    $integer = $pdf->page_count();
-
-Return the number of pages in the document.
-
-=cut
-
-# Deprecated (renamed)
-sub pages { return page_count(@_) }
-
-sub page_count {
-    my $self = shift();
-    return scalar @{$self->{'pagestack'}};
-}
-
 =head2 import_page
 
     $page = $pdf->import_page($source_pdf, $source_page_num, $target_page_num);
@@ -1630,6 +1614,22 @@ sub walk_obj {
     delete $target_object->{' streamsrc'};
 
     return $target_object;
+}
+
+=head2 page_count
+
+    $integer = $pdf->page_count();
+
+Return the number of pages in the document.
+
+=cut
+
+# Deprecated (renamed)
+sub pages { return page_count(@_) }
+
+sub page_count {
+    my $self = shift();
+    return scalar @{$self->{'pagestack'}};
 }
 
 =head2 page_labels
