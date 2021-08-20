@@ -414,6 +414,384 @@ sub to_string {
     return $string;
 }
 
+=head1 METADATA METHODS
+
+=head2 title
+
+    $title = $pdf->title();
+    $pdf = $pdf->title($title);
+
+Get/set/clear the document's title.
+
+=cut
+
+sub title {
+    my $self = shift();
+    return $self->info_metadata('Title', @_);
+}
+
+=head2 author
+
+    $author = $pdf->author();
+    $pdf = $pdf->author($author);
+
+Get/set/clear the name of the person who created the document.
+
+=cut
+
+sub author {
+    my $self = shift();
+    return $self->info_metadata('Author', @_);
+}
+
+=head2 subject
+
+    $subject = $pdf->subject();
+    $pdf = $pdf->subject($subject);
+
+Get/set/clear the subject of the document.
+
+=cut
+
+sub subject {
+    my $self = shift();
+    return $self->info_metadata('Subject', @_);
+}
+
+=head2 keywords
+
+    $keywords = $pdf->keywords();
+    $pdf = $pdf->keywords($keywords);
+
+Get/set/clear a space-separated string of keywords associated with the document.
+
+=cut
+
+sub keywords {
+    my $self = shift();
+    return $self->info_metadata('Keywords', @_);
+}
+
+=head2 creator
+
+    $creator = $pdf->creator();
+    $pdf = $pdf->creator($creator);
+
+Get/set/clear the name of the product that created the document prior to its
+conversion to PDF.
+
+=cut
+
+sub creator {
+    my $self = shift();
+    return $self->info_metadata('Creator', @_);
+}
+
+=head2 producer
+
+    $producer = $pdf->producer();
+    $pdf = $pdf->producer($producer);
+
+Get/set/clear the name of the product that converted the original document to
+PDF.
+
+PDF::API2 fills in this field when creating a PDF.
+
+=cut
+
+sub producer {
+    my $self = shift();
+    return $self->info_metadata('Producer', @_);
+}
+
+=head2 created
+
+    $date = $pdf->created();
+    $pdf = $pdf->created($date);
+
+Get/set/clear the document's creation date.
+
+The date format is C<D:YYYYMMDDHHmmSSOHH'mm>, where C<D:> is a static prefix
+identifying the string as a PDF date.  The date may be truncated at any point
+after the year.  C<O> is one of C<+>, C<->, or C<Z>, with the following C<HH'mm>
+representing an offset from UTC.
+
+When setting the date, C<D:> will be prepended automatically if omitted.
+
+=cut
+
+sub created {
+    my $self = shift();
+    return $self->info_metadata('CreationDate', @_);
+}
+
+=head2 created
+
+    $date = $pdf->created();
+    $pdf = $pdf->created($date);
+
+Get/set/clear the document's modification date.  The date format is as described
+in C<created> above.
+
+=cut
+
+sub modified {
+    my $self = shift();
+    return $self->info_metadata('ModDate', @_);
+}
+
+sub _is_date {
+    my $value = shift();
+
+    # PDF 1.7 section 7.9.4 describes the required date format.  Other than the
+    # D: prefix and the year, all components are optional but must be present if
+    # a later component is present.  No provision is made in the specification
+    # for leap seconds, etc.
+    return unless $value =~ /^D:([0-9]{4})        # D:YYYY (required)
+                             (?:([01][0-9])       # Month (01-12)
+                             (?:([0123][0-9])     # Day (01-31)
+                             (?:([012][0-9])      # Hour (00-23)
+                             (?:([012345][0-9])   # Minute (00-59)
+                             (?:([012345][0-9])   # Second (00-59)
+                             (?:([Z+-])           # UT Offset Direction
+                             (?:([012][0-9])      # UT Offset Hours
+                             (?:\'([012345][0-9]) # UT Offset Minutes
+                             )?)?)?)?)?)?)?)?$/x;
+    my ($year, $month, $day, $hour, $minute, $second, $od, $oh, $om)
+        = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+
+    # Do some basic validation to catch accidental date formatting issues.
+    # Complete date validation is out of scope.
+    if (defined $month) {
+        return unless $month >= 1 and $month <= 12;
+    }
+    if (defined $day) {
+        return unless $day >= 1 and $day <= 31;
+    }
+    if (defined $hour) {
+        return unless $hour <= 23;
+    }
+    if (defined $minute) {
+        return unless $minute <= 59;
+    }
+    if (defined $second) {
+        return unless $second <= 59;
+    }
+    if (defined $od) {
+        return if $od eq 'Z' and defined($oh);
+    }
+    if (defined $oh) {
+        return unless $oh <= 23;
+    }
+    if (defined $om) {
+        return unless $om <= 59;
+    }
+
+    return 1;
+}
+
+=head2 info_metadata
+
+    # Get all keys and values
+    %info = $pdf->info_metadata();
+
+    # Get the value of one key
+    $value = $pdf->info_metadata($key);
+
+    # Set the value of one key
+    $pdf = $pdf->info_metadata($key, $value);
+
+Get/set/clear a key in the document's information dictionary.  The standard keys
+(title, author, etc.) have their own accessors, so this is primarily intended
+for interacting with custom metadata.
+
+Pass C<undef> as the value in order to remove the key from the dictionary.
+
+=cut
+
+sub info_metadata {
+    my $self = shift();
+    my $field = shift();
+
+    # Return a hash of the Info table if called without arguments
+    unless (defined $field) {
+        return unless exists $self->{'pdf'}->{'Info'};
+        $self->{'pdf'}->{'Info'}->realise();
+        my %info;
+        foreach my $key (keys %{$self->{'pdf'}->{'Info'}}) {
+            next if $key =~ /^ /;
+            next unless defined $self->{'pdf'}->{'Info'}->{$key};
+            $info{$key} = $self->{'pdf'}->{'Info'}->{$key}->val();
+        }
+        return %info;
+    }
+
+    # Set
+    if (@_) {
+        my $value = shift();
+        $value = undef if defined($value) and not length($value);
+
+        if ($field eq 'CreationDate' or $field eq 'ModDate') {
+            if (defined ($value)) {
+                $value = 'D:' . $value unless $value =~ /^D:/;
+                croak "Invalid date string: $value" unless _is_date($value);
+            }
+        }
+
+        unless (exists $self->{'pdf'}->{'Info'}) {
+            return $self unless defined $value;
+            $self->{'pdf'}->{'Info'} = PDFDict();
+            $self->{'pdf'}->new_obj($self->{'pdf'}->{'Info'});
+        }
+        else {
+            $self->{'pdf'}->{'Info'}->realise();
+        }
+
+        if (defined $value) {
+            $self->{'pdf'}->{'Info'}->{$field} = PDFStr($value);
+        }
+        else {
+            delete $self->{'pdf'}->{'Info'}->{$field};
+        }
+
+        return $self;
+    }
+
+    # Get
+    return unless $self->{'pdf'}->{'Info'};
+    $self->{'pdf'}->{'Info'}->realise();
+    return unless $self->{'pdf'}->{'Info'}->{$field};
+    return $self->{'pdf'}->{'Info'}->{$field}->val();
+}
+
+# Deprecated; replace with individual accessors or info_metadata
+sub info {
+    my ($self, %opt) = @_;
+
+    if (not defined($self->{'pdf'}->{'Info'})) {
+        $self->{'pdf'}->{'Info'} = PDFDict();
+        $self->{'pdf'}->new_obj($self->{'pdf'}->{'Info'});
+    }
+    else {
+        $self->{'pdf'}->{'Info'}->realise();
+    }
+
+    # Maintenance Note: Since we're not shifting at the beginning of
+    # this sub, this "if" will always be true
+    if (scalar @_) {
+        foreach my $k (@{$self->{'infoMeta'}}) {
+            next unless defined $opt{$k};
+            $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
+        }
+        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Info'});
+    }
+
+    if (defined $self->{'pdf'}->{'Info'}) {
+        %opt = ();
+        foreach my $k (@{$self->{'infoMeta'}}) {
+            next unless defined $self->{'pdf'}->{'Info'}->{$k};
+            $opt{$k} = $self->{'pdf'}->{'Info'}->{$k}->val();
+            if (   (unpack('n', $opt{$k}) == 0xfffe)
+                or (unpack('n', $opt{$k}) == 0xfeff))
+            {
+                $opt{$k} = decode('UTF-16', $self->{'pdf'}->{'Info'}->{$k}->val());
+            }
+        }
+    }
+
+    return %opt;
+}
+
+# Deprecated; replace with info_metadata
+sub infoMetaAttributes {
+    my ($self, @attr) = @_;
+
+    if (scalar @attr) {
+        my %at = map { $_ => 1 } @{$self->{'infoMeta'}}, @attr;
+        @{$self->{'infoMeta'}} = keys %at;
+    }
+
+    return @{$self->{'infoMeta'}};
+}
+
+=head2 xml_metadata
+
+    $xml = $pdf->xml_metadata();
+    $pdf = $pdf->xml_metadata($xml);
+
+Get/set the document's XML metadata stream.
+
+=cut
+
+# Deprecated (renamed, changed set return value for consistency)
+sub xmpMetadata {
+    my $self = shift();
+    if (@_) {
+        my $value = shift();
+        $self->xml_metadata($value);
+        return $value;
+    }
+
+    return $self->xml_metadata();
+}
+
+sub xml_metadata {
+    my ($self, $value) = @_;
+
+    if (not defined($self->{'catalog'}->{'Metadata'})) {
+        $self->{'catalog'}->{'Metadata'} = PDFDict();
+        $self->{'catalog'}->{'Metadata'}->{'Type'} = PDFName('Metadata');
+        $self->{'catalog'}->{'Metadata'}->{'Subtype'} = PDFName('XML');
+        $self->{'pdf'}->new_obj($self->{'catalog'}->{'Metadata'});
+    }
+    else {
+        $self->{'catalog'}->{'Metadata'}->realise();
+        $self->{'catalog'}->{'Metadata'}->{' stream'} = unfilter($self->{'catalog'}->{'Metadata'}->{'Filter'}, $self->{'catalog'}->{'Metadata'}->{' stream'});
+        delete $self->{'catalog'}->{'Metadata'}->{' nofilt'};
+        delete $self->{'catalog'}->{'Metadata'}->{'Filter'};
+    }
+
+    my $md = $self->{'catalog'}->{'Metadata'};
+
+    if (defined $value) {
+        $md->{' stream'} = $value;
+        delete $md->{'Filter'};
+        delete $md->{' nofilt'};
+        $self->{'pdf'}->out_obj($md);
+        $self->{'pdf'}->out_obj($self->{'catalog'});
+    }
+
+    return $md->{' stream'};
+}
+
+=head2 version
+
+    $version = $pdf->version($new_version);
+
+Get/set the PDF version (e.g. 1.4).
+
+=cut
+
+sub version {
+    my $self = shift();
+    return $self->{'pdf'}->version(@_);
+}
+
+=head2 is_encrypted
+
+    $boolean = $pdf->is_encrypted();
+
+Returns true if the opened PDF is encrypted.
+
+=cut
+
+# Deprecated (renamed)
+sub isEncrypted { return is_encrypted(@_) }
+
+sub is_encrypted {
+    my $self = shift();
+    return defined($self->{'pdf'}->{'Encrypt'}) ? 1 : 0;
+}
 
 =head1 GENERIC METHODS
 
@@ -756,199 +1134,6 @@ sub default {
         $self->{$parameter} = $value;
     }
     return $previous_value;
-}
-
-=item $version = $pdf->version([$new_version])
-
-Get/set the PDF version (e.g. 1.4)
-
-=cut
-
-sub version {
-    my $self = shift();
-    return $self->{'pdf'}->version(@_);
-}
-
-=item $bool = $pdf->isEncrypted()
-
-Checks if the previously opened PDF is encrypted.
-
-=cut
-
-sub isEncrypted {
-    my $self = shift();
-    return defined($self->{'pdf'}->{'Encrypt'}) ? 1 : 0;
-}
-
-=item %infohash = $pdf->info(%infohash)
-
-Gets/sets the info structure of the document.
-
-B<Example:>
-
-    %h = $pdf->info(
-        'Author'       => "Alfred Reibenschuh",
-        'CreationDate' => "D:20020911000000+01'00'",
-        'ModDate'      => "D:YYYYMMDDhhmmssOHH'mm'",
-        'Creator'      => "fredos-script.pl",
-        'Producer'     => "PDF::API2",
-        'Title'        => "some Publication",
-        'Subject'      => "perl ?",
-        'Keywords'     => "all good things are pdf"
-    );
-    print "Author: $h{Author}\n";
-
-=cut
-
-sub info {
-    my ($self, %opt) = @_;
-
-    if (not defined($self->{'pdf'}->{'Info'})) {
-        $self->{'pdf'}->{'Info'} = PDFDict();
-        $self->{'pdf'}->new_obj($self->{'pdf'}->{'Info'});
-    }
-    else {
-        $self->{'pdf'}->{'Info'}->realise();
-    }
-
-    # Maintenance Note: Since we're not shifting at the beginning of
-    # this sub, this "if" will always be true
-    if (scalar @_) {
-        foreach my $k (@{$self->{'infoMeta'}}) {
-            next unless defined $opt{$k};
-            $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
-        }
-        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Info'});
-    }
-
-    if (defined $self->{'pdf'}->{'Info'}) {
-        %opt = ();
-        foreach my $k (@{$self->{'infoMeta'}}) {
-            next unless defined $self->{'pdf'}->{'Info'}->{$k};
-            $opt{$k} = $self->{'pdf'}->{'Info'}->{$k}->val();
-            if ((unpack('n', $opt{$k}) == 0xfffe) or (unpack('n', $opt{$k}) == 0xfeff)) {
-                $opt{$k} = decode('UTF-16', $self->{'pdf'}->{'Info'}->{$k}->val());
-            }
-        }
-    }
-
-    return %opt;
-}
-
-=item @metadata_attributes = $pdf->infoMetaAttributes(@metadata_attributes)
-
-Gets/sets the supported info-structure tags.
-
-B<Example:>
-
-    @attributes = $pdf->infoMetaAttributes;
-    print "Supported Attributes: @attr\n";
-
-    @attributes = $pdf->infoMetaAttributes('CustomField1');
-    print "Supported Attributes: @attributes\n";
-
-=cut
-
-sub infoMetaAttributes {
-    my ($self, @attr) = @_;
-
-    if (scalar @attr) {
-        my %at = map { $_ => 1 } @{$self->{'infoMeta'}}, @attr;
-        @{$self->{'infoMeta'}} = keys %at;
-    }
-
-    return @{$self->{'infoMeta'}};
-}
-
-=item $xml = $pdf->xmpMetadata($xml)
-
-Gets/sets the XMP XML data stream.
-
-B<Example:>
-
-    $xml = $pdf->xmpMetadata();
-    print "PDFs Metadata reads: $xml\n";
-    $xml=<<EOT;
-    <?xpacket begin='' id='W5M0MpCehiHzreSzNTczkc9d'?>
-    <?adobe-xap-filters esc="CRLF"?>
-    <x:xmpmeta
-      xmlns:x='adobe:ns:meta/'
-      x:xmptk='XMP toolkit 2.9.1-14, framework 1.6'>
-        <rdf:RDF
-          xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
-          xmlns:iX='http://ns.adobe.com/iX/1.0/'>
-            <rdf:Description
-              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
-              xmlns:pdf='http://ns.adobe.com/pdf/1.3/'
-              pdf:Producer='Acrobat Distiller 6.0.1 for Macintosh'></rdf:Description>
-            <rdf:Description
-              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
-              xmlns:xap='http://ns.adobe.com/xap/1.0/'
-              xap:CreateDate='2004-11-14T08:41:16Z'
-              xap:ModifyDate='2004-11-14T16:38:50-08:00'
-              xap:CreatorTool='FrameMaker 7.0'
-              xap:MetadataDate='2004-11-14T16:38:50-08:00'></rdf:Description>
-            <rdf:Description
-              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
-              xmlns:xapMM='http://ns.adobe.com/xap/1.0/mm/'
-              xapMM:DocumentID='uuid:919b9378-369c-11d9-a2b5-000393c97fd8'/></rdf:Description>
-            <rdf:Description
-              rdf:about='uuid:b8659d3a-369e-11d9-b951-000393c97fd8'
-              xmlns:dc='http://purl.org/dc/elements/1.1/'
-              dc:format='application/pdf'>
-                <dc:description>
-                  <rdf:Alt>
-                    <rdf:li xml:lang='x-default'>Adobe Portable Document Format (PDF)</rdf:li>
-                  </rdf:Alt>
-                </dc:description>
-                <dc:creator>
-                  <rdf:Seq>
-                    <rdf:li>Adobe Systems Incorporated</rdf:li>
-                  </rdf:Seq>
-                </dc:creator>
-                <dc:title>
-                  <rdf:Alt>
-                    <rdf:li xml:lang='x-default'>PDF Reference, version 1.6</rdf:li>
-                  </rdf:Alt>
-                </dc:title>
-            </rdf:Description>
-        </rdf:RDF>
-    </x:xmpmeta>
-    <?xpacket end='w'?>
-    EOT
-
-    $xml = $pdf->xmpMetadata($xml);
-    print "PDF metadata now reads: $xml\n";
-
-=cut
-
-sub xmpMetadata {
-    my ($self, $value) = @_;
-
-    if (not defined($self->{'catalog'}->{'Metadata'})) {
-        $self->{'catalog'}->{'Metadata'} = PDFDict();
-        $self->{'catalog'}->{'Metadata'}->{'Type'} = PDFName('Metadata');
-        $self->{'catalog'}->{'Metadata'}->{'Subtype'} = PDFName('XML');
-        $self->{'pdf'}->new_obj($self->{'catalog'}->{'Metadata'});
-    }
-    else {
-        $self->{'catalog'}->{'Metadata'}->realise();
-        $self->{'catalog'}->{'Metadata'}->{' stream'} = unfilter($self->{'catalog'}->{'Metadata'}->{'Filter'}, $self->{'catalog'}->{'Metadata'}->{' stream'});
-        delete $self->{'catalog'}->{'Metadata'}->{' nofilt'};
-        delete $self->{'catalog'}->{'Metadata'}->{'Filter'};
-    }
-
-    my $md = $self->{'catalog'}->{'Metadata'};
-
-    if (defined $value) {
-        $md->{' stream'} = $value;
-        delete $md->{'Filter'};
-        delete $md->{' nofilt'};
-        $self->{'pdf'}->out_obj($md);
-        $self->{'pdf'}->out_obj($self->{'catalog'});
-    }
-
-    return $md->{' stream'};
 }
 
 =item $pdf->pageLabel($index, $options)

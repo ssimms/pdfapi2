@@ -13,8 +13,14 @@
       - open_scalar -> from_string
       - stringify -> to_string
       - pages -> page_count
+      - isEncrypted -> is_encrypted
+      - xmpMetadata -> xml_metadata
 
     - Merged saveas into save.
+
+    - Added individual accessors for PDF metadata (title, author, producer,
+      etc.).  Replaced info and infoMetaAttributes with info_metadata for custom
+      metadata.
 
     - Added $page->boundaries() and $pdf->default_page_boundaries() to replace
       the separate methods for the various page boundaries.  The supported
