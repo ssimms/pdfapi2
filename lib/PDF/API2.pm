@@ -1138,8 +1138,6 @@ sub proc_pages {
     return @pages;
 }
 
-=back
-
 =head1 PAGE METHODS
 
 =head2 page
