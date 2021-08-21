@@ -25,9 +25,9 @@ like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 
 $pdf = PDF::API2->new();
 open my $fh, '<', 't/resources/1x1.gif';
-$gif = $pdf->image_gif($fh);
+$gif = $pdf->image($fh);
 isa_ok($gif, 'PDF::API2::Resource::XObject::Image::GIF',
-       q{$pdf->image_gif(filehandle)});
+       q{$pdf->image(filehandle)});
 
 is($gif->width(), 1,
    q{Image from filehandle has a width});

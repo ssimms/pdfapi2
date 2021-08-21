@@ -2151,15 +2151,110 @@ sub unifont {
     return $obj;
 }
 
-=head1 IMAGE METHODS
+=head1 GRAPHICS METHODS
 
-=over
+=head2 image
 
-=item $jpeg = $pdf->image_jpeg($file)
+    $object = $pdf->image($file, %options);
 
-Imports and returns a new JPEG image object.  C<$file> may be either a filename or a filehandle.
+Import a supported image type and return an object that can be placed as part of
+a page's content:
+
+    my $pdf = PDF::API2->new();
+    my $image = $pdf->image('/path/to/image.jpg');
+    my $page = $pdf->page();
+    my $content = $page->gfx();
+
+    my $x = 72;
+    my $y = 144;
+    $content->image($image, $x, $y);
+
+    $pdf->save('sample.pdf');
+
+C<$file> may be either a file name, a file handle, or a L<GD::Image> object.
+
+See L<PDF::API2::Content/"image"> for details about placing images on a page
+once they're imported.
+
+The image format is normally detected automatically based on the file's
+extension.  If passed a filehandle, image formats GIF, JPEG, and PNG will be
+detected based on the file's header.
+
+If the file has an atypical extension or the filehandle is for a different kind
+of image, you can set the C<format> option to one of the supported types:
+C<gif>, C<jpeg>, C<png>, C<pnm>, or C<tiff>.
+
+Note: PNG images that include an alpha (transparency) channel go through a
+relatively slow process of splitting the image into separate RGB and alpha
+components as is required by images in PDFs.  If you're having performance
+issues, install PDF::API2::XS or Image::PNG::Libpng to speed this process up by
+an order of magnitude; either module will be used automatically if available.
 
 =cut
+
+sub image {
+    my ($self, $file, %options) = @_;
+
+    my $format = lc($options{'format'} // '');
+
+    if (ref($file) eq 'GD::Image') {
+        return image_gd($file, %options);
+    }
+    elsif (ref($file)) {
+        $format ||= _detect_image_format($file);
+    }
+    unless (ref($file)) {
+        $format ||= ($file =~ /\.jpe?g$/i   ? 'jpeg' :
+                     $file =~ /\.png$/i     ? 'png'  :
+                     $file =~ /\.gif$/i     ? 'gif'  :
+                     $file =~ /\.tiff?$/i   ? 'tiff' :
+                     $file =~ /\.p[bgp]m$/i ? 'pnm'  : '');
+    }
+
+    if ($format eq 'jpeg') {
+        return $self->image_jpeg($file, %options);
+    }
+    elsif ($format eq 'png') {
+        return $self->image_png($file, %options);
+    }
+    elsif ($format eq 'gif') {
+        return $self->image_gif($file, %options);
+    }
+    elsif ($format eq 'tiff') {
+        return $self->image_tiff($file, %options);
+    }
+    elsif ($format eq 'pnm') {
+        return $self->image_pnm($file, %options);
+    }
+    elsif ($format) {
+        croak "Unrecognized image format: $format";
+    }
+    elsif (ref($file)) {
+        croak "Unspecified image format";
+    }
+    elsif ($file =~ /(\..*)$/) {
+        croak "Unrecognized image extension: $1";
+    }
+    else {
+        croak "Unrecognized image: $file";
+    }
+}
+
+sub _detect_image_format {
+    my $fh = shift();
+    $fh->seek(0, 0);
+    binmode $fh, ':raw';
+
+    my $test;
+    my $bytes_read = $fh->read($test, 8);
+    $fh->seek(0, 0);
+    return unless $bytes_read and $bytes_read == 8;
+
+    return 'gif'  if $test =~ /^GIF\d\d[a-z]/;
+    return 'jpeg' if $test =~ /^\xFF\xD8\xFF/;
+    return 'png'  if $test =~ /^\x89PNG\x0D\x0A\x1A\x0A/;
+    return;
+}
 
 sub image_jpeg {
     my ($self, $file, %opts) = @_;
@@ -2172,12 +2267,6 @@ sub image_jpeg {
     return $obj;
 }
 
-=item $tiff = $pdf->image_tiff($file)
-
-Imports and returns a new TIFF image object.  C<$file> may be either a filename or a filehandle.
-
-=cut
-
 sub image_tiff {
     my ($self, $file, %opts) = @_;
 
@@ -2188,12 +2277,6 @@ sub image_tiff {
 
     return $obj;
 }
-
-=item $pnm = $pdf->image_pnm($file)
-
-Imports and returns a new PNM image object.  C<$file> may be either a filename or a filehandle.
-
-=cut
 
 sub image_pnm {
     my ($self, $file, %opts) = @_;
@@ -2208,17 +2291,6 @@ sub image_pnm {
     return $obj;
 }
 
-=item $png = $pdf->image_png($file)
-
-Imports and returns a new PNG image object.  C<$file> may be either a filename or a filehandle.
-
-Note: PNG files that include an alpha (transparency) channel go through a
-relatively slow process of separating the transparency channel into a PDF SMask
-object.  Install PDF::API2::XS or Image::PNG::Libpng to speed this up by an
-order of magnitude.
-
-=cut
-
 sub image_png {
     my ($self, $file, %opts) = @_;
 
@@ -2229,12 +2301,6 @@ sub image_png {
 
     return $obj;
 }
-
-=item $gif = $pdf->image_gif($file)
-
-Imports and returns a new GIF image object.  C<$file> may be either a filename or a filehandle.
-
-=cut
 
 sub image_gif {
     my ($self, $file, %opts) = @_;
@@ -2247,14 +2313,6 @@ sub image_gif {
     return $obj;
 }
 
-=item $gdf = $pdf->image_gd($gd_object, %options)
-
-Imports and returns a new image object from GD::Image.
-
-B<Options:> The only option currently supported is C<< -lossless => 1 >>.
-
-=cut
-
 sub image_gd {
     my ($self, $gd, %opts) = @_;
 
@@ -2265,8 +2323,6 @@ sub image_gd {
 
     return $obj;
 }
-
-=back
 
 =head1 COLORSPACE METHODS
 

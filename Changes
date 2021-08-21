@@ -45,6 +45,9 @@
       different (pass options as a hash instead of a hashref; remove hyphens
       from option names).
 
+    - Created a convenience method $pdf->image, which combines image_jpeg,
+      image_tiff, image_pnm, image_png, image_gif, and image_gd.
+
     - Created a convenience method $pdf->font, which combines corefont, ttfont,
       psfont, and bdfont.  Unlike corefont, font requires the exact name of one
       of the standard fonts.  Kerning is on by default (vs. off by default in

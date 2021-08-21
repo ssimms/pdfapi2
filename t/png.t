@@ -57,9 +57,9 @@ is(substr($rgba1_pdf_string, 0, 512), substr($rgba2_pdf_string, 0, 512),
 
 $pdf = PDF::API2->new();
 open my $fh, '<', 't/resources/1x1.png';
-$png = $pdf->image_png($fh);
+$png = $pdf->image($fh);
 isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
-       q{$pdf->image_png(filehandle)});
+       q{$pdf->image(filehandle)});
 
 is($png->width(), 1,
    q{Image from filehandle has a width});
