@@ -1776,7 +1776,7 @@ sub default_page_size {
     $pdf->default_page_boundaries(%boundaries);
 
     # Get
-    \%boundaries = $pdf->default_page_boundaries();
+    %boundaries = $pdf->default_page_boundaries();
 
 Set default prepress page boundaries for pages in the PDF.  If called without
 arguments, returns the coordinates of the rectangles describing each of the

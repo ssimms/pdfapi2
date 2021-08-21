@@ -144,8 +144,8 @@ sub size {
     }
 
     # Get
-    my $boundaries = $self->boundaries();
-    return @{$boundaries->{'media'}};
+    my %boundaries = $self->boundaries();
+    return @{$boundaries{'media'}};
 }
 
 =head2 boundaries
@@ -358,7 +358,7 @@ sub boundaries {
         foreach my $box (qw(Media Crop Bleed Trim Art)) {
             $boundaries{lc($box)} = [$self->_bounding_box(uc($box) . 'Box')];
         }
-        return \%boundaries;
+        return %boundaries;
     }
 
     return $self;
