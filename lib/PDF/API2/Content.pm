@@ -1209,29 +1209,56 @@ sub shade {
 
 =over
 
-=item $content->image($image_object, $x, $y, $width, $height)
+=item $content->place($object, $x, $y, $scale_x, $scale_y)
 
-=item $content->image($image_object, $x, $y, $scale)
+Places an image or other external object (a.k.a. XObject) on the page in the
+specified location.
 
-=item $content->image($image_object, $x, $y)
+For images, C<$scale_x> and C<$scale_y> represent the width and height of the
+image on the page.  If C<$scale_x> is omitted, it will default to 72 pixels per
+inch.  If C<$scale_y> is omitted, the image will be scaled proportionally based
+on the image dimensions.
 
-    # Example
-    my $image_object = $pdf->image_jpeg($my_image_file);
-    $content->image($image_object, 100, 200);
+For other external objects, the scale is a multiplier, where 1 (the default)
+represents 100% (i.e. no change).
 
-Places an image on the page in the specified location.
+If coordinate transformations have been made (see Coordinate Transformations
+above), the position and scale will be relative to the updated coordinates.
 
-If coordinate transformations have been made (see Coordinate
-Transformations above), the position and scale will be relative to the
-updated coordinates.  Otherwise, [0,0] will represent the bottom left
-corner of the page, and C<$width> and C<$height> will be measured at
-72dpi.
-
-For example, if you have a 600x600 image that you would like to be
-shown at 600dpi (i.e. one inch square), set the width and height to 72.
+If no coordinate transformations are needed, this method can be called directly
+from the L<PDF::API2::Page> object instead.
 
 =cut
 
+# Behavior based on argument count
+# 0: Place at 0, 0, 100%
+# 2: Place at X, Y, 100%
+# 3: Place at X, Y, scaled
+# 4: Place at X, Y, scale_w, scale_h
+sub place {
+    my ($self, $object, $x, $y, $scale_x, $scale_y) = @_;
+    $x //= 0;
+    $y //= 0;
+    if ($object->isa('PDF::API2::Resource::XObject::Image')) {
+        $scale_x //= $object->width();
+        $scale_y //= $object->height() * $scale_x / $object->width();
+    }
+    else {
+        $scale_x //= 1;
+        $scale_y //= $scale_x;
+    }
+
+    $self->save();
+    $self->matrix($scale_x, 0, 0, $scale_y, $x, $y);
+    $self->add('/' . $object->name(), 'Do');
+    $self->restore();
+
+    $self->resource('XObject', $object->name(), $object);
+
+    return $self;
+}
+
+# Deprecated
 sub image {
     my $self = shift;
     my $img = shift;
@@ -1260,14 +1287,7 @@ sub image {
     return $self;
 }
 
-=item $content->formimage($form_object, $x, $y, $scale)
-
-=item $content->formimage($form_object, $x, $y)
-
-Places an XObject on the page in the specified location.
-
-=cut
-
+# Deprecated
 sub formimage {
     my $self = shift;
     my $img = shift;

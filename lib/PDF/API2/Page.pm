@@ -584,6 +584,22 @@ sub annotation {
     return $ant;
 }
 
+=item $page = $page->place $object, $x, $y, $scale_x, $scale_y
+
+Places an image or other external object (a.k.a. XObject) on the page in the
+specified location.
+
+This is equivalent to creating a C<gfx> object on the page and calling C<place>
+on the object without performing any coordinate transformations.
+
+=cut
+
+sub place {
+    my $self = shift();
+    $self->gfx->place(@_);
+    return $self;
+}
+
 =item $page->resource $type, $key, $obj
 
 Adds a resource to the page-inheritance tree.

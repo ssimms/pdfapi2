@@ -2163,17 +2163,16 @@ a page's content:
     my $pdf = PDF::API2->new();
     my $image = $pdf->image('/path/to/image.jpg');
     my $page = $pdf->page();
-    my $content = $page->gfx();
 
-    my $x = 72;
-    my $y = 144;
-    $content->image($image, $x, $y);
+    # Place the image 1" (72pts) from the left and 2" (144pts) from the bottom
+    # of the page, using the default scale of 72 pixels per inch.
+    $page->place($image, 72, 144);
 
     $pdf->save('sample.pdf');
 
-C<$file> may be either a file name, a file handle, or a L<GD::Image> object.
+C<$file> may be either a file name, a filehandle, or a L<GD::Image> object.
 
-See L<PDF::API2::Content/"image"> for details about placing images on a page
+See L<PDF::API2::Content/"place"> for details about placing images on a page
 once they're imported.
 
 The image format is normally detected automatically based on the file's
