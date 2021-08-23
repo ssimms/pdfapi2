@@ -48,6 +48,14 @@
     - Created a convenience method $pdf->image, which combines image_jpeg,
       image_tiff, image_pnm, image_png, image_gif, and image_gd.
 
+    - Replaced the individual barcode methods with $pdf->barcode, which is
+      fully documented and includes reasonable defaults based on the chosen
+      barcode format.
+
+    - Improved spacing between barcodes and labels when both bar_extend
+      (formerly -lmzn) and font_size (formerly -fnsz) are set and the font size
+      is larger than the bar extension.
+
     - Created a convenience method $pdf->font, which combines corefont, ttfont,
       psfont, and bdfont.  Unlike corefont, font requires the exact name of one
       of the standard fonts.  Kerning is on by default (vs. off by default in

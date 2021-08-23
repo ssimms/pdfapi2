@@ -104,12 +104,15 @@ sub drawbar {
                 $y0 = $self->{' quzn'} + $self->{' lmzn'};
                 $y1 = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
                 $y_label   = $self->{' quzn'};
+                if ($self->{' fnsz'} and $self->{' lmzn'} < $self->{' fnsz'}) {
+                    $y_label -= $self->{' fnsz'} * 0.8 - $self->{' lmzn'};
+                }
                 $font_size = $self->{' fnsz'} || $self->{' lmzn'};
             }
             elsif ($bar =~ /[a-z]/) {
                 $y0 = $self->{' quzn'};
                 $y1 = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
-                $y_label   = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'};
+                $y_label   = $self->{' quzn'} + $self->{' lmzn'} + $self->{' zone'} + $self->{' umzn'} + 2;
                 $font_size = $self->{' fnsz'} || $self->{' umzn'};
             }
             elsif ($bar =~ /[A-Z]/) {

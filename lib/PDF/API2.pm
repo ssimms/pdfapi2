@@ -25,6 +25,7 @@ use PDF::API2::Resource::Shading;
 
 use PDF::API2::NamedDestination;
 
+use List::Util qw(max);
 use Scalar::Util qw(weaken);
 
 my @font_path = __PACKAGE__->set_font_path('/usr/share/fonts',
@@ -2161,12 +2162,10 @@ Import a supported image type and return an object that can be placed as part of
 a page's content:
 
     my $pdf = PDF::API2->new();
-    my $image = $pdf->image('/path/to/image.jpg');
     my $page = $pdf->page();
 
-    # Place the image 1" (72pts) from the left and 2" (144pts) from the bottom
-    # of the page, using the default scale of 72 pixels per inch.
-    $page->place($image, 72, 144);
+    my $image = $pdf->image('/path/to/image.jpg');
+    $page->place($image, 100, 100);
 
     $pdf->save('sample.pdf');
 
@@ -2323,6 +2322,237 @@ sub image_gd {
     return $obj;
 }
 
+=head2 barcode
+
+    $object = $pdf->barcode($format, $code, %options);
+
+Generate and return a barcode that can be placed as part of a page's content:
+
+    my $pdf = PDF::API2->new();
+    my $page = $pdf->page();
+
+    my $barcode = $pdf->barcode('ean13', '0123456789012');
+    $page->place($barcode, 100, 100);
+
+    $pdf->save('sample.pdf');
+
+C<$format> can be one of C<codabar>, C<code128>, C<code39> (a.k.a. 3 of 9),
+C<ean128>, C<ean13>, or C<itf> (a.k.a. interleaved 2 of 5).
+
+C<$code> is the value to be encoded.  Start and stop characters are only
+required when they're not static (e.g. for Codabar).
+
+The following options are available:
+
+=over
+
+=item * bar_width
+
+The width of the smallest bar or space in points (72 points = 1 inch).
+
+=item * bar_height
+
+The base height of the barcode in points.
+
+=item * bar_extend
+
+If present, bars for non-printing characters (e.g. start and stop characters)
+will be extended downward by this many points, and printing characters will be
+shown below their respective bars.
+
+This is enabled by default for EAN-13 barcodes.
+
+=item * caption
+
+If present, this value will be printed, centered, beneath the barcode, and
+should be a human-readable representation of the barcode.
+
+=item * font
+
+A font object (created by L<PDF::API2/"font">) that will be used to print the
+caption, or the printable characters when C<bar_extend> is set.
+
+Helvetica will be used by default.
+
+=item * font_size
+
+The size of the font used for printing the caption or printable characters.
+
+The default will be calculated based on the barcode size, if C<bar_extend> is
+set, or 10 otherwise.
+
+=item * quiet_zone
+
+A margin, in points, that will be place before the left and bottom edges of the
+barcode (including the caption, if present).  This is used to help barcode
+scanners tell where the barcode begins and ends.
+
+The default is the width of one encoded character.
+
+=item * bar_overflow
+
+Shrinks the horizontal width of bars by this amount in points to account for ink
+spread when printing.
+
+The default is 0.01 points.
+
+=item * color
+
+Draw bars using this color, which may be any value accepted by
+L<PDF::API2::Content/"fillcolor">.
+
+The default is black.
+
+=back
+
+=cut
+
+sub barcode {
+    my ($self, $format, $value, %options) = @_;
+    croak "Missing barcode format" unless defined $format;
+    croak "Missing barcode value" unless defined $value;
+
+    # Set defaults to approximately the minimums for each barcode format.
+    if ($format eq 'codabar') {
+        $options{'bar_width'} //= 1.8; # 0.025"
+        $options{'bar_extend'} //= 0;
+        $options{'quiet_zone'} //= 10 * $options{'bar_width'};
+        if ($options{'bar_extend'}) {
+            $options{'font_size'} //= 9 * $options{'bar_width'};
+        }
+
+        # Minimum height is the larger of 0.25" or 15% of barcode length.
+        my $length = (10 * length($value) + 2) * $options{'bar_width'};
+        $options{'bar_height'} //= max(18, $length * 0.15);
+    }
+    elsif ($format eq 'code128' or $format eq 'ean128' or $format eq 'code39') {
+        $options{'bar_width'} //= 1;
+        $options{'bar_extend'} //= 0;
+        $options{'quiet_zone'} //= 11 * $options{'bar_width'};
+        if ($options{'bar_extend'}) {
+            $options{'font_size'} //= 10 * $options{'bar_width'};
+        }
+
+        # Minimum height is the larger of 0.5" or 15% of barcode length.
+        my $length = 11 * (length($value) + 1) * $options{'bar_width'};
+        $options{'bar_height'} //= max(36, $length * 0.15);
+    }
+    elsif ($format eq 'itf') {
+        $options{'bar_width'} //= 1;
+        $options{'bar_height'} //= 40;
+        $options{'bar_extend'} //= 0;
+        $options{'quiet_zone'} //= 10 * $options{'bar_width'};
+        if ($options{'bar_extend'}) {
+            $options{'font_size'} //= 9 * $options{'bar_width'};
+        }
+    }
+    elsif ($format eq 'ean13') {
+        $options{'bar_width'} //= 1;
+        $options{'bar_height'} //= 64.8;
+        $options{'quiet_zone'} //= 11 * $options{'bar_width'};
+        unless ($options{'caption'}) {
+            $options{'bar_extend'} //= 5 * $options{'bar_width'};
+        }
+        if ($options{'bar_extend'}) {
+            $options{'font_size'} //= 10 * $options{'bar_width'};
+        }
+    }
+    else {
+        croak "Unrecognized barcode format: $format";
+    }
+
+    if (exists $options{'caption'}) {
+        $options{'font_size'} //= 10;
+    }
+    if ($options{'bar_extend'} or $options{'font_size'}) {
+        $options{'font'} //= $self->font('Helvetica');
+    }
+
+    # Convert from new arguments to old arguments
+    $options{'-color'} = delete $options{'color'};
+    $options{'-fnsz'}  = delete $options{'font_size'};
+    $options{'-font'}  = delete $options{'font'};
+    $options{'-lmzn'}  = delete $options{'bar_extend'};
+    $options{'-mils'}  = (delete $options{'bar_width'}) * 1000 / 72;
+    $options{'-ofwt'}  = delete $options{'bar_overflow'};
+    $options{'-quzn'}  = delete $options{'quiet_zone'};
+    $options{'-zone'}  = delete $options{'bar_height'};
+
+    if ($format eq 'codabar') {
+        return $self->xo_codabar(%options, -code => $value);
+    }
+    elsif ($format eq 'code128') {
+        return $self->xo_code128(%options, -code => $value);
+    }
+    elsif ($format eq 'code39') {
+        return $self->xo_3of9(%options, -code => $value);
+    }
+    elsif ($format eq 'ean128') {
+        return $self->xo_code128(%options, -code => $value, -ean => 1);
+    }
+    elsif ($format eq 'ean13') {
+        return $self->xo_ean13(%options, -code => $value);
+    }
+    elsif ($format eq 'itf') {
+        return $self->xo_2of5int(%options, -code => $value);
+    }
+}
+
+sub xo_code128 {
+    my ($self, @opts) = @_;
+
+    require PDF::API2::Resource::XObject::Form::BarCode::code128;
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::code128->new($self->{'pdf'}, @opts);
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
+}
+
+sub xo_codabar {
+    my ($self, @opts) = @_;
+
+    require PDF::API2::Resource::XObject::Form::BarCode::codabar;
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::codabar->new($self->{'pdf'}, @opts);
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
+}
+
+sub xo_2of5int {
+    my ($self, @opts) = @_;
+
+    require PDF::API2::Resource::XObject::Form::BarCode::int2of5;
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::int2of5->new($self->{'pdf'}, @opts);
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
+}
+
+sub xo_3of9 {
+    my ($self, @opts) = @_;
+
+    require PDF::API2::Resource::XObject::Form::BarCode::code3of9;
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::code3of9->new($self->{'pdf'}, @opts);
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
+}
+
+sub xo_ean13 {
+    my ($self, @opts) = @_;
+
+    require PDF::API2::Resource::XObject::Form::BarCode::ean13;
+    my $obj = PDF::API2::Resource::XObject::Form::BarCode::ean13->new($self->{'pdf'}, @opts);
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
+}
+
 =head1 COLORSPACE METHODS
 
 =over
@@ -2436,81 +2666,6 @@ sub colorspace_devicen {
 
     require PDF::API2::Resource::ColorSpace::DeviceN;
     my $obj = PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'}, pdfkey(), $clrs, $samples);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=back
-
-=head1 BARCODE METHODS
-
-=over
-
-=item $bc = $pdf->xo_codabar(%options)
-
-=item $bc = $pdf->xo_code128(%options)
-
-=item $bc = $pdf->xo_2of5int(%options)
-
-=item $bc = $pdf->xo_3of9(%options)
-
-=item $bc = $pdf->xo_ean13(%options)
-
-Creates the specified barcode object as a form XObject.
-
-=cut
-
-sub xo_code128 {
-    my ($self, @opts) = @_;
-
-    require PDF::API2::Resource::XObject::Form::BarCode::code128;
-    my $obj = PDF::API2::Resource::XObject::Form::BarCode::code128->new($self->{'pdf'}, @opts);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-sub xo_codabar {
-    my ($self, @opts) = @_;
-
-    require PDF::API2::Resource::XObject::Form::BarCode::codabar;
-    my $obj = PDF::API2::Resource::XObject::Form::BarCode::codabar->new($self->{'pdf'}, @opts);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-sub xo_2of5int {
-    my ($self, @opts) = @_;
-
-    require PDF::API2::Resource::XObject::Form::BarCode::int2of5;
-    my $obj = PDF::API2::Resource::XObject::Form::BarCode::int2of5->new($self->{'pdf'}, @opts);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-sub xo_3of9 {
-    my ($self, @opts) = @_;
-
-    require PDF::API2::Resource::XObject::Form::BarCode::code3of9;
-    my $obj = PDF::API2::Resource::XObject::Form::BarCode::code3of9->new($self->{'pdf'}, @opts);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-sub xo_ean13 {
-    my ($self, @opts) = @_;
-
-    require PDF::API2::Resource::XObject::Form::BarCode::ean13;
-    my $obj = PDF::API2::Resource::XObject::Form::BarCode::ean13->new($self->{'pdf'}, @opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
 
