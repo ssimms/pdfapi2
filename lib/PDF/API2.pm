@@ -2369,8 +2369,8 @@ should be a human-readable representation of the barcode.
 
 =item * font
 
-A font object (created by L<PDF::API2/"font">) that will be used to print the
-caption, or the printable characters when C<bar_extend> is set.
+A font object (created by L</"font">) that will be used to print the caption, or
+the printable characters when C<bar_extend> is set.
 
 Helvetica will be used by default.
 
