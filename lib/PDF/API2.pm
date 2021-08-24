@@ -798,7 +798,41 @@ sub is_encrypted {
     return defined($self->{'pdf'}->{'Encrypt'}) ? 1 : 0;
 }
 
-=head1 VIEWER METHODS
+=head1 INTERACTIVE FEATURE METHODS
+
+=head2 outlines
+
+    $outlines = $pdf->outlines();
+
+Creates (if needed) and returns the document's outline tree, which is also known
+as its bookmarks or the table of contents, depending on the PDF reader.
+
+To examine or modify the outline tree, see L<PDF::API2::Outline>.
+
+=cut
+
+sub outlines {
+    my $self = shift();
+
+    require PDF::API2::Outlines;
+    my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
+    if ($obj) {
+        $obj->realise();
+        bless $obj, 'PDF::API2::Outlines';
+        $obj->{' api'} = $self;
+        weaken $obj->{' api'};
+    }
+    else {
+        $obj = PDF::API2::Outlines->new($self);
+
+        $self->{'pdf'}->{'Root'}->{'Outlines'} = $obj;
+        $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
+        $self->{'pdf'}->out_obj($obj);
+        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
+    }
+
+    return $obj;
+}
 
 =head2 open_action
 
@@ -2553,6 +2587,25 @@ sub xo_ean13 {
     return $obj;
 }
 
+=head2 egstate
+
+    $resource = $pdf->egstate();
+
+Creates and returns a new extended graphics state object, described in
+L<PDF::API2::ExtGState>.
+
+=cut
+
+sub egstate {
+    my $self = shift();
+
+    my $obj = PDF::API2::Resource::ExtGState->new($self->{'pdf'}, pdfkey());
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
+}
+
 =head1 COLORSPACE METHODS
 
 =over
@@ -2674,36 +2727,6 @@ sub colorspace_devicen {
 
 =back
 
-=head1 OTHER METHODS
-
-=over
-
-=item $val = $pdf->default($parameter)
-
-=item $pdf->default($parameter, $value)
-
-Gets/sets the default value for a behaviour of PDF::API2.
-
-B<Supported Parameters:>
-
-=over
-
-=item * nounrotate
-
-prohibits API2 from rotating imported/opened page to re-create a
-default pdf-context.
-
-=item * pageencaps
-
-enables than API2 will add save/restore commands upon imported/opened
-pages to preserve graphics-state for modification.
-
-=item * copyannots
-
-enables importing of annotations (B<*EXPERIMENTAL*>).
-
-=back
-
 =cut
 
 sub default {
@@ -2720,12 +2743,6 @@ sub default {
     return $previous_value;
 }
 
-=item $xo = $pdf->xo_form()
-
-Returns a new form XObject.
-
-=cut
-
 sub xo_form {
     my $self = shift();
 
@@ -2735,28 +2752,6 @@ sub xo_form {
 
     return $obj;
 }
-
-=item $egs = $pdf->egstate()
-
-Returns a new extended graphics state object.
-
-=cut
-
-sub egstate {
-    my $self = shift();
-
-    my $obj = PDF::API2::Resource::ExtGState->new($self->{'pdf'}, pdfkey());
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=item $obj = $pdf->pattern()
-
-Returns a new pattern object.
-
-=cut
 
 sub pattern {
     my ($self, %opts) = @_;
@@ -2768,50 +2763,12 @@ sub pattern {
     return $obj;
 }
 
-=item $obj = $pdf->shading()
-
-Returns a new shading object.
-
-=cut
-
 sub shading {
     my ($self, %opts) = @_;
 
     my $obj = PDF::API2::Resource::Shading->new($self->{'pdf'}, undef, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=item $outlines = $pdf->outlines()
-
-Creates (if needed) and returns the document's outline tree, which is also known
-as its bookmarks or the table of contents, depending on the PDF reader.
-
-To examine or modify the outline tree, see L<PDF::API2::Outline>.
-
-=cut
-
-sub outlines {
-    my $self = shift();
-
-    require PDF::API2::Outlines;
-    my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
-    if ($obj) {
-        $obj->realise();
-        bless $obj, 'PDF::API2::Outlines';
-        $obj->{' api'} = $self;
-        weaken $obj->{' api'};
-    }
-    else {
-        $obj = PDF::API2::Outlines->new($self);
-
-        $self->{'pdf'}->{'Root'}->{'Outlines'} = $obj;
-        $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
-        $self->{'pdf'}->out_obj($obj);
-        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
-    }
 
     return $obj;
 }
