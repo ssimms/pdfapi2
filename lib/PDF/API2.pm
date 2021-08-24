@@ -800,9 +800,9 @@ sub is_encrypted {
 
 =head1 INTERACTIVE FEATURE METHODS
 
-=head2 outlines
+=head2 outline
 
-    $outlines = $pdf->outlines();
+    $outline = $pdf->outlines();
 
 Creates (if needed) and returns the document's outline tree, which is also known
 as its bookmarks or the table of contents, depending on the PDF reader.
@@ -811,7 +811,9 @@ To examine or modify the outline tree, see L<PDF::API2::Outline>.
 
 =cut
 
-sub outlines {
+sub outlines { return outline(@_) }
+
+sub outline {
     my $self = shift();
 
     require PDF::API2::Outlines;

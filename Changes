@@ -16,6 +16,7 @@
       - importPageIntoForm -> embed_page
       - isEncrypted -> is_encrypted
       - xmpMetadata -> xml_metadata
+      - outlines -> outline
 
     - Merged saveas into save.
 
