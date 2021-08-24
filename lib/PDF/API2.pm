@@ -2727,10 +2727,6 @@ sub colorspace_devicen {
     return $obj;
 }
 
-=back
-
-=cut
-
 sub default {
     my ($self, $parameter, $value) = @_;
 
