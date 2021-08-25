@@ -2856,8 +2856,6 @@ sub named_destination {
 
 __END__
 
-=back
-
 =head1 BACKWARD COMPATIBILITY GOAL
 
 Code written using PDF::API2 should continue to work unchanged for the life of
