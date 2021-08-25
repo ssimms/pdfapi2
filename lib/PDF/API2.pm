@@ -2856,7 +2856,7 @@ sub named_destination {
 
 __END__
 
-=head1 BACKWARD COMPATIBILITY GOAL
+=head1 BACKWARD COMPATIBILITY
 
 Code written using PDF::API2 should continue to work unchanged for the life of
 most long-term-stable (LTS) server distributions.  Specifically, it should
@@ -2865,21 +2865,27 @@ past five years (the typical support window for LTS releases) plus six months
 (allowing plenty of time for package freezes prior to release).
 
 In PDF::API2, method names, options, and functionality change over time.
-Functionality that's documented (not just in source code comments) should also
-continue working for the same time period, though deprecation warnings may be
-added.  There may be exceptions if your code happens to rely on bugs that get
-fixed, including when a method in PDF::API2 is changed to more closely follow
-the PDF specification.
+Functionality that's documented (not just in source code comments) should
+continue working for the same time period of five years and six months, though
+deprecation warnings may be added.  There may be exceptions if your code happens
+to rely on bugs that get fixed, including when a method in PDF::API2 is changed
+to more closely follow the PDF specification.
 
-Undocumented features, features marked as experimental, and underlying data
-structures may change at any time.  An exception is for features that were
-previously documented, which should continue to work for the same time period
-after the documentation is removed.
+Occasional breaking changes may be unavoidable or deemed small enough in scope
+to be worth the benefit of making the change instead of keeping the old
+behavior.  These will be noted in the Changes file as items beginning with the
+phrase "Breaking Change".
+
+Undocumented features, unreleased code, features marked as experimental, and
+underlying data structures may change at any time.  An exception is for features
+that were previously released and documented, which should continue to work for
+the above time period after the documentation is removed.
 
 Before migrating to a new LTS server version, it's recommended that you upgrade
-to the latest version of PDF::API2, enable C<use warnings>, and check your
-server logs for deprecations.  Once these are resolved, your code should be safe
-to use for any PDF::API2 releases during that LTS support window.
+to the latest version of PDF::API2, C<use warnings>, and check your server logs
+for deprecation messages after exercising your code.  Once these are resolved,
+it should be safe to use future PDF::API2 releases during that LTS support
+window.
 
 =head1 AUTHOR
 
