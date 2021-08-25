@@ -2589,6 +2589,174 @@ sub xo_ean13 {
     return $obj;
 }
 
+=head2 colorspace
+
+    $colorspace = $pdf->colorspace($type, @arguments);
+
+Colorspaces can be added to a PDF to either specifically control the output
+color on a particular device (spot colors, device colors) or to save space by
+limiting the available colors to a defined color palette (web-safe palette, ACT
+file).
+
+Once added to the PDF, they can be used in place of regular hex codes or named
+colors:
+
+    my $pdf = PDF::API2->new();
+    my $page = $pdf->page();
+    my $gfx = $page->gfx();
+
+    # Add colorspaces for a spot color and the web-safe color palette
+    my $spot = $pdf->colorspace('spot', 'PANTONE Red 032 C', '#EF3340');
+    my $web = $pdf->colorspace('web');
+
+    # Fill using the spot color with 100% coverage
+    $gfx->fillcolor($spot, 1.0);
+
+    # Stroke using the first color of the web-safe palette
+    $gfx->strokecolor($web, 0);
+
+    # Add a rectangle to the page
+    $gfx->rect(100, 100, 100, 100);
+    $gfx->fillstroke();
+
+    $pdf->save('sample.pdf');
+
+The following types of colorspaces are supported
+
+=over
+
+=item * spot
+
+    my $spot = $pdf->colorspace('spot', $tint, $alt_color);
+
+Spot colors are used to instruct a device (usually a printer) to use or emulate
+a particular ink color (C<$tint>) for parts of the document.  An C<$alt_color>
+is provided for devices (e.g. PDF viewers) that don't know how to produce the
+named color.  It can either be an approximation of the color in RGB, CMYK, or
+HSV formats, or a wildly different color (e.g. 100% magenta, C<%0F00>) to make
+it clear if the spot color isn't being used as expected.
+
+=item * web
+
+    my $web = $pdf->colorspace('web');
+
+The web-safe color palette is a historical collection of colors that was used
+when many display devices only supported 256 colors.
+
+=item * act
+
+    my $act = $pdf->colorspace('act', $filename);
+
+An Adobe Color Table (ACT) file provides a custom palette of colors that can be
+referenced by PDF graphics and text drawing commands.
+
+=item * device
+
+    my $devicen = $pdf->colorspace('device', @colorspaces);
+
+A device-specific colorspace allows for precise color output on a given device
+(typically a printing press), bypassing the normal color interpretation
+performed by raster image processors (RIPs).
+
+Device colorspaces are also needed if you want to blend spot colors:
+
+    my $pdf = PDF::API2->new();
+    my $page = $pdf->page();
+    my $gfx = $page->gfx();
+
+    # Create a two-color device colorspace
+    my $yellow = $pdf->colorspace('spot', 'Yellow', '%00F0');
+    my $spot = $pdf->colorspace('spot', 'PANTONE Red 032 C', '#EF3340');
+    my $device = $pdf->colorspace('device', $yellow, $spot);
+
+    # Fill using a blend of 25% yellow and 75% spot color
+    $gfx->fillcolor($device, 0.25, 0.75);
+
+    # Stroke using 100% spot color
+    $gfx->strokecolor($device, 0, 1);
+
+    # Add a rectangle to the page
+    $gfx->rect(100, 100, 100, 100);
+    $gfx->fillstroke();
+
+    $pdf->save('sample.pdf');
+
+=back
+
+=cut
+
+sub colorspace {
+    my $self = shift();
+    my $type = shift();
+
+    if ($type eq 'act') {
+        my $file = shift();
+        return $self->colorspace_act($file);
+    }
+    elsif ($type eq 'web') {
+        return $self->colorspace_web();
+    }
+    elsif ($type eq 'hue') {
+        # This type is undocumented until either a reference can be found for
+        # this being a standard palette like the web color palette, or POD is
+        # added to the Hue colorspace class that describes how to use it.
+        return $self->colorspace_hue();
+    }
+    elsif ($type eq 'spot') {
+        my $name = shift();
+        my $alt_color = shift();
+        return $self->colorspace_separation($name, $alt_color);
+    }
+    elsif ($type eq 'device') {
+        my @colors = @_;
+        return $self->colorspace_devicen(\@colors);
+    }
+    else {
+        croak "Unrecognized or unsupported colorspace: $type";
+    }
+}
+
+sub colorspace_act {
+    my ($self, $file) = @_;
+
+    require PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
+    return PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new($self->{'pdf'},
+                                                                  $file);
+}
+
+sub colorspace_web {
+    my $self = shift();
+
+    require PDF::API2::Resource::ColorSpace::Indexed::WebColor;
+    return PDF::API2::Resource::ColorSpace::Indexed::WebColor->new($self->{'pdf'});
+}
+
+sub colorspace_hue {
+    my $self = shift();
+
+    require PDF::API2::Resource::ColorSpace::Indexed::Hue;
+    return PDF::API2::Resource::ColorSpace::Indexed::Hue->new($self->{'pdf'});
+}
+
+sub colorspace_separation {
+    my ($self, $name, @clr) = @_;
+
+    require PDF::API2::Resource::ColorSpace::Separation;
+    return PDF::API2::Resource::ColorSpace::Separation->new($self->{'pdf'},
+                                                            pdfkey(),
+                                                            $name,
+                                                            @clr);
+}
+
+sub colorspace_devicen {
+    my ($self, $clrs) = @_;
+
+    require PDF::API2::Resource::ColorSpace::DeviceN;
+    return PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'},
+                                                         pdfkey(),
+                                                         $clrs);
+}
+
 =head2 egstate
 
     $resource = $pdf->egstate();
@@ -2602,125 +2770,6 @@ sub egstate {
     my $self = shift();
 
     my $obj = PDF::API2::Resource::ExtGState->new($self->{'pdf'}, pdfkey());
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=head1 COLORSPACE METHODS
-
-=over
-
-=item $cs = $pdf->colorspace_act($file)
-
-Returns a new colorspace object based on an Adobe Color Table file.
-
-See L<PDF::API2::Resource::ColorSpace::Indexed::ACTFile> for a
-reference to the file format's specification.
-
-=cut
-
-sub colorspace_act {
-    my ($self, $file, %opts) = @_;
-
-    require PDF::API2::Resource::ColorSpace::Indexed::ACTFile;
-    my $obj = PDF::API2::Resource::ColorSpace::Indexed::ACTFile->new($self->{'pdf'}, $file);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=item $cs = $pdf->colorspace_web()
-
-Returns a new colorspace-object based on the web color palette.
-
-=cut
-
-sub colorspace_web {
-    my ($self, $file, %opts) = @_;
-
-    require PDF::API2::Resource::ColorSpace::Indexed::WebColor;
-    my $obj = PDF::API2::Resource::ColorSpace::Indexed::WebColor->new($self->{'pdf'});
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=item $cs = $pdf->colorspace_hue()
-
-Returns a new colorspace-object based on the hue color palette.
-
-See L<PDF::API2::Resource::ColorSpace::Indexed::Hue> for an explanation.
-
-=cut
-
-sub colorspace_hue {
-    my ($self, $file, %opts)=@_;
-
-    require PDF::API2::Resource::ColorSpace::Indexed::Hue;
-    my $obj = PDF::API2::Resource::ColorSpace::Indexed::Hue->new($self->{'pdf'});
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=item $cs = $pdf->colorspace_separation($tint, $color)
-
-Returns a new separation colorspace object based on the parameters.
-
-I<$tint> can be any valid ink identifier, including but not limited
-to: 'Cyan', 'Magenta', 'Yellow', 'Black', 'Red', 'Green', 'Blue' or
-'Orange'.
-
-I<$color> must be a valid color specification limited to: '#rrggbb',
-'!hhssvv', '%ccmmyykk' or a "named color" (rgb).
-
-The colorspace model will automatically be chosen based on the
-specified color.
-
-=cut
-
-sub colorspace_separation {
-    my ($self, $name, @clr)=@_;
-
-    require PDF::API2::Resource::ColorSpace::Separation;
-    my $obj = PDF::API2::Resource::ColorSpace::Separation->new($self->{'pdf'}, pdfkey(), $name, @clr);
-
-    $self->{'pdf'}->out_obj($self->{'pages'});
-
-    return $obj;
-}
-
-=item $cs = $pdf->colorspace_devicen(\@tintCSx, [$samples])
-
-Returns a new DeviceN colorspace object based on the parameters.
-
-B<Example:>
-
-    $cy = $pdf->colorspace_separation('Cyan',    '%f000');
-    $ma = $pdf->colorspace_separation('Magenta', '%0f00');
-    $ye = $pdf->colorspace_separation('Yellow',  '%00f0');
-    $bk = $pdf->colorspace_separation('Black',   '%000f');
-
-    $pms023 = $pdf->colorspace_separation('PANTONE 032CV', '%0ff0');
-
-    $dncs = $pdf->colorspace_devicen( [ $cy,$ma,$ye,$bk,$pms023 ] );
-
-The colorspace model will automatically be chosen based on the first
-colorspace specified.
-
-=cut
-
-sub colorspace_devicen {
-    my ($self, $clrs, $samples) = @_;
-    $samples ||= 2;
-
-    require PDF::API2::Resource::ColorSpace::DeviceN;
-    my $obj = PDF::API2::Resource::ColorSpace::DeviceN->new($self->{'pdf'}, pdfkey(), $clrs, $samples);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
 

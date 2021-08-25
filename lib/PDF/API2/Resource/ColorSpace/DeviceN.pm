@@ -23,7 +23,13 @@ sub new {
 
     my $fct = PDFDict();
 
-    my $csname = $clrs->[0]->type();
+    # The base colorspace was formerly chosen based on the base colorspace of
+    # the first color component, but since only DeviceCMYK has been implemented
+    # (everything else throws an error), always use DeviceCMYK.
+    #
+    # my $csname = $clrs->[0]->type();
+    my $csname = 'DeviceCMYK';
+
     my @xclr = map { $_->color() } @$clrs;
     my @xnam = map { $_->tintname() } @$clrs;
     if ($csname eq 'DeviceCMYK') {

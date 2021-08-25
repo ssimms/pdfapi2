@@ -20,13 +20,10 @@ sub new {
     $self->{' apipdf'} = $pdf;
     weaken $self->{' apipdf'};
 
-    my $csd=PDFDict();
+    my $csd = PDFDict();
     $pdf->new_obj($csd);
-    $csd->{'Filter'} = PDFArray(PDFName('ASCIIHexDecode'));
-    $csd->{'WhitePoint'} = PDFArray(map { PDFNum($_) } (0.95049, 1, 1.08897));
-    $csd->{'BlackPoint'} = PDFArray(map { PDFNum($_) } (0, 0, 0));
-    $csd->{'Gamma'} = PDFArray(map { PDFNum($_) } (2.22218, 2.22218, 2.22218));
 
+    $csd->{'Filter'} = PDFArray(PDFName('ASCIIHexDecode'));
     $csd->{' stream'} = '';
 
     # 0-215

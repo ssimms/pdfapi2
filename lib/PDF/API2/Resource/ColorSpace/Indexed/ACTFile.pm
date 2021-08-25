@@ -42,10 +42,6 @@ sub new {
     $pdf->new_obj($csd);
     $csd->{'Filter'} = PDFArray(PDFName('FlateDecode'));
 
-    $csd->{'WhitePoint'} = PDFArray(map { PDFNum($_) } (0.95049, 1, 1.08897));
-    $csd->{'BlackPoint'} = PDFArray(map { PDFNum($_) } (0, 0, 0));
-    $csd->{'Gamma'} = PDFArray(map { PDFNum($_) } (2.22218, 2.22218, 2.22218));
-
     my $fh;
     open($fh, "<", $file) or die "$!: $file";
     binmode($fh, ':raw');
