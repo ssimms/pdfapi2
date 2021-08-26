@@ -1,11 +1,10 @@
 {{$NEXT}}
 
     - This release includes many changes to method names, options, and
-      documentation aimed at improving approachability, so I've added a Backward
-      Compatibility section to the PDF::API2 POD (replacing the Supported Perl
-      Versions section) explaining that deprecated method names and options
-      should continue to work unchanged for an extended and defined period of
-      time, though not indefinitely.
+      documentation aimed at improving approachability, but existing code should
+      continue to work.  See the new Backward Compatibility section in the main
+      PDF::API2 documentation for details about deprecation timelines and a
+      suggested workflow for handling upgrades.
 
     - Renamed several methods in the PDF::API2 base class:
 
@@ -46,8 +45,8 @@
       different (pass options as a hash instead of a hashref; remove hyphens
       from option names).
 
-    - Created a convenience method $pdf->image, which combines image_jpeg,
-      image_tiff, image_pnm, image_png, image_gif, and image_gd.
+    - Replaced image_jpeg, image_tiff, image_pnm, image_png, image_gif, and
+      image_gd with $pdf->image.
 
     - Replaced the individual barcode methods with $pdf->barcode, which is
       fully documented and includes reasonable defaults based on the chosen
@@ -57,10 +56,10 @@
       (formerly -lmzn) and font_size (formerly -fnsz) are set and the font size
       is larger than the bar extension.
 
-    - Created a convenience method $pdf->font, which combines corefont, ttfont,
-      psfont, and bdfont.  Unlike corefont, font requires the exact name of one
-      of the standard fonts.  Kerning is on by default (vs. off by default in
-      the type-specific methods).
+    - Replaced corefont, ttfont, psfont, and bdfont with $pdf->font.  Unlike
+      corefont, font requires the exact name of one of the standard fonts.
+      Kerning is on by default (vs. off by default in the type-specific
+      methods).
 
     - Renamed synfont to synthetic_font.  Renamed and documented the options.
       The new hscale option (formerly -slant) now takes a percentage (100 = no
@@ -68,6 +67,11 @@
       Content.  The new "bold" option is in thousandths of a text unit,
       vs. hundredths for "-bold", so multiply the old value by 10 when
       migrating.
+
+    - Replaced the individual colorspace methods with $pdf->colorspace.  Added
+      documentation and examples for the various colorspace types except for the
+      former colorspace_hue, because I couldn't find the standard that it
+      implements (if one exists).
 
     - Renamed $content->advancewidth() to $content->text_width().
 
