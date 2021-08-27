@@ -4,7 +4,9 @@
       documentation aimed at improving approachability, but existing code should
       continue to work.  See the new Backward Compatibility section in the main
       PDF::API2 documentation for details about deprecation timelines and a
-      suggested workflow for handling upgrades.
+      suggested workflow for handling upgrades.  See the new Migration section
+      for a consolidated list of deprecated methods/options and their
+      replacements.
 
     - Renamed several methods in the PDF::API2 base class:
 

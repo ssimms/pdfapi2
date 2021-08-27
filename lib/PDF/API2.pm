@@ -811,6 +811,7 @@ To examine or modify the outline tree, see L<PDF::API2::Outline>.
 
 =cut
 
+# Deprecated (renamed)
 sub outlines { return outline(@_) }
 
 sub outline {
@@ -2386,6 +2387,9 @@ The following options are available:
 
 The width of the smallest bar or space in points (72 points = 1 inch).
 
+If you're following a specification that gives bar width in mils (thousandths of
+an inch), use this conversion: C<$points = $mils / 1000 * 72>.
+
 =item * bar_height
 
 The base height of the barcode in points.
@@ -2887,13 +2891,286 @@ for deprecation messages after exercising your code.  Once these are resolved,
 it should be safe to use future PDF::API2 releases during that LTS support
 window.
 
+If your code uses a PDF::API2 method that isn't documented here, it has probably
+been deprecated.  Search for it in the Migration section below to find its
+replacement.
+
+=head1 MIGRATION
+
+Use this section to bring your existing code up to date with current method
+names and options.  If you're not getting a deprecation warning, this is
+optional, but still recommended.
+
+For example, in cases where a method was simply renamed, the old name will be
+set up as an alias for the new one, which can be maintained indefinitely.  The
+main benefit of switching to the new name is to make it easier to find the
+appropriate documentation when you need it.
+
+=over
+
+=item new(-compress => 0)
+
+=item new(-file => $filename)
+
+Remove the hyphen from the option names.
+
+=item new() with any options other than C<compress> or C<file>
+
+Replace with calls to L</"INTERACTIVE FEATURE METHODS">.  See the deprecated
+L</"preferences"> method for particular option names.
+
+=item finishobjects
+
+=item saveas
+
+=item update
+
+Replace with L</"save">.
+
+=item end
+
+=item release
+
+Replace with L</"close">.
+
+=item open_scalar
+
+=item openScalar
+
+Replace with L</"from_string">.
+
+=item stringify
+
+Replace with L</"to_string">.
+
+=item info
+
+Each of the hash keys now has its own accessor.  See L</"METADATA METHODS">.
+
+For custom keys or if you prefer to give the key names as variables (e.g. as
+part of a loop), use L</"info_metadata">.
+
+=item infoMetaAttributes
+
+Use L</"info_metadata"> without arguments to get a list of currently-set keys in
+the Info dictionary (including any custom keys).  This is slightly different
+behavior from calling C<infoMetaAttributes> without arguments, which always
+returns the standard key names and any defined custom key names, whether or not
+they're present in the PDF.
+
+Calling C<infoMetaAttributes> with arguments defines the list of Info keys that
+are supported by the deprecated C<info> method.  You can now just call
+L</"info_metadata"> with a standard or custom key and value.
+
+=item xmpMetadata
+
+Replace with L</"xml_metadata">.  Note that, when called with an argument,
+C<xml_metadata> returns the PDF object rather than the value, to line up with
+most other PDF::API2 accessors.
+
+=item isEncrypted
+
+Replace with L</"is_encrypted">.
+
+=item outlines
+
+Replace with L</"outline">.
+
+=item preferences
+
+This functionality has been split into a few methods, aligning more closely with
+the underlying PDF structure.  See the documentation for each of the methods for
+revised option names.
+
+=over
+
+=item * -fullscreen, -thumbs, -outlines
+
+Call L</"page_mode">.
+
+=item * -singlepage, -onecolumn, -twocolumnleft, -twocolumnright
+
+Call L</"page_layout">.
+
+=item * -hidetoolbar, -hidemenubar, -hidewindowui, -fitwindow, -centerwindow,
+-displaytitle, -righttoleft, -afterfullscreenthumbs, -afterfullscreenoutlines,
+-printscalingnone, -simplex, -duplexfliplongedge, -duplexflipshortedge
+
+Call L</"viewer_preferences">.
+
+=item * -firstpage
+
+Call L</"open_action">.
+
+=back
+
+=item openpage
+
+Replace with L</"open_page">.
+
+=item importpage
+
+Replace with L</"import_page">.
+
+=item importPageIntoForm
+
+Replace with L</"embed_page">.
+
+=item pages
+
+Replace with L</"page_count">.
+
+=item pageLabel
+
+Replace with L</"page_labels">.  Remove hyphens from the argument names.  Add
+C<style =E<gt> 'decimal'> if there wasn't a C<-style> argument.
+
+=item mediabox
+
+=item cropbox
+
+=item bleedbox
+
+=item trimbox
+
+=item artbox
+
+Replace with L</"default_page_boundaries">.  If using page size aliases
+(e.g. "letter" or "A4"), check to ensure that the alias is still supported
+(you'll get an error if it isn't).
+
+=item synfont
+
+Replace with L</"synthetic_font">.
+
+=item addFontDirs
+
+Replace with L</"add_to_font_path">.
+
+=item corefont
+
+Replace with L</"font">.  Note that C<font> requires that the font name be an
+exact, case-sensitive match.  The full list can be found in
+L<PDF::API2::Resource::Font::CoreFont/"STANDARD FONTS">.
+
+=item ttfont
+
+Replace with L</"font">.  Replace C<-noembed =E<gt> 1> with C<embed =E<gt> 0>.
+
+=item bdfont
+
+Replace with L</"font">.
+
+=item psfont
+
+Replace with L</"font">.  Rename options C<-afmfile> and C<-pfmfile> to
+C<afm_file> and C<pfm_file>.
+
+Note that Adobe has announced that their products no longer support Postscript
+Type 1 fonts, effective early 2023.  They recommend using TrueType or OpenType
+fonts instead.
+
+=item cjkfont
+
+=item unifont
+
+These are old methods from back when Unicode was still new and poorly supported.
+Replace them with calls to L</"font"> using a TrueType or OpenType font that has
+the characters you need.
+
+If you're successfully using one of these two methods and feel they shouldn't be
+deprecated, please contact me with your use case.
+
+=item image_gd
+
+=item image_gif
+
+=item image_jpeg
+
+=item image_png
+
+=item image_pnm
+
+=item image_tiff
+
+Replace with L</"image">.
+
+=item xo_code128
+
+=item xo_codabar
+
+=item xo_2of5int
+
+=item xo_3of9
+
+=item xo_ean13
+
+Replace with L</"barcode">.  Replace arguments as follows:
+
+=over
+
+=item * C<-color>: C<color>
+
+=item * C<-fnsz>: C<font_size>
+
+=item * C<-font>: C<font>
+
+=item * C<-lmzn>: C<bar_extend>
+
+=item * C<-ofwt>: C<bar_overflow>
+
+=item * C<-quzn>: C<quiet_zone>
+
+=item * C<-zone>: C<bar_height>
+
+These options are simple renames.
+
+=item * C<-mils>: C<bar_width>
+
+This requires a conversion from mils to points.  The C<bar_width> documentation
+has sample code to do the conversion.
+
+=item * C<-ean>
+
+Specify C<ean128> as the barcode format instead of C<code128>.
+
+=back
+
+=item colorspace_act
+
+=item colorspace_web
+
+=item colorspace_separation
+
+=item colorspace_devicen
+
+Replace with L</"colorspace">.
+
+=item colorspace_hue
+
+This is deprecated because I wasn't able to find a corresponding standard.
+Please contact me if you're using it, to avoid having it be removed in a future
+release.
+
+=item default
+
+The optional changes in default behavior have all been deprecated.
+
+Replace C<pageencaps> with calls to C<save> and C<restore> when embedding or
+superimposing a page onto another, if needed.
+
+C<nounrotate> and C<copyannots> will continue to work until better options are
+available, but should not be used in new code.
+
+=back
+
 =head1 AUTHOR
 
-PDF::API2 was originally written by Alfred Reibenschuh, extending code written
-by Martin Hosken.
+PDF::API2 is developed and maintained by Steve Simms, with patches from numerous
+contributors who are credited in the Changes file.
 
-It is currently being maintained and developed by Steve Simms, with patches from
-numerous contributors who are credited in the Changes file.
+It was originally written by Alfred Reibenschuh, extending code written
+by Martin Hosken.
 
 =head1 LICENSE
 

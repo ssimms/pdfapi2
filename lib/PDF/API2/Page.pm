@@ -660,6 +660,43 @@ sub ship_out {
 
 =back
 
+=head1 MIGRATION
+
+See L<PDF::API2/"MIGRATION"> for an overview.
+
+=over
+
+=item mediabox
+
+=item get_mediabox
+
+Replace with L</"size"> if not in a print shop environment or L</"boundaries">
+if more complex page boundaries are needed.
+
+If using page size aliases (e.g. "letter" or "A4"), check the Page Sizes section
+to ensure that the alias you're using is still supported (you'll get an error if
+it isn't).
+
+=item cropbox
+
+=item bleedbox
+
+=item trimbox
+
+=item artbox
+
+=item get_cropbox
+
+=item get_bleedbox
+
+=item get_trimbox
+
+=item get_artbox
+
+Replace with L</"boundaries">.
+
+=back
+
 =cut
 
 1;

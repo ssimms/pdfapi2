@@ -2249,4 +2249,20 @@ sub resource {
     }
 }
 
+=head1 MIGRATION
+
+See L<PDF::API2/"MIGRATION"> for an overview.
+
+=over
+
+=item image
+
+=item formimage
+
+Replace with C<place>.
+
+=back
+
+=cut
+
 1;
