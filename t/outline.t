@@ -98,9 +98,9 @@ $page1 = $pdf->page();
 $page2 = $pdf->page();
 $outlines = $pdf->outlines();
 
-$a = $outlines->insert();
-$b = $outlines->insert();
-$c = $outlines->insert();
+$a = $outlines->outline();
+$b = $outlines->outline();
+$c = $outlines->outline();
 $d = $a->insert_after();
 
 is($outlines->count(), 4,

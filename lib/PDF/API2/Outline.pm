@@ -18,10 +18,10 @@ PDF::API2::Outline - Manage PDF outlines (a.k.a. bookmarks)
 =head1 SYNOPSIS
 
     # Get/create the top-level outline tree
-    my $outlines = $pdf->outlines();
+    my $outline = $pdf->outline();
 
     # Add an entry
-    my $item = $outlines->insert();
+    my $item = $outline->outline();
     $item->title('First Page');
     $item->destination($pdf->open_page(1));
 
@@ -188,18 +188,15 @@ sub next {
 
 =head2 Modify the Outline Tree
 
-=head3 insert
+=head3 outline
 
-    my $child = $outline->insert();
+    my $child = $outline->outline();
 
 Add an outline item at the end of the current outline's list of children.
 
 =cut
 
-# Deprecated (renamed)
-sub outline { return insert(@_) }
-
-sub insert {
+sub outline {
     my $self = shift();
 
     my $child = PDF::API2::Outline->new($self->{' api'}, $self);
