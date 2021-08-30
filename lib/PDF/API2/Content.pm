@@ -3,7 +3,7 @@ package PDF::API2::Content;
 use base 'PDF::API2::Basic::PDF::Dict';
 
 use strict;
-no warnings qw( deprecated recursion uninitialized );
+use warnings;
 
 # VERSION
 
@@ -37,8 +37,9 @@ PDF::API2::Content - Methods for adding graphics and text to a PDF
 =cut
 
 sub new {
-    my $class = $_[0];
-    my $self = $class->SUPER::new(@_);
+    my $class = shift();
+    my $self = $class->SUPER::new();
+
     $self->{' stream'} = '';
     $self->{' poststream'} = '';
     $self->{' font'} = undef;
@@ -60,6 +61,7 @@ sub new {
     $self->{' skew'} = [0, 0];
     $self->{' rotate'} = 0;
     $self->{' apiistext'} = 0;
+
     return $self;
 }
 
@@ -71,7 +73,7 @@ sub outobjdeep {
         $self->{' nofilt'} = 1;
         delete $self->{'-docompress'};
     }
-    $self->SUPER::outobjdeep(@_);
+    return $self->SUPER::outobjdeep(@_);
 }
 
 =head2 Coordinate Transformations
@@ -304,7 +306,7 @@ sub matrix {
 }
 
 sub matrix_update {
-    my ($self, $tx, $ty)=@_;
+    my ($self, $tx, $ty) = @_;
     $self->{' textlinematrix'}->[0] += $tx;
     $self->{' textlinematrix'}->[1] += $ty;
     return $self;
@@ -1143,63 +1145,61 @@ sub _makecolor {
 }
 
 sub _fillcolor {
-    my ($self,@clrs)=@_;
+    my ($self, @clrs) = @_;
     if (ref($clrs[0]) =~ m|^PDF::API2::Resource::ColorSpace|) {
-        $self->resource('ColorSpace',$clrs[0]->name,$clrs[0]);
+        $self->resource('ColorSpace', $clrs[0]->name(), $clrs[0]);
     }
     elsif (ref($clrs[0]) =~ m|^PDF::API2::Resource::Pattern|) {
-        $self->resource('Pattern',$clrs[0]->name,$clrs[0]);
+        $self->resource('Pattern', $clrs[0]->name(), $clrs[0]);
     }
 
-    return $self->_makecolor(1,@clrs);
+    return $self->_makecolor(1, @clrs);
 }
 
 sub fillcolor {
-    my $self = shift;
-    if (scalar @_) {
-        @{$self->{' fillcolor'}}=@_;
+    my $self = shift();
+    if (@_) {
+        @{$self->{' fillcolor'}} = @_;
         $self->add($self->_fillcolor(@_));
     }
     return @{$self->{' fillcolor'}};
 }
 
 sub _strokecolor {
-    my ($self,@clrs)=@_;
+    my ($self, @clrs) = @_;
     if (ref($clrs[0]) =~ m|^PDF::API2::Resource::ColorSpace|) {
-        $self->resource('ColorSpace',$clrs[0]->name,$clrs[0]);
+        $self->resource('ColorSpace', $clrs[0]->name(), $clrs[0]);
     }
     elsif (ref($clrs[0]) =~ m|^PDF::API2::Resource::Pattern|) {
-        $self->resource('Pattern',$clrs[0]->name,$clrs[0]);
+        $self->resource('Pattern', $clrs[0]->name(), $clrs[0]);
     }
-    return $self->_makecolor(0,@clrs);
+    return $self->_makecolor(0, @clrs);
 }
 
 sub strokecolor {
-    my $self = shift;
-    if (scalar @_) {
-        @{$self->{' strokecolor'}}=@_;
+    my $self = shift();
+    if (@_) {
+        @{$self->{' strokecolor'}} = @_;
         $self->add($self->_strokecolor(@_));
     }
     return @{$self->{' strokecolor'}};
 }
 
-
 sub shade {
-    my $self = shift;
-    my $shade = shift;
-    my @cord = @_;
+    my ($self, $shade, @cord) = @_;
+
     my @tm = (
-        $cord[2]-$cord[0] , 0,
-        0                 , $cord[3]-$cord[1],
-        $cord[0]          , $cord[1],
+        $cord[2] - $cord[0], 0,
+        0                  , $cord[3] - $cord[1],
+        $cord[0]           , $cord[1],
     );
-    $self->save;
+
+    $self->save();
     $self->matrix(@tm);
-    $self->add('/'.$shade->name,'sh');
+    $self->add('/' . $shade->name(), 'sh');
+    $self->resource('Shading', $shade->name(), $shade);
+    $self->restore();
 
-    $self->resource('Shading',$shade->name,$shade);
-
-    $self->restore;
     return $self;
 }
 
@@ -1262,46 +1262,44 @@ sub place {
 sub image {
     my $self = shift;
     my $img = shift;
-    my ($x,$y,$w,$h) = @_;
-    if (defined $img->{Metadata}) {
-        $self->metaStart('PPAM:PlacedImage',$img->{Metadata});
+    my ($x, $y, $w, $h) = @_;
+    if (defined $img->{'Metadata'}) {
+        $self->metaStart('PPAM:PlacedImage', $img->{'Metadata'});
     }
-    $self->save;
-    if (!defined $w) {
-        $h=$img->height;
-        $w=$img->width;
+    $self->save();
+    unless (defined $w) {
+        $h = $img->height();
+        $w = $img->width();
     }
-    elsif (!defined $h) {
-        $h=$img->height*$w;
-        $w=$img->width*$w;
+    elsif (not defined $h) {
+        $h = $img->height() * $w;
+        $w = $img->width() * $w;
     }
-    $self->matrix($w,0,0,$h,$x,$y);
-    $self->add("/".$img->name,'Do');
-    $self->restore;
-    $self->{' x'}=$x;
-    $self->{' y'}=$y;
-    $self->resource('XObject',$img->name,$img);
-    if(defined $img->{Metadata}) {
-        $self->metaEnd;
+    $self->matrix($w, 0, 0, $h, $x, $y);
+    $self->add('/' . $img->name(), 'Do');
+    $self->restore();
+    $self->{' x'} = $x;
+    $self->{' y'} = $y;
+    $self->resource('XObject', $img->name(), $img);
+    if (defined $img->{'Metadata'}) {
+        $self->metaEnd();
     }
     return $self;
 }
 
 # Deprecated
 sub formimage {
-    my $self = shift;
-    my $img = shift;
-    my ($x,$y,$s) = @_;
-    $self->save;
-    if (!defined $s) {
-        $self->matrix(1,0,0,1,$x,$y);
+    my ($self, $img, $x, $y, $s) = @_;
+    $self->save();
+    if (defined $s) {
+        $self->matrix($s, 0, 0, $s, $x, $y);
     }
     else {
-        $self->matrix($s,0,0,$s,$x,$y);
+        $self->matrix(1, 0, 0, 1, $x, $y);
     }
-    $self->add('/'.$img->name,'Do');
-    $self->restore;
-    $self->resource('XObject',$img->name,$img);
+    $self->add('/' . $img->name(), 'Do');
+    $self->restore();
+    $self->resource('XObject', $img->name(), $img);
     return $self;
 }
 
@@ -1322,14 +1320,15 @@ Sets the spacing between characters.  This is initially zero.
 =cut
 
 sub _charspace {
-    my ($para) = @_;
-    return float($para, 6) . ' Tc';
+    my $spacing = shift();
+    return float($spacing, 6) . ' Tc';
 }
+
 sub charspace {
-    my ($self, $para) = @_;
-    if (defined $para) {
-        $self->{' charspace'}=$para;
-        $self->add(_charspace($para));
+    my ($self, $spacing) = @_;
+    if (defined $spacing) {
+        $self->{' charspace'} = $spacing;
+        $self->add(_charspace($spacing));
     }
     return $self->{' charspace'};
 }
@@ -1348,15 +1347,15 @@ word spacing in fonts that use multi-byte codes.
 =cut
 
 sub _wordspace {
-    my ($para) = @_;
-    return float($para, 6) . ' Tw';
+    my $spacing = shift();
+    return float($spacing, 6) . ' Tw';
 }
 
 sub wordspace {
-    my ($self, $para) = @_;
-    if (defined $para) {
-        $self->{' wordspace'}=$para;
-        $self->add(_wordspace($para));
+    my ($self, $spacing) = @_;
+    if (defined $spacing) {
+        $self->{' wordspace'} = $spacing;
+        $self->add(_wordspace($spacing));
     }
     return $self->{' wordspace'};
 }
@@ -1370,7 +1369,7 @@ text, or 100 to disable any existing scaling.
 =cut
 
 sub _hscale {
-    my ($scale) = @_;
+    my $scale = shift();
     return float($scale, 6) . ' Tz';
 }
 
@@ -1400,14 +1399,14 @@ sub _lead { return _leading(@_) }
 sub  lead { return  leading(@_) }
 
 sub _leading {
-    my ($para) = @_;
-    return float($para) . ' TL';
+    my $leading = shift();
+    return float($leading) . ' TL';
 }
 sub leading {
-    my ($self,$para) = @_;
-    if (defined ($para)) {
-        $self->{' leading'} = $para;
-        $self->add(_leading($para));
+    my ($self, $leading) = @_;
+    if (defined ($leading)) {
+        $self->{' leading'} = $leading;
+        $self->add(_leading($leading));
     }
     return $self->{' leading'};
 }
@@ -1439,15 +1438,15 @@ Sets the text rendering mode.
 =cut
 
 sub _render {
-    my ($para) = @_;
-    return intg($para) . ' Tr';
+    my $mode = shift();
+    return intg($mode) . ' Tr';
 }
 
 sub render {
-    my ($self, $para) = @_;
-    if (defined ($para)) {
-        $self->{' render'} = $para;
-        $self->add(_render($para));
+    my ($self, $mode) = @_;
+    if (defined ($mode)) {
+        $self->{' render'} = $mode;
+        $self->add(_render($mode));
     }
     return $self->{' render'};
 }
@@ -1463,15 +1462,15 @@ adjustment to the font size as well).
 =cut
 
 sub _rise {
-    my ($para) = @_;
-    return float($para) . ' Ts';
+    my $distance = shift();
+    return float($distance) . ' Ts';
 }
 
 sub rise {
-    my ($self, $para) = @_;
-    if (defined ($para)) {
-        $self->{' rise'} = $para;
-        $self->add(_rise($para));
+    my ($self, $distance) = @_;
+    if (defined ($distance)) {
+        $self->{' rise'} = $distance;
+        $self->add(_rise($distance));
     }
     return $self->{' rise'};
 }
@@ -1488,45 +1487,45 @@ Note: This does not currently work with the C<save> and C<restore> commands.
 =cut
 
 sub textstate {
-    my $self = shift;
+    my $self = shift();
     my %state;
-    if (scalar @_) {
+    if (@_) {
         %state = @_;
-        foreach my $k (qw( charspace hscale wordspace leading rise render )) {
-            next unless($state{$k});
+        foreach my $k (qw(charspace hscale wordspace leading rise render)) {
+            next unless $state{$k};
             $self->can($k)->($self, $state{$k});
         }
-        if ($state{font} && $state{fontsize}) {
-            $self->font($state{font},$state{fontsize});
+        if ($state{'font'} and $state{'fontsize'}) {
+            $self->font($state{'font'}, $state{'fontsize'});
         }
-        if ($state{textmatrix}) {
-            $self->matrix(@{$state{textmatrix}});
-            @{$self->{' translate'}}=@{$state{translate}};
-            $self->{' rotate'}=$state{rotate};
-            @{$self->{' scale'}}=@{$state{scale}};
-            @{$self->{' skew'}}=@{$state{skew}};
+        if ($state{'textmatrix'}) {
+            $self->matrix(@{$state{'textmatrix'}});
+            @{$self->{' translate'}} = @{$state{'translate'}};
+            $self->{' rotate'} = $state{'rotate'};
+            @{$self->{' scale'}} = @{$state{'scale'}};
+            @{$self->{' skew'}} = @{$state{'skew'}};
         }
-        if ($state{fillcolor}) {
-            $self->fillcolor(@{$state{fillcolor}});
+        if ($state{'fillcolor'}) {
+            $self->fillcolor(@{$state{'fillcolor'}});
         }
-        if ($state{strokecolor}) {
-            $self->strokecolor(@{$state{strokecolor}});
+        if ($state{'strokecolor'}) {
+            $self->strokecolor(@{$state{'strokecolor'}});
         }
         %state = ();
     }
     else {
-        foreach my $k (qw( font fontsize charspace hscale wordspace leading rise render )) {
-            $state{$k}=$self->{" $k"};
+        foreach my $k (qw(font fontsize charspace hscale wordspace leading rise render)) {
+            $state{$k} = $self->{" $k"};
         }
-        $state{matrix}=[@{$self->{" matrix"}}];
-        $state{textmatrix}=[@{$self->{" textmatrix"}}];
-        $state{textlinematrix}=[@{$self->{" textlinematrix"}}];
-        $state{rotate}=$self->{" rotate"};
-        $state{scale}=[@{$self->{" scale"}}];
-        $state{skew}=[@{$self->{" skew"}}];
-        $state{translate}=[@{$self->{" translate"}}];
-        $state{fillcolor}=[@{$self->{" fillcolor"}}];
-        $state{strokecolor}=[@{$self->{" strokecolor"}}];
+        $state{'matrix'}         = [@{$self->{' matrix'}}];
+        $state{'textmatrix'}     = [@{$self->{' textmatrix'}}];
+        $state{'textlinematrix'} = [@{$self->{' textlinematrix'}}];
+        $state{'rotate'}         = $self->{' rotate'};
+        $state{'scale'}          = [@{$self->{' scale'}}];
+        $state{'skew'}           = [@{$self->{' skew'}}];
+        $state{'translate'}      = [@{$self->{' translate'}}];
+        $state{'fillcolor'}      = [@{$self->{' fillcolor'}}];
+        $state{'strokecolor'}    = [@{$self->{' strokecolor'}}];
     }
     return %state;
 }
@@ -1545,10 +1544,10 @@ Sets the font and font size.
 sub _font {
     my ($font, $size) = @_;
     if ($font->isvirtual()) {
-        return('/'.$font->fontlist->[0]->name.' '.float($size).' Tf');
+        return('/' . $font->fontlist->[0]->name() . ' ' . float($size) . ' Tf');
     }
     else {
-        return('/'.$font->name.' '.float($size).' Tf');
+        return('/' . $font->name() . ' ' . float($size) . ' Tf');
     }
 }
 sub font {
@@ -1563,18 +1562,18 @@ sub font {
 }
 
 sub fontset {
-    my ($self,$font,$size)=@_;
-    $self->{' font'}=$font;
-    $self->{' fontsize'}=$size;
-    $self->{' fontset'}=0;
+    my ($self, $font, $size) = @_;
+    $self->{' font'} = $font;
+    $self->{' fontsize'} = $size;
+    $self->{' fontset'} = 0;
 
     if ($font->isvirtual()) {
-        foreach my $f (@{$font->fontlist}) {
-            $self->resource('Font', $f->name, $f);
+        foreach my $f (@{$font->fontlist()}) {
+            $self->resource('Font', $f->name(), $f);
         }
     }
     else {
-        $self->resource('Font', $font->name, $font);
+        $self->resource('Font', $font->name(), $font);
     }
 
     return $self;
@@ -1597,10 +1596,10 @@ which are both required.
 =cut
 
 sub distance {
-    my ($self,$dx,$dy)=@_;
-    $self->add(float($dx),float($dy),'Td');
-    $self->matrix_update($dx,$dy);
-    $self->{' textlinematrix'}->[0]=$dx;
+    my ($self, $dx, $dy) = @_;
+    $self->add(float($dx), float($dy), 'Td');
+    $self->matrix_update($dx, $dy);
+    $self->{' textlinematrix'}->[0] = $dx;
 }
 
 =item $content->cr()
@@ -1655,25 +1654,29 @@ Note: This does not affect the PDF in any way.
 =cut
 
 sub _textpos {
-    my ($self,@xy)=@_;
-    my ($x,$y)=(0,0);
-    while (scalar @xy > 0) {
-        $x+=shift @xy;
-        $y+=shift @xy;
+    my ($self, @xy) = @_;
+
+    my ($x, $y) = (0, 0);
+    while (@xy) {
+        $x += shift(@xy);
+        $y += shift(@xy);
     }
-    my (@m)=_transform(
-        -matrix=>$self->{" textmatrix"},
-        -point=>[$x,$y]
+    my (@m) = _transform(
+        -matrix => $self->{' textmatrix'},
+        -point  => [$x, $y]
     );
-    return($m[0],$m[1]);
+
+    return ($m[0], $m[1]);
 }
+
 sub textpos {
-    my $self=shift @_;
-    return($self->_textpos(@{$self->{" textlinematrix"}}));
+    my $self =shift();
+    return $self->_textpos(@{$self->{' textlinematrix'}});
 }
+
 sub textpos2 {
-    my $self=shift @_;
-    return(@{$self->{" textlinematrix"}});
+    my $self = shift();
+    return @{$self->{" textlinematrix"}};
 }
 
 =back
@@ -1713,48 +1716,48 @@ thicknesses.
 =cut
 
 sub _text_underline {
-    my ($self,$xy1,$xy2,$underline,$color) = @_;
-    $color||='black';
-    my @underline=();
+    my ($self, $xy1, $xy2, $underline, $color) = @_;
+    $color ||= 'black';
+
+    my @underline;
     if (ref($underline) eq 'ARRAY') {
-        @underline=@{$underline};
+        @underline = @$underline;
     }
     else {
-        @underline=($underline,1);
+        @underline = ($underline, 1);
     }
-    push @underline,1 if(@underline%2);
+    push @underline, 1 if @underline % 2;
 
-    my $underlineposition=(-$self->{' font'}->underlineposition()*$self->{' fontsize'}/1000||1);
-    my $underlinethickness=($self->{' font'}->underlinethickness()*$self->{' fontsize'}/1000||1);
-    my $pos=1;
+    my $underlineposition = (-$self->{' font'}->underlineposition() * $self->{' fontsize'} / 1000 || 1);
+    my $underlinethickness = ($self->{' font'}->underlinethickness() * $self->{' fontsize'} / 1000 || 1);
+    my $pos = 1;
 
-    while(@underline) {
-        $self->add_post(_save);
+    while (@underline) {
+        $self->add_post(_save());
 
-        my $distance=shift @underline;
-        my $thickness=shift @underline;
-        my $scolor=$color;
-        if (ref $thickness) {
-            ($thickness,$scolor)=@{$thickness};
+        my $distance = shift(@underline);
+        my $thickness = shift(@underline);
+        my $scolor = $color;
+        if (ref($thickness)) {
+            ($thickness, $scolor) = @$thickness;
         }
-
         if ($distance eq 'auto') {
-            $distance=$pos*$underlineposition;
+            $distance = $pos * $underlineposition;
         }
         if ($thickness eq 'auto') {
-            $thickness=$underlinethickness;
+            $thickness = $underlinethickness;
         }
 
-        my ($x1,$y1)=$self->_textpos(@{$xy1},0,-($distance+($thickness/2)));
-        my ($x2,$y2)=$self->_textpos(@{$xy2},0,-($distance+($thickness/2)));
+        my ($x1, $y1) = $self->_textpos(@$xy1, 0, -($distance + ($thickness / 2)));
+        my ($x2, $y2) = $self->_textpos(@$xy2, 0, -($distance + ($thickness / 2)));
 
         $self->add_post($self->_strokecolor($scolor));
         $self->add_post(_linewidth($thickness));
-        $self->add_post(_move($x1,$y1));
-        $self->add_post(_line($x2,$y2));
-        $self->add_post(_stroke);
+        $self->add_post(_move($x1, $y1));
+        $self->add_post(_line($x2, $y2));
+        $self->add_post(_stroke());
 
-        $self->add_post(_restore);
+        $self->add_post(_restore());
         $pos++;
     }
 }
@@ -1813,7 +1816,7 @@ As C<text>, but right-aligned to the current point.
 
 sub text_right {
     my ($self, $text, @opts) = @_;
-    my $width=$self->advancewidth($text);
+    my $width = $self->advancewidth($text);
     return $self->text($text, -indent => -$width, @opts);
 }
 
@@ -1993,13 +1996,14 @@ sub paragraph {
         $height -= $leading;
         last if $height < 0;
 
-        if ($opts{'-align'} eq 'justified') {
+        my $align = $opts{'-align'} // 'left';
+        if ($align eq 'justified') {
             ($w, $text) = $self->text_fill_justified($text, $width, %opts);
         }
-        elsif ($opts{'-align'} eq 'right') {
+        elsif ($align eq 'right') {
             ($w, $text) = $self->text_fill_right($text, $width, %opts);
         }
-        elsif ($opts{'-align'} eq 'center') {
+        elsif ($align eq 'center') {
             ($w, $text) = $self->text_fill_center($text, $width, %opts);
         }
         else {
@@ -2049,61 +2053,68 @@ sub paragraphs {
 }
 
 sub textlabel {
-    my ($self,$x,$y,$font,$size,$text,%opts,$wht) = @_;
-    my %trans_opts=( -translate => [$x,$y] );
-    my %text_state=();
-    $trans_opts{-rotate} = $opts{-rotate} if($opts{-rotate});
+    my ($self, $x, $y, $font, $size, $text, %opts, $wht) = @_;
+    my %trans_opts = (-translate => [$x,$y]);
+    my %text_state;
+    $trans_opts{'-rotate'} = $opts{'-rotate'} if $opts{'-rotate'};
 
-    my $wastext = $self->_in_text_object;
+    my $wastext = $self->_in_text_object();
     if ($wastext) {
-        %text_state=$self->textstate;
-        $self->textend;
+        %text_state = $self->textstate();
+        $self->textend();
     }
-    $self->save;
-    $self->textstart;
+    $self->save();
+    $self->textstart();
 
     $self->transform(%trans_opts);
 
-    $self->fillcolor(ref($opts{-color}) ? @{$opts{-color}} : $opts{-color}) if($opts{-color});
-    $self->strokecolor(ref($opts{-strokecolor}) ? @{$opts{-strokecolor}} : $opts{-strokecolor}) if($opts{-strokecolor});
-
-    $self->font($font,$size);
-
-    $self->charspace($opts{-charspace})     if($opts{-charspace});
-    $self->hscale($opts{-hscale})           if($opts{-hscale});
-    $self->wordspace($opts{-wordspace})     if($opts{-wordspace});
-    $self->render($opts{-render})           if($opts{-render});
-
-    if ($opts{-right} || $opts{-align}=~/^r/i) {
-        $wht = $self->text_right($text,%opts);
+    if ($opts{'-color'}) {
+        my $color = ref($opts{'-color'}) ? @{$opts{'-color'}} : $opts{'-color'};
+        $self->fillcolor($color);
     }
-    elsif ($opts{-center} || $opts{-align}=~/^c/i) {
-        $wht = $self->text_center($text,%opts);
+    if ($opts{'-strokecolor'}) {
+        my $color = (ref($opts{'-strokecolor'})
+                     ? @{$opts{'-strokecolor'}}
+                     : $opts{'-strokecolor'});
+        $self->strokecolor($color);
+    }
+
+    $self->font($font, $size);
+
+    $self->charspace($opts{'-charspace'}) if $opts{'-charspace'};
+    $self->hscale($opts{'-hscale'})       if $opts{'-hscale'};
+    $self->wordspace($opts{'-wordspace'}) if $opts{'-wordspace'};
+    $self->render($opts{'-render'})       if $opts{'-render'};
+
+    my $align = $opts{'-align'} // 'left';
+    if ($opts{'-right'} or $align =~ /^r/i) {
+        $wht = $self->text_right($text, %opts);
+    }
+    elsif ($opts{'-center'} or $align =~ /^c/i) {
+        $wht = $self->text_center($text, %opts);
     }
     else {
-        $wht = $self->text($text,%opts);
+        $wht = $self->text($text, %opts);
     }
 
-    $self->textend;
-    $self->restore;
+    $self->textend();
+    $self->restore();
 
     if ($wastext) {
-        $self->textstart;
+        $self->textstart();
         $self->textstate(%text_state);
     }
     return $wht;
 }
 
 sub metaStart {
-    my $self=shift @_;
-    my $tag=shift @_;
-    my $obj=shift @_;
+    my ($self, $tag, $obj) = @_;
     $self->add("/$tag");
     if (defined $obj) {
-        my $dict=PDFDict();
-        $dict->{Metadata}=$obj;
-        $self->resource('Properties',$obj->name,$dict);
-        $self->add('/'.($obj->name));
+        my $dict = PDFDict();
+        $dict->{'Metadata'} = $obj;
+        $self->resource('Properties', $obj->name(), $dict);
+        $self->add('/' . $obj->name());
         $self->add('BDC');
     }
     else {
@@ -2113,7 +2124,7 @@ sub metaStart {
 }
 
 sub metaEnd {
-    my $self=shift @_;
+    my $self = shift();
     $self->add('EMC');
     return $self;
 }
@@ -2130,16 +2141,23 @@ other methods in this class instead.
 =cut
 
 sub add_post {
-    my $self = shift;
-    if (scalar @_) {
-        $self->{' poststream'} .= ($self->{' poststream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ';
+    my $self = shift();
+    if (@_) {
+        unless ($self->{' poststream'} =~ /\s$/) {
+            $self->{' poststream'} .= ' ';
+        }
+        $self->{' poststream'} .= join(' ', @_) . ' ';
     }
     return $self;
 }
+
 sub add {
-    my $self = shift;
-    if (scalar @_) {
-        $self->{' stream'} .= encode('iso-8859-1', ($self->{' stream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ');
+    my $self = shift();
+    if (@_) {
+        unless ($self->{' stream'} =~ /\s$/) {
+            $self->{' stream'} .= ' ';
+        }
+        $self->{' stream'} .= encode('iso-8859-1', join(' ', @_) . ' ');
     }
     return $self;
 }
@@ -2148,7 +2166,7 @@ sub add {
 # (i.e. between BT and ET).  See textstart and textend.
 sub _in_text_object {
     my $self = shift();
-    return defined($self->{' apiistext'}) && $self->{' apiistext'};
+    return $self->{' apiistext'};
 }
 
 =item $content->compressFlate
@@ -2159,9 +2177,9 @@ in nearly all cases, so you shouldn't need to call this yourself.
 =cut
 
 sub compressFlate {
-    my $self=shift @_;
-    $self->{'Filter'}=PDFArray(PDFName('FlateDecode'));
-    $self->{-docompress}=1;
+    my $self = shift();
+    $self->{'Filter'} = PDFArray(PDFName('FlateDecode'));
+    $self->{'-docompress'} = 1;
     return $self;
 }
 
@@ -2173,28 +2191,28 @@ instead.
 =cut
 
 sub textstart {
-    my ($self) = @_;
+    my $self = shift();
     unless ($self->_in_text_object()) {
         $self->add(' BT ');
-        $self->{' apiistext'}=1;
-        $self->{' font'}=undef;
-        $self->{' fontset'}=0;
-        $self->{' fontsize'}=0;
-        $self->{' charspace'}=0;
-        $self->{' hscale'}=100;
-        $self->{' wordspace'}=0;
-        $self->{' leading'}=0;
-        $self->{' rise'}=0;
-        $self->{' render'}=0;
-        @{$self->{' matrix'}}=(1,0,0,1,0,0);
-        @{$self->{' textmatrix'}}=(1,0,0,1,0,0);
-        @{$self->{' textlinematrix'}}=(0,0);
-        @{$self->{' fillcolor'}}=(0);
-        @{$self->{' strokecolor'}}=(0);
-        @{$self->{' translate'}}=(0,0);
-        @{$self->{' scale'}}=(1,1);
-        @{$self->{' skew'}}=(0,0);
-        $self->{' rotate'}=0;
+        $self->{' apiistext'} = 1;
+        $self->{' font'} = undef;
+        $self->{' fontset'} = 0;
+        $self->{' fontsize'} = 0;
+        $self->{' charspace'} = 0;
+        $self->{' hscale'} = 100;
+        $self->{' wordspace'} = 0;
+        $self->{' leading'} = 0;
+        $self->{' rise'} = 0;
+        $self->{' render'} = 0;
+        @{$self->{' matrix'}} = (1, 0, 0, 1, 0, 0);
+        @{$self->{' textmatrix'}} = (1, 0, 0, 1, 0, 0);
+        @{$self->{' textlinematrix'}} = (0, 0);
+        @{$self->{' fillcolor'}} = 0;
+        @{$self->{' strokecolor'}} = 0;
+        @{$self->{' translate'}} = (0, 0);
+        @{$self->{' scale'}} = (1, 1);
+        @{$self->{' skew'}} = (0, 0);
+        $self->{' rotate'} = 0;
     }
     return $self;
 }
@@ -2206,7 +2224,7 @@ Ends a text object.
 =cut
 
 sub textend {
-    my ($self) = @_;
+    my $self = shift();
     if ($self->_in_text_object()) {
         $self->add(' ET ', $self->{' poststream'});
         $self->{' apiistext'} = 0;
@@ -2227,22 +2245,22 @@ sub resource {
     }
     else {
         # we are a self-contained content stream.
-        $self->{Resources}||=PDFDict();
+        $self->{'Resources'} //= PDFDict();
 
-        my $dict=$self->{Resources};
-        $dict->realise if(ref($dict)=~/Objind$/);
+        my $dict = $self->{'Resources'};
+        $dict->realise() if ref($dict) =~ /Objind$/;
 
-        $dict->{$type}||= PDFDict();
-        $dict->{$type}->realise if(ref($dict->{$type})=~/Objind$/);
+        $dict->{$type} ||= PDFDict();
+        $dict->{$type}->realise() if ref($dict->{$type}) =~ /Objind$/;
         unless (defined $obj) {
-            return($dict->{$type}->{$key} || undef);
+            return $dict->{$type}->{$key};
         }
         else {
             if ($force) {
-                $dict->{$type}->{$key}=$obj;
+                $dict->{$type}->{$key} = $obj;
             }
             else {
-                $dict->{$type}->{$key}||=$obj;
+                $dict->{$type}->{$key} //= $obj;
             }
             return $dict;
         }
