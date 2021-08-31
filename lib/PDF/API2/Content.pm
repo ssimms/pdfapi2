@@ -1215,9 +1215,9 @@ Places an image or other external object (a.k.a. XObject) on the page in the
 specified location.
 
 For images, C<$scale_x> and C<$scale_y> represent the width and height of the
-image on the page.  If C<$scale_x> is omitted, it will default to 72 pixels per
-inch.  If C<$scale_y> is omitted, the image will be scaled proportionally based
-on the image dimensions.
+image on the page in points.  If C<$scale_x> is omitted, it will default to 72
+pixels per inch.  If C<$scale_y> is omitted, the image will be scaled
+proportionally based on the image dimensions.
 
 For other external objects, the scale is a multiplier, where 1 (the default)
 represents 100% (i.e. no change).
