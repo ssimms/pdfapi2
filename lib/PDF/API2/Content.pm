@@ -1209,7 +1209,7 @@ sub shade {
 
 =over
 
-=item $content->place($object, $x, $y, $scale_x, $scale_y)
+=item $content->object($object, $x, $y, $scale_x, $scale_y)
 
 Places an image or other external object (a.k.a. XObject) on the page in the
 specified location.
@@ -1235,7 +1235,7 @@ from the L<PDF::API2::Page> object instead.
 # 2: Place at X, Y, 100%
 # 3: Place at X, Y, scaled
 # 4: Place at X, Y, scale_w, scale_h
-sub place {
+sub object {
     my ($self, $object, $x, $y, $scale_x, $scale_y) = @_;
     $x //= 0;
     $y //= 0;

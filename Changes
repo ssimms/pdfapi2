@@ -82,8 +82,9 @@
 
     - Renamed $content->advancewidth() to $content->text_width().
 
-    - In PDF::API2::Content, replaced image and formimage with place.  Added a
-      $page->place() convenience method that is equivalent to $page->gfx->place.
+    - In PDF::API2::Content, replaced image and formimage with object.  Added a
+      $page->object() convenience method that is equivalent to
+      $page->graphics->object().
 
     - Tentatively deprecated $pdf->cjkfont.  If you're successfully using this
       method for CJK font support, read PDF::API2::Resource::CIDFont::CJKFont

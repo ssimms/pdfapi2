@@ -491,33 +491,6 @@ sub rotation {
     return $self;
 }
 
-=head2 place
-
-    $page = $page->place($object, $x, $y, $scale_x, $scale_y);
-
-Places an image or other external object (a.k.a. XObject) on the page in the
-specified location.
-
-For images, C<$scale_x> and C<$scale_y> represent the width and height of the
-image on the page in points.  If C<$scale_x> is omitted, it will default to 72
-pixels per inch.  If C<$scale_y> is omitted, the image will be scaled
-proportionally based on the image dimensions.
-
-For other external objects, the scale is a multiplier, where 1 (the default)
-represents 100% (i.e. no change).
-
-If the object to be placed depends on a coordinate transformation (e.g. rotation
-or skew), first create a content object using L</"graphics">, then call
-L<PDF::API2::Content/"place"> after making the appropriate transformations.
-
-=cut
-
-sub place {
-    my $self = shift();
-    $self->gfx->place(@_);
-    return $self;
-}
-
 =head2 graphics
 
     my $graphics = $page->graphics(%options);
@@ -650,6 +623,33 @@ sub text {
     }
 
     return $text;
+}
+
+=head2 object
+
+    $page = $page->object($object, $x, $y, $scale_x, $scale_y);
+
+Places an image or other external object (a.k.a. XObject) on the page in the
+specified location.
+
+For images, C<$scale_x> and C<$scale_y> represent the width and height of the
+image on the page in points.  If C<$scale_x> is omitted, it will default to 72
+pixels per inch.  If C<$scale_y> is omitted, the image will be scaled
+proportionally based on the image dimensions.
+
+For other external objects, the scale is a multiplier, where 1 (the default)
+represents 100% (i.e. no change).
+
+If the object to be placed depends on a coordinate transformation (e.g. rotation
+or skew), first create a content object using L</"graphics">, then call
+L<PDF::API2::Content/"object"> after making the appropriate transformations.
+
+=cut
+
+sub object {
+    my $self = shift();
+    $self->graphics->object(@_);
+    return $self;
 }
 
 =head2 annotation

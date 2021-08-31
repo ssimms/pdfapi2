@@ -2202,7 +2202,7 @@ a page's content:
     my $page = $pdf->page();
 
     my $image = $pdf->image('/path/to/image.jpg');
-    $page->place($image, 100, 100);
+    $page->object($image, 100, 100);
 
     $pdf->save('sample.pdf');
 
@@ -2369,7 +2369,7 @@ Generate and return a barcode that can be placed as part of a page's content:
     my $page = $pdf->page();
 
     my $barcode = $pdf->barcode('ean13', '0123456789012');
-    $page->place($barcode, 100, 100);
+    $page->object($barcode, 100, 100);
 
     $pdf->save('sample.pdf');
 
