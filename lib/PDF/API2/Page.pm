@@ -465,7 +465,7 @@ the page 180 degrees, [0, 0] will be in the top right corner of the page rather
 than the bottom left, X will increase to the right, and Y will increase
 downward.
 
-To create a landscape page without changing the coordinates, use L</"size">.
+To create a landscape page without moving the origin, use L</"size">.
 
 =cut
 
