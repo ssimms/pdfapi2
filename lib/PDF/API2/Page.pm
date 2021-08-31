@@ -738,6 +738,10 @@ See L<PDF::API2/"MIGRATION"> for an overview.
 
 Replace with L</"graphics">.
 
+=item rotate
+
+Replace with L</"rotation">.
+
 =item mediabox
 
 =item get_mediabox
