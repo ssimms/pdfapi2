@@ -63,10 +63,10 @@ PDF::API2::Page - Methods to interact with individual pages
     # Set prepress page boundaries
     $page->boundaries(media => '12x18', trim => 0.5 * 72);
 
-    # Create a content object for drawing shapes
-    my $gfx = $page->gfx();
+    # Add graphical content
+    my $graphics = $page->graphics();
 
-    # Create a content object for text
+    # Add textual content
     my $text = $page->text();
 
 =cut
@@ -104,7 +104,7 @@ sub update {
     return $self;
 }
 
-=head1 PAGE SIZE METHODS
+=head1 METHODS
 
 =head2 size
 
@@ -453,33 +453,92 @@ sub get_artbox {
     return $self->_bounding_box('ArtBox');
 }
 
-=head1 PAGE CONTENT METHODS
+=head2 rotation
 
-=over
+    $page = $page->rotation($degrees);
 
-=item $page->rotate $deg
+Rotates the page clockwise when displayed or printed.  C<$degrees> must be a
+multiple of 90 and may be negative for counter-clockwise rotation.
 
-Rotates the page by the given degrees, which must be a multiple of 90.
+The coordinate system follows the page rotation.  In other words, after rotating
+the page 180 degrees, [0, 0] will be in the top right corner of the page rather
+than the bottom left, X will increase to the right, and Y will increase
+downward.
 
-(This allows you to auto-rotate to landscape without changing the mediabox!)
+To create a landscape page without changing the coordinates, use L</"size">.
 
 =cut
 
-sub rotate {
+# Deprecated (renamed to follow the pattern of using nouns instead of verbs)
+sub rotate { return rotation(@_) }
+
+sub rotation {
     my ($self, $degrees) = @_;
+    $degrees //= 0;
 
     # Ignore rotation of 360 or more (in either direction)
     $degrees = $degrees % 360;
+
+    unless (   $degrees ==   0
+            or $degrees ==  90 or $degrees ==  -90
+            or $degrees == 180 or $degrees == -180
+            or $degrees == 270 or $degrees == -270) {
+        croak "Rotation must be a multiple of 90 degrees";
+    }
 
     $self->{'Rotate'} = PDFNum($degrees);
 
     return $self;
 }
 
-=item $gfx = $page->gfx $prepend
+=head2 place
 
-Returns a graphics content object. If $prepend is true the content
-will be prepended to the page description.
+    $page = $page->place($object, $x, $y, $scale_x, $scale_y);
+
+Places an image or other external object (a.k.a. XObject) on the page in the
+specified location.
+
+For images, C<$scale_x> and C<$scale_y> represent the width and height of the
+image on the page in points.  If C<$scale_x> is omitted, it will default to 72
+pixels per inch.  If C<$scale_y> is omitted, the image will be scaled
+proportionally based on the image dimensions.
+
+For other external objects, the scale is a multiplier, where 1 (the default)
+represents 100% (i.e. no change).
+
+If the object to be placed depends on a coordinate transformation (e.g. rotation
+or skew), first create a content object using L</"graphics">, then call
+L<PDF::API2::Content/"place"> after making the appropriate transformations.
+
+=cut
+
+sub place {
+    my $self = shift();
+    $self->gfx->place(@_);
+    return $self;
+}
+
+=head2 graphics
+
+    my $graphics = $page->graphics(%options);
+
+Returns a L<PDF::API2::Content> object for drawing paths and shapes.
+
+The following options are available:
+
+=over
+
+=item * prepend (boolean)
+
+If true, place the drawing at the beginning of the page's content stream instead
+of the end.
+
+=item * compress (boolean)
+
+Manually specify whether the drawing instructions should be compressed.  If
+unspecified, the PDF's compression setting will be used, which is on by default.
+
+=back
 
 =cut
 
@@ -521,6 +580,7 @@ sub addcontent {
     $self->{'Contents'}->add_elements(@objs);
     return;
 }
+
 sub precontent {
     my ($self, @objs) = @_;
     $self->fixcontents();
@@ -528,32 +588,75 @@ sub precontent {
     return;
 }
 
+# Deprecated; replace with graphics, which adds input validation
 sub gfx {
-    my ($self, $dir) = @_;
-    my $gfx=PDF::API2::Content->new();
-    $self->content($gfx,$dir);
-    $gfx->compressFlate() if $self->{' api'}->{'forcecompress'};
-    return $gfx;
+    my ($self, $prepend) = @_;
+    my $graphics = $self->graphics(prepend => $prepend);
+
+    # Delete the input validation flag
+    delete $graphics->{' graphics'};
+
+    return $graphics;
 }
 
-=item $txt = $page->text $prepend
+sub graphics {
+    my ($self, %options) = @_;
+    my $graphics = PDF::API2::Content->new();
+    $graphics->{' graphics'} = 1;
 
-Returns a text content object. If $prepend is true the content
-will be prepended to the page description.
+    $options{'compress'} //= $self->{' api'}->{'forcecompress'};
+    $graphics->compressFlate() if $options{'compress'};
+
+    if ($options{'prepend'}) {
+        return $self->content($graphics, 1);
+    }
+    else {
+        return $self->content($graphics);
+    }
+}
+
+=head2 text
+
+    my $text = $page->text(%options);
+
+Returns a L<PDF::API2::Content> object for including textual content.
+
+The options are the same as the L</"graphics"> method.
 
 =cut
 
 sub text {
-    my ($self, $dir) = @_;
+    my $self = shift();
+
+    my %options;
+    if (@_ == 1) {
+        # Deprecated
+        $options{'prepend'} = shift();
+    }
+    else {
+        %options = @_;
+    }
+
     my $text = PDF::API2::Content::Text->new();
-    $self->content($text, $dir);
-    $text->compressFlate() if $self->{' api'}->{'forcecompress'};
+
+    $options{'compress'} //= $self->{' api'}->{'forcecompress'};
+    $text->compressFlate() if $options{'compress'};
+
+    if ($options{'prepend'}) {
+        $self->content($text, 1);
+    }
+    else {
+        $self->content($text);
+    }
+
     return $text;
 }
 
-=item $ant = $page->annotation
+=head2 annotation
 
-Returns a new annotation object.
+    my $annotation = $page->annotation();
+
+Returns a new L<PDF::API2::Annotation> object.
 
 =cut
 
@@ -583,39 +686,6 @@ sub annotation {
 
     return $ant;
 }
-
-=item $page = $page->place $object, $x, $y, $scale_x, $scale_y
-
-Places an image or other external object (a.k.a. XObject) on the page in the
-specified location.
-
-This is equivalent to creating a C<gfx> object on the page and calling C<place>
-on the object without performing any coordinate transformations.
-
-=cut
-
-sub place {
-    my $self = shift();
-    $self->gfx->place(@_);
-    return $self;
-}
-
-=item $page->resource $type, $key, $obj
-
-Adds a resource to the page-inheritance tree.
-
-B<Example:>
-
-    $co->resource('Font',$fontkey,$fontobj);
-    $co->resource('XObject',$imagekey,$imageobj);
-    $co->resource('Shading',$shadekey,$shadeobj);
-    $co->resource('ColorSpace',$spacekey,$speceobj);
-
-B<Note:> You only have to add the required resources, if
-they are NOT handled by the *font*, *image*, *shade* or *space*
-methods.
-
-=cut
 
 sub resource {
     my ($self, $type, $key, $obj, $force) = @_;
@@ -658,13 +728,15 @@ sub ship_out {
     return $self;
 }
 
-=back
-
 =head1 MIGRATION
 
 See L<PDF::API2/"MIGRATION"> for an overview.
 
 =over
+
+=item gfx
+
+Replace with L</"graphics">.
 
 =item mediabox
 

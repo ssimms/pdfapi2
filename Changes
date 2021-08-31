@@ -25,6 +25,11 @@
       etc.).  Replaced info and infoMetaAttributes with info_metadata for custom
       metadata.
 
+    - Renamed the following methods in the PDF::API2::Page class:
+
+      - gfx -> graphics
+      - rotate -> rotation
+
     - Added $page->boundaries() and $pdf->default_page_boundaries() to replace
       the separate methods for the various page boundaries.  The supported
       arguments are slightly different; some edge cases have been removed and
