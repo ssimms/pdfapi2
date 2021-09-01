@@ -27,12 +27,10 @@ PDF::API2::Content - Methods for adding graphics and text to a PDF
     my $page = $pdf->page();
 
     # Add a new content object
-    my $content = $page->gfx();
+    my $content = $page->graphics();
     my $content = $page->text();
 
     # Then call the methods below add graphics and text to the page.
-
-=head1 METHODS
 
 =cut
 
@@ -76,24 +74,19 @@ sub outobjdeep {
     return $self->SUPER::outobjdeep(@_);
 }
 
-=head2 Coordinate Transformations
+=head1 COORDINATE TRANSFORMATIONS
 
 The methods in this section change the coordinate system for the current content
 object relative to the rest of the document.
 
-If you call more than one of these methods, the PDF specification recommends
-calling them in the following order: translate, rotate, scale, skew.  Each
-change builds on the last, and you can get unexpected results when calling them
-in a different order.
+Changes to the coordinate system only affect subsequent paths or text.
 
-=over
+A call to any of the methods in this section resets the coordinate system before
+applying its changes, unless the C<relative> option is set.
 
-=cut
+=head2 translate
 
-# The following transformations are described in the PDF 1.7 specification,
-# section 8.3.3: Common Transformations.
-
-=item $content->translate($x, $y)
+    $content = $content->translate($x, $y);
 
 Moves the origin along the x and y axes.
 
@@ -106,10 +99,12 @@ sub _translate {
 
 sub translate {
     my ($self, $x, $y) = @_;
-    $self->transform(-translate => [$x, $y]);
+    $self->transform(translate => [$x, $y]);
 }
 
-=item $content->rotate($degrees)
+=head2 rotate
+
+    $content = $content->rotate($degrees);
 
 Rotates the coordinate system counter-clockwise.
 
@@ -124,12 +119,15 @@ sub _rotate {
 
 sub rotate {
     my ($self, $a) = @_;
-    $self->transform(-rotate => $a);
+    $self->transform(rotate => $a);
 }
 
-=item $content->scale($sx, $sy)
+=head2 scale
 
-Scales (stretches) the coordinate systems along the x and y axes.
+    $content = $content->scale($x, $y);
+
+Scales (stretches) the coordinate systems along the x and y axes.  A value of 1
+for either C<$x> or C<$y> represents 100% scale (i.e. no change).
 
 =cut
 
@@ -140,13 +138,15 @@ sub _scale {
 
 sub scale {
     my ($self, $sx, $sy) = @_;
-    $self->transform(-scale => [$sx, $sy]);
+    $self->transform(scale => [$sx, $sy]);
 }
 
-=item $content->skew($sa, $sb)
+=head2 skew
 
-Skews the coordinate system by C<$sa> degrees (counter-clockwise) from
-the x axis and C<$sb> degrees (clockwise) from the y axis.
+    $content = $content->skew($a, $b);
+
+Skews the coordinate system by C<$a> degrees (counter-clockwise) from the x axis
+and C<$b> degrees (clockwise) from the y axis.
 
 =cut
 
@@ -158,23 +158,27 @@ sub _skew {
 
 sub skew {
     my ($self, $a, $b) = @_;
-    $self->transform(-skew => [$a, $b]);
+    $self->transform(skew => [$a, $b]);
 }
 
-=item $content->transform(%options)
+=head2 transform
 
-    $content->transform(
-        -translate => [$x, $y],
-        -rotate    => $degrees,
-        -scale     => [$sx, $sy],
-        -skew      => [$sa, $sb],
-    )
+    $content = $content->transform(
+        translate => [$x, $y],
+        rotate    => $degrees,
+        scale     => [$x, $y],
+        skew      => [$a, $b],
+        relative  => $boolean,
+    );
 
-Performs multiple coordinate transformations at once, in the order
-recommended by the PDF specification (translate, rotate, scale, then
-skew).
+Performs multiple coordinate transformations, in the order recommended by the
+PDF specification (translate, rotate, scale, then skew).  Omitted options will
+be unchanged.
 
-This is equivalent to making each transformation separately.
+If C<relative> is true, the specified transformations will be added to any
+previous changes to the coordinate system.  By default, calling C<transform> or
+any of the other transformation methods will overwrite any previous changes to
+the coordinate system.
 
 =cut
 
@@ -196,17 +200,17 @@ sub _transform {
 
     # Note that the transformations are applied in reverse order.  See PDF 1.7
     # specification section 8.3.4: Transformation Matrices.
-    if (defined $opts{'-skew'}) {
-        $m = $m->multiply(_to_matrix(_skew(@{$opts{'-skew'}})));
+    if (defined $opts{'skew'}) {
+        $m = $m->multiply(_to_matrix(_skew(@{$opts{'skew'}})));
     }
-    if (defined $opts{'-scale'}) {
-        $m = $m->multiply(_to_matrix(_scale(@{$opts{'-scale'}})));
+    if (defined $opts{'scale'}) {
+        $m = $m->multiply(_to_matrix(_scale(@{$opts{'scale'}})));
     }
-    if (defined $opts{'-rotate'}) {
-        $m = $m->multiply(_to_matrix(_rotate($opts{'-rotate'})));
+    if (defined $opts{'rotate'}) {
+        $m = $m->multiply(_to_matrix(_rotate($opts{'rotate'})));
     }
-    if (defined $opts{'-translate'}) {
-        $m = $m->multiply(_to_matrix(_translate(@{$opts{'-translate'}})));
+    if (defined $opts{'translate'}) {
+        $m = $m->multiply(_to_matrix(_translate(@{$opts{'translate'}})));
     }
 
     # Undocumented; only used by textpos()
@@ -224,52 +228,75 @@ sub _transform {
     );
 }
 
+# Transformations are described in the PDF 1.7 specification, section 8.3.3:
+# Common Transformations.
 sub transform {
-    my ($self, %opts) = @_;
-    $self->matrix(_transform(%opts));
-    $self->{' translate'} = $opts{'-translate'} // [0, 0];
-    $self->{' rotate'}    = $opts{'-rotate'}    // 0;
-    $self->{' scale'}     = $opts{'-scale'}     // [1, 1];
-    $self->{' skew'}      = $opts{'-skew'}      // [0, 0];
+    my ($self, %options) = @_;
+    return $self->transform_rel(%options) if $options{'relative'};
+
+    # Deprecated options (remove hyphens)
+    foreach my $option (qw(translate rotate scale skew)) {
+        if (exists $options{'-' . $option}) {
+            $options{$option} //= delete $options{'-' . $option};
+        }
+    }
+
+    # Apply the transformations
+    $self->matrix(_transform(%options));
+
+    # Store the transformations for lookup or future relative transformations
+    $self->{' translate'} = $options{'translate'} // [0, 0];
+    $self->{' rotate'}    = $options{'rotate'}    // 0;
+    $self->{' scale'}     = $options{'scale'}     // [1, 1];
+    $self->{' skew'}      = $options{'skew'}      // [0, 0];
+
     return $self;
 }
 
-=item $content->transform_rel(%options)
-
-Makes transformations similarly to C<transform>, except that it adds
-to the previously set values.
-
-=cut
-
 sub transform_rel {
-    my ($self, %opt) = @_;
+    my ($self, %options) = @_;
 
-    my ($sa1, $sb1) = @{$opt{'-skew'} ? $opt{'-skew'} : [0, 0]};
+    # Deprecated options (remove hyphens)
+    foreach my $option (qw(translate rotate scale skew)) {
+        if (exists $options{'-' . $option}) {
+            $options{$option} //= delete $options{'-' . $option};
+        }
+    }
+
+    my ($sa1, $sb1) = @{$options{'skew'} ? $options{'skew'} : [0, 0]};
     my ($sa0, $sb0) = @{$self->{' skew'}};
 
-    my ($sx1, $sy1) = @{$opt{'-scale'} ? $opt{'-scale'} : [1, 1]};
+    my ($sx1, $sy1) = @{$options{'scale'} ? $options{'scale'} : [1, 1]};
     my ($sx0, $sy0) = @{$self->{' scale'}};
 
-    my $r1 = $opt{'-rotate'} // 0;
+    my $r1 = $options{'rotate'} // 0;
     my $r0 = $self->{' rotate'};
 
-    my ($tx1, $ty1) = @{$opt{'-translate'} ? $opt{'-translate'} : [0, 0]};
+    my ($tx1, $ty1) = @{$options{'translate'} ? $options{'translate'} : [0, 0]};
     my ($tx0, $ty0) = @{$self->{' translate'}};
 
     $self->transform(
-        -skew      => [$sa0 + $sa1, $sb0 + $sb1],
-        -scale     => [$sx0 * $sx1, $sy0 * $sy1],
-        -rotate    => $r0 + $r1,
-        -translate => [$tx0 + $tx1, $ty0 + $ty1],
+        skew      => [$sa0 + $sa1, $sb0 + $sb1],
+        scale     => [$sx0 * $sx1, $sy0 * $sy1],
+        rotate    => $r0 + $r1,
+        translate => [$tx0 + $tx1, $ty0 + $ty1],
     );
+
     return $self;
 }
 
-=item $content->matrix($a, $b, $c, $d, $e, $f)
+=head2 matrix
 
-(Advanced) Sets the current transformation matrix manually.  Unless you have a
-particular need to enter transformations manually, you should use the
-C<transform> method instead.
+    $graphics = $graphics->matrix($a, $b, $c, $d, $e, $f);
+
+    ($a, $b, $c, $d, $e, $f) = $text->matrix($a, $b, $c, $d, $e, $f);
+
+Sets the current transformation matrix manually.  Unless you have a particular
+need to enter transformations manually, you should use the C<transform> method
+instead.
+
+The return value differs based on whether the caller is a graphics content
+object or a text content object.
 
 =cut
 
@@ -312,15 +339,13 @@ sub matrix_update {
     return $self;
 }
 
-=back
+=head1 GRAPHICS STATE
 
-=head2 Graphics State Parameters
+=head2 save
 
-=over
+    $content = $content->save();
 
-=item $content->save
-
-Saves the current graphics state and text state on a stack.
+Saves the current graphics state on a stack.
 
 =cut
 
@@ -330,15 +355,21 @@ sub _save {
 
 sub save {
     my $self = shift;
-    unless ($self->_in_text_object()) {
-        $self->add(_save());
+    if ($self->_in_text_object()) {
+        carp 'Calling save from a text content object has no effect';
+        return;
     }
+
+    $self->add(_save());
+
+    return $self;
 }
 
-=item $content->restore
+=head2 restore
 
-Restores the most recently saved graphics state and text state, removing it from
-the stack.
+    $content = $content->restore();
+
+Restores the most recently saved graphics state, removing it from the stack.
 
 =cut
 
@@ -348,14 +379,21 @@ sub _restore {
 
 sub restore {
     my $self = shift;
-    unless ($self->_in_text_object()) {
-        $self->add(_restore());
+    if ($self->_in_text_object()) {
+        carp 'Calling save from a text content object has no effect';
+        return;
     }
+
+    $self->add(_restore());
+
+    return $self;
 }
 
-=item $content->linewidth($width)
+=head2 line_width
 
-Sets the width of the stroke.
+    $content = $content->line_width($points);
+
+Sets the width of the stroke in points.
 
 =cut
 
@@ -364,27 +402,36 @@ sub _linewidth {
     return ($linewidth, 'w');
 }
 
-sub linewidth {
-    my ($self, $linewidth) = @_;
-    $self->add(_linewidth($linewidth));
+# Deprecated (renamed)
+sub linewidth { return line_width(@_) }
+
+sub line_width {
+    my ($self, $line_width) = @_;
+
+    $self->add(_linewidth($line_width));
+
+    return $self;
 }
 
-=item $content->linecap($style)
+=head2 line_cap_style
 
-Sets the style to be used at the end of a stroke.
+    $content = $content->line_cap_style($style);
+
+Sets the shape that will be used at the ends of open subpaths (and dashes, if
+any) when they are stroked.
 
 =over
 
-=item 0 = Butt Cap
+=item * "butt" or 0 = Butt Cap, default
 
 The stroke ends at the end of the path, with no projection.
 
-=item 1 = Round Cap
+=item * "round" or 1 = Round Cap)
 
 An arc is drawn around the end of the path with a diameter equal to the line
 width, and is filled in.
 
-=item 2 = Projecting Square Cap
+=item * "square" or 2 = Projecting Square Cap
 
 The stroke continues past the end of the path for half the line width.
 
@@ -397,28 +444,54 @@ sub _linecap {
     return ($linecap, 'J');
 }
 
-sub linecap {
-    my ($self, $linecap) = @_;
-    $self->add(_linecap($linecap));
+# Deprecated (renamed)
+sub linecap { return line_cap_style(@_) }
+
+sub line_cap_style {
+    my $self = shift();
+
+    if ($self->{' graphics'} and not @_) {
+        croak "Missing argument to line_cap_style";
+    }
+
+    my $style = shift() // 0;
+    $style = 0 if $style eq 'butt';
+    $style = 1 if $style eq 'round';
+    $style = 2 if $style eq 'square';
+
+    unless ($style >= 0 and $style <= 2) {
+        if ($self->{' graphics'}) {
+            croak "Unknown line cap style \"$style\"";
+        }
+        else {
+            confess "Unknown line cap style \"$style\"";
+        }
+    }
+
+    $self->add(_linecap($style));
+
+    return $self;
 }
 
-=item $content->linejoin($style)
+=head2 line_join_style
+
+    $content = $content->line_join_style($style);
 
 Sets the style of join to be used at corners of a path.
 
 =over
 
-=item 0 = Miter Join
+=item * "miter" or 0 = Miter Join, default
 
 The outer edges of the stroke extend until they meet, up to the limit specified
 below.  If the limit would be surpassed, a bevel join is used instead.
 
-=item 1 = Round Join
+=item * "round" or 1 = Round Join
 
 A circle with a diameter equal to the linewidth is drawn around the corner
 point, producing a rounded corner.
 
-=item 2 = Bevel Join
+=item * "bevel" or 2 = Bevel Join
 
 A triangle is drawn to fill in the notch between the two strokes.
 
@@ -431,12 +504,38 @@ sub _linejoin {
     return ($linejoin, 'j');
 }
 
-sub linejoin {
-    my ($this, $linejoin) = @_;
-    $this->add(_linejoin($linejoin));
+# Deprecated (renamed)
+sub linejoin { return line_join_style(@_) }
+
+sub line_join_style {
+    my $self = shift();
+
+    if ($self->{' graphics'} and not @_) {
+        croak "Missing argument to line_join_style";
+    }
+
+    my $style = shift() // 0;
+    $style = 0 if $style eq 'miter';
+    $style = 1 if $style eq 'round';
+    $style = 2 if $style eq 'bevel';
+
+    unless ($style >= 0 and $style <= 2) {
+        if ($self->{' graphics'}) {
+            croak "Unknown line join style \"$style\"";
+        }
+        else {
+            confess "Unknown line join style \"$style\"";
+        }
+    }
+
+    $self->add(_linejoin($style));
+
+    return $self;
 }
 
-=item $content->miterlimit($ratio)
+=head2 miter_limit
+
+    $content = $content->miter_limit($ratio);
 
 Sets the miter limit when the line join style is a miter join.
 
@@ -454,22 +553,36 @@ sub _miterlimit {
     return ($limit, 'M');
 }
 
-sub miterlimit {
+# Deprecated; miterlimit was originally named incorrectly
+sub meterlimit { return miter_limit(@_) }
+
+# Deprecated (renamed)
+sub miterlimit { return miter_limit(@_) }
+
+sub miter_limit {
     my ($self, $limit) = @_;
+
     $self->add(_miterlimit($limit));
+
+    return $self;
 }
 
-# Deprecated: miterlimit was originally named incorrectly
-sub  meterlimit { return  miterlimit(@_) }
-sub _meterlimit { return _miterlimit(@_) }
+=head2 line_dash_pattern
 
-=item $content->linedash()
+    # Solid line
+    $content = $content->line_dash_pattern();
 
-=item $content->linedash($length)
+    # Equal length lines and gaps
+    $content = $content->line_dash_pattern($length);
 
-=item $content->linedash($dash_length, $gap_length, ...)
+    # Specified line and gap lengths
+    $content = $content->line_dash_pattern($line1, $gap1, $line2, $gap2, ...);
 
-=item $content->linedash(-pattern => [$dash_length, $gap_length, ...], -shift => $offset)
+    # Offset the starting point
+    $content = $content->line_dash_pattern(
+        pattern => [$line1, $gap1, $line2, $gap2, ...],
+        offset => $points,
+    );
 
 Sets the line dash pattern.
 
@@ -486,36 +599,56 @@ distance into the pattern at which to start the dash.
 =cut
 
 sub _linedash {
-    my @a = @_;
-    unless (scalar @a) {
+    my @options = @_;
+
+    unless (@options) {
         return ('[', ']', '0', 'd');
     }
-    else {
-        if ($a[0] =~ /^\-/) {
-            my %a = @a;
 
-            # Deprecated: the -full and -clear options will be removed in a
-            # future release
-            unless (exists $a{'-pattern'}) {
-                $a{'-pattern'} = [$a{'-full'} || 0, $a{'-clear'} || 0];
-            }
-
-            return ('[', floats(@{$a{'-pattern'}}), ']', ($a{'-shift'} || 0), 'd');
-        }
-        else {
-            return ('[', floats(@a), '] 0 d');
-        }
+    if ($options[0] =~ /^\d/) {
+        return ('[', floats(@options), '] 0 d');
     }
+
+    my %options = @options;
+
+    # Deprecated option names
+    if ($options{'-pattern'}) {
+        $options{'pattern'} //= delete $options{'-pattern'};
+    }
+    if ($options{'-shift'}) {
+        $options{'offset'} //= delete $options{'-shift'};
+    }
+
+    # Deprecated: the -full and -clear options will be removed in a future
+    # release
+    if (exists $options{'-full'} or exists $options{'-clear'}) {
+        $options{'pattern'} //= [$options{'-full'} // 0, $options{'-clear'} // 0];
+    }
+
+    return ('[', floats(@{$options{'pattern'}}), ']',
+            ($options{'offset'} || 0), 'd');
 }
 
-sub linedash {
+# Deprecated (renamed)
+sub linedash { return line_dash_pattern(@_) }
+
+sub line_dash_pattern {
     my ($self, @a) = @_;
+
     $self->add(_linedash(@a));
+
+    return $self;
 }
 
-=item $content->flatness($tolerance)
+=head2 flatness_tolerance
 
-(Advanced) Sets the maximum variation in output pixels when drawing curves.
+    $content = $content->flatness_tolerance($tolerance);
+
+Sets the maximum distance in device pixels between the mathematically correct
+path for a curve and an approximation constructed from straight line segments.
+
+C<$tolerance> is an integer between 0 and 100, where 0 represents the device's
+default flatness tolerance.
 
 =cut
 
@@ -524,15 +657,23 @@ sub _flatness {
     return ($flatness, 'i');
 }
 
-sub flatness {
+# Deprecated (renamed)
+sub flatness { return flatness_tolerance(@_) }
+
+sub flatness_tolerance {
     my ($self, $flatness) = @_;
+
     $self->add(_flatness($flatness));
+
+    return $self;
 }
 
-=item $content->egstate($object)
+=head2 egstate
 
-(Advanced) Adds an Extended Graphic State object containing additional state
-parameters.
+    $content = $content->egstate($object);
+
+Adds a L<PDF::API2::Resource::ExtGState> object containing a set of graphics
+state parameters.
 
 =cut
 
@@ -543,9 +684,7 @@ sub egstate {
     return $self;
 }
 
-=back
-
-=head2 Path Construction (Drawing)
+=head1 PATH CONSTRUCTION (DRAWING)
 
 =over
 
@@ -985,7 +1124,7 @@ sub rectxy {
 
 =back
 
-=head2 Path Painting (Drawing)
+=head1 PATH PAINTING (DRAWING)
 
 =over
 
@@ -1049,7 +1188,7 @@ sub clip {
 
 =back
 
-=head2 Colors
+=head1 COLORS
 
 =over
 
@@ -1205,7 +1344,7 @@ sub shade {
 
 =back
 
-=head2 External Objects
+=head1 EXTERNAL OBJECTS
 
 =over
 
@@ -1305,11 +1444,10 @@ sub formimage {
 
 =back
 
-=head2 Text State Parameters
+=head1 TEXT STATE
 
-All of the following parameters that take a size are applied before
-any scaling takes place, so you don't need to adjust values to
-counteract scaling.
+All of the following parameters that take a size are applied before any scaling
+takes place, so you don't need to adjust values to counteract scaling.
 
 =over
 
@@ -1581,7 +1719,7 @@ sub fontset {
 
 =back
 
-=head2 Text-Positioning
+=head1 TEXT PLACEMENT
 
 Note: There is a very good chance that these commands will be replaced
 in a future release.
@@ -1670,7 +1808,7 @@ sub _textpos {
 }
 
 sub textpos {
-    my $self =shift();
+    my $self = shift();
     return $self->_textpos(@{$self->{' textlinematrix'}});
 }
 
@@ -1678,12 +1816,6 @@ sub textpos2 {
     my $self = shift();
     return @{$self->{" textlinematrix"}};
 }
-
-=back
-
-=head2 Text-Showing
-
-=over
 
 =item $width = $content->text($text, %options)
 
@@ -2129,17 +2261,6 @@ sub metaEnd {
     return $self;
 }
 
-=head2 Advanced Methods
-
-=over
-
-=item $content->add @content
-
-Add raw content to the PDF stream.  You will generally want to use the
-other methods in this class instead.
-
-=cut
-
 sub add_post {
     my $self = shift();
     if (@_) {
@@ -2169,26 +2290,12 @@ sub _in_text_object {
     return $self->{' apiistext'};
 }
 
-=item $content->compressFlate
-
-Marks content for compression on output.  This is done automatically
-in nearly all cases, so you shouldn't need to call this yourself.
-
-=cut
-
 sub compressFlate {
     my $self = shift();
     $self->{'Filter'} = PDFArray(PDFName('FlateDecode'));
     $self->{'-docompress'} = 1;
     return $self;
 }
-
-=item $content->textstart
-
-Starts a text object.  You will likely want to use the C<text> method
-instead.
-
-=cut
 
 sub textstart {
     my $self = shift();
@@ -2217,12 +2324,6 @@ sub textstart {
     return $self;
 }
 
-=item $content->textend
-
-Ends a text object.
-
-=cut
-
 sub textend {
     my $self = shift();
     if ($self->_in_text_object()) {
@@ -2232,10 +2333,6 @@ sub textend {
     }
     return $self;
 }
-
-=back
-
-=cut
 
 sub resource {
     my ($self, $type, $key, $obj, $force) = @_;
