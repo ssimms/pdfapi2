@@ -686,9 +686,12 @@ sub egstate {
 
 =head1 PATH CONSTRUCTION (DRAWING)
 
-=over
+Note that paths will not appear until a path painting method is called
+(L</"stroke">, L</"fill">, or L</"paint">).
 
-=item $content->move($x, $y)
+=head2 move
+
+    $content = $content->move($x, $y);
 
 Starts a new path at the specified coordinates.
 
@@ -716,12 +719,12 @@ sub move {
     return $self;
 }
 
-=item $content->line($x, $y)
+=head2 line
+
+    $content = $content->line($x, $y);
 
 Extends the path in a line from the current coordinates to the specified
-coordinates, and updates the current position to be the new coordinates.
-
-Note: The line will not appear until you call C<stroke>.
+coordinates.
 
 =cut
 
@@ -747,11 +750,12 @@ sub line {
     return $self;
 }
 
-=item $content->hline($x)
+=head2 hline
 
-=item $content->vline($y)
+    $content = $content->hline($x);
 
-Shortcut for drawing horizontal and vertical lines from the current position.
+Extends the path in a horizontal line from the current position to the specified
+x coordinate.
 
 =cut
 
@@ -767,6 +771,15 @@ sub hline {
     return $self;
 }
 
+=head2 vline
+
+    $content = $content->vline($x);
+
+Extends the path in a vertical line from the current position to the specified y
+coordinate.
+
+=cut
+
 sub vline {
     my ($self, $y) = @_;
     if ($self->_in_text_object()) {
@@ -779,13 +792,32 @@ sub vline {
     return $self;
 }
 
-=item $content->poly($x1, $y1, ..., $xn, $yn)
+=head2 polyline
 
-Shortcut for creating a polyline path.  Moves to C<[$x1, $y1]>, and then extends
-the path in lines along the specified coordinates.
+    $content = $content->polyline($x1, $y1, $x2, $y2, ...);
+
+Extends the path from the current position in one or more straight lines.
 
 =cut
 
+sub polyline {
+    my $self = shift();
+    unless (@_ % 2 == 0) {
+        croak 'polyline requires pairs of coordinates';
+    }
+
+    while (@_) {
+        my $x = shift();
+        my $y = shift();
+        $self->line($x, $y);
+    }
+
+    return $self;
+}
+
+# Deprecated; replace with move and polyline.  Deprecated because poly breaks
+# the convention followed by every other path-drawing method (other than
+# enclosed shapes) of extending the path from the current position.
 sub poly {
     my $self = shift();
     my $x = shift();
@@ -795,13 +827,12 @@ sub poly {
     return $self;
 }
 
-=item $content->curve($cx1, $cy1, $cx2, $cy2, $x, $y)
+=head2 curve
+
+    $content = $content->curve($cx1, $cy1, $cx2, $cy2, $x, $y);
 
 Extends the path in a curve from the current point to C<($x, $y)>, using the two
-specified points to create a cubic Bezier curve, and updates the current
-position to be the new point.
-
-Note: The curve will not appear until you call C<stroke>.
+specified points to create a cubic Bezier curve.
 
 =cut
 
@@ -826,13 +857,12 @@ sub curve {
     return $self;
 }
 
-=item $content->spline($cx1, $cy1, $x, $y)
+=head2 spline
 
-Extends the path in a curve from the current point to C<($x, $y)>,
-using the two specified points to create a spline, and updates the
-current position to be the new point.
+    $content = $content->spline($cx1, $cy1, $x, $y);
 
-Note: The curve will not appear until you call C<stroke>.
+Extends the path in a curve from the current point to C<($x, $y)>, using the two
+specified points to create a spline.
 
 =cut
 
@@ -852,15 +882,13 @@ sub spline {
     }
 }
 
-=item $content->arc($x, $y, $a, $b, $alpha, $beta, $move)
+=head2 arc
 
-Extends the path along an arc of an ellipse centered at C<[x, y]>.  The major
-and minor axes of the ellipse are C<$a> and C<$b>, respectively, and the arc
-moves from C<$alpha> degrees to C<$beta> degrees.  The current position is then
-set to the endpoint of the arc.
+    $content = $content->arc($x, $y, $major, $minor, $a, $b);
 
-Set C<$move> to a true value if this arc is the beginning of a new path instead
-of the continuation of an existing path.
+Extends the path along an arc of an ellipse centered at C<[$x, $y]>.  C<$major>
+and C<$minor> represent the axes of the ellipse, and the arc moves from C<$a>
+degrees to C<$b> degrees.
 
 =cut
 
@@ -904,6 +932,7 @@ sub arc {
     $p0_x = $x + shift(@points);
     $p0_y = $y + shift(@points);
 
+    # Deprecated
     $self->move($p0_x, $p0_y) if $move;
 
     while (scalar @points) {
@@ -922,27 +951,21 @@ sub arc {
     return $self;
 }
 
-=item $content->bogen($x1, $y1, $x2, $y2, $radius, $move, $outer, $reverse)
+# Extends the path along an arc of a circle of the specified radius from
+# C<[x1,y1]> to C<[x2,y2]>.
+#
+# Set C<$move> to a true value if this arc is the beginning of a new path
+# instead of the continuation of an existing path.
+#
+# Set C<$outer> to a true value to draw the larger arc between the two points
+# instead of the smaller one.
+#
+# Set C<$reverse> to a true value to draw the mirror image of the specified arc.
+#
+# C<$radius * 2> cannot be smaller than the distance from C<[x1,y1]> to
+# C<[x2,y2]>.
 
-Extends the path along an arc of a circle of the specified radius between
-C<[x1,y1]> to C<[x2,y2]>.  The current position is then set to the endpoint of
-the arc.
-
-Set C<$move> to a true value if this arc is the beginning of a new path instead
-of the continuation of an existing path.
-
-Set C<$outer> to a true value to draw the larger arc between the two points
-instead of the smaller one.
-
-Set C<$reverse> to a true value to draw the mirror image of the specified arc.
-
-C<$radius * 2> cannot be smaller than the distance from C<[x1,y1]> to
-C<[x2,y2]>.
-
-Note: The curve will not appear until you call C<stroke>.
-
-=cut
-
+# Deprecated; recreate using arc (Bogen is German for arc)
 sub bogen {
     my ($self, $x1, $y1, $x2, $y2, $r, $move, $larc, $spf) = @_;
     my ($p0_x, $p0_y, $p1_x, $p1_y, $p2_x, $p2_y, $p3_x, $p3_y);
@@ -1005,10 +1028,12 @@ sub bogen {
     return $self;
 }
 
-=item $content->close()
+=head2 close
 
-Closes and ends the current path by extending a line from the current position
-to the starting position.
+    $content = $content->close();
+
+Closes the current path by extending a line from the current position to the
+starting position.
 
 =cut
 
@@ -1020,79 +1045,50 @@ sub close {
     return $self;
 }
 
-=item $content->endpath()
+=head2 end
 
-Ends the current path without explicitly enclosing it.
+    $content = $content->end();
+
+Ends the current path without filling or stroking.
 
 =cut
 
-sub endpath {
-    my $self = shift;
+# Deprecated (renamed)
+sub endpath { return end(@_) }
+
+sub end {
+    my $self = shift();
     $self->add('n');
     return $self;
 }
 
-=item $content->ellipse($x, $y, $a, $b)
+=head1 SHAPE CONSTRUCTION (DRAWING)
 
-Creates an elliptical path centered on C<[$x,$y]>, with major and minor axes
-specified by C<$a> and C<$b>, respectively.
+The following are convenience methods for drawing closed paths.
 
-Note: The ellipse will not appear until you call C<stroke> or C<fill>.
+Note that shapes will not appear until a path painting method is called
+(L</"stroke">, L</"fill">, or L</"paint">).
+
+=head2 rectangle
+
+    $content = $content->rectangle($x, $y, $width, $height);
+
+Creates a new rectangle-shaped path, with the lower left point at C<[$x, $y]>
+and the specified width and height.
 
 =cut
 
-sub ellipse {
-    my ($self, $x, $y, $a, $b) = @_;
-    $self->arc($x, $y, $a, $b, 0, 360, 1);
-    $self->close();
+sub rectangle {
+    my ($self, $x, $y, $w, $h) = @_;
+
+    $self->add(floats($x, $y, $w, $h), 're');
+    $self->{' x'} = $x;
+    $self->{' y'} = $y;
+
     return $self;
 }
 
-=item $content->circle($x, $y, $radius)
-
-Creates a circular path centered on C<[$x, $y]> with the specified
-radius.
-
-Note: The circle will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
-sub circle {
-    my ($self, $x, $y, $r) = @_;
-    $self->arc($x, $y, $r, $r, 0, 360, 1);
-    $self->close();
-    return $self;
-}
-
-=item $content->pie($x, $y, $a, $b, $alpha, $beta)
-
-Creates a pie-shaped path from an ellipse centered on C<[$x,$y]>.  The major and
-minor axes of the ellipse are C<$a> and C<$b>, respectively, and the arc moves
-from C<$alpha> degrees to C<$beta> degrees.
-
-Note: The pie will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
-sub pie {
-    my $self = shift();
-    my ($x, $y, $a, $b, $alpha, $beta) = @_;
-    my ($p0_x, $p0_y) = arctocurve($a, $b, $alpha, $beta);
-    $self->move($x, $y);
-    $self->line($p0_x + $x, $p0_y + $y);
-    $self->arc($x, $y, $a, $b, $alpha, $beta);
-    $self->close();
-}
-
-=item $content->rect($x1, $y1, $w1, $h1, ..., $xn, $yn, $wn, $hn)
-
-Creates paths for one or more rectangles, with their lower left points at
-C<[$x,$y]> and with the specified widths and heights.
-
-Note: The rectangles will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
+# Deprecated; replace with individual calls to rectangle
 sub rect {
     my $self = shift();
     my ($x, $y, $w, $h);
@@ -1107,109 +1103,94 @@ sub rect {
     return $self;
 }
 
-=item $content->rectxy($x1, $y1, $x2, $y2)
-
-Creates a rectangular path, with C<[$x1,$y1]> and and C<[$x2,$y2]> specifying
-opposite corners.
-
-Note: The rectangle will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
+# Deprecated; replace with rectangle, converting x2/y2 to w/h.
 sub rectxy {
     my ($self, $x, $y, $x2, $y2) = @_;
     $self->rect($x, $y, ($x2 - $x), ($y2 - $y));
     return $self;
 }
 
-=back
+=head2 circle
+
+    $content = $content->circle($x, $y, $radius);
+
+Creates a new circular path centered on C<[$x, $y]> with the specified radius.
+
+=cut
+
+sub circle {
+    my ($self, $x, $y, $r) = @_;
+    $self->arc($x, $y, $r, $r, 0, 360, 1);
+    $self->close();
+    return $self;
+}
+
+=head2 ellipse
+
+    $content = $content->ellipse($x, $y, $major, $minor);
+
+Creates a new elliptical path centered on C<[$x, $y]> with the specified major
+and minor axes.
+
+=cut
+
+sub ellipse {
+    my ($self, $x, $y, $a, $b) = @_;
+    $self->arc($x, $y, $a, $b, 0, 360, 1);
+    $self->close();
+    return $self;
+}
+
+=head2 pie
+
+    $content = $content->pie($x, $y, $major, $minor, $a, $b);
+
+Creates a new wedge-shaped path from an ellipse centered on C<[$x, $y]> with the
+specified major and minor axes, extending from C<$a> degrees to C<$b> degrees.
+
+=cut
+
+sub pie {
+    my $self = shift();
+    my ($x, $y, $a, $b, $alpha, $beta) = @_;
+    my ($p0_x, $p0_y) = arctocurve($a, $b, $alpha, $beta);
+    $self->move($x, $y);
+    $self->line($p0_x + $x, $p0_y + $y);
+    $self->arc($x, $y, $a, $b, $alpha, $beta);
+    $self->close();
+}
 
 =head1 PATH PAINTING (DRAWING)
 
-=over
+=head2 stroke_color
 
-=item $content->stroke
+    $content = $content->stroke_color($color, @arguments);
 
-Strokes the current path.
-
-=cut
-
-sub _stroke {
-    return 'S';
-}
-
-sub stroke {
-    my $self = shift();
-    $self->add(_stroke());
-    return $self;
-}
-
-=item $content->fill($use_even_odd_fill)
-
-Fills the current path.
-
-If the path intersects with itself, the nonzero winding rule will be used to
-determine which part of the path is filled in.  If you would prefer to use the
-even-odd rule, pass a true argument.
-
-See the PDF Specification, section 8.5.3.3, for more details on filling.
-
-=cut
-
-sub fill {
-    my $self = shift();
-    $self->add(shift() ? 'f*' : 'f');
-    return $self;
-}
-
-=item $content->fillstroke($use_even_odd_fill)
-
-Fills and then strokes the current path.
-
-=cut
-
-sub fillstroke {
-    my $self = shift();
-    $self->add(shift() ? 'B*' : 'B');
-    return $self;
-}
-
-=item $content->clip($use_even_odd_fill)
-
-Modifies the current clipping path by intersecting it with the current path.
-
-=cut
-
-sub clip {
-    my $self = shift();
-    $self->add(shift() ? 'W*' : 'W');
-    return $self;
-}
-
-=back
-
-=head1 COLORS
-
-=over
-
-=item $content->fillcolor($color)
-
-=item $content->strokecolor($color)
-
-Sets the fill or stroke color.
+Sets the stroke color, which is black by default.
 
     # Use a named color
-    $content->fillcolor('blue');
+    $content->stroke_color('blue');
 
     # Use an RGB color (start with '#')
-    $content->fillcolor('#FF0000');
+    $content->stroke_color('#FF0000');
 
     # Use a CMYK color (start with '%')
-    $content->fillcolor('%FF000000');
+    $content->stroke_color('%FF000000');
 
-RGB and CMYK colors can have one-byte, two-byte, three-byte, or
-four-byte values for each color.  For instance, cyan can be given as
-C<%F000> or C<%FFFF000000000000>.
+    # Use a spot color with 100% coverage.
+    my $spot = $pdf->colorspace('spot', 'PANTONE Red 032 C', '#EF3340');
+    $content->stroke_color($spot, 1.0);
+
+RGB and CMYK colors can have one-byte, two-byte, three-byte, or four-byte values
+for each color, depending on the level of precision needed.  For instance, cyan
+can be given as C<%F000> or C<%FFFF000000000000>.
+
+=head2 fill_color
+
+    $content = $content->fill_color($color, @arguments);
+
+Sets the fill color, which is black by default.  Arguments are the same as in
+L</"stroke_color">.
 
 =cut
 
@@ -1221,9 +1202,6 @@ C<%F000> or C<%FFFF000000000000>.
 #
 # legacy greylevel
 #   ... only one value
-#
-#
-
 sub _makecolor {
     my ($self, $sf, @clr) = @_;
 
@@ -1324,6 +1302,132 @@ sub strokecolor {
     return @{$self->{' strokecolor'}};
 }
 
+=head2 stroke
+
+    $content = $content->stroke();
+
+Strokes the current path.
+
+=cut
+
+sub _stroke {
+    return 'S';
+}
+
+sub stroke {
+    my $self = shift();
+    $self->add(_stroke());
+    return $self;
+}
+
+=head2 fill
+
+    $content = $content->fill(rule => $rule);
+
+Fills the current path.
+
+C<$rule> describes which areas are filled in when the path intersects with itself.
+
+=over
+
+=item * nonzero (default)
+
+Use the nonzero winding number rule.  This tends to mean that the entire area
+enclosed by the path is filled in, with some exceptions depending on the
+direction of the path.
+
+=item * even-odd
+
+Use the even-odd rule.  This tends to mean that the presence of fill alternates
+each time the path is intersected.
+
+=back
+
+See PDF specification 1.7 section 8.5.3.3, Filling, for more details.
+
+=cut
+
+sub fill {
+    my $self = shift();
+
+    my $even_odd;
+    if (@_ == 2) {
+        my %options = @_;
+        if (($options{'rule'} // 'nonzero') eq 'even-odd') {
+            $even_odd = 1;
+        }
+    }
+    else {
+        # Deprecated
+        $even_odd = shift();
+    }
+
+    $self->add($even_odd ? 'f*' : 'f');
+
+    return $self;
+}
+
+=head2 paint
+
+    $content = $content->paint(rule => $rule);
+
+Fills and strokes the current path.  C<$rule> is as described in L</"fill">.
+
+=cut
+
+# Deprecated (renamed)
+sub fillstroke { return paint(@_) }
+
+sub paint {
+    my $self = shift();
+
+    my $even_odd;
+    if (@_ == 2) {
+        my %options = @_;
+        if (($options{'rule'} // 'nonzero') eq 'even-odd') {
+            $even_odd = 1;
+        }
+    }
+    else {
+        # Deprecated
+        $even_odd = shift();
+    }
+
+    $self->add($even_odd ? 'B*' : 'B');
+
+    return $self;
+}
+
+=head2 clip
+
+    $content = $content->clip(rule => $rule);
+
+Modifies the current clipping path (initially the entire page) by intersecting
+it with the current path following the next path-painting command.  C<$rule> is
+as described in L</"fill">.
+
+=cut
+
+sub clip {
+    my $self = shift();
+
+    my $even_odd;
+    if (@_ == 2) {
+        my %options = @_;
+        if (($options{'rule'} // 'nonzero') eq 'even-odd') {
+            $even_odd = 1;
+        }
+    }
+    else {
+        # Deprecated
+        $even_odd = shift();
+    }
+
+    $self->add($even_odd ? 'W*' : 'W');
+
+    return $self;
+}
+
 sub shade {
     my ($self, $shade, @cord) = @_;
 
@@ -1342,13 +1446,11 @@ sub shade {
     return $self;
 }
 
-=back
-
 =head1 EXTERNAL OBJECTS
 
-=over
+=head2 object
 
-=item $content->object($object, $x, $y, $scale_x, $scale_y)
+    $content = $content->object($object, $x, $y, $scale_x, $scale_y);
 
 Places an image or other external object (a.k.a. XObject) on the page in the
 specified location.
@@ -1441,8 +1543,6 @@ sub formimage {
     $self->resource('XObject', $img->name(), $img);
     return $self;
 }
-
-=back
 
 =head1 TEXT STATE
 

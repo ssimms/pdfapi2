@@ -2614,14 +2614,14 @@ colors:
     my $web = $pdf->colorspace('web');
 
     # Fill using the spot color with 100% coverage
-    $gfx->fillcolor($spot, 1.0);
+    $gfx->fill_color($spot, 1.0);
 
     # Stroke using the first color of the web-safe palette
-    $gfx->strokecolor($web, 0);
+    $gfx->stroke_color($web, 0);
 
     # Add a rectangle to the page
-    $gfx->rect(100, 100, 100, 100);
-    $gfx->fillstroke();
+    $gfx->rectangle(100, 100, 100, 100);
+    $gfx->paint();
 
     $pdf->save('sample.pdf');
 
