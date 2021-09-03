@@ -413,9 +413,9 @@ sub line_width {
     return $self;
 }
 
-=head2 line_cap_style
+=head2 line_cap
 
-    $content = $content->line_cap_style($style);
+    $content = $content->line_cap($style);
 
 Sets the shape that will be used at the ends of open subpaths (and dashes, if
 any) when they are stroked.
@@ -445,13 +445,13 @@ sub _linecap {
 }
 
 # Deprecated (renamed)
-sub linecap { return line_cap_style(@_) }
+sub linecap { return line_cap(@_) }
 
-sub line_cap_style {
+sub line_cap {
     my $self = shift();
 
     if ($self->{' graphics'} and not @_) {
-        croak "Missing argument to line_cap_style";
+        croak "Missing argument to line_cap";
     }
 
     my $style = shift() // 0;
@@ -473,9 +473,9 @@ sub line_cap_style {
     return $self;
 }
 
-=head2 line_join_style
+=head2 line_join
 
-    $content = $content->line_join_style($style);
+    $content = $content->line_join($style);
 
 Sets the style of join to be used at corners of a path.
 
@@ -505,13 +505,13 @@ sub _linejoin {
 }
 
 # Deprecated (renamed)
-sub linejoin { return line_join_style(@_) }
+sub linejoin { return line_join(@_) }
 
-sub line_join_style {
+sub line_join {
     my $self = shift();
 
     if ($self->{' graphics'} and not @_) {
-        croak "Missing argument to line_join_style";
+        croak "Missing argument to line_join";
     }
 
     my $style = shift() // 0;
@@ -1549,9 +1549,67 @@ sub formimage {
 All of the following parameters that take a size are applied before any scaling
 takes place, so you don't need to adjust values to counteract scaling.
 
-=over
+=head2 font
 
-=item $spacing = $content->charspace($spacing)
+    $content = $content->font($font, $size);
+
+Sets the font and font size.  C<$font> is an object created by calling
+L<PDF::API2/"font"> to add the font to the document.
+
+    my $pdf = PDF::API2->new();
+    my $page = $pdf->page();
+    my $text = $pdf->text();
+
+    my $font = $pdf->font('Helvetica');
+    $text->font($font, 24);
+    $text->position(72, 720);
+    $text->text('Hello, World!');
+
+    $pdf->save('sample.pdf');
+
+=cut
+
+sub _font {
+    my ($font, $size) = @_;
+    if ($font->isvirtual()) {
+        return('/' . $font->fontlist->[0]->name() . ' ' . float($size) . ' Tf');
+    }
+    else {
+        return('/' . $font->name() . ' ' . float($size) . ' Tf');
+    }
+}
+sub font {
+    my ($self, $font, $size) = @_;
+    unless ($size) {
+        croak q{A font size is required};
+    }
+    $self->fontset($font, $size);
+    $self->add(_font($font, $size));
+    $self->{' fontset'} = 1;
+    return $self;
+}
+
+sub fontset {
+    my ($self, $font, $size) = @_;
+    $self->{' font'} = $font;
+    $self->{' fontsize'} = $size;
+    $self->{' fontset'} = 0;
+
+    if ($font->isvirtual()) {
+        foreach my $f (@{$font->fontlist()}) {
+            $self->resource('Font', $f->name(), $f);
+        }
+    }
+    else {
+        $self->resource('Font', $font->name(), $font);
+    }
+
+    return $self;
+}
+
+=head2 character_spacing
+
+    $spacing = $content->character_spacing($spacing);
 
 Sets the spacing between characters.  This is initially zero.
 
@@ -1571,16 +1629,18 @@ sub charspace {
     return $self->{' charspace'};
 }
 
-=item $spacing = $content->wordspace($spacing)
+=head2 word_spacing
 
-Sets the spacing between words.  This is initially zero (or, in other
-words, just the width of the space).
+    $spacing = $content->word_spacing($spacing);
 
-Word spacing might only affect simple fonts and composite fonts where
-the space character is a single-byte code.  This is a limitation of
-the PDF specification at least as of version 1.7 (see section 9.3.3).
-It's possible that a later version of the specification will support
-word spacing in fonts that use multi-byte codes.
+Sets the spacing between words.  This is initially zero (i.e. just the width of
+the space).
+
+Word spacing might only affect simple fonts and composite fonts where the space
+character is a single-byte code.  This is a limitation of the PDF specification
+at least as of version 1.7 (see section 9.3.3).  It's possible that a later
+version of the specification will support word spacing in fonts that use
+multi-byte codes.
 
 =cut
 
@@ -1598,11 +1658,13 @@ sub wordspace {
     return $self->{' wordspace'};
 }
 
-=item $scale = $content->hscale($scale)
+=head2 hscale
 
-Sets and returns the percentage of horizontal text scaling.  Enter a
-scale greater than 100 to stretch text, less than 100 to squeeze
-text, or 100 to disable any existing scaling.
+    $scale = $content->hscale($scale);
+
+Sets/gets the percentage of horizontal text scaling.  Enter a scale greater than
+100 to stretch text, less than 100 to squeeze text, or 100 to disable any
+existing scaling.
 
 =cut
 
@@ -1624,11 +1686,12 @@ sub hscale {
 sub  hspace { return  hscale(@_) }
 sub _hspace { return _hscale(@_) }
 
-=item $leading = $content->leading($leading)
+=head2 leading
 
-Sets the text leading, which is the distance between baselines.  This
-is initially zero (i.e. the lines will be printed on top of each
-other).
+    $leading = $content->leading($leading);
+
+Sets/gets the text leading, which is the distance between baselines.  This is
+initially zero (i.e. the lines will be printed on top of each other).
 
 =cut
 
@@ -1649,27 +1712,29 @@ sub leading {
     return $self->{' leading'};
 }
 
-=item $mode = $content->render($mode)
+=head2 render
+
+    $mode = $content->render($mode);
 
 Sets the text rendering mode.
 
 =over
 
-=item 0 = Fill text
+=item * 0 = Fill text
 
-=item 1 = Stroke text (outline)
+=item * 1 = Stroke text (outline)
 
-=item 2 = Fill, then stroke text
+=item * 2 = Fill, then stroke text
 
-=item 3 = Neither fill nor stroke text (invisible)
+=item * 3 = Neither fill nor stroke text (invisible)
 
-=item 4 = Fill text and add to path for clipping
+=item * 4 = Fill text and add to path for clipping
 
-=item 5 = Stroke text and add to path for clipping
+=item * 5 = Stroke text and add to path for clipping
 
-=item 6 = Fill, then stroke text and add to path for clipping
+=item * 6 = Fill, then stroke text and add to path for clipping
 
-=item 7 = Add text to path for clipping
+=item * 7 = Add text to path for clipping
 
 =back
 
@@ -1689,13 +1754,15 @@ sub render {
     return $self->{' render'};
 }
 
-=item $distance = $content->rise($distance)
+=head2 rise
 
-Adjusts the baseline up or down from its current location.  This is
-initially zero.
+    $distance = $content->rise($distance);
 
-Use this for creating superscripts or subscripts (usually with an
-adjustment to the font size as well).
+Adjusts the baseline up or down from its current location.  This is initially
+zero.
+
+Use this to create superscripts or subscripts (usually with an adjustment to the
+font size as well).
 
 =cut
 
@@ -1713,17 +1780,7 @@ sub rise {
     return $self->{' rise'};
 }
 
-=item %state = $content->textstate(charspace => $value, wordspace => $value, ...)
-
-Shortcut for setting multiple text state parameters at once.
-
-This can also be used without arguments to retrieve the current text
-state settings.
-
-Note: This does not currently work with the C<save> and C<restore> commands.
-
-=cut
-
+# Formerly documented; still used internally
 sub textstate {
     my $self = shift();
     my %state;
@@ -1768,71 +1825,42 @@ sub textstate {
     return %state;
 }
 
-=item $content->font($font_object, $size)
-
-    # Example
-    my $pdf = PDF::API2->new();
-    my $font = $pdf->corefont('Helvetica');
-    $content->font($font, 12);
-
-Sets the font and font size.
-
-=cut
-
-sub _font {
-    my ($font, $size) = @_;
-    if ($font->isvirtual()) {
-        return('/' . $font->fontlist->[0]->name() . ' ' . float($size) . ' Tf');
-    }
-    else {
-        return('/' . $font->name() . ' ' . float($size) . ' Tf');
-    }
-}
-sub font {
-    my ($self, $font, $size) = @_;
-    unless ($size) {
-        croak q{A font size is required};
-    }
-    $self->fontset($font, $size);
-    $self->add(_font($font, $size));
-    $self->{' fontset'} = 1;
-    return $self;
-}
-
-sub fontset {
-    my ($self, $font, $size) = @_;
-    $self->{' font'} = $font;
-    $self->{' fontsize'} = $size;
-    $self->{' fontset'} = 0;
-
-    if ($font->isvirtual()) {
-        foreach my $f (@{$font->fontlist()}) {
-            $self->resource('Font', $f->name(), $f);
-        }
-    }
-    else {
-        $self->resource('Font', $font->name(), $font);
-    }
-
-    return $self;
-}
-
-=back
-
 =head1 TEXT PLACEMENT
 
-Note: There is a very good chance that these commands will be replaced
-in a future release.
+=head2 position
 
-=over
+    # Set
+    $content = $content->position($x, $y);
 
-=item $content->distance($dx, $dy)
+    # Get
+    ($x, $y) = $content->position();
 
-Moves to the start of the next line, offset by the given amounts,
-which are both required.
+If called with arguments, moves to the start of the current line of text, offset
+by C<$x> and C<$y>.
+
+If called without arguments, returns the current position of the cursor (before
+the effects of any coordinate transformation methods).
 
 =cut
 
+sub position {
+    my ($self, $x, $y) = @_;
+
+    if (defined $x and not defined $y) {
+        croak 'position requires either 0 or 2 arguments';
+    }
+
+    if (defined $x) {
+        $self->add(float($x), float($y), 'Td');
+        $self->matrix_update($x, $y);
+        $self->{' textlinematrix'}->[0] = $x;
+        return $self;
+    }
+
+    return @{$self->{' textlinematrix'}};
+}
+
+# Deprecated; replace with position
 sub distance {
     my ($self, $dx, $dy) = @_;
     $self->add(float($dx), float($dy), 'Td');
@@ -1840,23 +1868,7 @@ sub distance {
     $self->{' textlinematrix'}->[0] = $dx;
 }
 
-=item $content->cr()
-
-=item $content->cr($vertical_offset)
-
-Moves the cursor to the start of the line when called without an
-argument.  If leading has been set, the cursor will move to the next
-line instead.
-
-An offset can be passed as an argument to override the leading value.
-A positive offset will move the cursor up, and a negative offset will
-move the cursor down.
-
-Pass zero as the argument to ignore the leading and get just a
-carriage return.
-
-=cut
-
+# Deprecated; use position (ignores leading) or crlf (uses leading) instead
 sub cr {
     my ($self, $offset) = @_;
     if (defined $offset) {
@@ -1870,26 +1882,39 @@ sub cr {
     $self->{' textlinematrix'}->[0] = 0;
 }
 
-=item $content->nl()
+=head2 crlf
 
-Moves to the start of the next line.
+    $content = $content->crlf();
+
+Moves to the start of the next line, based on the L</"leading"> setting.
+
+If leading isn't set, a default distance of 120% of the font size will be used.
 
 =cut
 
+sub crlf {
+    my $self = shift();
+    my $leading = $self->leading();
+    if ($leading) {
+        $self->add('T*');
+    }
+    else {
+        $leading = $self->{' fontsize'} * 1.2;
+        $self->add(0, float($leading * -1), 'Td');
+    }
+
+    $self->matrix_update(0, $leading * -1);
+    $self->{' textlinematrix'}->[0] = 0;
+    return $self;
+}
+
+# Deprecated; replace with crlf
 sub nl {
     my $self = shift();
     $self->add('T*');
     $self->matrix_update(0, $self->leading() * -1);
     $self->{' textlinematrix'}->[0] = 0;
 }
-
-=item ($tx, $ty) = $content->textpos()
-
-Gets the current estimated text position.
-
-Note: This does not affect the PDF in any way.
-
-=cut
 
 sub _textpos {
     my ($self, @xy) = @_;
@@ -1901,47 +1926,69 @@ sub _textpos {
     }
     my (@m) = _transform(
         -matrix => $self->{' textmatrix'},
-        -point  => [$x, $y]
+        -point  => [$x, $y],
     );
 
     return ($m[0], $m[1]);
 }
 
+# Deprecated
 sub textpos {
     my $self = shift();
     return $self->_textpos(@{$self->{' textlinematrix'}});
 }
 
+# Deprecated; replace with position (without arguments)
 sub textpos2 {
     my $self = shift();
-    return @{$self->{" textlinematrix"}};
+    return $self->position();
 }
 
-=item $width = $content->text($text, %options)
+=head2 text
 
-Adds text to the page.
+    my $width = $content->text($text, %options);
 
-Returns the width of the text in points.
+Places text on the page.  Returns the width of the text in points.
 
 Options:
 
 =over
 
-=item -indent
+=item * align
+
+One of C<left> (default), C<center>, or C<right>.  Text will be placed such that
+it begins, is centered on, or ends at the current text position, respectively.
+
+In each case, the position will then be moved to the end of the text.
+
+=item * indent
 
 Indents the text by the number of points.
 
-=item -underline => 'auto'
+If C<align> is set to anything other than C<left>, this setting will be ignored.
 
-=item -underline => $distance
+=item * underline
 
-=item -underline => [$distance, $thickness, ...]
+Underlines the text.  The value may be one of the following:
 
-Underlines the text.  C<$distance> is the number of units beneath the
-baseline, and C<$thickness> is the width of the line.
+=over
 
-Multiple underlines can be made by passing several distances and
-thicknesses.
+=item * auto
+
+Determines the underline distance from the text based on the font and font size.
+
+=item * $distance
+
+Manually set the underline distance in points.  A positive distance moves the
+line downward.
+
+=item * [$distance, $thickness, ...]
+
+Manually set both the underline distance and line thickness, both in points.
+
+Repeat these arguments to include multiple underlines.
+
+=back
 
 =back
 
@@ -1996,63 +2043,84 @@ sub _text_underline {
 
 sub text {
     my ($self, $text, %opts) = @_;
-    if ($self->{' fontset'} == 0) {
+    unless ($self->{' fontset'}) {
         unless (defined $self->{' font'} and $self->{' fontsize'}) {
             croak q{Can't add text without first setting a font and font size};
         }
         $self->font($self->{' font'}, $self->{' fontsize'});
         $self->{' fontset'} = 1;
     }
-    if (defined $opts{'-indent'}) {
-        $self->matrix_update($opts{'-indent'}, 0);
-    }
-    my $ulxy1 = [$self->textpos2()];
 
-    if (defined $opts{'-indent'}) {
-        my $indent = -$opts{'-indent'} * (1000 / $self->{' fontsize'}) * (100 / $self->hscale());
+    # Deprecated options (remove hyphens)
+    if (exists $opts{'-indent'}) {
+        $opts{'indent'} //= delete $opts{'-indent'};
+    }
+    if (exists $opts{'-underline'}) {
+        $opts{'underline'} //= delete $opts{'-underline'};
+    }
+
+    my $width = $self->text_width($text);
+
+    if (defined $opts{'align'}) {
+        if ($opts{'align'} eq 'left') {
+            # NOOP
+        }
+        elsif ($opts{'align'} eq 'center') {
+            $opts{'indent'} = -($width / 2);
+        }
+        elsif ($opts{'align'} eq 'right') {
+            $opts{'indent'} = -$width;
+        }
+        else {
+            croak 'Invalid alignment: ' . $opts{'align'};
+        }
+    }
+
+    if (defined $opts{'indent'}) {
+        $self->matrix_update($opts{'indent'}, 0);
+    }
+
+    my $underline_start = [$self->position()];
+
+    if (defined $opts{'indent'}) {
+        my $indent = -$opts{'indent'};
+        $indent *= (1000 / $self->{' fontsize'}) * (100 / $self->hscale());
         $self->add($self->{' font'}->text($text, $self->{' fontsize'}, $indent));
     }
     else {
         $self->add($self->{' font'}->text($text, $self->{' fontsize'}));
     }
 
-    my $width = $self->advancewidth($text);
     $self->matrix_update($width, 0);
 
-    my $ulxy2 = [$self->textpos2()];
+    my $underline_end = [$self->position()];
 
-    if (defined $opts{'-underline'}) {
-        $self->_text_underline($ulxy1, $ulxy2, $opts{'-underline'}, $opts{'-strokecolor'});
+    if (defined $opts{'underline'}) {
+        $self->_text_underline($underline_start, $underline_end,
+                               $opts{'underline'},
+                               $opts{'-strokecolor'});
     }
 
     return $width;
 }
 
-=item $width = $content->text_center($text, %options)
-
-As C<text>, but centered on the current point.
-
-=cut
-
+# Deprecated; replace with text($line, align => 'center')
 sub text_center {
     my ($self, $text, @opts) = @_;
     my $width = $self->advancewidth($text);
     return $self->text($text, -indent => -($width / 2), @opts);
 }
 
-=item $width = $content->text_right($text, %options)
-
-As C<text>, but right-aligned to the current point.
-
-=cut
-
+# Deprecated; replace with text($line, align => 'right')
 sub text_right {
     my ($self, $text, @opts) = @_;
     my $width = $self->advancewidth($text);
     return $self->text($text, -indent => -$width, @opts);
 }
 
-=item $width = $content->text_justified($text, $width, %options)
+=head2 text_justified
+
+    my $width = $content->text_justified($text, $width, %options);
 
 As C<text>, filling the specified width by adjusting the space between words.
 
@@ -2060,47 +2128,12 @@ As C<text>, filling the specified width by adjusting the space between words.
 
 sub text_justified {
     my ($self, $text, $width, %opts) = @_;
-    my $initial_width = $self->advancewidth($text);
+    my $initial_width = $self->text_width($text);
     my $space_count = scalar split /\s/, $text;
     my $ws = $self->wordspace();
-    $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
+    $self->wordspace(($width - $initial_width) / $space_count) if $space_count;
     $self->text($text, %opts);
     $self->wordspace($ws);
-    return $width;
-}
-
-=item $width = $txt->text_width($string, %text_state)
-
-Returns the width of the string based on all currently set text state
-attributes.  These can optionally be overridden.
-
-=cut
-
-# Deprecated (renamed)
-sub advancewidth { return text_width(@_) }
-
-sub text_width {
-    my ($self, $text, %opts) = @_;
-    return 0 unless defined($text) and length($text);
-
-    foreach my $k (qw(font fontsize wordspace charspace hscale)) {
-        $opts{$k} = $self->{" $k"} unless defined $opts{$k};
-    }
-
-    # Width of glyphs
-    my $width = $opts{'font'}->width($text) * $opts{'fontsize'};
-
-    # Width of space characters
-    my $space_count = $text =~ y/\x20/\x20/;
-    $width += $opts{'wordspace'} * $space_count;
-
-    # Width of space between characters
-    my $char_count = length($text);
-    $width += $opts{'charspace'} * ($char_count - 1);
-
-    # Horizontal scale multiplier
-    $width *= $opts{'hscale'} / 100;
-
     return $width;
 }
 
@@ -2152,65 +2185,68 @@ sub text_fill_justified {
     # Normal Line
     if ($ret) {
         $self->wordspace(($width - $w) / $space_count) if $space_count;
-        $width = $self->text($line, %opts);
+        $width = $self->text($line, %opts, align => 'left');
         $self->wordspace($ws);
         return $width, $ret;
     }
 
     # Last Line
-    if ($opts{'-align-last'}) {
-        unless ($opts{'-align-last'} =~ /^(left|center|right|justified)$/) {
-            croak 'Invalid -align-last (must be left, center, right, or justified)';
+    if ($opts{'align-last'}) {
+        unless ($opts{'align-last'} =~ /^(left|center|right|justified)$/) {
+            croak 'Invalid align-last (must be left, center, right, or justified)';
         }
     }
-    my $align_last = $opts{'-align-last'} // 'left';
+    my $align_last = $opts{'align-last'} // 'left';
     if ($align_last eq 'left') {
-        $self->text($line, %opts);
+        $self->text($line, %opts, align => 'left');
     }
     elsif ($align_last eq 'center') {
-        $self->text_center($line, %opts);
+        $self->text($line, %opts, align => 'center');
     }
     elsif ($align_last eq 'right') {
-        $self->text_right($line, %opts);
+        $self->text($line, %opts, align => 'right');
     }
     else {
         $self->wordspace(($width - $w) / $space_count) if $space_count;
-        $width = $self->text($line, %opts);
+        $width = $self->text($line, %opts, align => 'left');
         $self->wordspace($ws);
     }
     return $width, $ret;
 }
 
-=item $overflow_text = $content->paragraph($text, $width, $height, %options)
+=head2 paragraph
 
-Fill the rectangle with as much of the provided text as will fit.
+    # Scalar context
+    $overflow_text = $content->paragraph($text, $width, $height, %options);
 
-Line spacing is set using the C<leading> call.
+    # Array context
+    ($overflow, $height) = $content->paragraph($text, $width, $height, %options);
+
+Fills the rectangle with as much of the provided text as will fit.
 
 In array context, returns the remaining text (if any) of the positioned text and
 the remaining (unused) height.  In scalar context, returns the remaining text
 (if any).
 
+Line spacing follows L</"leading">, if set, or 120% of the font size by default.
+
 B<Options>
 
-=over 4
+=over
 
-=item -align => $alignment
+=item * align
 
-Specifies the alignment for each line of text.  May be set to left, center,
-right, or justified.  Default is left.
+Specifies the alignment for each line of text.  May be set to C<left> (default),
+C<center>, C<right>, or C<justified>.
 
-=item -align-last => $alignment
+=item * align-last
 
 Specifies the alignment for the last line of justified text.  May be set to
-left, center, right, or justified.  Default is left.
+C<left> (default), C<center>, C<right>, or C<justified>.
 
-=item -underline => $distance
+=item * underline
 
-=item -underline => [ $distance, $thickness, ... ]
-
-If a scalar, distance below baseline, else array reference with pairs of
-distance and line thickness.
+As described in L</"text">.
 
 =back
 
@@ -2218,17 +2254,54 @@ distance and line thickness.
 
 sub paragraph {
     my ($self, $text, $width, $height, %opts) = @_;
-    my @line;
-    my $w;
+
+    # Deprecated options (remove hyphens)
+    if (exists $opts{'-align'}) {
+        $opts{'align'} //= delete $opts{'-align'};
+    }
+    if (exists $opts{'-align-last'}) {
+        $opts{'align-last'} //= delete $opts{'-align-last'};
+    }
+    if (exists $opts{'-underline'}) {
+        $opts{'underline'} //= delete $opts{'-underline'};
+    }
+
     my $leading = $self->leading();
     unless ($leading) {
-        carp "Leading is unset; paragraph lines will be placed on top of each other";
+        $leading = $self->{' fontsize'} * 1.2;
     }
+
+    # If the text contains newlines, call paragraph on each line
+    if ($text =~ /\n/) {
+        my $overflow = '';
+        foreach my $line (split /\n/, $text) {
+            # If there's overflow, no more text can be placed.
+            if (length($overflow)) {
+                $overflow .= "\n" . $line;
+                next;
+            }
+
+            # Place a blank line if there are consecutive newlines
+            unless (length($line)) {
+                $self->crlf();
+                $height -= $leading;
+                next;
+            }
+
+            ($line, $height) = $self->paragraph($line, $width, $height, %opts);
+            $overflow .= $line if length($line);
+        }
+
+        return ($overflow, $height) if wantarray();
+        return $overflow;
+    }
+
+    my $w;
     while (length($text) > 0) {
         $height -= $leading;
         last if $height < 0;
 
-        my $align = $opts{'-align'} // 'left';
+        my $align = $opts{'align'} // 'left';
         if ($align eq 'justified') {
             ($w, $text) = $self->text_fill_justified($text, $width, %opts);
         }
@@ -2241,48 +2314,18 @@ sub paragraph {
         else {
             ($w, $text) = $self->text_fill_left($text, $width, %opts);
         }
-        $self->nl();
+        $self->crlf();
     }
+
     return ($text, $height) if wantarray();
     return $text;
 }
 
-=item $overflow_text = $content->paragraphs($text, $width, $height, %options)
-
-As C<paragraph>, but start a new line after every newline character.
-
-=back
-
-=cut
-
 # Deprecated former name
 sub section { return paragraphs(@_) }
 
-sub paragraphs {
-    my ($self, $text, $width, $height, %opts) = @_;
-    my $overflow = '';
-
-    foreach my $para (split(/\n/, $text)) {
-        # If there's overflow, no more text can be placed.
-        if (length($overflow) > 0) {
-            $overflow .= "\n" . $para;
-            next;
-        }
-
-        # Place a blank line if there are consecutive newlines.
-        unless (length($para)) {
-            $self->nl();
-            $height -= $self->leading();
-            next;
-        }
-
-        ($para, $height) = $self->paragraph($para, $width, $height, %opts);
-        $overflow .= $para if length($para) > 0;
-    }
-
-    return ($overflow, $height) if wantarray();
-    return $overflow;
-}
+# Deprecated; merged into paragraph
+sub paragraphs { return paragraph(@_) }
 
 sub textlabel {
     my ($self, $x, $y, $font, $size, $text, %opts, $wht) = @_;
@@ -2337,6 +2380,62 @@ sub textlabel {
         $self->textstate(%text_state);
     }
     return $wht;
+}
+
+=head2 text_width
+
+    my $width = $content->text_width($line, %overrides);
+
+Returns the width of the string based on the current text state attributes.
+These can optionally be overridden.
+
+    my $width = $content->text_width($line,
+        font => $font,
+        size => $size,
+        character_spacing => $spacing,
+        word_spacing => $spacing,
+        hscale => $scale,
+    );
+
+=cut
+
+# Deprecated (renamed)
+sub advancewidth { return text_width(@_) }
+
+sub text_width {
+    my ($self, $text, %opts) = @_;
+    return 0 unless defined($text) and length($text);
+
+    # Convert new names to old names
+    if (exists $opts{'size'}) {
+        $opts{'fontsize'} = delete $opts{'size'};
+    }
+    if (exists $opts{'character_spacing'}) {
+        $opts{'charspace'} = delete $opts{'character_spacing'};
+    }
+    if (exists $opts{'word_spacing'}) {
+        $opts{'charspace'} = delete $opts{'word_spacing'};
+    }
+
+    foreach my $k (qw(font fontsize wordspace charspace hscale)) {
+        $opts{$k} = $self->{" $k"} unless defined $opts{$k};
+    }
+
+    # Width of glyphs
+    my $width = $opts{'font'}->width($text) * $opts{'fontsize'};
+
+    # Width of space characters
+    my $space_count = $text =~ y/\x20/\x20/;
+    $width += $opts{'wordspace'} * $space_count;
+
+    # Width of space between characters
+    my $char_count = length($text);
+    $width += $opts{'charspace'} * ($char_count - 1);
+
+    # Horizontal scale multiplier
+    $width *= $opts{'hscale'} / 100;
+
+    return $width;
 }
 
 sub metaStart {
