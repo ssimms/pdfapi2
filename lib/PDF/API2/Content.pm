@@ -1620,7 +1620,10 @@ sub _charspace {
     return float($spacing, 6) . ' Tc';
 }
 
-sub charspace {
+# Deprecated (renamed)
+sub charspace { return character_spacing(@_) }
+
+sub character_spacing {
     my ($self, $spacing) = @_;
     if (defined $spacing) {
         $self->{' charspace'} = $spacing;
@@ -1649,7 +1652,10 @@ sub _wordspace {
     return float($spacing, 6) . ' Tw';
 }
 
-sub wordspace {
+# Deprecated (renamed)
+sub wordspace { return word_spacing(@_) }
+
+sub word_spacing {
     my ($self, $spacing) = @_;
     if (defined $spacing) {
         $self->{' wordspace'} = $spacing;
@@ -2386,8 +2392,8 @@ sub textlabel {
 
     my $width = $content->text_width($line, %overrides);
 
-Returns the width of the string based on the current text state attributes.
-These can optionally be overridden.
+Returns the width of a line of text based on the current text state attributes.
+These can optionally be overridden:
 
     my $width = $content->text_width($line,
         font => $font,
@@ -2569,11 +2575,132 @@ See L<PDF::API2/"MIGRATION"> for an overview.
 
 =over
 
+=item transform(%hyphen_prefixed_options);
+
+Remove hyphens from option names (C<-translate> becomes C<translate>, etc.).
+
+=item transform_rel
+
+Replace with L</"transform">, setting option C<relative> to true.  Remove
+hyphens from the names of other options.
+
+=item linewidth
+
+Replace with L</"line_width">.
+
+=item linecap
+
+Replace with L</"line_cap">.
+
+=item linejoin
+
+Replace with L</"line_join">.
+
+=item meterlimit
+
+=item miterlimit
+
+Replace with L</"miter_limit">.
+
+=item linedash
+
+Replace with L</"line_dash_pattern">.  Remove hyphens from option names.  Rename
+C<-shift> to C<offset>.
+
+=item flatness
+
+Replace with L</"flatness_tolerance">.
+
+=item poly
+
+Replace with L</"move"> (first two arguments) and L</"polyline"> (remaining
+arguments).
+
+=item endpath
+
+Replace with L</"end">.
+
+=item rect
+
+Replace with L</"rectangle">.
+
+=item rectxy
+
+Replace with L</"rectangle">, converting the C<$x2> (third) and C<$y2> (fourth)
+arguments to width and height.
+
+=item fill(1)
+
+Replace with C<$content-E<gt>fill(rule =E<gt> 'even-odd')>.
+
+=item fillstroke
+
+Replace with L</"paint">.
+
+=item clip(1)
+
+Replace with C<$content-E<gt>clip(rule =E<gt> 'even-odd')>.
+
 =item image
 
 =item formimage
 
-Replace with C<place>.
+Replace with L</"object">.
+
+=item charspace
+
+Replace with L</"character_spacing">.
+
+=item wordspace
+
+Replace with L</"word_spacing">.
+
+=item hspace
+
+Replace with L</"hscale">.
+
+=item lead
+
+Replace with L</"leading">.
+
+=item distance
+
+Replace with L</"position">.
+
+=item cr
+
+Replace with either L</"position"> (if called with arguments) or L</"crlf"> (if
+called without arguments).
+
+=item nl
+
+Replace with L</"crlf">.
+
+=item text(%hyphen_prefixed_options)
+
+Remove initial hyphens from option names.
+
+=item text_center
+
+Replace with L</"text">, setting C<align> to C<center>.
+
+=item text_right
+
+Replace with L</"text">, setting C<align> to C<right>.
+
+=item paragraph(%hyphen_prefixed_options)
+
+Remove initial hyphens from option names.  C<-align-last> becomes C<align-last>.
+
+=item section
+
+=item paragraphs
+
+Replace with L</"paragraph">.
+
+=item advancewidth
+
+Replace with L</"text_width">.
 
 =back
 

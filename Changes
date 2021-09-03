@@ -80,11 +80,48 @@
       former colorspace_hue, because I couldn't find the standard that it
       implements (if one exists).
 
-    - Renamed $content->advancewidth() to $content->text_width().
+    - Renamed several methods in PDF::API2::Content:
+
+      - linewidth -> line_width
+      - linecap -> line_cap
+      - linejoin -> line_join
+      - miterlimit -> miter_limit
+      - flatness -> flatness_tolerance
+      - endpath -> end
+      - rect -> rectangle
+      - fillstroke -> paint
+      - charspace -> character_spacing
+      - wordspace -> word_spacing
+      - nl -> crlf
+      - advancewidth -> text_width
 
     - In PDF::API2::Content, replaced image and formimage with object.  Added a
       $page->object() convenience method that is equivalent to
       $page->graphics->object().
+
+    - In PDF::API2::Content, merged text_center and text_right into text.  Use
+      the "align" option to set alignment to "center" or "right".
+
+    - In PDF::API2::Content, merged paragraphs into paragraph.
+
+    - In PDF::API2::Content, deprecated poly and added polyline.  poly was the
+      only path-drawing method that took a starting position as its first two
+      arguments.  These should be passed to a move call instead, with the
+      remaining arguments passed to the new polyline method.
+
+    - In PDF::API2::Content, added position, which combines the functionality of
+      distance and textpos2 (which was undocumented).  Deprecated textpos, which
+      attempted to return the position of the "cursor" after taking into account
+      coordinate transformations.  textpos2 and the new position method return
+      the text position before any coordinate transformations are applied, which
+      is consistent with how the other methods in this class behave.
+
+    - In PDF::API2::Content, deprecated bogen.  Recreate using arc, if feasible.
+      If not, I'm likely to leave the code in place indefinitely as an
+      undocumented method.
+
+    - In PDF::API2::Content, deprecated cr.  Replace with either position (if
+      called with arguments) or crlf (if called without arguments).
 
     - Tentatively deprecated $pdf->cjkfont.  If you're successfully using this
       method for CJK font support, read PDF::API2::Resource::CIDFont::CJKFont
