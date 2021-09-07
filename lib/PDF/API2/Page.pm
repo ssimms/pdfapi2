@@ -63,11 +63,15 @@ PDF::API2::Page - Methods to interact with individual pages
     # Set prepress page boundaries
     $page->boundaries(media => '12x18', trim => 0.5 * 72);
 
-    # Add graphical content
-    my $graphics = $page->graphics();
+    # Add an image
+    my $image = $pdf->image('/path/to/file.jpg');
+    $page->object($image, $x, $y, $w, $h);
 
     # Add textual content
     my $text = $page->text();
+
+    # Add graphical content (paths and shapes)
+    my $canvas = $page->graphics();
 
 =cut
 
@@ -493,7 +497,7 @@ sub rotation {
 
 =head2 graphics
 
-    my $graphics = $page->graphics(%options);
+    my $canvas = $page->graphics(%options);
 
 Returns a L<PDF::API2::Content> object for drawing paths and shapes.
 
