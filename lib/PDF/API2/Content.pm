@@ -2153,9 +2153,9 @@ As C<text>, filling the specified width by adjusting the space between words.
 sub text_justified {
     my ($self, $text, $width, %opts) = @_;
     my $initial_width = $self->text_width($text);
-    my $space_count = scalar split /\s/, $text;
+    my $space_count = ($text =~ tr/\x20//);
     my $ws = $self->wordspace();
-    $self->wordspace(($width - $initial_width) / $space_count) if $space_count;
+    $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
     $self->text($text, %opts);
     $self->wordspace($ws);
     return $width;
@@ -2170,12 +2170,14 @@ sub _text_fill_line {
          push @line, (shift @words);
          last if $self->advancewidth("@line") > $width;
     }
-    if ((scalar @line > 1) and ($self->advancewidth("@line") > $width)) {
+    my $words_in_line = scalar @line;
+    if (($words_in_line > 1) and ($self->advancewidth("@line") > $width)) {
         unshift @words, pop @line;
+        --$words_in_line;
     }
     my $ret = "@words";
     my $line = "@line";
-    return $line, $ret;
+    return $line, $ret, $words_in_line;
 }
 
 sub text_fill_left {
@@ -2201,14 +2203,14 @@ sub text_fill_right {
 
 sub text_fill_justified {
     my ($self, $text, $width, %opts) = @_;
-    my ($line, $ret) = $self->_text_fill_line($text, $width);
+    my ($line, $ret, $word_count) = $self->_text_fill_line($text, $width);
     my $ws = $self->wordspace();
     my $w = $self->advancewidth($line);
-    my $space_count = scalar split /\s/, $line;
+    my $space_count = $word_count - 1;
 
     # Normal Line
     if ($ret) {
-        $self->wordspace(($width - $w) / $space_count) if $space_count;
+        $self->wordspace(($width - $w) / $space_count) if $space_count > 0;
         $width = $self->text($line, %opts, align => 'left');
         $self->wordspace($ws);
         return $width, $ret;
@@ -2231,7 +2233,7 @@ sub text_fill_justified {
         $self->text($line, %opts, align => 'right');
     }
     else {
-        $self->wordspace(($width - $w) / $space_count) if $space_count;
+        $self->wordspace(($width - $w) / $space_count) if $space_count > 0;
         $width = $self->text($line, %opts, align => 'left');
         $self->wordspace($ws);
     }
