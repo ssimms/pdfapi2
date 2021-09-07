@@ -1273,7 +1273,10 @@ sub _fillcolor {
     return $self->_makecolor(1, @clrs);
 }
 
-sub fillcolor {
+# Deprecated
+sub fillcolor { return fill_color(@_) }
+
+sub fill_color {
     my $self = shift();
     if (@_) {
         @{$self->{' fillcolor'}} = @_;
@@ -1293,7 +1296,10 @@ sub _strokecolor {
     return $self->_makecolor(0, @clrs);
 }
 
-sub strokecolor {
+# Deprecated
+sub strokecolor { return stroke_color(@_) }
+
+sub stroke_color {
     my $self = shift();
     if (@_) {
         @{$self->{' strokecolor'}} = @_;
@@ -1901,7 +1907,7 @@ If leading isn't set, a default distance of 120% of the font size will be used.
 sub crlf {
     my $self = shift();
     my $leading = $self->leading();
-    if ($leading) {
+    if ($leading or not $self->{' fontsize'}) {
         $self->add('T*');
     }
     else {

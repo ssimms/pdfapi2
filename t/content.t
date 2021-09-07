@@ -1,4 +1,4 @@
-use Test::More tests => 59;
+use Test::More;
 
 use warnings;
 use strict;
@@ -7,209 +7,202 @@ use PDF::API2;
 
 # Translate
 
-my $pdf = PDF::API2->new(-compress => 0);
-my $gfx = $pdf->page->gfx();
+my $pdf = PDF::API2->new(compress => 0);
+my $gfx = $pdf->page->graphics();
 
 $gfx->translate(72, 144);
 like($pdf->to_string(), qr/1 0 0 1 72 144 cm/, q{translate(72, 144)});
 
 # Rotate
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->rotate(65);
 like($pdf->to_string, qr/0.42262 0.90631 -0.90631 0.42262 0 0 cm/, q{rotate(65)});
 
 # Scale
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->scale(1.1, 2.5);
 like($pdf->to_string, qr/1.1 0 0 2.5 0 0 cm/, q{scale(1.1, 2.5)});
 
 # Skew
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->skew(15, 25);
 like($pdf->to_string, qr/1 0.26795 0.46631 1 0 0 cm/, q{skew(15, 25)});
 
 # Transform
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->transform(-translate => [20, 50],
-                -rotate    => 10,
-                -scale     => [1.5, 3],
-                -skew      => [10, -20]);
-$gfx->transform(-translate => [20, 50],
-                -rotate    => 10,
-                -scale     => [1.5, 3],
-                -skew      => [10, -20]);
+$gfx->transform(translate => [20, 50],
+                rotate    => 10,
+                scale     => [1.5, 3],
+                skew      => [10, -20]);
+$gfx->transform(translate => [20, 50],
+                rotate    => 10,
+                scale     => [1.5, 3],
+                skew      => [10, -20]);
 like($pdf->to_string, qr/1.3854 0.78142 -1.0586 2.8596 20 50 cm 1.3854 0.78142 -1.0586 2.8596 20 50 cm/, q{transform + transform});
 
 # Relative Transform
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->transform(-translate => [20, 50],
-                -rotate    => 10,
-                -scale     => [1.5, 3],
-                -skew      => [10, -20]);
-$gfx->transform_rel(-translate => [10, 10],
-                    -rotate    => 10,
-                    -scale     => [2, 4],
-                    -skew      => [5, -10]);
-like($pdf->to_string, qr/1.3854 0.78142 -1.0586 2.8596 20 50 cm 1.7193 4.0475 -5.7318 10.684 30 60 cm/, q{transform + transform_rel});
+$gfx->transform(translate => [20, 50],
+                rotate    => 10,
+                scale     => [1.5, 3],
+                skew      => [10, -20]);
+$gfx->transform(translate => [10, 10],
+                rotate    => 10,
+                scale     => [2, 4],
+                skew      => [5, -10],
+                relative  => 1);
+like($pdf->to_string, qr/1.3854 0.78142 -1.0586 2.8596 20 50 cm 1.7193 4.0475 -5.7318 10.684 30 60 cm/, q{transform + transform(relative)});
 
 # Matrix
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->matrix(1.3854, 0.78142, -1.0586, 2.8596, 20, 50);
 like($pdf->to_string, qr/1.3854 0.78142 -1.0586 2.8596 20 50 cm/, q{matrix});
 
 # Save
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->save();
 like($pdf->to_string, qr/q/, q{save});
 
 # Restore
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->restore();
 like($pdf->to_string, qr/Q/, q{restore});
 
 # Named Fill Color
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->fillcolor('blue');
-like($pdf->to_string(), qr/0 0 1 rg/, q{fillcolor('blue')});
+$gfx->fill_color('blue');
+like($pdf->to_string(), qr/0 0 1 rg/, q{fill_color('blue')});
 
 # RGB Fill Color
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->fillcolor('#ff0000');
-like($pdf->to_string(), qr/1 0 0 rg/, q{fillcolor('#ff0000')});
+$gfx->fill_color('#ff0000');
+like($pdf->to_string(), qr/1 0 0 rg/, q{fill_color('#ff0000')});
 
 # CMYK Fill Color
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->fillcolor('%ff000000');
-like($pdf->to_string, qr/1 0 0 0 k/, q{fillcolor('%ff000000')});
+like($pdf->to_string, qr/1 0 0 0 k/, q{fill_color('%ff000000')});
 
 # Named Stroke Color
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->strokecolor('blue');
-like($pdf->to_string(), qr/0 0 1 RG/, q{strokecolor('blue')});
+$gfx->stroke_color('blue');
+like($pdf->to_string(), qr/0 0 1 RG/, q{stroke_color('blue')});
 
 # RGB Stroke Color
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->strokecolor('#ff0000');
-like($pdf->to_string(), qr/1 0 0 RG/, q{strokecolor('#ff0000')});
+$gfx->stroke_color('#ff0000');
+like($pdf->to_string(), qr/1 0 0 RG/, q{stroke_color('#ff0000')});
 
 # CMYK Stroke Color
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->strokecolor('%ff000000');
-like($pdf->to_string, qr/1 0 0 0 K/, q{strokecolor('%ff000000')});
+$gfx->stroke_color('%ff000000');
+like($pdf->to_string, qr/1 0 0 0 K/, q{stroke_color('%ff000000')});
 
 # Line Width
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->linewidth(8.125);
-like($pdf->to_string, qr/8.125 w/, q{linewidth(8.125)});
+$gfx->line_width(8.125);
+like($pdf->to_string, qr/8.125 w/, q{line_width(8.125)});
 
 # Line Cap Style
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->linecap(1);
-like($pdf->to_string, qr/1 J/, q{linecap(1)});
+$gfx->line_cap('round');
+like($pdf->to_string, qr/1 J/, q{line_cap('round')});
 
 # Line Join Style
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->linejoin(1);
-like($pdf->to_string, qr/1 j/, q{linejoin(1)});
+$gfx->line_join('bevel');
+like($pdf->to_string, qr/2 j/, q{line_join('bevel')});
 
 # Miter Limit
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->miterlimit(3);
-like($pdf->to_string, qr/3 M/, q{miterlimit(3)});
-
-# Miter Limit (deprecated typo)
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->meterlimit(3);
-like($pdf->to_string, qr/3 M/, q{meterlimit(3)});
+$gfx->miter_limit(3);
+like($pdf->to_string, qr/3 M/, q{miter_limit(3)});
 
 # Line Dash (no args)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->linedash();
-like($pdf->to_string, qr/\[ \] 0 d/, q{linedash()});
+$gfx->line_dash_pattern();
+like($pdf->to_string, qr/\[ \] 0 d/, q{line_dash_pattern()});
 
 # Line Dash (1 arg)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->linedash(3);
-like($pdf->to_string, qr/\[ 3 \] 0 d/, q{linedash(3)});
+$gfx->line_dash_pattern(3);
+like($pdf->to_string, qr/\[ 3 \] 0 d/, q{line_dash_pattern(3)});
 
 # Line Dash (2 args)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->linedash(2, 1);
-like($pdf->to_string, qr/\[ 2 1 \] 0 d/, q{linedash(2, 1)});
+$gfx->line_dash_pattern(2, 1);
+like($pdf->to_string, qr/\[ 2 1 \] 0 d/, q{line_dash_pattern(2, 1)});
 
 # Flatness Tolerance
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->flatness(5);
-like($pdf->to_string, qr/5 i/, q{flatness(5)});
+$gfx->flatness_tolerance(5);
+like($pdf->to_string, qr/5 i/, q{flatness_tolerance(5)});
 
 
 ##
@@ -218,8 +211,8 @@ like($pdf->to_string, qr/5 i/, q{flatness(5)});
 
 # Horizontal Line
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(72, 144);
 $gfx->hline(288);
@@ -228,60 +221,50 @@ like($pdf->to_string, qr/72 144 m 288 144 l S/, q{hline});
 
 # Vertical Line
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(72, 144);
 $gfx->vline(288);
 $gfx->stroke();
 like($pdf->to_string, qr/72 144 m 72 288 l S/, q{vline});
 
-# Poly-Line (4 args, 1 line segment)
+# Poly-Line (1 line segment)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->poly(72, 144, 216, 288);
+$gfx->move(72, 144);
+$gfx->polyline(216, 288);
 $gfx->stroke();
-like($pdf->to_string, qr/72 144 m 216 288 l S/, q{poly, four arguments});
+like($pdf->to_string, qr/72 144 m 216 288 l S/, q{polyline, two arguments});
 
-# Poly-Line (6 args, 2 line segments)
+# Poly-Line (2 line segments)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->poly(72, 144, 216, 288, 100, 200);
+$gfx->move(72, 144);
+$gfx->polyline(216, 288, 100, 200);
 $gfx->stroke();
-like($pdf->to_string, qr/72 144 m 216 288 l 100 200 l S/, q{poly, six arguments});
+like($pdf->to_string, qr/72 144 m 216 288 l 100 200 l S/,
+     q{polyline, four arguments});
 
 # Rectangle
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->rect(100, 200, 25, 50);
+$gfx->rectangle(100, 200, 25, 50);
 $gfx->stroke();
-$gfx->rect(100, 200, 25, -50);
+$gfx->rectangle(100, 200, 25, -50);
 $gfx->stroke();
-$gfx->rect(200, 300, 50, 75, 400, 800, 10, 15);
-$gfx->stroke();
-like($pdf->to_string, qr/100 200 25 50 re S 100 200 25 -50 re S 200 300 50 75 re 400 800 10 15 re S/, q{rect});
-
-# XY Rectangle
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->rectxy(100, 200, 125, 250);
-$gfx->stroke();
-$gfx->rectxy(100, 200, 125, 150);
-$gfx->stroke();
-like($pdf->to_string, qr/100 200 25 50 re S 100 200 25 -50 re S/, q{rectxy});
+like($pdf->to_string, qr/100 200 25 50 re S 100 200 25 -50 re S/, q{rectangle});
 
 # Curve
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(72, 144);
 $gfx->curve(100, 200, 125, 250, 144, 288);
@@ -290,8 +273,8 @@ like($pdf->to_string, qr/72 144 m 100 200 125 250 144 288 c S/, q{curve});
 
 # Spline
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(30, 60);
 $gfx->spline(90, 120, 150, 180);
@@ -300,8 +283,8 @@ like($pdf->to_string, qr/30 60 m 70 100 110 140 150 180 c S/, q{spline});
 
 # Arc (with move)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(72, 144);
 $gfx->arc(216, 288, 144, 72, 90, 180, 1);
@@ -311,8 +294,8 @@ like($pdf->to_string, qr/72 144 m 216 360 m 197.09 360 178.36 358.14 160.89 354.
 
 # Arc (without move)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(72, 144);
 $gfx->arc(216, 288, 144, 72, 90, 180, 0);
@@ -320,53 +303,10 @@ $gfx->stroke();
 like($pdf->to_string, qr/72 144 m 197.09 360 178.36 358.14 160.89 354.52 c 143.42 350.9 127.55 345.6 114.18 338.91 c 100.8 332.23 90.198 324.29 82.961 315.55 c 75.725 306.82 72 297.46 72 288 c S/,
      q{arc, without move});
 
-# Bogen (with move)
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->bogen(72, 72, 216, 72, 72, 1);
-$gfx->stroke();
-like($pdf->to_string, qr/72 72 m 72 81.455 73.862 90.818 77.481 99.553 c 81.099 108.29 86.402 116.23 93.088 122.91 c 99.774 129.6 107.71 134.9 116.45 138.52 c 125.18 142.14 134.54 144 144 144 c 153.46 144 162.82 142.14 171.55 138.52 c 180.29 134.9 188.23 129.6 194.91 122.91 c 201.6 116.23 206.9 108.29 210.52 99.553 c 214.14 90.818 216 81.455 216 72 c S/,
-     q{bogen, with move});
-
-# Bogen (without move)
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->move(72, 72);
-$gfx->bogen(72, 72, 216, 72, 72, 0);
-$gfx->stroke();
-like($pdf->to_string, qr/72 72 m 72 81.455 73.862 90.818 77.481 99.553 c 81.099 108.29 86.402 116.23 93.088 122.91 c 99.774 129.6 107.71 134.9 116.45 138.52 c 125.18 142.14 134.54 144 144 144 c 153.46 144 162.82 142.14 171.55 138.52 c 180.29 134.9 188.23 129.6 194.91 122.91 c 201.6 116.23 206.9 108.29 210.52 99.553 c 214.14 90.818 216 81.455 216 72 c S/,
-     q{bogen, without move});
-
-# Bogen (with move, outer)
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->move(72, 72);
-$gfx->bogen(72, 72, 144, 144, 72, 0, 1);
-$gfx->stroke();
-like($pdf->to_string, qr/72 72 m 64.919 72 57.876 73.045 51.1 75.1 c 44.323 77.156 37.887 80.2 31.999 84.134 c 26.111 88.068 20.836 92.85 16.343 98.324 c 11.851 103.8 8.1906 109.9 5.4807 116.45 c 2.7707 122.99 1.0408 129.9 0.3467 136.94 c -0.3474 143.99 0.00195 151.1 1.3835 158.05 c 2.765 164.99 5.1635 171.7 8.5017 177.94 c 11.84 184.19 16.081 189.9 21.088 194.91 c 26.096 199.92 31.814 204.16 38.059 207.5 c 44.305 210.84 51.008 213.24 57.953 214.62 c 64.899 216 72.01 216.35 79.057 215.65 c 86.105 214.96 93.011 213.23 99.553 210.52 c 106.1 207.81 112.2 204.15 117.68 199.66 c 123.15 195.16 127.93 189.89 131.87 184 c 135.8 178.11 138.84 171.68 140.9 164.9 c 142.96 158.12 144 151.08 144 144 c S/,
-     q{bogen, without move, with outer});
-
-# Bogen (without move, inner, reverse)
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->move(72, 72);
-$gfx->bogen(72, 72, 144, 144, 72, 0, 0, 1);
-$gfx->stroke();
-like($pdf->to_string, qr/72 72 m 81.455 72 90.818 73.862 99.553 77.481 c 108.29 81.099 116.23 86.402 122.91 93.088 c 129.6 99.774 134.9 107.71 138.52 116.45 c 142.14 125.18 144 134.54 144 144 c S/,
-     q{bogen, without move, without outer, with reverse});
-
 # Close Path
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(72, 144);
 $gfx->line(216, 288);
@@ -378,19 +318,19 @@ like($pdf->to_string, qr/72 144 m 216 288 l 360 432 l h S/,
 
 # End Path
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->move(72, 144);
 $gfx->line(216, 288);
-$gfx->endpath();
+$gfx->end();
 like($pdf->to_string, qr/72 144 m 216 288 l n/,
-     q{endpath});
+     q{end});
 
 # Ellipse
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->ellipse(144, 216, 108, 36);
 $gfx->stroke();
@@ -400,8 +340,8 @@ like($pdf->to_string, qr/252 216 m 252 220.73 249.21 225.41 243.78 229.78 c 238.
 
 # Circle
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->circle(144, 216, 72);
 $gfx->stroke();
@@ -410,24 +350,16 @@ like($pdf->to_string, qr/216 216 m 216 225.46 214.14 234.82 210.52 243.55 c 206.
 
 # Horizontal Scale
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->hscale(105);
 like($pdf->to_string, qr/105 Tz/, q{hscale(105)});
 
-# Horizontal Scale (deprecated)
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->hspace(105);
-like($pdf->to_string, qr/105 Tz/, q{hspace(105)});
-
 # Fill Path
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->fill();
 $gfx->close();
@@ -436,38 +368,38 @@ like($pdf->to_string, qr/f h S/, q{fill()});
 
 # Fill Path (even-odd rule)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->fill(1);
+$gfx->fill(rule => 'even-odd');
 $gfx->close();
 $gfx->stroke();
 like($pdf->to_string, qr/f\* h S/, q{fill(1)});
 
 # Fill and Stroke
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->fillstroke();
+$gfx->paint();
 $gfx->close();
 $gfx->stroke();
 like($pdf->to_string, qr/B h S/, q{fillstroke()});
 
 # Fill and Stroke (even-odd rule)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->fillstroke(1);
+$gfx->paint(rule => 'even-odd');
 $gfx->close();
 $gfx->stroke();
 like($pdf->to_string, qr/B\* h S/, q{fillstroke(1)});
 
 # Clipping Path
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->clip();
 $gfx->close();
@@ -476,84 +408,86 @@ like($pdf->to_string, qr/W h S/, q{clip()});
 
 # Clipping Path (even-odd rule)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->clip(1);
+$gfx->clip(rule => 'even-odd');
 $gfx->close();
 $gfx->stroke();
 like($pdf->to_string, qr/W\* h S/, q{clip(1)});
 
 # Character Spacing
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->charspace(2);
-like($pdf->to_string, qr/2 Tc/, q{charspace(2)});
+$gfx->character_spacing(2);
+like($pdf->to_string, qr/2 Tc/, q{character_spacing(2)});
 
 # Word Spacing
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->wordspace(2);
-like($pdf->to_string, qr/2 Tw/, q{wordspace(2)});
+$gfx->word_spacing(2);
+like($pdf->to_string, qr/2 Tw/, q{word_spacing(2)});
 
 # Text Leading
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->leading(14);
 like($pdf->to_string, qr/14 TL/, q{leading(14)});
 
-# Text Leading (deprecated name)
-
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->lead(14);
-like($pdf->to_string, qr/14 TL/, q{lead(14) (deprecated)});
-
 # Text Rendering Mode
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->render(4);
 like($pdf->to_string, qr/4 Tr/, q{render(4)});
 
 # Text Rise
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
 $gfx->rise(4);
 like($pdf->to_string, qr/4 Ts/, q{rise(4)});
 
-# distance
+# Position
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->distance(3, 4);
-like($pdf->to_string, qr/3 4 Td/, q{distance(3, 4)});
+$gfx->position(3, 4);
+like($pdf->to_string, qr/3 4 Td/, q{position(3, 4)});
 
-# cr
+# crlf (neither leading nor font size)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
 
-$gfx->cr();
-$gfx->cr(12.5);
-$gfx->cr(0);
-like($pdf->to_string, qr/T\* 0 12.5 Td 0 0 Td/, q{cr});
+$gfx->crlf();
+like($pdf->to_string, qr/T\*/, q{crlf});
 
-# nl
+# crlf (with font size)
 
-$pdf = PDF::API2->new(-compress => 0);
-$gfx = $pdf->page->gfx();
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
+$gfx->font($pdf->font('Helvetica'), 10);
 
-$gfx->nl();
-like($pdf->to_string, qr/T\*/, q{nl});
+$gfx->crlf();
+like($pdf->to_string, qr/0 -12 Td/, q{crlf with font size});
+
+# crlf (with leading)
+
+$pdf = PDF::API2->new(compress => 0);
+$gfx = $pdf->page->graphics();
+
+$gfx->leading(12);
+$gfx->crlf();
+like($pdf->to_string, qr/12 TL T\*/, q{crlf with leading});
+
+done_testing();
