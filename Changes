@@ -88,7 +88,7 @@
       - miterlimit -> miter_limit
       - flatness -> flatness_tolerance
       - endpath -> end
-      - rect -> rectangle
+      - rectxy -> rectangle
       - fillstroke -> paint
       - charspace -> character_spacing
       - wordspace -> word_spacing

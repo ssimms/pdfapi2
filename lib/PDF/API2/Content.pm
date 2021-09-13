@@ -1071,19 +1071,31 @@ Note that shapes will not appear until a path painting method is called
 
 =head2 rectangle
 
-    $content = $content->rectangle($x, $y, $width, $height);
+    $content = $content->rectangle($x1, $y1, $x2, $y2);
 
-Creates a new rectangle-shaped path, with the lower left point at C<[$x, $y]>
-and the specified width and height.
+Creates a new rectangle-shaped path, between the two points C<[$x1, $y1]>
+and C<[$x2, $y2]>.
 
 =cut
 
 sub rectangle {
-    my ($self, $x, $y, $w, $h) = @_;
+    my ($self, $x1, $y1, $x2, $y2) = @_;
 
-    $self->add(floats($x, $y, $w, $h), 're');
-    $self->{' x'} = $x;
-    $self->{' y'} = $y;
+    # Ensure that x1,y1 is lower-left and x2,y2 is upper-right
+    if ($x2 < $x1) {
+        my $x = $x1;
+        $x1 = $x2;
+        $x2 = $x;
+    }
+    if ($y2 < $y1) {
+        my $y = $y1;
+        $y1 = $y2;
+        $y2 = $y;
+    }
+
+    $self->add(floats($x1, $y1, ($x2 - $x1), ($y2 - $y1)), 're');
+    $self->{' x'} = $x1;
+    $self->{' y'} = $y1;
 
     return $self;
 }
@@ -2628,12 +2640,18 @@ Replace with L</"end">.
 
 =item rect
 
-Replace with L</"rectangle">.
+Replace with L</"rectangle">, converting the C<$w> (third) and C<$h> (fourth)
+arguments to the X and Y values of the upper-right corner:
+
+    # Old
+    $content->rect($x, $y, $w, $h);
+
+    # New
+    $content->rectangle($x, $y, $x + $w, $y + $h);
 
 =item rectxy
 
-Replace with L</"rectangle">, converting the C<$x2> (third) and C<$y2> (fourth)
-arguments to width and height.
+Replace with L</"rectangle">.
 
 =item fill(1)
 
