@@ -154,16 +154,22 @@ sub size {
 
 =head2 boundaries
 
+    # Set
     $page->boundaries(
         media => '13x19',
         bleed => [0.75 * 72, 0.75 * 72, 12.25 * 72, 18.25 * 72],
         trim  => 0.25 * 72,
     );
 
+    # Get
+    %boundaries = $page->boundaries();
+    ($x1, $y1, $x2, $y2) = $page->boundaries('trim');
+
 Set prepress page boundaries when called with a hash containing one or more page
 boundary definitions.  Returns the C<$page> object.
 
-Returns the current page boundaries if called without arguments.
+Returns the current page boundaries if called without arguments.  Returns the
+coordinates for the specified page boundary if called with one argument.
 
 =head3 Page Boundaries
 
@@ -318,9 +324,24 @@ sub _to_rectangle {
 }
 
 sub boundaries {
-    my ($self, %boxes) = @_;
+    my $self = shift();
+
+    # Get
+    unless (@_) {
+        my %boundaries;
+        foreach my $box (qw(Media Crop Bleed Trim Art)) {
+            $boundaries{lc($box)} = [$self->_bounding_box($box . 'Box')];
+        }
+        return %boundaries;
+    }
+    elsif (@_ == 1) {
+        my $box = shift();
+        my @coordinates = $self->_bounding_box(ucfirst($box) . 'Box');
+        return @coordinates;
+    }
 
     # Set
+    my %boxes = @_;
     foreach my $box (qw(media crop bleed trim art)) {
         next unless exists $boxes{$box};
 
@@ -357,13 +378,6 @@ sub boundaries {
     }
 
     # Get
-    unless (keys %boxes) {
-        my %boundaries;
-        foreach my $box (qw(Media Crop Bleed Trim Art)) {
-            $boundaries{lc($box)} = [$self->_bounding_box(uc($box) . 'Box')];
-        }
-        return %boundaries;
-    }
 
     return $self;
 }
