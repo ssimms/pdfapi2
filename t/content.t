@@ -255,11 +255,11 @@ like($pdf->to_string, qr/72 144 m 216 288 l 100 200 l S/,
 $pdf = PDF::API2->new(compress => 0);
 $gfx = $pdf->page->graphics();
 
-$gfx->rectangle(100, 200, 25, 50);
+$gfx->rectangle(100, 200, 125, 250);
 $gfx->stroke();
-$gfx->rectangle(100, 200, 25, -50);
+$gfx->rectangle(125, 200, 100, 250);
 $gfx->stroke();
-like($pdf->to_string, qr/100 200 25 50 re S 100 200 25 -50 re S/, q{rectangle});
+like($pdf->to_string, qr/100 200 25 50 re S 100 200 25 50 re S/, q{rectangle});
 
 # Curve
 
