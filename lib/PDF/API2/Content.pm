@@ -2222,13 +2222,13 @@ sub text_fill_justified {
     }
     my $align_last = $opts{'align-last'} // 'left';
     if ($align_last eq 'left') {
-        $self->text($line, %opts, align => 'left');
+        $width = $self->text($line, %opts, align => 'left');
     }
     elsif ($align_last eq 'center') {
-        $self->text($line, %opts, align => 'center');
+        $width = $self->text($line, %opts, align => 'center');
     }
     elsif ($align_last eq 'right') {
-        $self->text($line, %opts, align => 'right');
+        $width = $self->text($line, %opts, align => 'right');
     }
     else {
         $self->wordspace(($width - $w) / $space_count) if $space_count;
