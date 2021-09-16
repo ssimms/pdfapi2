@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.042     2021-09-16
+
     - This release includes many changes to method names, options, and
       documentation aimed at improving approachability, but existing code should
       continue to work.  See the new Backward Compatibility section in the main
