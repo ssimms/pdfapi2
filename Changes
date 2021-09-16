@@ -154,6 +154,9 @@
     - A PDF version number specified in the document catalog is now respected by
       $pdf->version().
 
+    - Fixed space calculation between words in justified text (report and fix by
+      Vladislav Glinsky).
+
 
 2.041     2021-07-27
 

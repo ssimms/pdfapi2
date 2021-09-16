@@ -106,7 +106,7 @@ $font = $pdf->corefont('Helvetica');
 $text->font($font, 12);
 
 $width = $text->text_justified('Test Text', 72);
-like($pdf->to_string(), qr/10.992 Tw \(Test Text\) Tj 0 Tw/,
+like($pdf->to_string(), qr/21.984 Tw \(Test Text\) Tj 0 Tw/,
      q{text_justified});
 
 # paragraph
@@ -159,7 +159,7 @@ $text->leading(15);
 
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified');
 like($pdf->to_string(),
-     qr/1.204 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* \(aaa aaa aaa aaa\) Tj T\*/,
+     qr/1.4448 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* \(aaa aaa aaa aaa\) Tj T\*/,
      q{paragraph, justified, last line left});
 
 # paragraph, justified right
@@ -173,7 +173,7 @@ $text->leading(15);
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified',
                  '-align-last' => 'right');
 like($pdf->to_string(),
-     qr/1.204 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* \[ 7506 \((aaa ){3}aaa\) \] TJ T\*/,
+     qr/1.4448 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* \[ 7506 \((aaa ){3}aaa\) \] TJ T\*/,
      q{paragraph, justified, last line right});
 
 # paragraph, justified center
@@ -187,7 +187,7 @@ $text->leading(15);
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified',
                  '-align-last' => 'center');
 like($pdf->to_string(),
-     qr/1.204 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* \[ 3753 \((aaa ){3}aaa\) \] TJ T\*/,
+     qr/1.4448 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* \[ 3753 \((aaa ){3}aaa\) \] TJ T\*/,
      q{paragraph, justified, last line center});
 
 # paragraph, justified, last line justified
@@ -201,7 +201,7 @@ $text->leading(15);
 $text->paragraph(('aaa ' x 10), 144, 72, -align => 'justified',
                  '-align-last' => 'justified');
 like($pdf->to_string(),
-     qr/1.204 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* 13.482 Tw \((aaa ){3}aaa\) Tj 0 Tw/,
+     qr/1.4448 Tw \((aaa ){5}aaa\) Tj 0 Tw T\* 17.976 Tw \((aaa ){3}aaa\) Tj 0 Tw/,
      q{paragraph, justified, last line justified});
 
 # paragraphs (formerly "section")

@@ -2153,7 +2153,7 @@ As C<text>, filling the specified width by adjusting the space between words.
 sub text_justified {
     my ($self, $text, $width, %opts) = @_;
     my $initial_width = $self->text_width($text);
-    my $space_count = scalar split /\s/, $text;
+    my $space_count = (split /\s/, $text) - 1;
     my $ws = $self->wordspace();
     $self->wordspace(($width - $initial_width) / $space_count) if $space_count;
     $self->text($text, %opts);
@@ -2204,7 +2204,7 @@ sub text_fill_justified {
     my ($line, $ret) = $self->_text_fill_line($text, $width);
     my $ws = $self->wordspace();
     my $w = $self->advancewidth($line);
-    my $space_count = scalar split /\s/, $line;
+    my $space_count = (split /\s/, $line) - 1;
 
     # Normal Line
     if ($ret) {
