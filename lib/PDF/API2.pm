@@ -64,7 +64,7 @@ PDF::API2 - Create, modify, and examine PDF files
     # Add some text to the page
     $text = $page->text();
     $text->font($font, 20);
-    $text->translate(200, 700);
+    $text->position(200, 700);
     $text->text('Hello World!');
 
     # Save the PDF
@@ -1351,13 +1351,13 @@ page.
 
 B<Example:>
 
-    $pdf = PDF::API2->new();
-    $old = PDF::API2->open('our/old.pdf');
+    my $pdf = PDF::API2->new();
+    my $source = PDF::API2->open('source.pdf');
 
-    # Add page 2 from the old PDF as page 1 of the new PDF
-    $page = $pdf->import_page($old, 2);
+    # Add page 2 from the source PDF as page 1 of the new PDF
+    my $page = $pdf->import_page($source, 2);
 
-    $pdf->save('our/new.pdf');
+    $pdf->save('sample.pdf');
 
 B<Note:> You can only import a page from an existing PDF file.
 
@@ -1904,11 +1904,11 @@ the path to a font file.
     my $page = $pdf->page();
     my $content = $page->text();
 
-    $content->translate(1 * 72, 9 * 72);
+    $content->position(1 * 72, 9 * 72);
     $content->font($font1, 24);
     $content->text('Hello, World!');
 
-    $content->distance(0, -36);
+    $content->position(0, -36);
     $content->font($font2, 12);
     $content->text('This is some sample text.');
 
@@ -2607,21 +2607,21 @@ colors:
 
     my $pdf = PDF::API2->new();
     my $page = $pdf->page();
-    my $gfx = $page->gfx();
+    my $content = $page->graphics();
 
     # Add colorspaces for a spot color and the web-safe color palette
     my $spot = $pdf->colorspace('spot', 'PANTONE Red 032 C', '#EF3340');
     my $web = $pdf->colorspace('web');
 
     # Fill using the spot color with 100% coverage
-    $gfx->fill_color($spot, 1.0);
+    $content->fill_color($spot, 1.0);
 
     # Stroke using the first color of the web-safe palette
-    $gfx->stroke_color($web, 0);
+    $content->stroke_color($web, 0);
 
     # Add a rectangle to the page
-    $gfx->rectangle(100, 100, 100, 100);
-    $gfx->paint();
+    $content->rectangle(100, 100, 200, 200);
+    $content->paint();
 
     $pdf->save('sample.pdf');
 
@@ -2666,7 +2666,7 @@ Device colorspaces are also needed if you want to blend spot colors:
 
     my $pdf = PDF::API2->new();
     my $page = $pdf->page();
-    my $gfx = $page->gfx();
+    my $content = $page->graphics();
 
     # Create a two-color device colorspace
     my $yellow = $pdf->colorspace('spot', 'Yellow', '%00F0');
@@ -2674,14 +2674,14 @@ Device colorspaces are also needed if you want to blend spot colors:
     my $device = $pdf->colorspace('device', $yellow, $spot);
 
     # Fill using a blend of 25% yellow and 75% spot color
-    $gfx->fillcolor($device, 0.25, 0.75);
+    $content->fill_color($device, 0.25, 0.75);
 
     # Stroke using 100% spot color
-    $gfx->strokecolor($device, 0, 1);
+    $content->stroke_color($device, 0, 1);
 
     # Add a rectangle to the page
-    $gfx->rect(100, 100, 100, 100);
-    $gfx->fillstroke();
+    $content->rectangle(100, 100, 200, 200);
+    $content->paint();
 
     $pdf->save('sample.pdf');
 
