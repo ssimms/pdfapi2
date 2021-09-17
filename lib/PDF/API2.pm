@@ -1503,18 +1503,18 @@ If $source_page_number is 0 or -1, it will return the last page in the document.
 
 B<Example:>
 
-    $pdf = PDF::API2->new();
-    $old = PDF::API2->open('our/old.pdf');
-    $page = $pdf->page();
-    $gfx = $page->gfx();
+    my $pdf = PDF::API2->new();
+    my $source = PDF::API2->open('source.pdf');
+    my $page = $pdf->page();
 
-    # Import Page 2 from the old PDF
-    $xo = $pdf->embed_page($old, 2);
+    # Import Page 2 from the source PDF
+    my $object = $pdf->embed_page($source, 2);
 
     # Add it to the new PDF's first page at 1/2 scale
-    $gfx->formimage($xo, 0, 0, 0.5);
+    my ($x, $y) = (0, 0);
+    $page->object($object, $x, $y, 0.5);
 
-    $pdf->save('our/new.pdf');
+    $pdf->save('sample.pdf');
 
 B<Note:> You can only import a page from an existing PDF file.
 
