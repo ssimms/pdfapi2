@@ -158,7 +158,9 @@ sub cidsByUtf {
     my ($self, $s) = @_;
     $s = pack('n*',
               map { $self->cidByUni($_) }
-              (map { ($_ > 0x7f and $_ < 0xa0) ? uniByName(nameByUni($_)) : $_ }
+              (map {
+                  ($_ and $_ > 0x7f and $_ < 0xa0) ? uniByName(nameByUni($_)) : $_
+               }
                unpack('U*', $s)));
     utf8::downgrade($s);
     return $s;
