@@ -276,7 +276,7 @@ sub rect {
 
     $annotation = $annotation->border($h_radius, $v_radius, $width);
 
-Define the border style.  Defaults to 0, 0, 1.
+Define the border style.  Defaults to 0, 0, 0 (no border).
 
 =cut
 
