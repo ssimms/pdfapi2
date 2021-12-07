@@ -1728,7 +1728,11 @@ sub pageLabel {
             $options{'start'} = delete $options{'-start'};
         }
         if (exists $options{'-style'}) {
-            $options{'style'} = delete $options{'-style'};
+            my $style = delete $options{'-style'};
+            $options{'style'} = $style eq 'Roman' ? 'R' :
+                                $style eq 'roman' ? 'r' :
+                                $style eq 'Alpha' ? 'A' :
+                                $style eq 'alpha' ? 'a' : 'D';
         }
 
         # page_labels doesn't have a default numbering style, to be consistent
