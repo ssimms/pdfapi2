@@ -4,6 +4,9 @@
       $pdf->pageLabel is given an invalid -style option starting with "a" or
       "r" (report by Johan Vromans).
 
+    - Fix incorrect default in documentation for annotation borders (report and
+      patch by Johan Vromans).
+
 
 2.042     2021-09-16
 
