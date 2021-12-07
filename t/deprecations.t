@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use strict;
 use warnings;
@@ -38,3 +38,12 @@ $pdf2 = PDF::API2->from_string($pdf_string);
 $page = $pdf->openpage(1);
 is(ref($page), 'PDF::API2::Page',
    q{openpage still works});
+
+# Invalid input to pageLabel (#40)
+{
+    $pdf = PDF::API2->new();
+    local $SIG{__WARN__} = sub {};
+    $pdf->pageLabel(0, { -style => 'arabic' });
+    like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D >> \] >>},
+         q{pageLabel defaults to decimal if given invalid input});
+}

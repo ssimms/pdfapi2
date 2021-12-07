@@ -1729,6 +1729,10 @@ sub pageLabel {
         }
         if (exists $options{'-style'}) {
             $options{'style'} = delete $options{'-style'};
+            unless ($options{'style'} =~ /^(?:[Rr]oman|[Aa]lpha|decimal)$/) {
+                carp "Invalid -style for page labels; defaulting to decimal";
+                $options{'style'} = 'decimal';
+            }
         }
 
         # page_labels doesn't have a default numbering style, to be consistent
