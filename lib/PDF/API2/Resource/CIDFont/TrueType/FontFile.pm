@@ -280,8 +280,8 @@ sub read_kern_table {
                 if ($val != 0) {
                     $data->{"$idx1:$idx2"} = $val;
                     $data->{join(':',
-                                 $self->data->{'g2n'}->[$idx1],
-                                 $self->data->{'g2n'}->[$idx2])} = $val;
+                                 ($self->data->{'g2n'}->[$idx1] // ''),
+                                 ($self->data->{'g2n'}->[$idx2] // ''))} = $val;
                 }
             }
         }
