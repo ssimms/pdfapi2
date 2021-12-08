@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.043     2021-12-07
+
     - Restores backward compatibility (with a warning) when the deprecated
       $pdf->pageLabel is given an invalid -style option starting with "a" or
       "r" (report by Johan Vromans).
