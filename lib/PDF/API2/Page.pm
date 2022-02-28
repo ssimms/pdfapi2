@@ -165,8 +165,8 @@ sub size {
     %boundaries = $page->boundaries();
     ($x1, $y1, $x2, $y2) = $page->boundaries('trim');
 
-Set prepress page boundaries when called with a hash containing one or more page
-boundary definitions.  Returns the C<$page> object.
+Set or replace all prepress page boundaries when called with a hash containing
+one or more page boundary definitions.  Returns the C<$page> object.
 
 Returns the current page boundaries if called without arguments.  Returns the
 coordinates for the specified page boundary if called with one argument.
@@ -376,8 +376,6 @@ sub boundaries {
         $self->_bounding_box($box_name, @rectangle);
         $boxes{$box} = [@rectangle];
     }
-
-    # Get
 
     return $self;
 }
