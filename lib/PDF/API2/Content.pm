@@ -52,6 +52,7 @@ sub new {
     $self->{' matrix'} = [1, 0, 0, 1, 0, 0];
     $self->{' textmatrix'} = [1, 0, 0, 1, 0, 0];
     $self->{' textlinematrix'} = [0, 0];
+    $self->{' textlinestart'} = 0;
     $self->{' fillcolor'} = [0];
     $self->{' strokecolor'} = [0];
     $self->{' translate'} = [0, 0];
@@ -1877,7 +1878,8 @@ sub position {
     if (defined $x) {
         $self->add(float($x), float($y), 'Td');
         $self->matrix_update($x, $y);
-        $self->{' textlinematrix'}->[0] = $x;
+        $self->{' textlinematrix'}->[0] = $self->{' textlinestart'} + $x;
+        $self->{' textlinestart'} = $self->{' textlinematrix'}->[0];
         return $self;
     }
 
@@ -1889,7 +1891,8 @@ sub distance {
     my ($self, $dx, $dy) = @_;
     $self->add(float($dx), float($dy), 'Td');
     $self->matrix_update($dx, $dy);
-    $self->{' textlinematrix'}->[0] = $dx;
+    $self->{' textlinematrix'}->[0] = $self->{' textlinestart'} + $dx;
+    $self->{' textlinestart'} = $self->{' textlinematrix'}->[0];
 }
 
 # Deprecated; use position (ignores leading) or crlf (uses leading) instead
@@ -1903,7 +1906,8 @@ sub cr {
         $self->add('T*');
         $self->matrix_update(0, $self->leading() * -1);
     }
-    $self->{' textlinematrix'}->[0] = 0;
+
+    $self->{' textlinematrix'}->[0] = $self->{' textlinestart'};
 }
 
 =head2 crlf
@@ -1928,7 +1932,7 @@ sub crlf {
     }
 
     $self->matrix_update(0, $leading * -1);
-    $self->{' textlinematrix'}->[0] = 0;
+    $self->{' textlinematrix'}->[0] = $self->{' textlinestart'};
     return $self;
 }
 
@@ -1937,7 +1941,7 @@ sub nl {
     my $self = shift();
     $self->add('T*');
     $self->matrix_update(0, $self->leading() * -1);
-    $self->{' textlinematrix'}->[0] = 0;
+    $self->{' textlinematrix'}->[0] = $self->{' textlinestart'};
 }
 
 sub _textpos {
@@ -2534,6 +2538,7 @@ sub textstart {
         $self->{' leading'} = 0;
         $self->{' rise'} = 0;
         $self->{' render'} = 0;
+        $self->{' textlinestart'} = 0;
         @{$self->{' matrix'}} = (1, 0, 0, 1, 0, 0);
         @{$self->{' textmatrix'}} = (1, 0, 0, 1, 0, 0);
         @{$self->{' textlinematrix'}} = (0, 0);
