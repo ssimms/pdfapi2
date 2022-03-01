@@ -1576,7 +1576,7 @@ L<PDF::API2/"font"> to add the font to the document.
 
     my $pdf = PDF::API2->new();
     my $page = $pdf->page();
-    my $text = $pdf->text();
+    my $text = $page->text();
 
     my $font = $pdf->font('Helvetica');
     $text->font($font, 24);
