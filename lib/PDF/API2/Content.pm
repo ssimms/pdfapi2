@@ -169,17 +169,16 @@ sub skew {
         rotate    => $degrees,
         scale     => [$x, $y],
         skew      => [$a, $b],
-        relative  => $boolean,
+        repeat    => $boolean,
     );
 
 Performs multiple coordinate transformations, in the order recommended by the
 PDF specification (translate, rotate, scale, then skew).  Omitted options will
 be unchanged.
 
-If C<relative> is true, the specified transformations will be added to any
-previous changes to the coordinate system.  By default, calling C<transform> or
-any of the other transformation methods will overwrite any previous changes to
-the coordinate system.
+If C<repeat> is true and if this is not the first call to a transformation
+method, the previous transformation will be performed again, modified by any
+other provided arguments.
 
 =cut
 
@@ -233,6 +232,9 @@ sub _transform {
 # Common Transformations.
 sub transform {
     my ($self, %options) = @_;
+    return $self->transform_rel(%options) if $options{'repeat'};
+
+    # Deprecated (renamed to 'repeat' to avoid confusion)
     return $self->transform_rel(%options) if $options{'relative'};
 
     # Deprecated options (remove hyphens)
@@ -2604,7 +2606,7 @@ Remove hyphens from option names (C<-translate> becomes C<translate>, etc.).
 
 =item transform_rel
 
-Replace with L</"transform">, setting option C<relative> to true.  Remove
+Replace with L</"transform">, setting option C<repeat> to true.  Remove
 hyphens from the names of other options.
 
 =item linewidth

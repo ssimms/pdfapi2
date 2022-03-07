@@ -4,6 +4,9 @@
       $text->textpos() was incorrect when read after being set twice (report by
       Johan Vromans).
 
+    - [GH-45] Renamed transform's "relative" option to "repeat" and fixed the
+      documentation describing what it does (report by Johan Vromans).
+
     - Minor doc clarifications.
 
 
