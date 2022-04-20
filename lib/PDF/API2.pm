@@ -1381,6 +1381,7 @@ sub import_page {
     }
     else {
         $s_page = $s_pdf->open_page($s_idx);
+        die "Unable to open page '$s_idx' in source PDF" unless defined $s_page;
     }
 
     if (ref($t_idx) eq 'PDF::API2::Page') {

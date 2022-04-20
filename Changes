@@ -7,7 +7,7 @@
     - [GH-45] Renamed transform's "relative" option to "repeat" and fixed the
       documentation describing what it does (report by Johan Vromans).
 
-    - Minor doc clarifications.
+    - Minor doc clarifications and improved error messages.
 
 
 2.043     2021-12-07
