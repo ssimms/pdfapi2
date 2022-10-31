@@ -30,7 +30,7 @@ PDF::API2::Content - Methods for adding graphics and text to a PDF
     my $content = $page->graphics();
     my $content = $page->text();
 
-    # Then call the methods below add graphics and text to the page.
+    # Then call the methods below to add graphics and text to the page.
 
 =cut
 
