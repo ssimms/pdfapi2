@@ -2376,10 +2376,13 @@ Generate and return a barcode that can be placed as part of a page's content:
     my $barcode = $pdf->barcode('ean13', '0123456789012');
     $page->object($barcode, 100, 100);
 
+    my $qr_code = $pdf->barcode('qr', 'http://www.example.com');
+    $page->object($qr_code, 100, 300, 144 / $qr_code->width())
+
     $pdf->save('sample.pdf');
 
 C<$format> can be one of C<codabar>, C<code128>, C<code39> (a.k.a. 3 of 9),
-C<ean128>, C<ean13>, or C<itf> (a.k.a. interleaved 2 of 5).
+C<ean128>, C<ean13>, C<itf> (a.k.a. interleaved 2 of 5), or C<qr>.
 
 C<$code> is the value to be encoded.  Start and stop characters are only
 required when they're not static (e.g. for Codabar).
@@ -2502,6 +2505,11 @@ sub barcode {
             $options{'font_size'} //= 10 * $options{'bar_width'};
         }
     }
+    elsif ($format eq 'qr') {
+        $options{'bar_width'} //= 1;
+        $options{'bar_height'} //= $options{'bar_width'};
+        $options{'quiet_zone'} //= 4 * $options{'bar_width'};
+    }
     else {
         croak "Unrecognized barcode format: $format";
     }
@@ -2540,6 +2548,13 @@ sub barcode {
     }
     elsif ($format eq 'itf') {
         return $self->xo_2of5int(%options, -code => $value);
+    }
+    elsif ($format eq 'qr') {
+        my $qr_class = 'PDF::API2::Resource::XObject::Form::BarCode::qrcode';
+        eval "require $qr_class";
+        my $obj = $qr_class->new($self->{'pdf'}, %options, code => $value);
+        # $self->{'pdf'}->out_obj($self->{'pages'});
+        return $obj;
     }
 }
 
