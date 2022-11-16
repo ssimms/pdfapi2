@@ -926,7 +926,7 @@ sub page_layout {
                   $name eq 'two_page_right'   ? 'TwoPageRight'   : '');
 
     croak "Invalid page layout: $name" unless $layout;
-    $self->{'catalog'}->{'PageMode'} = PDFName($layout);
+    $self->{'catalog'}->{'PageLayout'} = PDFName($layout);
     $self->{'pdf'}->out_obj($self->{'catalog'});
     return $self;
 }

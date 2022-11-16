@@ -9,6 +9,9 @@
     - [GH-45] Renamed transform's "relative" option to "repeat" and fixed the
       documentation describing what it does (report by Johan Vromans).
 
+    - [GH-49] Fix page_layout storing its value as page_mode (report by Johan
+      Vromans).
+
     - [GH-50] Fix $pdf->viewer_preferences to return the same values it accepts
       for non_full_screen_page_mode (report by Johan Vromans).
 
