@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.044     2022-11-16
+
     - Added support for QR codes.
 
     - [GH-44] The X coordinate returned by $text->position() or (deprecated)
