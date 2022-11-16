@@ -86,6 +86,12 @@ sub get_preferences {
             $value =~ s/Edge//;
             $values{'duplex'} = _snake_case($value);
         }
+        elsif ($pref eq 'NonFullScreenPageMode') {
+            my $value = _snake_case($prefs->{$pref}->val());
+            $value =~ s/^use_//;
+            $value = 'optional_content' if $value eq 'oc';
+            $values{'non_full_screen_page_mode'} = $value;
+        }
         else {
             $values{_snake_case($pref)} = _snake_case($prefs->{$pref}->val());
         }
@@ -140,10 +146,11 @@ sub set_preferences {
     foreach my $snake (keys %values) {
         my $camel = _camel_case($snake);
         if ($camel eq 'NonFullScreenPageMode') {
-            my $name = ($values{$snake} eq 'none'             ? 'UseNone'     :
-                        $values{$snake} eq 'outlines'         ? 'UseOutlines' :
-                        $values{$snake} eq 'thumbnails'       ? 'UseThumbs'   :
-                        $values{$snake} eq 'optional_content' ? 'UseOC'       :
+            my $value = $values{$snake};
+            my $name = ($value eq 'none'             ? 'UseNone'     :
+                        $value eq 'outlines'         ? 'UseOutlines' :
+                        $value eq 'thumbnails'       ? 'UseThumbs'   :
+                        $value eq 'optional_content' ? 'UseOC'       :
                         '');
             croak "Invalid value for $snake: $values{$snake}" unless $name;
             $prefs->{$camel} = PDFName($name);
@@ -256,7 +263,8 @@ the document.
 =item non_full_screen_page_mode (name)
 
 The document's page mode, specifying how to display the document on exiting
-full-screen mode.  Options are the same as C<page_mode> in L<PDF::API2>.
+full-screen mode.  Options are the same as C<page_mode> in L<PDF::API2> except
+that the C<attachments> and C<full_screen> options aren't supported.
 
 =item direction ('l2r' or 'r2l')
 
