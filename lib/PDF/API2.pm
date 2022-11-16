@@ -1342,8 +1342,8 @@ sub open_page {
 Imports a page from C<$source_pdf> and adds it to the specified position in
 C<$pdf>.
 
-If C<$source_page_num> or C<$target_page_num> is 0 or -1, the last page in the
-document is used.
+If C<$source_page_num> or C<$target_page_num> is 0, -1, or unspecified, the last
+page in the document is used.
 
 B<Note:> If you pass a page object instead of a page number for
 C<$target_page_num>, the contents of the page will be merged into the existing
