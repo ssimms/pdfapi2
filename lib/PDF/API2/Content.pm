@@ -2332,7 +2332,7 @@ sub paragraph {
         last if $height < 0;
 
         my $align = $opts{'align'} // 'left';
-        if ($align eq 'justified') {
+        if ($align eq 'justified' or $align eq 'justify') {
             ($w, $text) = $self->text_fill_justified($text, $width, %opts);
         }
         elsif ($align eq 'right') {
