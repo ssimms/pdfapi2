@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - Fixed documentation error in synopsis for QR codes.
+
+
 2.044     2022-11-16
 
     - Added support for QR codes.
