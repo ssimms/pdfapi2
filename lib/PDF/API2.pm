@@ -2404,16 +2404,17 @@ The base height of the barcode in points.
 
 =item * bar_extend
 
-If present, bars for non-printing characters (e.g. start and stop characters)
-will be extended downward by this many points, and printing characters will be
-shown below their respective bars.
+If present and applicable, bars for non-printing characters (e.g. start and stop
+characters) will be extended downward by this many points, and printing
+characters will be shown below their respective bars.
 
 This is enabled by default for EAN-13 barcodes.
 
 =item * caption
 
 If present, this value will be printed, centered, beneath the barcode, and
-should be a human-readable representation of the barcode.
+should be a human-readable representation of the barcode.  This option is
+ignored for QR codes.
 
 =item * font
 
@@ -2435,12 +2436,12 @@ A margin, in points, that will be place before the left and bottom edges of the
 barcode (including the caption, if present).  This is used to help barcode
 scanners tell where the barcode begins and ends.
 
-The default is the width of one encoded character.
+The default is the width of one encoded character, or four squares for QR codes.
 
 =item * bar_overflow
 
 Shrinks the horizontal width of bars by this amount in points to account for ink
-spread when printing.
+spread when printing.  This option is ignored for QR codes.
 
 The default is 0.01 points.
 
@@ -2452,6 +2453,10 @@ L<PDF::API2::Content/"fillcolor">.
 The default is black.
 
 =back
+
+QR codes have
+L<additional options|PDF::API2::Resource::XObject::Form::BarCode::qrcode> for
+customizing the error correction level and other niche settings.
 
 =cut
 
