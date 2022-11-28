@@ -1529,7 +1529,7 @@ sub embed_page {
     $s_idx ||= 0;
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
-        die "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
+        croak "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
     }
 
     my ($s_page, $xo);
@@ -1541,6 +1541,7 @@ sub embed_page {
     }
     else {
         $s_page = $s_pdf->open_page($s_idx);
+        croak "Unable to open page $s_idx in source PDF" unless defined $s_page;
     }
 
     $self->{'apiimportcache'} ||= {};
