@@ -1973,6 +1973,12 @@ sub font {
     if (PDF::API2::Resource::Font::CoreFont->is_standard($name)) {
         return $self->corefont($name, %options);
     }
+    elsif ($name eq 'Times' and not $options{'format'}) {
+        # Accept Times as an alias for Times-Roman to follow the pattern set by
+        # Courier and Helvetica.
+        carp "Times is not a standard font; substituting Times-Roman";
+        return $self->corefont('Times-Roman', %options);
+    }
 
     my $format = $options{'format'};
     $format //= ($name =~ /\.[ot]tf$/i ? 'truetype' :
