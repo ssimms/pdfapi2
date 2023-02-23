@@ -1476,6 +1476,8 @@ sub shade {
 Places an image or other external object (a.k.a. XObject) on the page in the
 specified location.
 
+If C<$x> and C<$y> are omitted, the object will be placed at C<[0, 0]>.
+
 For images, C<$scale_x> and C<$scale_y> represent the width and height of the
 image on the page in points.  If C<$scale_x> is omitted, it will default to 72
 pixels per inch.  If C<$scale_y> is omitted, the image will be scaled
