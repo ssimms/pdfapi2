@@ -2,6 +2,9 @@
 
     - Fixed documentation error in synopsis for QR codes.
 
+    - Fixed validating PDF date in CreationDate and ModDate metadata.
+      The 1.4, 1.7 and ISO specs seem to differ whether a final apostrophe is required.
+      Adjust the regexp in PDF::API2:_is_date to accept both forms.
 
 2.044     2022-11-16
 
