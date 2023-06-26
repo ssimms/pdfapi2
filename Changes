@@ -7,6 +7,9 @@
       prohibited by the ISO PDF specifications.  PDF::API2 now accepts either
       version as valid (report by Johan Vromans).
 
+    - Fixed passing a GD object to $pdf->image() (reported by Hakon Hagland).
+
+
 2.044     2022-11-16
 
     - Added support for QR codes.
