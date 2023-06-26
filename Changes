@@ -2,6 +2,10 @@
 
     - Fixed documentation error in synopsis for QR codes.
 
+    - Fixed date validation when timezone offset minute contains a trailing
+      apostrophe, which is required by the Adobe PDF specifications and
+      prohibited by the ISO PDF specifications.  PDF::API2 now accepts either
+      version as valid (report by Johan Vromans).
 
 2.044     2022-11-16
 

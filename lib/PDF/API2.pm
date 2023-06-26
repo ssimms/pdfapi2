@@ -552,15 +552,20 @@ sub _is_date {
     # D: prefix and the year, all components are optional but must be present if
     # a later component is present.  No provision is made in the specification
     # for leap seconds, etc.
-    return unless $value =~ /^D:([0-9]{4})        # D:YYYY (required)
-                             (?:([01][0-9])       # Month (01-12)
-                             (?:([0123][0-9])     # Day (01-31)
-                             (?:([012][0-9])      # Hour (00-23)
-                             (?:([012345][0-9])   # Minute (00-59)
-                             (?:([012345][0-9])   # Second (00-59)
-                             (?:([Z+-])           # UT Offset Direction
-                             (?:([012][0-9])      # UT Offset Hours
-                             (?:\'([012345][0-9]) # UT Offset Minutes
+    #
+    # The Adobe PDF specifications (including 1.7) state that the offset minutes
+    # must have a trailing apostrophe.  Beginning with the ISO version of the
+    # 1.7 specification, a trailing apostrophe is not permitted after the offset
+    # minutes.  For compatibility, we accept either version as valid.
+    return unless $value =~ /^D:([0-9]{4})         # D:YYYY (required)
+                             (?:([01][0-9])        # Month (01-12)
+                             (?:([0123][0-9])      # Day (01-31)
+                             (?:([012][0-9])       # Hour (00-23)
+                             (?:([012345][0-9])    # Minute (00-59)
+                             (?:([012345][0-9])    # Second (00-59)
+                             (?:([Z+-])            # UT Offset Direction
+                             (?:([012][0-9])\'?    # UT Offset Hours
+                             (?:([012345][0-9])\'? # UT Offset Minutes
                              )?)?)?)?)?)?)?)?$/x;
     my ($year, $month, $day, $hour, $minute, $second, $od, $oh, $om)
         = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
@@ -590,6 +595,10 @@ sub _is_date {
     }
     if (defined $om) {
         return unless $om <= 59;
+    }
+    if (defined $oh and $om) {
+        # Apostrophe is required between offset hour and minute
+        return unless $value =~ /$oh\'$om\'?/;
     }
 
     return 1;
