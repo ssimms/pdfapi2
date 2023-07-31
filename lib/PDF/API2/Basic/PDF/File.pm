@@ -617,7 +617,7 @@ sub readval {
         # streams can't be followed by a lone carriage-return.
         # fredo: yes they can !!! -- use the MacOS Luke.
         if (($str =~ s/^stream(?:(?:\015\012)|\012|\015)//) and ($result->{'Length'}->val != 0)) {   # stream
-            my $length = $result->{'Length'}->val;
+            my $length = $result->{'Length'}->val() + 0;
             $result->{' streamsrc'} = $fh;
             $result->{' streamloc'} = $fh->tell - length($str);
 
@@ -647,8 +647,8 @@ sub readval {
 
     # Indirect Object
     elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R/s) {
-        my $num = $1;
-        $value = $2;
+        my $num = $1 + 0;
+        $value = $2 + 0;
         $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R//s;
         unless ($result = $self->test_obj($num, $value)) {
             $result = PDF::API2::Basic::PDF::Objind->new();
@@ -669,8 +669,8 @@ sub readval {
     # Object
     elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj/s) {
         my $obj;
-        my $num = $1;
-        $value = $2;
+        my $num = $1 + 0;
+        $value = $2 + 0;
         $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj//s;
         ($obj, $str) = $self->readval($str, %opts);
         if ($result = $self->test_obj($num, $value)) {

@@ -9,6 +9,8 @@
 
     - Fixed passing a GD object to $pdf->image() (reported by Hakon Hagland).
 
+    - Fix a crash when object numbers contain leading zeroes.
+
 
 2.044     2022-11-16
 
