@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.045     2023-09-25
+
     - Fixed documentation error in synopsis for QR codes.
 
     - Fixed date validation when timezone offset minute contains a trailing
