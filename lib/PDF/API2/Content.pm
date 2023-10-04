@@ -383,7 +383,7 @@ sub _restore {
 sub restore {
     my $self = shift;
     if ($self->_in_text_object()) {
-        carp 'Calling save from a text content object has no effect';
+        carp 'Calling restore from a text content object has no effect';
         return;
     }
 
