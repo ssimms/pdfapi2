@@ -1179,7 +1179,7 @@ sub pie {
 
 =head2 stroke_color
 
-    $content = $content->stroke_color($color, @arguments);
+    $content->stroke_color($color, @arguments);
 
 Sets the stroke color, which is black by default.
 
@@ -1202,7 +1202,7 @@ can be given as C<%F000> or C<%FFFF000000000000>.
 
 =head2 fill_color
 
-    $content = $content->fill_color($color, @arguments);
+    $content->fill_color($color, @arguments);
 
 Sets the fill color, which is black by default.  Arguments are the same as in
 L</"stroke_color">.
