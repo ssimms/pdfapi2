@@ -1048,23 +1048,6 @@ sub close {
     return $self;
 }
 
-=head2 end
-
-    $content = $content->end();
-
-Ends the current path without filling or stroking.
-
-=cut
-
-# Deprecated (renamed)
-sub endpath { return end(@_) }
-
-sub end {
-    my $self = shift();
-    $self->add('n');
-    return $self;
-}
-
 =head1 SHAPE CONSTRUCTION (DRAWING)
 
 The following are convenience methods for drawing closed paths.
@@ -1446,6 +1429,24 @@ sub clip {
 
     $self->add($even_odd ? 'W*' : 'W');
 
+    return $self;
+}
+
+=head2 end
+
+    $content = $content->end();
+
+Ends the current path without filling or stroking.  This is used primarily for
+the side effect of changing the current clipping path.
+
+=cut
+
+# Deprecated (renamed)
+sub endpath { return end(@_) }
+
+sub end {
+    my $self = shift();
+    $self->add('n');
     return $self;
 }
 
