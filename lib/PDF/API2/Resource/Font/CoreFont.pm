@@ -12,6 +12,14 @@ use File::Basename;
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
 
+# The 14 corefonts.
+my @corefonts =
+  qw( Courier Courier-Bold Courier-BoldOblique Courier-Oblique
+      Helvetica Helvetica-Bold Helvetica-BoldOblique Helvetica-Oblique
+      Symbol
+      Times-Bold Times-BoldItalic Times-Italic Times-Roman
+      ZapfDingbats );
+
 # Windows fonts with Type1 equivalents
 my $alias = {
     'arial'           => 'helvetica',
@@ -186,6 +194,22 @@ sub new {
 
 =head1 METHODS
 
+=head2 standard_fonts
+
+    my @array = $class->standard_fonts();
+    my $aref  = $class->standard_fonts();
+
+Returns the list of the names of the 14 PDF corefonts.
+
+=cut
+
+sub standard_fonts {
+    my @fonts = @corefonts;
+    wantarray ? @fonts : \@fonts;
+}
+
+=head1 METHODS
+
 =head2 is_standard
 
     my $boolean = $class->is_standard($name);
@@ -197,22 +221,8 @@ standard font names shown above.
 
 sub is_standard {
     my $name = pop();
-
-    return 1 if $name eq 'Courier';
-    return 1 if $name eq 'Courier-Bold';
-    return 1 if $name eq 'Courier-BoldOblique';
-    return 1 if $name eq 'Courier-Oblique';
-    return 1 if $name eq 'Helvetica';
-    return 1 if $name eq 'Helvetica-Bold';
-    return 1 if $name eq 'Helvetica-BoldOblique';
-    return 1 if $name eq 'Helvetica-Oblique';
-    return 1 if $name eq 'Symbol';
-    return 1 if $name eq 'Times-Bold';
-    return 1 if $name eq 'Times-BoldItalic';
-    return 1 if $name eq 'Times-Italic';
-    return 1 if $name eq 'Times-Roman';
-    return 1 if $name eq 'ZapfDingbats';
-    return;
+    use List::Util qw(any);
+    return any { $_ eq $name } @corefonts;
 }
 
 1;
