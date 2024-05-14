@@ -6,6 +6,8 @@
     - Crash instead of freezing if a PDF trailer's Prev keys result in a loop or
       if multiple trailers use the same object ID and generation number.
 
+    - [GH-70] Fix off-by-one error when adding a page at the beginning of a PDF.
+
 
 2.045     2023-09-25
 

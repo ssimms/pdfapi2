@@ -180,7 +180,7 @@ sub add_page_recurse {
 
     my $parent = $self;
     my $max_kids_per_parent = 8; # Why?
-    if (scalar $parent->{'Kids'}->elements() >= $max_kids_per_parent and $parent->{'Parent'} and $page_index < 1) {
+    if (scalar $parent->{'Kids'}->elements() >= $max_kids_per_parent and $parent->{'Parent'} and $page_index == -1) {
         my $grandparent = $parent->{'Parent'}->realise();
         $parent = $parent->new($parent->_pdf(), $grandparent);
 
