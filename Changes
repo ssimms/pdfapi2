@@ -8,6 +8,8 @@
 
     - [GH-70] Fix off-by-one error when adding a page at the beginning of a PDF.
 
+    - [GH-77] Significantly improve performance when adding many pages to a PDF.
+
 
 2.045     2023-09-25
 

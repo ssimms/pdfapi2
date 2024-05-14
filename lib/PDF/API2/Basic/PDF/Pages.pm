@@ -132,15 +132,25 @@ sub add_page {
     my ($self, $page, $page_number) = @_;
     my $top = $self->get_top();
 
-    $page_number = -1 unless defined $page_number and $page_number <= $top->{'Count'}->val();
+    $page_number = -1 unless defined $page_number and $page_number < $top->{'Count'}->val();
 
     my $previous_page;
     if ($page_number == -1) {
-        $previous_page = $top->find_page($top->{'Count'}->val() - 1);
+        $previous_page = $top->{' last_page'};
+        unless (defined $previous_page) {
+            $previous_page = $top->find_page($top->{'Count'}->val() - 1);
+            $top->{' last_page'} = $page;
+        }
     }
     else {
         $page_number = $top->{'Count'}->val() + $page_number + 1 if $page_number < 0;
-        $previous_page = $top->find_page($page_number);
+        $page_number = 0 if $page_number < 0;
+        if ($top->{'Count'}->val() == scalar($top->{'Kids'}->realise->elements())) {
+            $previous_page = ($top->{'Kids'}->elements())[$page_number];
+        }
+        else {
+            $previous_page = $top->find_page($page_number);
+        }
     }
 
     my $parent;
