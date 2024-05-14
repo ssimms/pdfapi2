@@ -3,6 +3,9 @@
     - [GH-74] Fixed documentation error saying that stroke_color and fill_color
       can be chained.
 
+    - Crash instead of freezing if a PDF trailer's Prev keys result in a loop or
+      if multiple trailers use the same object ID and generation number.
+
 
 2.045     2023-09-25
 
