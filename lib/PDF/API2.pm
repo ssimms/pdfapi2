@@ -2025,7 +2025,7 @@ sub font {
 
     $font = $pdf->synthetic_font($base_font, %options)
 
-Create and return a new synthetic font object.  See
+Creates and returns a new synthetic font object.  See
 L<PDF::API2::Resource::Font::SynFont> for details.
 
 =cut
@@ -2049,6 +2049,35 @@ sub synthetic_font {
     $obj->tounicodemap() if $opts{-unicodemap};
 
     return $obj;
+}
+
+=head2 standard_fonts
+
+    @names = $pdf->standard_fonts()
+
+Returns the names of the 14 standard (built-in) fonts.  See
+L<PDF::API2::Resource::Font::CoreFont> for details.
+
+=cut
+
+sub standard_fonts {
+    require PDF::API2::Resource::Font::CoreFont;
+    return PDF::API2::Resource::Font::CoreFont->names();
+}
+
+=head2 is_standard_font
+
+    $boolean = PDF::API2->is_standard_font($name);
+
+Returns true if C<$name> is an exact, case-sensitive match for one of the
+standard font names.
+
+=cut
+
+sub is_standard_font {
+    my $name = pop();
+    require PDF::API2::Resource::Font::CoreFont;
+    return PDF::API2::Resource::Font::CoreFont->is_standard($name);
 }
 
 =head2 font_path
