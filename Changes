@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.047     2024-05-18
+
     - Fixed implementation of GH-77.
 
     - Added $pdf->standard_fonts() and $pdf->is_standard_font($name) (initial
