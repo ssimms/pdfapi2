@@ -2836,7 +2836,7 @@ sub colorspace_devicen {
     $resource = $pdf->egstate();
 
 Creates and returns a new extended graphics state object, described in
-L<PDF::API2::ExtGState>.
+L<PDF::API2::Resource::ExtGState>.
 
 =cut
 
