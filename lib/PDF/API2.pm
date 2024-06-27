@@ -2258,7 +2258,7 @@ a page's content:
 
 C<$file> may be either a file name, a filehandle, or a L<GD::Image> object.
 
-See L<PDF::API2::Content/"place"> for details about placing images on a page
+See L<PDF::API2::Content/"object"> for details about placing images on a page
 once they're imported.
 
 The image format is normally detected automatically based on the file's
