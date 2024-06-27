@@ -811,7 +811,7 @@ sub is_encrypted {
 
 =head2 outline
 
-    $outline = $pdf->outlines();
+    $outline = $pdf->outline();
 
 Creates (if needed) and returns the document's outline tree, which is also known
 as its bookmarks or the table of contents, depending on the PDF reader.
