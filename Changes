@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - [GH-85] Fix default_page_size when called without arguments (patch by
+      Johan Vromans).
+
     - [GH-90] Fix deprecated option -noembed (reported by Bernhard Schmalhofer).
 
 
