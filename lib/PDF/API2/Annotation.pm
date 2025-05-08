@@ -196,11 +196,11 @@ sub pdf {
 
     unless (%options) {
 	if ( $dest =~ /^#(.+)/ ) { # named dest
-	    $self->{'A'}->{'D'} = PDFStr($1);
+	    $self->{'A'}->{'D'} = PDFName($1);
 	}
 	else {
-	    my $destination = PDFNum($dest);
-	    $self->{'A'}->{'D'} = _destination($destination, $location, @args);
+	    my $page_number = PDFNum($dest);
+	    $self->{'A'}->{'D'} = _destination($page_number, $location, @args);
 	}
     }
     else {
