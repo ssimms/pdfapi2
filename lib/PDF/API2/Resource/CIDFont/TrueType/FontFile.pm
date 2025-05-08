@@ -359,9 +359,16 @@ sub readcffstructs {
 sub new {
     my ($class, $pdf, $file, %opts) = @_;
     my $data = {};
+    my $font;
 
-    confess "cannot find font '$file'" unless -f $file;
-    my $font = Font::TTF::Font->open($file);
+    # If the file is already a suitable font object, use it.
+    if ( UNIVERSAL::isa( $file, 'Font::TTF::Font' ) ) {
+	$font = $file;
+    }
+    else {
+	confess "cannot find font '$file'" unless -f $file;
+	$font = Font::TTF::Font->open($file);
+    }
     $data->{'obj'} = $font;
 
     $class = ref($class) if ref($class);
