@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    - [GH-90] Fix deprecated option -noembed (reported by Bernhard Schmalhofer).
+
+
 2.047     2024-05-18
 
     - Fixed implementation of GH-77.

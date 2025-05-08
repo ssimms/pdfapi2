@@ -2189,7 +2189,7 @@ sub ttfont {
 
     # -noembed is deprecated (replace with embed => 0)
     if ($opts{'-noembed'}) {
-        $opts{'embed'} //= 1;
+        $opts{'embed'} //= 0;
     }
     $opts{'embed'} //= 1;
 
