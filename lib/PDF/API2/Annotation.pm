@@ -195,7 +195,7 @@ sub pdf {
     $self->{'A'}->{'F'} = PDFStr($file);
 
     unless (%options) {
-	if ( $dest =~ /^#(.+)/ ) { # named dest
+	if ( $dest =~ /^\/(.+)/ ) { # named dest
 	    $self->{'A'}->{'D'} = PDFName($1);
 	}
 	else {
