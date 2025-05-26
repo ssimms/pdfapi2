@@ -1946,9 +1946,6 @@ extension.  If you're using a font with an atypical extension, you can set
 C<format> to one of C<truetype> (TrueType or OpenType), C<type1> (PostScript
 Type 1), or C<bitmap> (Adobe Bitmap).
 
-Setting format to C<truetype> is mandatory if the C<$name> argument is a
-C<Font::TTF::Font> object.
-
 =item * kerning
 
 Kerning (automatic adjustment of space between pairs of characters) is enabled
@@ -1993,6 +1990,7 @@ sub font {
     }
 
     my $format = $options{'format'};
+    $format //= 'truetype' if UNIVERSAL::isa($name, 'Font::TTF::Font');
     $format //= ($name =~ /\.[ot]tf$/i ? 'truetype' :
                  $name =~ /\.pf[ab]$/i ? 'type1'    :
                  $name =~ /\.bdf$/i    ? 'bitmap'   : '');
