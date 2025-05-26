@@ -1910,8 +1910,8 @@ Add a font to the PDF.  Returns the font object, to be used by
 L<PDF::API2::Content>.
 
 The font C<$name> is either the name of one of the L<standard 14
-fonts|PDF::API2::Resource::Font::CoreFont/"STANDARD FONTS"> (e.g. Helvetica) or
-the path to a font file.
+fonts|PDF::API2::Resource::Font::CoreFont/"STANDARD FONTS"> (e.g. Helvetica),
+a C<Font::TTF::Font> object, or the path to a font file.
 
     my $pdf = PDF::API2->new();
     my $font1 = $pdf->font('Helvetica-Bold');
@@ -1990,6 +1990,7 @@ sub font {
     }
 
     my $format = $options{'format'};
+    $format //= 'truetype' if UNIVERSAL::isa($name, 'Font::TTF::Font');
     $format //= ($name =~ /\.[ot]tf$/i ? 'truetype' :
                  $name =~ /\.pf[ab]$/i ? 'type1'    :
                  $name =~ /\.bdf$/i    ? 'bitmap'   : '');
@@ -2193,7 +2194,7 @@ sub ttfont {
     }
     $opts{'embed'} //= 1;
 
-    my $file = _find_font($name) or croak "Unable to find font \"$name\"";
+    my $file = UNIVERSAL::isa($name,'Font::TTF::Font') ? $name : _find_font($name) or croak "Unable to find font \"$name\"";
     require PDF::API2::Resource::CIDFont::TrueType;
     my $obj = PDF::API2::Resource::CIDFont::TrueType->new($self->{'pdf'}, $file, %opts);
 
