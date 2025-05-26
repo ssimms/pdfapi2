@@ -5,6 +5,9 @@
 
     - [GH-90] Fix deprecated option -noembed (reported by Bernhard Schmalhofer).
 
+    - [GH-91] Support annotation links to a named external destination (patch by
+      Johan Vromans).
+
 
 2.047     2024-05-18
 
