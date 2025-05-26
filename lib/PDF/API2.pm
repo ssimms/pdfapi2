@@ -1819,8 +1819,8 @@ sub default_page_size {
     }
 
     # Get
-    my $boundaries = $self->default_page_boundaries();
-    return @{$boundaries->{'media'}};
+    my %boundaries = $self->default_page_boundaries();
+    return @{$boundaries{'media'}};
 }
 
 =head2 default_page_boundaries
@@ -2192,7 +2192,7 @@ sub ttfont {
 
     # -noembed is deprecated (replace with embed => 0)
     if ($opts{'-noembed'}) {
-        $opts{'embed'} //= 1;
+        $opts{'embed'} //= 0;
     }
     $opts{'embed'} //= 1;
 
