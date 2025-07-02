@@ -8,6 +8,9 @@
     - [GH-91] Support annotation links to a named external destination (patch by
       Johan Vromans).
 
+    - [GH-92] Allow Font::TTF::Font objects to be used as fonts (patch by Johan
+      Vromans).
+
 
 2.047     2024-05-18
 
