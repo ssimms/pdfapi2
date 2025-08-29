@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.048     2025-08-29
+
     - [GH-85] Fix default_page_size when called without arguments (patch by
       Johan Vromans).
 
