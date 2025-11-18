@@ -78,6 +78,30 @@ sub type {
     return $self->{'Type'}->val();
 }
 
+=head2 $p->find_prop($key)
+
+Searches up through the inheritance tree to find a property.
+
+=cut
+
+sub find_prop {
+    my ($self, $prop) = @_;
+
+    if (defined $self->{$prop}) {
+        if (ref($self->{$prop}) and $self->{$prop}->isa('PDF::API2::Basic::PDF::Objind')) {
+            return $self->{$prop}->realise();
+        }
+        else {
+            return $self->{$prop};
+        }
+    }
+    elsif (defined $self->{'Parent'}) {
+        return $self->{'Parent'}->find_prop($prop);
+    }
+
+    return;
+}
+
 =head2 @filters = $d->filter(@filters)
 
 Get/Set one or more filters being used by the optional stream attached to the dictionary.
