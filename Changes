@@ -2,6 +2,8 @@
 
     - Added check for encrypted PDF documents.
 
+    - Added sample PDF file with R3 encryption.
+
 2.048     2025-08-29
 
     - [GH-85] Fix default_page_size when called without arguments (patch by
