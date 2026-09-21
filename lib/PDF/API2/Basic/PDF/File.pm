@@ -210,7 +210,7 @@ $filename may be an IO object
 =cut
 
 sub open {
-    my ($class, $filename, $update) = @_;
+    my ($class, $filename, $update, %options) = @_;
     my ($fh, $buffer);
 
     my $self = $class->_new();
@@ -263,7 +263,60 @@ sub open {
     foreach my $key (keys %$tdict) {
         $self->{$key} = $tdict->{$key};
     }
+    $self->init_security(%options);
     return $self;
+}
+
+
+=head2 $p->init_security(%options)
+
+Initializes or validates the security handler after the xref/trailer chain has
+been read and before the document catalog is dereferenced.
+
+At present this method reports the encryption parameters and raises a clear
+error for encrypted files.  The actual decryption implementation is not yet
+available, so encrypted files are rejected here instead of allowing a later
+object-stream parse to fail with an unrelated error.
+
+=cut
+
+sub init_security {
+    my ($self, %options) = @_;
+
+    return $self unless defined $self->{'Encrypt'};
+
+    my $encrypt = $self->{'Encrypt'}->realise();
+
+    my $filter = defined $encrypt->{'Filter'}
+        ? $encrypt->{'Filter'}->val()
+        : 'Standard';
+
+    my $revision = defined $encrypt->{'R'}
+        ? $encrypt->{'R'}->val()
+        : undef;
+
+    my $version = defined $encrypt->{'V'}
+        ? $encrypt->{'V'}->val()
+        : undef;
+
+    my $cfm;
+    if (defined $encrypt->{'CF'}) {
+        my $crypt_filters = $encrypt->{'CF'}->realise();
+        if (defined $crypt_filters->{'StdCF'}) {
+            my $stdcf = $crypt_filters->{'StdCF'}->realise();
+            $cfm = $stdcf->{'CFM'}->val() if defined $stdcf->{'CFM'};
+        }
+    }
+
+    my $description = sprintf(
+        'Filter=%s R=%s V=%s CFM=%s',
+        defined $filter ? $filter : '?',
+        defined $revision ? $revision : '?',
+        defined $version ? $version : '?',
+        defined $cfm ? $cfm : '?',
+    );
+
+    croak "PDF encryption is not implemented yet: $description";
 }
 
 =head2 $p->version($version)
