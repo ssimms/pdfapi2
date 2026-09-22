@@ -266,6 +266,17 @@ sub read_stream {
         }
     }
 
+    my $decryptor;
+    if ($self->{' streamencrypted'}
+        && $self->{' streamsecurity'}
+        && defined $self->{' streamobjnum'}
+        && (!defined($self->{'Type'}) || $self->{'Type'}->val() ne 'XRef')) {
+        $decryptor = $self->{' streamsecurity'}->stream_cipher(
+            $self->{' streamobjnum'},
+            $self->{' streamobjgen'} // 0,
+        );
+    }
+
     my $last = 0;
     if (defined $self->{' streamfile'}) {
         unlink ($self->{' streamfile'});
@@ -284,6 +295,8 @@ sub read_stream {
             $last = 1;
             read $fh, $data, $len - $i;
         }
+
+        $data = $decryptor->RC4($data) if $decryptor;
 
         foreach my $filter (@filters) {
             $data = $filter->infilt($data, $last);

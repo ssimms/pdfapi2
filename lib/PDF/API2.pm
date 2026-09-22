@@ -93,6 +93,11 @@ a filehandle.
 By default, most of the PDF will be compressed to save space.  To turn this off
 (generally only useful for testing or debugging), set C<compress> to 0.
 
+=item * password
+
+Password used to open an encrypted PDF.  Encrypted PDF support is currently
+limited to the formats implemented by the underlying security handler.
+
 =back
 
 =cut
@@ -176,7 +181,11 @@ sub open {
     }
 
     my $is_writable = -w $file;
-    $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($file, $is_writable);
+    $self->{'pdf'} = PDF::API2::Basic::PDF::File->open(
+        $file,
+        $is_writable,
+        password => $options{'password'},
+    );
     _open_common($self, %options);
     $self->{'pdf'}->{' fname'} = $file;
     $self->{'opened_readonly'} = 1 unless $is_writable;
