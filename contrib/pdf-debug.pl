@@ -90,7 +90,17 @@ sub _print_obj {
         print "[" . ref($object) . "]\n";
     }
 
-    if ($object->{' stream'}) {
+    if ($object->{'Type'} and $object->{'Type'}->val() eq 'XRef') {
+        print "\n";
+        print "Index\n";
+        print "-----\n";
+        if ($object->{'Type'}->val() eq 'XRef') {
+            foreach my $id (sort { $a <=> $b } keys $object->{' xref'}->%*) {
+                print $id . '. ' . join(' ', $object->{' xref'}->{$id}->@*) . "\n";
+            }
+        }
+    }
+    elsif ($object->{' stream'}) {
         print "\n";
         print "Stream\n";
         print "------\n";
