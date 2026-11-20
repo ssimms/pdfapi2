@@ -1,5 +1,12 @@
 {{$NEXT}}
 
+    - Prevent an infinite loop in PDFs with multiple cross-reference streams
+      using the same object ID.
+
+    - Prevent an infinite loop if a series of cross-reference tables contain a
+      circular reference.
+
+
 2.048     2025-08-29
 
     - [GH-85] Fix default_page_size when called without arguments (patch by

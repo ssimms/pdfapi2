@@ -672,8 +672,21 @@ sub readval {
         my $num = $1 + 0;
         $value = $2 + 0;
         $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj//s;
+        my $is_xref = delete $opts{'is_xref'};
         ($obj, $str) = $self->readval($str, %opts);
-        if ($result = $self->test_obj($num, $value)) {
+        if ($is_xref) {
+            # While reading cross-reference streams, return the object without
+            # caching it.  The object is syntactically required to have an
+            # object ID, but that ID is only relevant if it also shows up in a
+            # cross-reference table.
+            #
+            # Some PDF writers (notably Apple's Quartz in AppendMode) reuse the
+            # previous cross-reference stream's object ID, which results in an
+            # infinite loop if the objects are cached and the new stream object
+            # gets merged with the old stream object.
+            $result = $obj;
+        }
+        elsif ($result = $self->test_obj($num, $value)) {
             $result->merge($obj);
         }
         else {
@@ -1162,10 +1175,8 @@ sub locate_obj {
                 return;        # if $ref->[2] eq 'f';
             }
         }
+        last unless defined $tdict->{' prev'};
         $tdict = $tdict->{' prev'};
-        if ($seen->{$tdict->{' loc'}}) {
-            die 'Malformed PDF: trailer contains a loop or repeated object ID';
-        }
     }
     return;
 }
@@ -1266,7 +1277,7 @@ sub _unpack_xref_stream {
 }
 
 sub readxrtr {
-    my ($self, $xpos) = @_;
+    my ($self, $xpos, $loop_check) = @_;
     my ($tdict, $buf, $xmin, $xnum, $xdiff);
 
     my $fh = $self->{' INFILE'};
@@ -1316,7 +1327,7 @@ sub readxrtr {
         my ($xref_obj, $xref_gen) = ($1, $2);
 
         # XRef streams.
-        ($tdict, $buf) = $self->readval($buf);
+        ($tdict, $buf) = $self->readval($buf, is_xref => 1);
 
         unless ($tdict->{' stream'}) {
             die "Malformed XRefStm at $xref_obj $xref_gen obj in PDF file $self->{' fname'}";
@@ -1376,9 +1387,20 @@ sub readxrtr {
     $tdict->{' loc'} = $xpos;
     $tdict->{' xref'} = $xlist;
     $self->{' maxobj'} = $xmin + 1 if $xmin + 1 > $self->{' maxobj'};
-    $tdict->{' prev'} = $self->readxrtr($tdict->{'Prev'}->val)
-        if (defined $tdict->{'Prev'} and $tdict->{'Prev'}->val != 0);
-    delete $tdict->{' prev'} unless defined $tdict->{' prev'};
+    unless ($loop_check) {
+        $self->{' xref_seen'} = {};
+    }
+    else {
+        $self->{' xref_seen'} //= {};
+    }
+    $self->{' xref_seen'}->{$xpos} = 1;
+    if (defined $tdict->{'Prev'} and $tdict->{'Prev'}->val() != 0) {
+        my $prev = $tdict->{'Prev'}->val();
+        if ($loop_check and $self->{' xref_seen'}->{$prev}) {
+            die "Malformed PDF: trailer contains a circular reference";
+        }
+        $tdict->{' prev'} = $self->readxrtr($prev, 1);
+    }
     return $tdict;
 }
 
