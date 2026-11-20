@@ -44,6 +44,10 @@ elsif ($command eq 'obj') {
 
     my $location = $pdf->locate_obj($id, $generation);
     my $object = $pdf->read_objnum($id, $generation);
+    unless ($object) {
+        print "Object $id not found\n";
+        exit;
+    }
     print "Object $id";
     unless (ref($location)) {
         print " (file position $location)\n";
