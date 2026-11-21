@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+2.049     2026-11-20
+
     - Prevent an infinite loop in PDFs with multiple cross-reference streams
       using the same object ID.
 
