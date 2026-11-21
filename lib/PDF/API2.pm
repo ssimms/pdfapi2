@@ -1405,13 +1405,10 @@ sub import_page {
         }
     }
 
-    $self->{'apiimportcache'} = $self->{'apiimportcache'} || {};
-    $self->{'apiimportcache'}->{$s_pdf} = $self->{'apiimportcache'}->{$s_pdf} || {};
-
     # we now import into a form to keep
     # all that nasty resources from polluting
     # our very own resource naming space.
-    my $xo = $self->importPageIntoForm($s_pdf, $s_page);
+    my $xo = $self->embed_page($s_pdf, $s_page);
 
     # copy all page dimensions
     foreach my $k (qw(MediaBox ArtBox TrimBox BleedBox CropBox)) {
@@ -1553,15 +1550,17 @@ sub embed_page {
         croak "Unable to open page $s_idx in source PDF" unless defined $s_page;
     }
 
+    $s_pdf->{'embed_page_cache_id'} ||= pdfkey();
     $self->{'apiimportcache'} ||= {};
-    $self->{'apiimportcache'}->{$s_pdf} ||= {};
+    $self->{'apiimportcache'}->{$s_pdf->{'embed_page_cache_id'}} ||= {};
+    my $cache = $self->{'apiimportcache'}->{$s_pdf->{'embed_page_cache_id'}};
 
     # This should never get past MediaBox, since it's a required object.
     foreach my $k (qw(MediaBox ArtBox TrimBox BleedBox CropBox)) {
         # next unless defined $s_page->{$k};
-        # my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
+        # my $box = walk_obj($cache, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
         next unless defined $s_page->find_prop($k);
-        my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
+        my $box = walk_obj($cache, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
         $xo->bbox(map { $_->val() } $box->elements());
         last;
     }
@@ -1577,7 +1576,7 @@ sub embed_page {
             $s_page->{$k}->{$sk}->realise() if ref($s_page->{$k}->{$sk}) =~ /Objind$/;
             foreach my $ssk (keys %{$s_page->{$k}->{$sk}}) {
                 next if $ssk =~ /^ /;
-                $xo->resource($sk, $ssk, walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k}->{$sk}->{$ssk}));
+                $xo->resource($sk, $ssk, walk_obj($cache, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k}->{$sk}->{$ssk}));
             }
         }
     }

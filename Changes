@@ -6,6 +6,10 @@
     - Prevent an infinite loop if a series of cross-reference tables contain a
       circular reference.
 
+    - [GH-97] Fix: When embedding from multiple PDFs, import_page/embed_page can
+      embed an object from a prior PDF due to an unreliable cache key (reported
+      by Adam Wipprecht).
+
 
 2.048     2025-08-29
 
