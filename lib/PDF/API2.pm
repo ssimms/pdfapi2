@@ -1167,7 +1167,7 @@ sub proc_pages {
     $pdf->{' apipagecount'} ||= 0;
     foreach my $page ($object->{'Kids'}->elements()) {
         $page->realise();
-        if ($page->{'Type'}->val() eq 'Pages') {
+        if (defined $page->{'Type'} && $page->{'Type'}->val() eq 'Pages') {
             push @pages, proc_pages($pdf, $page);
         }
         else {
